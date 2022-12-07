@@ -21,3 +21,9 @@ __pycache__/
 # Ignore certificate files.
 *.pem
 *.crt
+
+# Ignore test build directory
+FreeRTOS/Test/Target/build
+
+# Ignore vscode local state directory
+.vscode
