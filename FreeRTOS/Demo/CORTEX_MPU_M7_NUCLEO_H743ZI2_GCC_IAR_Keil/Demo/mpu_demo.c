@@ -27,6 +27,8 @@
 /* FreeRTOS includes. */
 #include "FreeRTOS.h"
 #include "task.h"
+#include "queue.h"
+#include "semphr.h"
 
 /** ARMv7 MPU Details:
  *
@@ -83,7 +85,28 @@ static void prvROAccessTask( void * pvParameters );
  */
 static void prvRWAccessTask( void * pvParameters );
 
+static void prvMutexAccessTask( void * pvParameters );
+
 /*-----------------------------------------------------------*/
+
+static void prvMutexAccessTask( void * pvParameters )
+{
+	/* Unused parameters. */
+	( void ) pvParameters;
+	
+	xSemaphoreHandle xMutex = NULL;
+
+	xMutex = xSemaphoreCreateMutex();	
+	configASSERT(xMutex != NULL);
+	configASSERT(xMutex>0 && xMutex<11);
+
+	xSemaphoreTake( xMutex, 10 );
+	{
+		printf("Blocking the semaphore");
+	}
+	xSemaphoreGive(xMutex);
+	
+}
 
 static void prvROAccessTask( void * pvParameters )
 {
@@ -171,16 +194,130 @@ static void prvRWAccessTask( void * pvParameters )
 	/* Unused parameters. */
 	( void ) pvParameters;
 
+	UBaseType_t uxReturn;
+
+	uint32_t sent = 0;
+	uint32_t received = 0;
+	QueueHandle_t qHandle,qHandle1,qHandle2;
+	QueueHandle_t qReceived;
+	QueueSetHandle_t qSetHandle;
+	QueueSetMemberHandle_t qSetMemberHandle;
+	BaseType_t result = pdFAIL;
+	const char pcName[14];
+
+	static StackType_t xMutexAccessTaskStack[ configMINIMAL_STACK_SIZE ] __attribute__( ( aligned( configMINIMAL_STACK_SIZE * sizeof( StackType_t ) ) ) );
+	TaskParameters_t xMutexAccessTaskParameters =
+	{
+		.pvTaskCode		= prvMutexAccessTask,
+		.pcName			= "MutexAccess",
+		.usStackDepth	= configMINIMAL_STACK_SIZE,
+		.pvParameters	= NULL,
+		.uxPriority		= tskIDLE_PRIORITY,
+		.puxStackBuffer	= xMutexAccessTaskStack,
+		.xRegions		=	{
+								{ ucSharedMemory1,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
+								{ ucSharedMemory2,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
+								{ ucSharedMemory3,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
+								{ ucSharedMemory4,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
+								{ ucSharedMemory5,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
+								{ ucSharedMemory6,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
+								{ 0,				0,					0														},
+								{ 0,				0,					0														},
+								{ 0,				0,					0														},
+								{ 0,				0,					0														},
+								{ 0,				0,					0														}
+							}
+	};
+
 	for( ; ; )
 	{
 		/* This task has RW access to shared memories and therefore can write to
 		 * them. */
-		ucSharedMemory1[ 0 ] = 0;
+		/*ucSharedMemory1[ 0 ] = 0;
 		ucSharedMemory2[ 0 ] = 0;
 		ucSharedMemory3[ 0 ] = 0;
 		ucSharedMemory4[ 0 ] = 0;
 		ucSharedMemory5[ 0 ] = 0;
-		ucSharedMemory6[ 0 ] = 0;
+		ucSharedMemory6[ 0 ] = 0;*/
+
+/*		MPU_xQueueCreate					*/
+#if ( configSUPPORT_DYNAMIC_ALLOCATION == 1 )
+		qHandle = xQueueCreate( 5, sizeof( uint32_t ) );
+#endif
+#if ( configSUPPORT_STATIC_ALLOCATION == 1 )
+		static uint8_t ucQueueStorageArea[ 4 ];
+		qHandle = xQueueCreateStatic( 1, sizeof( uint32_t ), sizeof( uint32_t ), ucQueueStorageArea );
+#endif
+/*		MPU_xQueueCreate						*/
+
+/*		MPU_xQueueGenericSend and Receive		*/
+		for( ; sent<=5; )
+		{
+			sent += 1;
+
+			result = xQueueSend( qHandle, &( sent ), pdMS_TO_TICKS( 1000 ) );
+			configASSERT( result == pdPASS );
+			if( sent <= 5 )
+			{
+				xQueueReceive( qHandle, &( received ), 0 );
+				configASSERT( sent == received );
+			}
+		}
+/*		MPU_xQueueGenericSend and Receive		*/
+
+
+/*		MPU_uxQueueMessagesWaiting		*/
+		uxReturn = uxQueueMessagesWaiting(qHandle);
+		configPRINTF(("Messages waiting : %ul",uxReturn));
+/*		MPU_uxQueueMessagesWaiting		*/
+
+/*		MPU_uxQueueSpacesAvailable		*/
+		uxReturn = uxQueueSpacesAvailable(qHandle);
+		configPRINTF(("Space Available : %ul",uxReturn));
+/*		MPU_uxQueueSpacesAvailable		*/
+
+/*		MPU_xQueuePeek					*/
+		result = xQueuePeek(qHandle, &( received ), ( TickType_t ) 10 );
+		configASSERT( result == pdPASS );
+		configASSERT( sent == received );
+/*		MPU_xQueuePeek					*/
+
+		xTaskCreateRestricted( &( xMutexAccessTaskParameters ), NULL );
+
+/* 		Queue Set APIs					*/
+		qSetHandle = xQueueCreateSet( 4 );
+		
+		xQueueAddToSet( qHandle, qSetHandle );
+
+		qReceived = xQueueSelectFromSet( qSetHandle, ( TickType_t ) 10 );
+		configASSERT(qReceived == NULL);	
+
+
+/* 		Queue Set APIs					*/
+
+/* 		Queue Registry APIs					*/
+
+		#if ( configSUPPORT_DYNAMIC_ALLOCATION == 1 )
+			qHandle1 = xQueueCreate( 5, sizeof( uint32_t ) );
+			qHandle2 = xQueueCreate( 5, sizeof( uint32_t ) );
+		#endif
+		#if ( configSUPPORT_STATIC_ALLOCATION == 1 )
+			static uint8_t ucQueueStorageArea[ 4 ];
+			qHandle1 = xQueueCreateStatic( 1, sizeof( uint32_t ), sizeof( uint32_t ), ucQueueStorageArea );
+			qHandle2 = xQueueCreateStatic( 1, sizeof( uint32_t ), sizeof( uint32_t ), ucQueueStorageArea );
+		#endif
+
+		vQueueAddToRegistry( qHandle1, "Queue Handle 1" );
+		vQueueAddToRegistry( qHandle2, "Queue Handle 2" );
+
+
+	
+/* 		Queue Registry APIs					*/
+
+		xQueueReset(qHandle); // MPU_GenericResetFunction
+
+		vQueueDelete(qHandle); //MPU_vQueueDelete
+
 
 		/* Wait for a second. */
 		vTaskDelay( pdMS_TO_TICKS( 1000 ) );
@@ -240,9 +377,8 @@ TaskParameters_t xRWAccessTaskParameters =
 							{ 0,				0,					0														}
 						}
 };
-
 	/* Create an unprivileged task with RO access to ucSharedMemory. */
-	xTaskCreateRestricted( &( xROAccessTaskParameters ), NULL );
+	//xTaskCreateRestricted( &( xROAccessTaskParameters ), NULL );
 
 	/* Create an unprivileged task with RW access to ucSharedMemory. */
 	xTaskCreateRestricted( &( xRWAccessTaskParameters ), NULL );
