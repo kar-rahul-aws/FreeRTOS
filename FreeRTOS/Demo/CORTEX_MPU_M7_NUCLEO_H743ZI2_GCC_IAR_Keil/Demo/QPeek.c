@@ -51,6 +51,8 @@
 #define qpeekHIGH_PRIORITY       ( tskIDLE_PRIORITY + 2 )
 #define qpeekHIGHEST_PRIORITY    ( tskIDLE_PRIORITY + 3 )
 
+#define qpeekSHARED_MEM_SIZE_WORDS  ( 8 )
+#define qpeekSHARED_MEM_SIZE_BYTES  ( 32 )
 /*-----------------------------------------------------------*/
 
 /*
@@ -71,10 +73,13 @@ static volatile BaseType_t xErrorDetected = pdFALSE;
 
 /* Counter that is incremented on each cycle of a test.  This is used to
  * detect a stalled task - a test that is no longer running. */
-static volatile uint32_t ulLoopCounter[8] = {0};
+static volatile uint32_t ulLoopCounter[ qpeekSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( qpeekSHARED_MEM_SIZE_BYTES ) ) ) = { 0 };
 
 /* Handles to the test tasks. */
-TaskHandle_t xMediumPriorityTask, xHighPriorityTask, xHighestPriorityTask;
+#define qpeekMED_PRIO_TASK_IDX      0
+#define qpeekHIGH_PRIO_TASK_IDX     1
+#define qpeekHIGHEST_PRIO_TASK_IDX  2
+static TaskHandle_t xQPeekLocalTaskHandles[ qpeekSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( qpeekSHARED_MEM_SIZE_BYTES ) ) );
 /*-----------------------------------------------------------*/
 
 void vStartQueuePeekTasks( void )
@@ -106,107 +111,110 @@ void vStartQueuePeekTasks( void )
 
         TaskParameters_t xMediumPriorityPeekTaskParameters =
         {
-        	.pvTaskCode		= prvMediumPriorityPeekTask,
-        	.pcName			= "PeekM",
-        	.usStackDepth	= configMINIMAL_STACK_SIZE,
-        	.pvParameters	= ( void * ) xQueue,
-        	.uxPriority		= qpeekMEDIUM_PRIORITY,
-        	.puxStackBuffer	= xMediumPriorityPeekTaskStack,
-        	.xRegions		=	{
-					{ ucSharedMemory1,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-					{ ucSharedMemory2,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-					{ ucSharedMemory3,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-					{ ucSharedMemory4,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-					{ ucSharedMemory5,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-					{ ucSharedMemory6,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-					{ (void *)ulLoopCounter, SHARED_MEMORY_SIZE, portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-					{ 0,				0,					0														},
-					{ 0,				0,					0														},
-					{ 0,				0,					0														},
-					{ 0,				0,					0														}
-        						}
+            .pvTaskCode      = prvMediumPriorityPeekTask,
+            .pcName          = "PeekM",
+            .usStackDepth    = configMINIMAL_STACK_SIZE,
+            .pvParameters    = ( void * ) xQueue,
+            .uxPriority      = qpeekMEDIUM_PRIORITY,
+            .puxStackBuffer  = xMediumPriorityPeekTaskStack,
+            .xRegions        =    {
+                    { ( void * ) &( ulLoopCounter[ 0 ] ), qpeekSHARED_MEM_SIZE_BYTES,
+                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                        ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                    },
+                    { 0,                0,                    0                                                        },
+                    { 0,                0,                    0                                                        },
+                    { 0,                0,                    0                                                        },
+                    { 0,                0,                    0                                                        },
+                    { 0,                0,                    0                                                        },
+                    { 0,                0,                    0                                                        },
+                    { 0,                0,                    0                                                        },
+                    { 0,                0,                    0                                                        },
+                    { 0,                0,                    0                                                        },
+                    { 0,                0,                    0                                                        }
+                }
         };
 
         TaskParameters_t xHighPriorityPeekTaskParameters =
         {
-        	.pvTaskCode		= prvHighPriorityPeekTask,
-        	.pcName			= "PeekH1",
-        	.usStackDepth	= configMINIMAL_STACK_SIZE,
-        	.pvParameters	= ( void * ) xQueue,
-        	.uxPriority		= qpeekHIGH_PRIORITY,
-        	.puxStackBuffer	= xHighPriorityPeekTaskStack,
-        	.xRegions		=	{
-					{ ucSharedMemory1,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-					{ ucSharedMemory2,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-					{ ucSharedMemory3,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-					{ ucSharedMemory4,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-					{ ucSharedMemory5,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-					{ ucSharedMemory6,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-					{ 0,				0,					0														},
-					{ 0,				0,					0														},
-					{ 0,				0,					0														},
-					{ 0,				0,					0														},
-					{ 0,				0,					0														}
-        						}
+            .pvTaskCode      = prvHighPriorityPeekTask,
+            .pcName          = "PeekH1",
+            .usStackDepth    = configMINIMAL_STACK_SIZE,
+            .pvParameters    = ( void * ) xQueue,
+            .uxPriority      = qpeekHIGH_PRIORITY,
+            .puxStackBuffer  = xHighPriorityPeekTaskStack,
+            .xRegions        =    {
+                    { 0,                0,                    0                                                        },
+                    { 0,                0,                    0                                                        },
+                    { 0,                0,                    0                                                        },
+                    { 0,                0,                    0                                                        },
+                    { 0,                0,                    0                                                        },
+                    { 0,                0,                    0                                                        },
+                    { 0,                0,                    0                                                        },
+                    { 0,                0,                    0                                                        },
+                    { 0,                0,                    0                                                        },
+                    { 0,                0,                    0                                                        },
+                    { 0,                0,                    0                                                        }
+                                }
         };
 
         TaskParameters_t xHighestPriorityPeekTaskParameters =
         {
-        	.pvTaskCode		= prvHighestPriorityPeekTask,
-        	.pcName			= "PeekH2",
-        	.usStackDepth	= configMINIMAL_STACK_SIZE,
-        	.pvParameters	= ( void * ) xQueue,
-        	.uxPriority		= qpeekHIGHEST_PRIORITY,
-        	.puxStackBuffer	= xHighestPriorityPeekTaskStack,
-        	.xRegions		=	{
-					{ ucSharedMemory1,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-					{ ucSharedMemory2,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-					{ ucSharedMemory3,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-					{ ucSharedMemory4,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-					{ ucSharedMemory5,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-					{ ucSharedMemory6,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-					{ 0,				0,					0														},
-					{ 0,				0,					0														},
-					{ 0,				0,					0														},
-					{ 0,				0,					0														},
-					{ 0,				0,					0														}
-        						}
+            .pvTaskCode      = prvHighestPriorityPeekTask,
+            .pcName          = "PeekH2",
+            .usStackDepth    = configMINIMAL_STACK_SIZE,
+            .pvParameters    = ( void * ) xQueue,
+            .uxPriority      = qpeekHIGHEST_PRIORITY,
+            .puxStackBuffer  = xHighestPriorityPeekTaskStack,
+            .xRegions        =    {
+                    { 0,                0,                    0                                                        },
+                    { 0,                0,                    0                                                        },
+                    { 0,                0,                    0                                                        },
+                    { 0,                0,                    0                                                        },
+                    { 0,                0,                    0                                                        },
+                    { 0,                0,                    0                                                        },
+                    { 0,                0,                    0                                                        },
+                    { 0,                0,                    0                                                        },
+                    { 0,                0,                    0                                                        },
+                    { 0,                0,                    0                                                        },
+                    { 0,                0,                    0                                                        }
+                                }
         };
 
+        TaskParameters_t xLowPriorityPeekTaskParameters =
+        {
+            .pvTaskCode      = prvLowPriorityPeekTask,
+            .pcName          = "PeekL",
+            .usStackDepth    = configMINIMAL_STACK_SIZE,
+            .pvParameters    = ( void * ) xQueue,
+            .uxPriority      = qpeekLOW_PRIORITY,
+            .puxStackBuffer  = xLowPriorityPeekTaskStack,
+            .xRegions        =    {
+                    { ( void * ) &( xQPeekLocalTaskHandles[ 0 ] ), qpeekSHARED_MEM_SIZE_BYTES,
+                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                        ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                    },
+                    { 0,                0,                    0                                                        },
+                    { 0,                0,                    0                                                        },
+                    { 0,                0,                    0                                                        },
+                    { 0,                0,                    0                                                        },
+                    { 0,                0,                    0                                                        },
+                    { 0,                0,                    0                                                        },
+                    { 0,                0,                    0                                                        },
+                    { 0,                0,                    0                                                        },
+                    { 0,                0,                    0                                                        },
+                    { 0,                0,                    0                                                        }
+                                }
+        };
 
         //xTaskCreate( prvLowPriorityPeekTask, "PeekL", configMINIMAL_STACK_SIZE, ( void * ) xQueue, qpeekLOW_PRIORITY, NULL );
         //xTaskCreate( prvMediumPriorityPeekTask, "PeekM", configMINIMAL_STACK_SIZE, ( void * ) xQueue, qpeekMEDIUM_PRIORITY, &xMediumPriorityTask );
         //xTaskCreate( prvHighPriorityPeekTask, "PeekH1", configMINIMAL_STACK_SIZE, ( void * ) xQueue, qpeekHIGH_PRIORITY, &xHighPriorityTask );
         //xTaskCreate( prvHighestPriorityPeekTask, "PeekH2", configMINIMAL_STACK_SIZE, ( void * ) xQueue, qpeekHIGHEST_PRIORITY, &xHighestPriorityTask );
 
-
-        xTaskCreateRestricted( &( xMediumPriorityPeekTaskParameters ), &xMediumPriorityTask );
-        xTaskCreateRestricted( &( xHighPriorityPeekTaskParameters ), &xHighPriorityTask );
-        xTaskCreateRestricted( &( xHighestPriorityPeekTaskParameters ), &xHighestPriorityTask );
-
-        TaskParameters_t xLowPriorityPeekTaskParameters =
-        {
-        	.pvTaskCode		= prvLowPriorityPeekTask,
-        	.pcName			= "PeekL",
-        	.usStackDepth	= configMINIMAL_STACK_SIZE,
-        	.pvParameters	= ( void * ) xQueue,
-        	.uxPriority		= qpeekLOW_PRIORITY,
-        	.puxStackBuffer	= xLowPriorityPeekTaskStack,
-        	.xRegions		=	{
-					{ ucSharedMemory1,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-					{ ucSharedMemory2,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-					{ ucSharedMemory3,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-					{ ucSharedMemory4,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-					{ ucSharedMemory5,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-					{ ucSharedMemory6,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-					{ xMediumPriorityTask, SHARED_MEMORY_SIZE, portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-					{ 0,				0,					0														},
-					{ 0,				0,					0														},
-					{ 0,				0,					0														},
-					{ 0,				0,					0														}
-        						}
-        };
-
+        xTaskCreateRestricted( &( xMediumPriorityPeekTaskParameters ), &( xQPeekLocalTaskHandles[ qpeekMED_PRIO_TASK_IDX ] ) );
+        xTaskCreateRestricted( &( xHighPriorityPeekTaskParameters ), &( xQPeekLocalTaskHandles[ qpeekHIGH_PRIO_TASK_IDX ] ) );
+        xTaskCreateRestricted( &( xHighestPriorityPeekTaskParameters ), &( xQPeekLocalTaskHandles[ qpeekHIGHEST_PRIO_TASK_IDX ] ) );
         xTaskCreateRestricted( &( xLowPriorityPeekTaskParameters ), NULL );
 
     }
@@ -407,7 +415,7 @@ static void prvMediumPriorityPeekTask( void * pvParameters )
         }
 
         /* Just so we know the test is still running. */
-        ulLoopCounter[0]++;
+        ulLoopCounter[ 0 ]++;
 
         /* Now we can suspend ourselves so the low priority task can execute
          * again. */
@@ -485,9 +493,9 @@ static void prvLowPriorityPeekTask( void * pvParameters )
          * priority task is actually going to remove it from the queue.  Send
          * to front is used just to be different.  As the queue is empty it
          * makes no difference to the result. */
-        vTaskResume( xMediumPriorityTask );
-        vTaskResume( xHighPriorityTask );
-        vTaskResume( xHighestPriorityTask );
+        vTaskResume( xQPeekLocalTaskHandles[ qpeekMED_PRIO_TASK_IDX ] );
+        vTaskResume( xQPeekLocalTaskHandles[ qpeekHIGH_PRIO_TASK_IDX ] );
+        vTaskResume( xQPeekLocalTaskHandles[ qpeekHIGHEST_PRIO_TASK_IDX ] );
 
         #if ( configUSE_PREEMPTION == 0 )
             taskYIELD();
@@ -517,8 +525,8 @@ static void prvLowPriorityPeekTask( void * pvParameters )
         /* Unsuspend the highest and high priority tasks so we can go back
          * and repeat the whole thing.  The medium priority task should not be
          * suspended as it was not able to peek the data in this last case. */
-        vTaskResume( xHighPriorityTask );
-        vTaskResume( xHighestPriorityTask );
+        vTaskResume( xQPeekLocalTaskHandles[ qpeekHIGH_PRIO_TASK_IDX ] );
+        vTaskResume( xQPeekLocalTaskHandles[ qpeekHIGHEST_PRIO_TASK_IDX ] );
 
         /* Lets just delay a while as this is an intensive test as we don't
          * want to starve other tests of processing time. */
@@ -534,12 +542,12 @@ BaseType_t xAreQueuePeekTasksStillRunning( void )
 
     /* If the demo task is still running then we expect the loopcounter to
      * have incremented since this function was last called. */
-    if( ulLastLoopCounter == ulLoopCounter )
+    if( ulLastLoopCounter == ulLoopCounter[ 0 ] )
     {
         xErrorDetected = pdTRUE;
     }
 
-    ulLastLoopCounter = ulLoopCounter;
+    ulLastLoopCounter = ulLoopCounter[ 0 ];
 
     /* Errors detected in the task itself will have latched xErrorDetected
      * to true. */
