@@ -46,6 +46,9 @@
 /* Demo program include files. */
 #include "GenQTest.h"
 
+#define genqSHARED_MEM_SIZE_WORDS             ( 8 )
+#define genqSHARED_MEM_SIZE_BYTES             ( 32 )
+
 #define genqQUEUE_LENGTH                      ( 5 )
 #define intsemNO_BLOCK                        ( 0 )
 #define genqSHORT_BLOCK                       ( pdMS_TO_TICKS( 2 ) )
@@ -121,15 +124,17 @@ static volatile BaseType_t xErrorDetected = pdFALSE;
 
 /* Counters that are incremented on each cycle of a test.  This is used to
  * detect a stalled task - a test that is no longer running. */
-static volatile uint32_t ulLoopCounter[8] = {0};
-static volatile uint32_t ulLoopCounter2[8] = {0};
+static volatile uint32_t ulLoopCounter[ genqSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( genqSHARED_MEM_SIZE_BYTES ) ) ) = { 0 };
+static volatile uint32_t ulLoopCounter2[ genqSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( genqSHARED_MEM_SIZE_BYTES ) ) ) = { 0 };
 
 /* The variable that is guarded by the mutex in the mutex demo tasks. */
-static volatile uint32_t ulGuardedVariable[8] = {0};
+static volatile uint32_t ulGuardedVariable[ genqSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( genqSHARED_MEM_SIZE_BYTES ) ) ) = { 0 };
 
 /* Handles used in the mutex test to suspend and resume the high and medium
  * priority mutex test tasks. */
-static TaskHandle_t xHighPriorityMutexTask, xMediumPriorityMutexTask;
+#define HIGH_PRIO_MUTEX_TASK_IDX    0
+#define MED_PRIO_MUTEX_TASK_IDX     1
+static TaskHandle_t xLocalTaskHandles[ genqSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( genqSHARED_MEM_SIZE_BYTES ) ) ) = { NULL };
 
 /* If INCLUDE_xTaskAbortDelay is 1 additional tests are performed, requiring an
  * additional task. */
@@ -149,11 +154,10 @@ void vStartGenericQueueTasks( UBaseType_t uxPriority )
     QueueHandle_t xQueue;
     SemaphoreHandle_t xMutex;
 
-	static StackType_t xLowPriorityMutexTaskStack[ genqMUTEX_TEST_TASK_STACK_SIZE ] __attribute__( ( aligned( genqMUTEX_TEST_TASK_STACK_SIZE * sizeof( StackType_t ) ) ) );
-	static StackType_t xMediumPriorityMutexTaskStack[ configMINIMAL_STACK_SIZE ] __attribute__( ( aligned( configMINIMAL_STACK_SIZE * sizeof( StackType_t ) ) ) );
-	static StackType_t xHighPriorityMutexTaskStack[ genqMUTEX_TEST_TASK_STACK_SIZE ] __attribute__( ( aligned( genqMUTEX_TEST_TASK_STACK_SIZE * sizeof( StackType_t ) ) ) );
-	static StackType_t xSendFrontAndBackTestStack[ genqGENERIC_QUEUE_TEST_TASK_STACK_SIZE ]__attribute__( ( aligned( genqGENERIC_QUEUE_TEST_TASK_STACK_SIZE * sizeof( StackType_t ) ) ) );
-
+    static StackType_t xLowPriorityMutexTaskStack[ genqMUTEX_TEST_TASK_STACK_SIZE ] __attribute__( ( aligned( genqMUTEX_TEST_TASK_STACK_SIZE * sizeof( StackType_t ) ) ) );
+    static StackType_t xMediumPriorityMutexTaskStack[ configMINIMAL_STACK_SIZE ] __attribute__( ( aligned( configMINIMAL_STACK_SIZE * sizeof( StackType_t ) ) ) );
+    static StackType_t xHighPriorityMutexTaskStack[ genqMUTEX_TEST_TASK_STACK_SIZE ] __attribute__( ( aligned( genqMUTEX_TEST_TASK_STACK_SIZE * sizeof( StackType_t ) ) ) );
+    static StackType_t xSendFrontAndBackTestStack[ genqGENERIC_QUEUE_TEST_TASK_STACK_SIZE ]__attribute__( ( aligned( genqGENERIC_QUEUE_TEST_TASK_STACK_SIZE * sizeof( StackType_t ) ) ) );
 
     /* Create the queue that we are going to use for the
      * prvSendFrontAndBackTest demo. */
@@ -169,35 +173,38 @@ void vStartGenericQueueTasks( UBaseType_t uxPriority )
          * defined to be less than 1. */
         vQueueAddToRegistry( xQueue, "Gen_Queue_Test" );
 
-    	TaskParameters_t xprvSendFrontAndBackTestParameters =
-    		{
-    			.pvTaskCode		= prvSendFrontAndBackTest,
-    			.pcName			= "GenQ",
-    			.usStackDepth	= genqGENERIC_QUEUE_TEST_TASK_STACK_SIZE,
-    			.pvParameters	= ( void * ) xQueue,
-    			.uxPriority		= uxPriority,
-    			.puxStackBuffer	= xSendFrontAndBackTestStack,
-    			.xRegions		=	{
-    									{ ucSharedMemory1,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-    									{ ucSharedMemory2,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-    									{ ucSharedMemory3,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-    									{ ucSharedMemory4,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-    									{ ucSharedMemory5,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-    									{ ucSharedMemory6,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-    									{ (void *)ulLoopCounter,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-    									{ 0,				0,					0														},
-    									{ 0,				0,					0														},
-    									{ 0,				0,					0														},
-    									{ 0,				0,					0														}
-    								}
-    		};
+        TaskParameters_t xSendFrontAndBackTestParameters =
+            {
+                .pvTaskCode      = prvSendFrontAndBackTest,
+                .pcName          = "GenQ",
+                .usStackDepth    = genqGENERIC_QUEUE_TEST_TASK_STACK_SIZE,
+                .pvParameters    = ( void * ) xQueue,
+                .uxPriority      = uxPriority,
+                .puxStackBuffer  = xSendFrontAndBackTestStack,
+                .xRegions        =    {
+                                        { ( void * ) &( ulLoopCounter[ 0 ] ), genqSHARED_MEM_SIZE_BYTES,
+                                           ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                             ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                        },
+                                        { 0,                0,                    0                                                        },
+                                        { 0,                0,                    0                                                        },
+                                        { 0,                0,                    0                                                        },
+                                        { 0,                0,                    0                                                        },
+                                        { 0,                0,                    0                                                        },
+                                        { 0,                0,                    0                                                        },
+                                        { 0,                0,                    0                                                        },
+                                        { 0,                0,                    0                                                        },
+                                        { 0,                0,                    0                                                        },
+                                        { 0,                0,                    0                                                        }
+                                    }
+            };
 
 
         /* Create the demo task and pass it the queue just created.  We are
          * passing the queue handle by value so it does not matter that it is
          * declared on the stack here. */
         //xTaskCreate( prvSendFrontAndBackTest, "GenQ", genqGENERIC_QUEUE_TEST_TASK_STACK_SIZE, ( void * ) xQueue, uxPriority, NULL );
-        xTaskCreateRestricted(&(xprvSendFrontAndBackTestParameters),NULL);
+        xTaskCreateRestricted( &( xSendFrontAndBackTestParameters ), NULL );
     }
 
     /* Create the mutex used by the prvMutexTest task. */
@@ -213,72 +220,87 @@ void vStartGenericQueueTasks( UBaseType_t uxPriority )
          * defined or is defined to be less than 1. */
         vQueueAddToRegistry( ( QueueHandle_t ) xMutex, "Gen_Queue_Mutex" );
 
-    	TaskParameters_t xprvLowPriorityMutexTaskParameters =
-    	{
-    		.pvTaskCode		= prvLowPriorityMutexTask,
-    		.pcName			= "MuLow",
-    		.usStackDepth	= genqMUTEX_TEST_TASK_STACK_SIZE,
-    		.pvParameters	= ( void * ) xMutex,
-    		.uxPriority		= genqMUTEX_LOW_PRIORITY,
-    		.puxStackBuffer	= xLowPriorityMutexTaskStack,
-    		.xRegions		=	{
-    								{ ucSharedMemory1,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-    								{ ucSharedMemory2,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-    								{ ucSharedMemory3,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-    								{ ucSharedMemory4,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-    								{ ucSharedMemory5,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-    								{ ucSharedMemory6,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-    								{ (void *)ulLoopCounter2,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-    								{ (void *)ulGuardedVariable,SHARED_MEMORY_SIZE,portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-    								{ 0,				0,					0														},
-    								{ 0,				0,					0														},
-    								{ 0,				0,					0														}
-    							}
-    	};
-    	TaskParameters_t xprvMediumPriorityMutexTaskParameters =
-    	{
-    		.pvTaskCode		= prvMediumPriorityMutexTask,
-    		.pcName			= "MuMed",
-    		.usStackDepth	= configMINIMAL_STACK_SIZE,
-    		.pvParameters	= NULL,
-    		.uxPriority		= genqMUTEX_MEDIUM_PRIORITY,
-    		.puxStackBuffer	= xMediumPriorityMutexTaskStack,
-    		.xRegions		=	{
-    								{ ucSharedMemory1,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-    								{ ucSharedMemory2,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-    								{ ucSharedMemory3,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-    								{ ucSharedMemory4,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-    								{ ucSharedMemory5,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-    								{ ucSharedMemory6,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-    								{ (void *)ulGuardedVariable,SHARED_MEMORY_SIZE,portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-    								{ 0,				0,					0														},
-    								{ 0,				0,					0														},
-    								{ 0,				0,					0														},
-    								{ 0,				0,					0														}
-    							}
-    	};
-    	TaskParameters_t xprvHighPriorityMutexTaskParameters =
-    	{
-    		.pvTaskCode		= prvHighPriorityMutexTask,
-    		.pcName			= "MuHigh",
-    		.usStackDepth	= genqMUTEX_TEST_TASK_STACK_SIZE,
-    		.pvParameters	= ( void * ) xMutex,
-    		.uxPriority		= genqMUTEX_HIGH_PRIORITY,
-    		.puxStackBuffer	= xHighPriorityMutexTaskStack,
-    		.xRegions		=	{
-    								{ ucSharedMemory1,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-    								{ ucSharedMemory2,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-    								{ ucSharedMemory3,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-    								{ ucSharedMemory4,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-    								{ ucSharedMemory5,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-    								{ ucSharedMemory6,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-    								{ (void *)ulGuardedVariable,SHARED_MEMORY_SIZE,portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-    								{ 0,				0,					0														},
-    								{ 0,				0,					0														},
-    								{ 0,				0,					0														},
-    								{ 0,				0,					0														}
-    							}
-    	};
+        TaskParameters_t xLowPriorityMutexTaskParameters =
+        {
+            .pvTaskCode      = prvLowPriorityMutexTask,
+            .pcName          = "MuLow",
+            .usStackDepth    = genqMUTEX_TEST_TASK_STACK_SIZE,
+            .pvParameters    = ( void * ) xMutex,
+            .uxPriority      = genqMUTEX_LOW_PRIORITY,
+            .puxStackBuffer  = xLowPriorityMutexTaskStack,
+            .xRegions        =    {
+                                    { ( void * ) &( ulLoopCounter2[ 0 ] ),   genqSHARED_MEM_SIZE_BYTES,
+                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                        ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                    },
+                                    { ( void * ) &( ulGuardedVariable[ 0 ]), genqSHARED_MEM_SIZE_BYTES,
+                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                        ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                    },
+                                    { ( void * ) &( xLocalTaskHandles[ 0 ]), genqSHARED_MEM_SIZE_BYTES,
+                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                        ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                    },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        }
+                                }
+        };
+        TaskParameters_t xMediumPriorityMutexTaskParameters =
+        {
+            .pvTaskCode      = prvMediumPriorityMutexTask,
+            .pcName          = "MuMed",
+            .usStackDepth    = configMINIMAL_STACK_SIZE,
+            .pvParameters    = NULL,
+            .uxPriority      = genqMUTEX_MEDIUM_PRIORITY,
+            .puxStackBuffer  = xMediumPriorityMutexTaskStack,
+            .xRegions        =    {
+                                    { ( void * ) &( ulGuardedVariable[ 0 ] ), genqSHARED_MEM_SIZE_BYTES,
+                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                        ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                    },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        }
+                                }
+        };
+        TaskParameters_t xHighPriorityMutexTaskParameters =
+        {
+            .pvTaskCode      = prvHighPriorityMutexTask,
+            .pcName          = "MuHigh",
+            .usStackDepth    = genqMUTEX_TEST_TASK_STACK_SIZE,
+            .pvParameters    = ( void * ) xMutex,
+            .uxPriority      = genqMUTEX_HIGH_PRIORITY,
+            .puxStackBuffer  = xHighPriorityMutexTaskStack,
+            .xRegions        =    {
+                                    { ( void * ) &( ulGuardedVariable[ 0 ] ), genqSHARED_MEM_SIZE_BYTES,
+                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                        ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                    },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        }
+                                }
+        };
 
         /* Create the mutex demo tasks and pass it the mutex just created.  We
          * are passing the mutex handle by value so it does not matter that it is
@@ -287,9 +309,9 @@ void vStartGenericQueueTasks( UBaseType_t uxPriority )
         //xTaskCreate( prvMediumPriorityMutexTask, "MuMed", configMINIMAL_STACK_SIZE, NULL, genqMUTEX_MEDIUM_PRIORITY, &xMediumPriorityMutexTask );
         //xTaskCreate( prvHighPriorityMutexTask, "MuHigh", genqMUTEX_TEST_TASK_STACK_SIZE, ( void * ) xMutex, genqMUTEX_HIGH_PRIORITY, &xHighPriorityMutexTask );
 
-        xTaskCreateRestricted(&(xprvLowPriorityMutexTaskParameters),NULL);
-        xTaskCreateRestricted(&(xprvMediumPriorityMutexTaskParameters),&xMediumPriorityMutexTask);
-        xTaskCreateRestricted(&(xprvHighPriorityMutexTaskParameters),&xHighPriorityMutexTask);
+        xTaskCreateRestricted( &( xLowPriorityMutexTaskParameters ), NULL );
+        xTaskCreateRestricted( &( xMediumPriorityMutexTaskParameters ), &( xLocalTaskHandles[ MED_PRIO_MUTEX_TASK_IDX ] ) );
+        xTaskCreateRestricted( &( xHighPriorityMutexTaskParameters ), &( xLocalTaskHandles[ HIGH_PRIO_MUTEX_TASK_IDX ] ) );
 
         /* If INCLUDE_xTaskAbortDelay is set then additional tests are performed,
          * requiring two instances of prvHighPriorityMutexTask(). */
@@ -324,7 +346,7 @@ static void prvSendFrontAndBackTest( void * pvParameters )
          * should have the same effect as sending it to the front of the queue.
          *
          * First send to the front and check everything is as expected. */
-        ulLoopCounterSnapshot = ulLoopCounter[0];
+        ulLoopCounterSnapshot = ulLoopCounter[ 0 ];
         xQueueSendToFront( xQueue, ( void * ) &ulLoopCounterSnapshot, intsemNO_BLOCK );
 
         if( uxQueueMessagesWaiting( xQueue ) != 1 )
@@ -339,7 +361,7 @@ static void prvSendFrontAndBackTest( void * pvParameters )
 
         /* The data we sent to the queue should equal the data we just received
          * from the queue. */
-        if( ulLoopCounter[0] != ulData )
+        if( ulLoopCounter[ 0 ] != ulData )
         {
             xErrorDetected = pdTRUE;
         }
@@ -351,7 +373,7 @@ static void prvSendFrontAndBackTest( void * pvParameters )
             xErrorDetected = pdTRUE;
         }
 
-        ulLoopCounterSnapshot = ulLoopCounter[0];
+        ulLoopCounterSnapshot = ulLoopCounter[ 0 ];
         xQueueSendToBack( xQueue, ( void * ) &ulLoopCounterSnapshot, intsemNO_BLOCK );
 
         if( uxQueueMessagesWaiting( xQueue ) != 1 )
@@ -371,7 +393,7 @@ static void prvSendFrontAndBackTest( void * pvParameters )
 
         /* The data sent to the queue should equal the data just received from
          * the queue. */
-        if( ulLoopCounter[0] != ulData )
+        if( ulLoopCounter[ 0 ] != ulData )
         {
             xErrorDetected = pdTRUE;
         }
@@ -531,7 +553,7 @@ static void prvSendFrontAndBackTest( void * pvParameters )
 
         /* Increment the loop counter to indicate these tasks are still
          * executing. */
-        ulLoopCounter[0]++;
+        ulLoopCounter[ 0 ]++;
     }
 }
 /*-----------------------------------------------------------*/
@@ -571,7 +593,7 @@ static void prvSendFrontAndBackTest( void * pvParameters )
 
         /* Now unsuspend the high priority task.  This will attempt to take the
          * mutex, and block when it finds it cannot obtain it. */
-        vTaskResume( xHighPriorityMutexTask );
+        vTaskResume( xLocalTaskHandles[ HIGH_PRIO_MUTEX_TASK_IDX ] );
 
         /* This task should now have inherited the priority of the high priority
          * task as by now the high priority task will have attempted to obtain the
@@ -610,7 +632,7 @@ static void prvSendFrontAndBackTest( void * pvParameters )
          *  task knows that its failure to obtain the semaphore is not an error. */
         xBlockWasAborted = pdTRUE;
 
-        if( xTaskAbortDelay( xHighPriorityMutexTask ) != pdPASS )
+        if( xTaskAbortDelay( xLocalTaskHandles[ HIGH_PRIO_MUTEX_TASK_IDX ] ) != pdPASS )
         {
             xErrorDetected = pdTRUE;
         }
@@ -694,7 +716,7 @@ static void prvSendFrontAndBackTest( void * pvParameters )
         }
 
         /* This time the high priority task in unsuspended second. */
-        vTaskResume( xHighPriorityMutexTask );
+        vTaskResume( xLocalTaskHandles[ HIGH_PRIO_MUTEX_TASK_IDX ] );
 
         /* The high priority task should already have run, causing this task to
          * inherit a priority for the second time. */
@@ -709,7 +731,7 @@ static void prvSendFrontAndBackTest( void * pvParameters )
          * which is the medium priority task. */
         xBlockWasAborted = pdTRUE;
 
-        if( xTaskAbortDelay( xHighPriorityMutexTask ) != pdPASS )
+        if( xTaskAbortDelay( xLocalTaskHandles[ HIGH_PRIO_MUTEX_TASK_IDX ] ) != pdPASS )
         {
             xErrorDetected = pdTRUE;
         }
@@ -761,7 +783,7 @@ static void prvTakeTwoMutexesReturnInDifferentOrder( SemaphoreHandle_t xMutex,
     }
 
     /* Set the guarded variable to a known start value. */
-    ulGuardedVariable[0] = 0;
+    ulGuardedVariable[ 0 ] = 0;
 
     /* This task's priority should be as per that assigned when the task was
      * created. */
@@ -772,7 +794,7 @@ static void prvTakeTwoMutexesReturnInDifferentOrder( SemaphoreHandle_t xMutex,
 
     /* Now unsuspend the high priority task.  This will attempt to take the
      * mutex, and block when it finds it cannot obtain it. */
-    vTaskResume( xHighPriorityMutexTask );
+    vTaskResume( xLocalTaskHandles[ HIGH_PRIO_MUTEX_TASK_IDX ] );
 
     #if configUSE_PREEMPTION == 0
         taskYIELD();
@@ -782,7 +804,7 @@ static void prvTakeTwoMutexesReturnInDifferentOrder( SemaphoreHandle_t xMutex,
      * suspended (as it would have done in versions up to V7.5.3). */
     #if ( INCLUDE_eTaskGetState == 1 )
     {
-        configASSERT( eTaskGetState( xHighPriorityMutexTask ) == eBlocked );
+        configASSERT( eTaskGetState( xLocalTaskHandles[ HIGH_PRIO_MUTEX_TASK_IDX ] ) == eBlocked );
     }
     #endif /* INCLUDE_eTaskGetState */
 
@@ -807,11 +829,11 @@ static void prvTakeTwoMutexesReturnInDifferentOrder( SemaphoreHandle_t xMutex,
     /* Now unsuspend the medium priority task.  This should not run as the
      * inherited priority of this task is above that of the medium priority
      * task. */
-    vTaskResume( xMediumPriorityMutexTask );
+    vTaskResume( xLocalTaskHandles[ MED_PRIO_MUTEX_TASK_IDX ] );
 
     /* If the medium priority task did run then it will have incremented the
      * guarded variable. */
-    if( ulGuardedVariable[0] != 0 )
+    if( ulGuardedVariable[ 0 ] != 0 )
     {
         xErrorDetected = pdTRUE;
     }
@@ -840,7 +862,7 @@ static void prvTakeTwoMutexesReturnInDifferentOrder( SemaphoreHandle_t xMutex,
     /* The guarded variable is only incremented by the medium priority task,
      * which still should not have executed as this task should remain at the
      * higher priority, ensure this is the case. */
-    if( ulGuardedVariable[0] != 0 )
+    if( ulGuardedVariable[ 0 ] != 0 )
     {
         xErrorDetected = pdTRUE;
     }
@@ -854,7 +876,7 @@ static void prvTakeTwoMutexesReturnInDifferentOrder( SemaphoreHandle_t xMutex,
      * This time the priority of this task should be disinherited back to the
      * priority to which it was set while the mutex was held.  This means
      * the medium priority task should execute and increment the guarded
-     * variable.   When this task next	runs both the high and medium priority
+     * variable.   When this task next    runs both the high and medium priority
      * tasks will have been suspended again. */
     if( xSemaphoreGive( xLocalMutex ) != pdPASS )
     {
@@ -866,7 +888,7 @@ static void prvTakeTwoMutexesReturnInDifferentOrder( SemaphoreHandle_t xMutex,
     #endif
 
     /* Check the guarded variable did indeed increment... */
-    if( ulGuardedVariable[0] != 1 )
+    if( ulGuardedVariable[ 0 ] != 1 )
     {
         xErrorDetected = pdTRUE;
     }
@@ -894,7 +916,7 @@ static void prvTakeTwoMutexesReturnInSameOrder( SemaphoreHandle_t xMutex,
     }
 
     /* Set the guarded variable to a known start value. */
-    ulGuardedVariable[0] = 0;
+    ulGuardedVariable[ 0 ] = 0;
 
     /* This task's priority should be as per that assigned when the task was
      * created. */
@@ -905,7 +927,7 @@ static void prvTakeTwoMutexesReturnInSameOrder( SemaphoreHandle_t xMutex,
 
     /* Now unsuspend the high priority task.  This will attempt to take the
      * mutex, and block when it finds it cannot obtain it. */
-    vTaskResume( xHighPriorityMutexTask );
+    vTaskResume( xLocalTaskHandles[ HIGH_PRIO_MUTEX_TASK_IDX ] );
 
     #if configUSE_PREEMPTION == 0
         taskYIELD();
@@ -915,7 +937,7 @@ static void prvTakeTwoMutexesReturnInSameOrder( SemaphoreHandle_t xMutex,
      * suspended (as it would have done in versions up to V7.5.3). */
     #if ( INCLUDE_eTaskGetState == 1 )
     {
-        configASSERT( eTaskGetState( xHighPriorityMutexTask ) == eBlocked );
+        configASSERT( eTaskGetState( xLocalTaskHandles[ HIGH_PRIO_MUTEX_TASK_IDX ] ) == eBlocked );
     }
     #endif /* INCLUDE_eTaskGetState */
 
@@ -930,11 +952,11 @@ static void prvTakeTwoMutexesReturnInSameOrder( SemaphoreHandle_t xMutex,
     /* Now unsuspend the medium priority task.  This should not run as the
      * inherited priority of this task is above that of the medium priority
      * task. */
-    vTaskResume( xMediumPriorityMutexTask );
+    vTaskResume( xLocalTaskHandles[ MED_PRIO_MUTEX_TASK_IDX ] );
 
     /* If the medium priority task did run then it will have incremented the
      * guarded variable. */
-    if( ulGuardedVariable[0] != 0 )
+    if( ulGuardedVariable[ 0 ] != 0 )
     {
         xErrorDetected = pdTRUE;
     }
@@ -963,7 +985,7 @@ static void prvTakeTwoMutexesReturnInSameOrder( SemaphoreHandle_t xMutex,
     /* The guarded variable is only incremented by the medium priority task,
      * which still should not have executed as this task should remain at the
      * higher priority, ensure this is the case. */
-    if( ulGuardedVariable[0] != 0 )
+    if( ulGuardedVariable[ 0 ] != 0 )
     {
         xErrorDetected = pdTRUE;
     }
@@ -988,7 +1010,7 @@ static void prvTakeTwoMutexesReturnInSameOrder( SemaphoreHandle_t xMutex,
     #endif
 
     /* Check the guarded variable did indeed increment... */
-    if( ulGuardedVariable[0] != 1 )
+    if( ulGuardedVariable[ 0 ] != 1 )
     {
         xErrorDetected = pdTRUE;
     }
@@ -1027,7 +1049,7 @@ static void prvLowPriorityMutexTask( void * pvParameters )
         prvTakeTwoMutexesReturnInDifferentOrder( xMutex, xLocalMutex );
 
         /* Just to show this task is still running. */
-        ulLoopCounter2[0]++;
+        ulLoopCounter2[ 0 ]++;
 
         #if configUSE_PREEMPTION == 0
             taskYIELD();
@@ -1038,7 +1060,7 @@ static void prvLowPriorityMutexTask( void * pvParameters )
         prvTakeTwoMutexesReturnInSameOrder( xMutex, xLocalMutex );
 
         /* Just to show this task is still running. */
-        ulLoopCounter2[0]++;
+        ulLoopCounter2[ 0 ]++;
 
         #if configUSE_PREEMPTION == 0
             taskYIELD();
@@ -1069,7 +1091,7 @@ static void prvMediumPriorityMutexTask( void * pvParameters )
         /* When this task unsuspends all it does is increment the guarded
          * variable, this is so the low priority task knows that it has
          * executed. */
-        ulGuardedVariable[0]++;
+        ulGuardedVariable[ 0 ]++;
     }
 }
 /*-----------------------------------------------------------*/
@@ -1121,18 +1143,18 @@ BaseType_t xAreGenericQueueTasksStillRunning( void )
 
     /* If the demo task is still running then we expect the loop counters to
      * have incremented since this function was last called. */
-    if( ulLastLoopCounter == ulLoopCounter[0] )
+    if( ulLastLoopCounter == ulLoopCounter[ 0 ] )
     {
         xErrorDetected = pdTRUE;
     }
 
-    if( ulLastLoopCounter2 == ulLoopCounter2[0] )
+    if( ulLastLoopCounter2 == ulLoopCounter2[ 0 ] )
     {
         xErrorDetected = pdTRUE;
     }
 
-    ulLastLoopCounter = ulLoopCounter[0];
-    ulLastLoopCounter2 = ulLoopCounter2[0];
+    ulLastLoopCounter = ulLoopCounter[ 0 ];
+    ulLastLoopCounter2 = ulLoopCounter2[ 0 ];
 
     /* Errors detected in the task itself will have latched xErrorDetected
      * to true. */

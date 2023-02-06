@@ -75,7 +75,7 @@ static volatile uint8_t ucROTaskFaultTracker[ SHARED_MEMORY_SIZE ] __attribute__
  *
  * @param pvParameters[in] Parameters as passed during task creation.
  */
-static void prvROAccessTask( void * pvParameters );
+/* static void prvROAccessTask( void * pvParameters ); */
 
 /**
  * @brief Implements the task which has Read Write access to the shared memory
@@ -93,100 +93,100 @@ static void prvMutexAccessTask( void * pvParameters )
 {
 	/* Unused parameters. */
 	( void ) pvParameters;
-	
+
 	xSemaphoreHandle xMutex = NULL;
 
-	xMutex = xSemaphoreCreateMutex();	
-	configASSERT(xMutex != NULL);
-	configASSERT(xMutex>0 && xMutex<11);
+	xMutex = xSemaphoreCreateMutex();
+	configASSERT( xMutex != NULL );
+	configASSERT( ( xMutex > ( SemaphoreHandle_t ) 0 ) && ( xMutex < ( SemaphoreHandle_t ) 11 ) ) ;
 
 	xSemaphoreTake( xMutex, 10 );
 	{
 		printf("Blocking the semaphore");
 	}
-	xSemaphoreGive(xMutex);
-	
+	xSemaphoreGive( xMutex );
+
 }
 
-static void prvROAccessTask( void * pvParameters )
-{
-uint8_t ucVal;
+// static void prvROAccessTask( void * pvParameters )
+// {
+// uint8_t ucVal;
 
-	/* Unused parameters. */
-	( void ) pvParameters;
+// 	/* Unused parameters. */
+// 	( void ) pvParameters;
 
-	for( ; ; )
-	{
-		/* This task performs the following sequence for all the shared memory
-		 * regions:
-		 *
-		 * 1. Perfrom a read access to the shared memory. Since this task has
-		 *    RO access to the shared memory, the read operation is successful.
-		 *
-		 * 2. Set ucROTaskFaultTracker[ 0 ] to 1 before performing a write to
-		 *    the shared memory. Since this task has Read Only access to the
-		 *    shared memory, the write operation would result in a Memory Fault.
-		 *    Setting ucROTaskFaultTracker[ 0 ] to 1 tells the Memory Fault
-		 *    Handler that this is an expected fault. The handler recovers from
-		 *    the expected fault gracefully by jumping to the next instruction.
-		 *
-		 * 3. Perfrom a write to the shared memory resulting in a memory fault.
-		 *
-		 * 4. Ensure that the write access did generate MemFault and the fault
-		 *    handler did clear the  ucROTaskFaultTracker[ 0 ].
-		 */
-		/* Perform the above mentioned sequence on ucSharedMemory1. */
-		ucVal = ucSharedMemory1[ 0 ];
-		/* Silent compiler warnings about unused variables. */
-		( void ) ucVal;
-		ucROTaskFaultTracker[ 0 ] = 1;
-		ucSharedMemory1[ 0 ] = 0;
-		configASSERT( ucROTaskFaultTracker[ 0 ] == 0 );
+// 	for( ; ; )
+// 	{
+// 		/* This task performs the following sequence for all the shared memory
+// 		 * regions:
+// 		 *
+// 		 * 1. Perfrom a read access to the shared memory. Since this task has
+// 		 *    RO access to the shared memory, the read operation is successful.
+// 		 *
+// 		 * 2. Set ucROTaskFaultTracker[ 0 ] to 1 before performing a write to
+// 		 *    the shared memory. Since this task has Read Only access to the
+// 		 *    shared memory, the write operation would result in a Memory Fault.
+// 		 *    Setting ucROTaskFaultTracker[ 0 ] to 1 tells the Memory Fault
+// 		 *    Handler that this is an expected fault. The handler recovers from
+// 		 *    the expected fault gracefully by jumping to the next instruction.
+// 		 *
+// 		 * 3. Perfrom a write to the shared memory resulting in a memory fault.
+// 		 *
+// 		 * 4. Ensure that the write access did generate MemFault and the fault
+// 		 *    handler did clear the  ucROTaskFaultTracker[ 0 ].
+// 		 */
+// 		/* Perform the above mentioned sequence on ucSharedMemory1. */
+// 		ucVal = ucSharedMemory1[ 0 ];
+// 		/* Silent compiler warnings about unused variables. */
+// 		( void ) ucVal;
+// 		ucROTaskFaultTracker[ 0 ] = 1;
+// 		ucSharedMemory1[ 0 ] = 0;
+// 		configASSERT( ucROTaskFaultTracker[ 0 ] == 0 );
 
-		/* Perform the above mentioned sequence on ucSharedMemory2. */
-		ucVal = ucSharedMemory2[ 0 ];
-		/* Silent compiler warnings about unused variables. */
-		( void ) ucVal;
-		ucROTaskFaultTracker[ 0 ] = 1;
-		ucSharedMemory2[ 0 ] = 0;
-		configASSERT( ucROTaskFaultTracker[ 0 ] == 0 );
+// 		/* Perform the above mentioned sequence on ucSharedMemory2. */
+// 		ucVal = ucSharedMemory2[ 0 ];
+// 		/* Silent compiler warnings about unused variables. */
+// 		( void ) ucVal;
+// 		ucROTaskFaultTracker[ 0 ] = 1;
+// 		ucSharedMemory2[ 0 ] = 0;
+// 		configASSERT( ucROTaskFaultTracker[ 0 ] == 0 );
 
-		/* Perform the above mentioned sequence on ucSharedMemory3. */
-		ucVal = ucSharedMemory3[ 0 ];
-		/* Silent compiler warnings about unused variables. */
-		( void ) ucVal;
-		ucROTaskFaultTracker[ 0 ] = 1;
-		ucSharedMemory3[ 0 ] = 0;
-		configASSERT( ucROTaskFaultTracker[ 0 ] == 0 );
+// 		/* Perform the above mentioned sequence on ucSharedMemory3. */
+// 		ucVal = ucSharedMemory3[ 0 ];
+// 		/* Silent compiler warnings about unused variables. */
+// 		( void ) ucVal;
+// 		ucROTaskFaultTracker[ 0 ] = 1;
+// 		ucSharedMemory3[ 0 ] = 0;
+// 		configASSERT( ucROTaskFaultTracker[ 0 ] == 0 );
 
-		/* Perform the above mentioned sequence on ucSharedMemory4. */
-		ucVal = ucSharedMemory4[ 0 ];
-		/* Silent compiler warnings about unused variables. */
-		( void ) ucVal;
-		ucROTaskFaultTracker[ 0 ] = 1;
-		ucSharedMemory4[ 0 ] = 0;
-		configASSERT( ucROTaskFaultTracker[ 0 ] == 0 );
+// 		/* Perform the above mentioned sequence on ucSharedMemory4. */
+// 		ucVal = ucSharedMemory4[ 0 ];
+// 		/* Silent compiler warnings about unused variables. */
+// 		( void ) ucVal;
+// 		ucROTaskFaultTracker[ 0 ] = 1;
+// 		ucSharedMemory4[ 0 ] = 0;
+// 		configASSERT( ucROTaskFaultTracker[ 0 ] == 0 );
 
-		/* Perform the above mentioned sequence on ucSharedMemory5. */
-		ucVal = ucSharedMemory5[ 0 ];
-		/* Silent compiler warnings about unused variables. */
-		( void ) ucVal;
-		ucROTaskFaultTracker[ 0 ] = 1;
-		ucSharedMemory5[ 0 ] = 0;
-		configASSERT( ucROTaskFaultTracker[ 0 ] == 0 );
+// 		/* Perform the above mentioned sequence on ucSharedMemory5. */
+// 		ucVal = ucSharedMemory5[ 0 ];
+// 		/* Silent compiler warnings about unused variables. */
+// 		( void ) ucVal;
+// 		ucROTaskFaultTracker[ 0 ] = 1;
+// 		ucSharedMemory5[ 0 ] = 0;
+// 		configASSERT( ucROTaskFaultTracker[ 0 ] == 0 );
 
-		/* Perform the above mentioned sequence on ucSharedMemory6. */
-		ucVal = ucSharedMemory6[ 0 ];
-		/* Silent compiler warnings about unused variables. */
-		( void ) ucVal;
-		ucROTaskFaultTracker[ 0 ] = 1;
-		ucSharedMemory6[ 0 ] = 0;
-		configASSERT( ucROTaskFaultTracker[ 0 ] == 0 );
+// 		/* Perform the above mentioned sequence on ucSharedMemory6. */
+// 		ucVal = ucSharedMemory6[ 0 ];
+// 		/* Silent compiler warnings about unused variables. */
+// 		( void ) ucVal;
+// 		ucROTaskFaultTracker[ 0 ] = 1;
+// 		ucSharedMemory6[ 0 ] = 0;
+// 		configASSERT( ucROTaskFaultTracker[ 0 ] == 0 );
 
-		/* Wait for a second. */
-		vTaskDelay( pdMS_TO_TICKS( 1000 ) );
-	}
-}
+// 		/* Wait for a second. */
+// 		vTaskDelay( pdMS_TO_TICKS( 1000 ) );
+// 	}
+// }
 /*-----------------------------------------------------------*/
 
 static void prvRWAccessTask( void * pvParameters )
@@ -201,9 +201,7 @@ static void prvRWAccessTask( void * pvParameters )
 	QueueHandle_t qHandle,qHandle1,qHandle2;
 	QueueHandle_t qReceived;
 	QueueSetHandle_t qSetHandle;
-	QueueSetMemberHandle_t qSetMemberHandle;
 	BaseType_t result = pdFAIL;
-	const char pcName[14];
 
 	static StackType_t xMutexAccessTaskStack[ configMINIMAL_STACK_SIZE ] __attribute__( ( aligned( configMINIMAL_STACK_SIZE * sizeof( StackType_t ) ) ) );
 	TaskParameters_t xMutexAccessTaskParameters =
@@ -267,13 +265,13 @@ static void prvRWAccessTask( void * pvParameters )
 
 
 /*		MPU_uxQueueMessagesWaiting		*/
-		uxReturn = uxQueueMessagesWaiting(qHandle);
-		configPRINTF(("Messages waiting : %ul",uxReturn));
+		uxReturn = uxQueueMessagesWaiting( qHandle );
+		configPRINTF( ( "Messages waiting : %lu", uxReturn ) );
 /*		MPU_uxQueueMessagesWaiting		*/
 
 /*		MPU_uxQueueSpacesAvailable		*/
-		uxReturn = uxQueueSpacesAvailable(qHandle);
-		configPRINTF(("Space Available : %ul",uxReturn));
+		uxReturn = uxQueueSpacesAvailable( qHandle );
+		configPRINTF( ( "Space Available : %lu", uxReturn ) );
 /*		MPU_uxQueueSpacesAvailable		*/
 
 /*		MPU_xQueuePeek					*/
@@ -286,11 +284,11 @@ static void prvRWAccessTask( void * pvParameters )
 
 /* 		Queue Set APIs					*/
 		qSetHandle = xQueueCreateSet( 4 );
-		
+
 		xQueueAddToSet( qHandle, qSetHandle );
 
 		qReceived = xQueueSelectFromSet( qSetHandle, ( TickType_t ) 10 );
-		configASSERT(qReceived == NULL);	
+		configASSERT( qReceived == NULL );
 
 
 /* 		Queue Set APIs					*/
@@ -311,7 +309,7 @@ static void prvRWAccessTask( void * pvParameters )
 		vQueueAddToRegistry( qHandle2, "Queue Handle 2" );
 
 
-	
+
 /* 		Queue Registry APIs					*/
 
 		xQueueReset(qHandle); // MPU_GenericResetFunction
@@ -331,9 +329,8 @@ void vStartMPUDemo( void )
  * Since stack of a task is protected using MPU, it must satisfy MPU
  * requirements as mentioned at the top of this file.
  */
-static StackType_t xROAccessTaskStack[ configMINIMAL_STACK_SIZE ] __attribute__( ( aligned( configMINIMAL_STACK_SIZE * sizeof( StackType_t ) ) ) );
 static StackType_t xRWAccessTaskStack[ configMINIMAL_STACK_SIZE ] __attribute__( ( aligned( configMINIMAL_STACK_SIZE * sizeof( StackType_t ) ) ) );
-TaskParameters_t xROAccessTaskParameters =
+/* TaskParameters_t xROAccessTaskParameters =
 {
 	.pvTaskCode		= prvROAccessTask,
 	.pcName			= "ROAccess",
@@ -354,7 +351,7 @@ TaskParameters_t xROAccessTaskParameters =
 							{ 0,								0,					0																						},
 							{ 0,								0,					0																						}
 						}
-};
+};*/
 TaskParameters_t xRWAccessTaskParameters =
 {
 	.pvTaskCode		= prvRWAccessTask,
@@ -378,7 +375,7 @@ TaskParameters_t xRWAccessTaskParameters =
 						}
 };
 	/* Create an unprivileged task with RO access to ucSharedMemory. */
-	//xTaskCreateRestricted( &( xROAccessTaskParameters ), NULL );
+	/* xTaskCreateRestricted( &( xROAccessTaskParameters ), NULL ); */
 
 	/* Create an unprivileged task with RW access to ucSharedMemory. */
 	xTaskCreateRestricted( &( xRWAccessTaskParameters ), NULL );

@@ -61,6 +61,9 @@
 #define blckqSTACK_SIZE       configMINIMAL_STACK_SIZE
 #define blckqNUM_TASK_SETS    ( 3 )
 
+#define blckqSHARED_MEM_SIZE_HALF_WORDS    ( 16 )
+#define blckqSHARED_MEM_SIZE_BYTES         ( 32 )
+
 #if ( configSUPPORT_DYNAMIC_ALLOCATION == 0 )
     #error This example cannot be used if dynamic allocation is not allowed.
 #endif
@@ -71,6 +74,7 @@ typedef struct BLOCKING_QUEUE_PARAMETERS
     QueueHandle_t xQueue;             /*< The queue to be used by the task. */
     TickType_t xBlockTime;            /*< The block time to use on queue reads/writes. */
     volatile short * psCheckVariable; /*< Incremented on each successful cycle to check the task is still running. */
+    uint32_t unused[ 5 ];
 } xBlockingQueueParameters;
 
 /* Task function that creates an incrementing number and posts it on a queue. */
@@ -83,12 +87,18 @@ static portTASK_FUNCTION_PROTO( vBlockingQueueConsumer, pvParameters );
 /* Variables which are incremented each time an item is removed from a queue, and
  * found to be the expected value.
  * These are used to check that the tasks are still running. */
-static volatile short sBlockingConsumerCount[ blckqNUM_TASK_SETS ] = { ( uint16_t ) 0, ( uint16_t ) 0, ( uint16_t ) 0 };
+static volatile short sBlockingConsumerCount[ blckqSHARED_MEM_SIZE_HALF_WORDS ] __attribute__( ( aligned( blckqSHARED_MEM_SIZE_BYTES ) ) ) = { 0 };
 
 /* Variable which are incremented each time an item is posted on a queue.   These
  * are used to check that the tasks are still running. */
-static volatile short sBlockingProducerCount[ blckqNUM_TASK_SETS ] = { ( uint16_t ) 0, ( uint16_t ) 0, ( uint16_t ) 0 };
+static volatile short sBlockingProducerCount[ blckqSHARED_MEM_SIZE_HALF_WORDS ] __attribute__( ( aligned( blckqSHARED_MEM_SIZE_BYTES ) ) ) = { 0 };
 
+static xBlockingQueueParameters xQueueParameters1 __attribute__( ( aligned( blckqSHARED_MEM_SIZE_BYTES ) ) );
+static xBlockingQueueParameters xQueueParameters2 __attribute__( ( aligned( blckqSHARED_MEM_SIZE_BYTES ) ) );
+static xBlockingQueueParameters xQueueParameters3 __attribute__( ( aligned( blckqSHARED_MEM_SIZE_BYTES ) ) );
+static xBlockingQueueParameters xQueueParameters4 __attribute__( ( aligned( blckqSHARED_MEM_SIZE_BYTES ) ) );
+static xBlockingQueueParameters xQueueParameters5 __attribute__( ( aligned( blckqSHARED_MEM_SIZE_BYTES ) ) );
+static xBlockingQueueParameters xQueueParameters6 __attribute__( ( aligned( blckqSHARED_MEM_SIZE_BYTES ) ) );
 /*-----------------------------------------------------------*/
 
 void vStartBlockingQueueTasks( UBaseType_t uxPriority )
@@ -110,7 +120,7 @@ void vStartBlockingQueueTasks( UBaseType_t uxPriority )
     /* Create the first two tasks as described at the top of the file. */
 
     /* First create the structure used to pass parameters to the consumer tasks. */
-    pxQueueParameters1 = ( xBlockingQueueParameters * ) pvPortMalloc( sizeof( xBlockingQueueParameters ) );
+    pxQueueParameters1 = &( xQueueParameters1 );
 
     /* Create the queue used by the first two tasks to pass the incrementing number.
      * Pass a pointer to the queue in the parameter structure. */
@@ -124,7 +134,7 @@ void vStartBlockingQueueTasks( UBaseType_t uxPriority )
     pxQueueParameters1->psCheckVariable = &( sBlockingConsumerCount[ 0 ] );
 
     /* Create the structure used to pass parameters to the producer task. */
-    pxQueueParameters2 = ( xBlockingQueueParameters * ) pvPortMalloc( sizeof( xBlockingQueueParameters ) );
+    pxQueueParameters2 = &( xQueueParameters2 );
 
     /* Pass the queue to this task also, using the parameter structure. */
     pxQueueParameters2->xQueue = pxQueueParameters1->xQueue;
@@ -142,183 +152,211 @@ void vStartBlockingQueueTasks( UBaseType_t uxPriority )
      * spawned. */
 
 
-	TaskParameters_t xBlockingQueueConsumerB1Task =
-    	{
-    		.pvTaskCode		= vBlockingQueueConsumer,
-    		.pcName			= "QConsB1",
-    		.usStackDepth	= blckqSTACK_SIZE,
-    		.pvParameters	= ( void * ) pxQueueParameters1,
-    		.uxPriority		= uxPriority,
-    		.puxStackBuffer	= xBlockingQueueConsumerB1TaskStack,
-    		.xRegions		=	{
-    								{ ucSharedMemory1,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-    								{ ucSharedMemory2,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-    								{ ucSharedMemory3,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-    								{ ucSharedMemory4,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-    								{ ucSharedMemory5,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-    								{ ucSharedMemory6,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-    								{ 0,				0,					0														},
-    								{ 0,				0,					0														},
-    								{ 0,				0,					0														},
-    								{ 0,				0,					0														},
-    								{ 0,				0,					0														}
-    							}
-    	};
-	TaskParameters_t xBlockingQueueProducerB2Task =
-	    	{
-	    		.pvTaskCode		= vBlockingQueueProducer,
-	    		.pcName			= "QProdB2",
-	    		.usStackDepth	= blckqSTACK_SIZE,
-	    		.pvParameters	= ( void * ) pxQueueParameters2,
-	    		.uxPriority		= tskIDLE_PRIORITY,
-	    		.puxStackBuffer	= xBlockingQueueProducerB2TaskStack,
-	    		.xRegions		=	{
-	    								{ ucSharedMemory1,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-	    								{ ucSharedMemory2,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-	    								{ ucSharedMemory3,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-	    								{ ucSharedMemory4,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-	    								{ ucSharedMemory5,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-	    								{ ucSharedMemory6,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-	    								{ 0,				0,					0														},
-	    								{ 0,				0,					0														},
-	    								{ 0,				0,					0														},
-	    								{ 0,				0,					0														},
-	    								{ 0,				0,					0														}
-	    							}
-	    	};
+    TaskParameters_t xBlockingQueueConsumerB1Task =
+        {
+            .pvTaskCode      = vBlockingQueueConsumer,
+            .pcName          = "QConsB1",
+            .usStackDepth    = blckqSTACK_SIZE,
+            .pvParameters    = ( void * ) pxQueueParameters1,
+            .uxPriority      = uxPriority,
+            .puxStackBuffer  = xBlockingQueueConsumerB1TaskStack,
+            .xRegions        =    {
+                                    { ( void * ) &( sBlockingConsumerCount[ 0 ] ), blckqSHARED_MEM_SIZE_BYTES,
+                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                        ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                    },
+                                    { &( xQueueParameters1 ), blckqSHARED_MEM_SIZE_BYTES,
+                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                        ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                    },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        }
+                                }
+        };
+    TaskParameters_t xBlockingQueueProducerB2Task =
+        {
+            .pvTaskCode      = vBlockingQueueProducer,
+            .pcName          = "QProdB2",
+            .usStackDepth    = blckqSTACK_SIZE,
+            .pvParameters    = ( void * ) pxQueueParameters2,
+            .uxPriority      = tskIDLE_PRIORITY,
+            .puxStackBuffer  = xBlockingQueueProducerB2TaskStack,
+            .xRegions        =    {
+                                    { ( void * ) &( sBlockingProducerCount[ 0 ] ), blckqSHARED_MEM_SIZE_BYTES,
+                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                        ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                    },
+                                    { &( xQueueParameters2 ), blckqSHARED_MEM_SIZE_BYTES,
+                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                        ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                    },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        }
+                                }
+        };
 
-    //xTaskCreate( vBlockingQueueConsumer, "QConsB1", blckqSTACK_SIZE, ( void * ) pxQueueParameters1, uxPriority, NULL );
-    //xTaskCreate( vBlockingQueueProducer, "QProdB2", blckqSTACK_SIZE, ( void * ) pxQueueParameters2, tskIDLE_PRIORITY, NULL );
-	xTaskCreateRestricted( &(xBlockingQueueConsumerB1Task), NULL );
-	xTaskCreateRestricted( &(xBlockingQueueProducerB2Task), NULL );
+    xTaskCreateRestricted( &( xBlockingQueueConsumerB1Task ), NULL );
+    xTaskCreateRestricted( &( xBlockingQueueProducerB2Task ), NULL );
 
 
     /* Create the second two tasks as described at the top of the file.   This uses
      * the same mechanism but reverses the task priorities. */
 
-    pxQueueParameters3 = ( xBlockingQueueParameters * ) pvPortMalloc( sizeof( xBlockingQueueParameters ) );
+    pxQueueParameters3 = &( xQueueParameters3 );
     pxQueueParameters3->xQueue = xQueueCreate( uxQueueSize1, ( UBaseType_t ) sizeof( uint16_t ) );
     pxQueueParameters3->xBlockTime = xDontBlock;
-    pxQueueParameters3->psCheckVariable = &( sBlockingProducerCount[ 1 ] );
+    pxQueueParameters3->psCheckVariable = &( sBlockingConsumerCount[ 1 ] );
 
-    pxQueueParameters4 = ( xBlockingQueueParameters * ) pvPortMalloc( sizeof( xBlockingQueueParameters ) );
+    pxQueueParameters4 = &( xQueueParameters4 );
     pxQueueParameters4->xQueue = pxQueueParameters3->xQueue;
     pxQueueParameters4->xBlockTime = xBlockTime;
-    pxQueueParameters4->psCheckVariable = &( sBlockingConsumerCount[ 1 ] );
+    pxQueueParameters4->psCheckVariable = &( sBlockingProducerCount[ 1 ] );
 
-	TaskParameters_t xBlockingQueueConsumerB3Task =
-    	{
-    		.pvTaskCode		= vBlockingQueueConsumer,
-    		.pcName			= "QConsB3",
-    		.usStackDepth	= blckqSTACK_SIZE,
-    		.pvParameters	= ( void * ) pxQueueParameters3,
-    		.uxPriority		= tskIDLE_PRIORITY,
-    		.puxStackBuffer	= xBlockingQueueConsumerB3TaskStack,
-    		.xRegions		=	{
-    								{ ucSharedMemory1,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-    								{ ucSharedMemory2,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-    								{ ucSharedMemory3,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-    								{ ucSharedMemory4,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-    								{ ucSharedMemory5,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-    								{ ucSharedMemory6,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-    								{ 0,				0,					0														},
-    								{ 0,				0,					0														},
-    								{ 0,				0,					0														},
-    								{ 0,				0,					0														},
-    								{ 0,				0,					0														}
-    							}
-    	};
-	TaskParameters_t xBlockingQueueProducerB4Task =
-	    	{
-	    		.pvTaskCode		= vBlockingQueueProducer,
-	    		.pcName			= "QProdB4",
-	    		.usStackDepth	= blckqSTACK_SIZE,
-	    		.pvParameters	= ( void * ) pxQueueParameters4,
-	    		.uxPriority		= uxPriority,
-	    		.puxStackBuffer	= xBlockingQueueProducerB4TaskStack,
-	    		.xRegions		=	{
-	    								{ ucSharedMemory1,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-	    								{ ucSharedMemory2,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-	    								{ ucSharedMemory3,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-	    								{ ucSharedMemory4,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-	    								{ ucSharedMemory5,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-	    								{ ucSharedMemory6,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-	    								{ 0,				0,					0														},
-	    								{ 0,				0,					0														},
-	    								{ 0,				0,					0														},
-	    								{ 0,				0,					0														},
-	    								{ 0,				0,					0														}
-	    							}
-	    	};
+    TaskParameters_t xBlockingQueueConsumerB3Task =
+        {
+            .pvTaskCode      = vBlockingQueueConsumer,
+            .pcName          = "QConsB3",
+            .usStackDepth    = blckqSTACK_SIZE,
+            .pvParameters    = ( void * ) pxQueueParameters3,
+            .uxPriority      = tskIDLE_PRIORITY,
+            .puxStackBuffer  = xBlockingQueueConsumerB3TaskStack,
+            .xRegions        =    {
+                                    { ( void * ) &( sBlockingConsumerCount[ 0 ] ), blckqSHARED_MEM_SIZE_BYTES,
+                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                             ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                    },
+                                    { &( xQueueParameters3 ), blckqSHARED_MEM_SIZE_BYTES,
+                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                        ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                    },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        }
+                                }
+        };
+    TaskParameters_t xBlockingQueueProducerB4Task =
+        {
+            .pvTaskCode      = vBlockingQueueProducer,
+            .pcName          = "QProdB4",
+            .usStackDepth    = blckqSTACK_SIZE,
+            .pvParameters    = ( void * ) pxQueueParameters4,
+            .uxPriority      = uxPriority,
+            .puxStackBuffer  = xBlockingQueueProducerB4TaskStack,
+            .xRegions        =    {
+                                    { ( void * ) &( sBlockingProducerCount[ 0 ] ), blckqSHARED_MEM_SIZE_BYTES,
+                                        ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                        ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                    },
+                                    { &( xQueueParameters4 ), blckqSHARED_MEM_SIZE_BYTES,
+                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                        ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                    },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        }
+                                }
+        };
 
-    //xTaskCreate( vBlockingQueueConsumer, "QConsB3", blckqSTACK_SIZE, ( void * ) pxQueueParameters3, tskIDLE_PRIORITY, NULL );
-    //xTaskCreate( vBlockingQueueProducer, "QProdB4", blckqSTACK_SIZE, ( void * ) pxQueueParameters4, uxPriority, NULL );
-
-	xTaskCreateRestricted( &(xBlockingQueueConsumerB3Task), NULL );
-	xTaskCreateRestricted( &(xBlockingQueueProducerB4Task), NULL );
+    xTaskCreateRestricted( &( xBlockingQueueConsumerB3Task ), NULL );
+    xTaskCreateRestricted( &( xBlockingQueueProducerB4Task ), NULL );
 
     /* Create the last two tasks as described above.  The mechanism is again just
      * the same.  This time both parameter structures are given a block time. */
-    pxQueueParameters5 = ( xBlockingQueueParameters * ) pvPortMalloc( sizeof( xBlockingQueueParameters ) );
+    pxQueueParameters5 = &( xQueueParameters5 );
     pxQueueParameters5->xQueue = xQueueCreate( uxQueueSize5, ( UBaseType_t ) sizeof( uint16_t ) );
     pxQueueParameters5->xBlockTime = xBlockTime;
     pxQueueParameters5->psCheckVariable = &( sBlockingProducerCount[ 2 ] );
 
-    pxQueueParameters6 = ( xBlockingQueueParameters * ) pvPortMalloc( sizeof( xBlockingQueueParameters ) );
+    pxQueueParameters6 = &( xQueueParameters6 );
     pxQueueParameters6->xQueue = pxQueueParameters5->xQueue;
     pxQueueParameters6->xBlockTime = xBlockTime;
     pxQueueParameters6->psCheckVariable = &( sBlockingConsumerCount[ 2 ] );
 
-	TaskParameters_t xBlockingQueueProducerB5Task =
-    	{
-    		.pvTaskCode		= vBlockingQueueProducer,
-    		.pcName			= "QProdB5",
-    		.usStackDepth	= blckqSTACK_SIZE,
-    		.pvParameters	= ( void * ) pxQueueParameters5,
-    		.uxPriority		= tskIDLE_PRIORITY,
-    		.puxStackBuffer	= xBlockingQueueProducerB5TaskStack,
-    		.xRegions		=	{
-    								{ ucSharedMemory1,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-    								{ ucSharedMemory2,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-    								{ ucSharedMemory3,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-    								{ ucSharedMemory4,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-    								{ ucSharedMemory5,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-    								{ ucSharedMemory6,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-    								{ 0,				0,					0														},
-    								{ 0,				0,					0														},
-    								{ 0,				0,					0														},
-    								{ 0,				0,					0														},
-    								{ 0,				0,					0														}
-    							}
-    	};
-	TaskParameters_t xBlockingQueueConsumerB6Task =
-	    	{
-	    		.pvTaskCode		= vBlockingQueueConsumer,
-	    		.pcName			= "QConsB6",
-	    		.usStackDepth	= blckqSTACK_SIZE,
-	    		.pvParameters	= ( void * ) pxQueueParameters6,
-	    		.uxPriority		= tskIDLE_PRIORITY,
-	    		.puxStackBuffer	= xBlockingQueueConsumerB6TaskStack,
-	    		.xRegions		=	{
-	    								{ ucSharedMemory1,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-	    								{ ucSharedMemory2,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-	    								{ ucSharedMemory3,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-	    								{ ucSharedMemory4,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-	    								{ ucSharedMemory5,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-	    								{ ucSharedMemory6,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-	    								{ 0,				0,					0														},
-	    								{ 0,				0,					0														},
-	    								{ 0,				0,					0														},
-	    								{ 0,				0,					0														},
-	    								{ 0,				0,					0														}
-	    							}
-	    	};
+    TaskParameters_t xBlockingQueueProducerB5Task =
+        {
+            .pvTaskCode      = vBlockingQueueProducer,
+            .pcName          = "QProdB5",
+            .usStackDepth    = blckqSTACK_SIZE,
+            .pvParameters    = ( void * ) pxQueueParameters5,
+            .uxPriority      = tskIDLE_PRIORITY,
+            .puxStackBuffer  = xBlockingQueueProducerB5TaskStack,
+            .xRegions        =    {
+                                    { ( void * ) &( sBlockingProducerCount[ 0 ] ), blckqSHARED_MEM_SIZE_BYTES,
+                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                        ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                    },
+                                    { &( xQueueParameters5 ), blckqSHARED_MEM_SIZE_BYTES,
+                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                        ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                    },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        }
+                                }
+        };
+    TaskParameters_t xBlockingQueueConsumerB6Task =
+        {
+            .pvTaskCode      = vBlockingQueueConsumer,
+            .pcName          = "QConsB6",
+            .usStackDepth    = blckqSTACK_SIZE,
+            .pvParameters    = ( void * ) pxQueueParameters6,
+            .uxPriority      = tskIDLE_PRIORITY,
+            .puxStackBuffer  = xBlockingQueueConsumerB6TaskStack,
+            .xRegions        =    {
+                                    { ( void * ) &( sBlockingConsumerCount[ 0 ] ), blckqSHARED_MEM_SIZE_BYTES,
+                                        ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                        ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                    },
+                                    { &( xQueueParameters6 ), blckqSHARED_MEM_SIZE_BYTES,
+                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                        ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                    },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        }
+                                }
+        };
 
-    //xTaskCreate( vBlockingQueueProducer, "QProdB5", blckqSTACK_SIZE, ( void * ) pxQueueParameters5, tskIDLE_PRIORITY, NULL );
-    //xTaskCreate( vBlockingQueueConsumer, "QConsB6", blckqSTACK_SIZE, ( void * ) pxQueueParameters6, tskIDLE_PRIORITY, NULL );
-
-	xTaskCreateRestricted( &(xBlockingQueueProducerB5Task), NULL );
-	xTaskCreateRestricted( &(xBlockingQueueConsumerB6Task), NULL );
+    xTaskCreateRestricted( &( xBlockingQueueProducerB5Task ), NULL );
+    xTaskCreateRestricted( &( xBlockingQueueConsumerB6Task ), NULL );
 }
 /*-----------------------------------------------------------*/
 
@@ -346,7 +384,7 @@ static portTASK_FUNCTION( vBlockingQueueProducer, pvParameters )
             }
 
             /* Increment the variable we are going to post next time round.  The
-             * consumer will expect the numbers to	follow in numerical order. */
+             * consumer will expect the numbers to follow in numerical order. */
             ++usValue;
 
             #if configUSE_PREEMPTION == 0

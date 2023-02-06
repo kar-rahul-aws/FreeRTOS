@@ -82,15 +82,6 @@
  * Period used in timer tests.
  */
 #define testrunnerTIMER_TEST_PERIOD				( 50 )
-
-/* shared regions */
-/**
- * @brief Size of the shared memory region.
- */
-#define SHARED_MEMORY_SIZE 32
-
-
-
 /*-----------------------------------------------------------*/
 
 /**
@@ -116,15 +107,15 @@ void vStartTests( void )
 		.pcName			= "Check",
 		.usStackDepth	= configMINIMAL_STACK_SIZE,
 		.pvParameters	= NULL,
-		.uxPriority		= testrunnerCHECK_TASK_PRIORITY|portPRIVILEGE_BIT,
+		.uxPriority		= ( testrunnerCHECK_TASK_PRIORITY | portPRIVILEGE_BIT ),
 		.puxStackBuffer	= xCheckTaskStack,
 		.xRegions		=	{
-								{ ucSharedMemory1,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-								{ ucSharedMemory2,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-								{ ucSharedMemory3,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-								{ ucSharedMemory4,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-								{ ucSharedMemory5,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-								{ ucSharedMemory6,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
+								{ 0,				0,					0														},
+								{ 0,				0,					0														},
+								{ 0,				0,					0														},
+								{ 0,				0,					0														},
+								{ 0,				0,					0														},
+								{ 0,				0,					0														},
 								{ 0,				0,					0														},
 								{ 0,				0,					0														},
 								{ 0,				0,					0														},
@@ -132,14 +123,6 @@ void vStartTests( void )
 								{ 0,				0,					0														}
 							}
 	};
-
-	/*xResult = xTaskCreate( prvCheckTask,
-						  "",
-						  configMINIMAL_STACK_SIZE,
-						  NULL,
-						  testrunnerCHECK_TASK_PRIORITY,
-						  NULL );
-	*/
 
 	xResult = xTaskCreateRestricted( &( xCheckTaskParameters ), NULL );
 
