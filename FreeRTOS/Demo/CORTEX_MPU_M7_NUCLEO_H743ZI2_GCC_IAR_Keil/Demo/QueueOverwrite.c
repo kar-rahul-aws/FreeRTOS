@@ -43,12 +43,15 @@
 /* Number of times to overwrite the value in the queue. */
 #define qoLOOPS         5
 
+#define qoSHARED_MEMORY_SIZE_WORDS  ( 8 )
+#define qoSHARED_MEMORY_SIZE_BYTES  ( 32 )
+
 /* The task that uses the queue. */
 static void prvQueueOverwriteTask( void * pvParameters );
 
 /* Variable that is incremented on each loop of prvQueueOverwriteTask() provided
  * prvQueueOverwriteTask() has not found any errors. */
-static uint32_t ulLoopCounter[8] = {0};
+static uint32_t ulLoopCounter[ qoSHARED_MEMORY_SIZE_WORDS ] __attribute__( ( aligned( qoSHARED_MEMORY_SIZE_BYTES ) ) ) = {0};
 
 /* Set to pdFALSE if an error is discovered by the
  * vQueueOverwritePeriodicISRDemo() function. */
@@ -71,30 +74,33 @@ void vStartQueueOverwriteTask( UBaseType_t uxPriority )
     /* Create the test task.  The queue used by the test task is created inside
      * the task itself. */
     static StackType_t xQueueOverwriteTaskStack[ configMINIMAL_STACK_SIZE ] __attribute__( ( aligned( configMINIMAL_STACK_SIZE * sizeof( StackType_t ) ) ) );
-	TaskParameters_t xQueueOverwriteTask =
-	    	{
-	    		.pvTaskCode		= prvQueueOverwriteTask,
-	    		.pcName			= "QOver",
-	    		.usStackDepth	= configMINIMAL_STACK_SIZE,
-	    		.pvParameters	= NULL,
-	    		.uxPriority		= uxPriority,
-	    		.puxStackBuffer	= xQueueOverwriteTaskStack,
-	    		.xRegions		=	{
-	    								{ ucSharedMemory1,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-	    								{ ucSharedMemory2,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-	    								{ ucSharedMemory3,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-	    								{ ucSharedMemory4,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-	    								{ ucSharedMemory5,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-	    								{ ucSharedMemory6,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-	    								{ (void *)ulLoopCounter, SHARED_MEMORY_SIZE, portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-	    								{ 0,				0,					0														},
-	    								{ 0,				0,					0														},
-	    								{ 0,				0,					0														},
-	    								{ 0,				0,					0														}
-	    							}
-	    	};
-    //xTaskCreate( prvQueueOverwriteTask, "QOver", configMINIMAL_STACK_SIZE, NULL, uxPriority, ( TaskHandle_t * ) NULL );
-	xTaskCreateRestricted(&(xQueueOverwriteTask),NULL);
+    TaskParameters_t xQueueOverwriteTask =
+            {
+                .pvTaskCode      = prvQueueOverwriteTask,
+                .pcName          = "QOver",
+                .usStackDepth    = configMINIMAL_STACK_SIZE,
+                .pvParameters    = NULL,
+                .uxPriority      = uxPriority,
+                .puxStackBuffer  = xQueueOverwriteTaskStack,
+                .xRegions        =    {
+                                        { ( void * ) &( ulLoopCounter[ 0 ] ), qoSHARED_MEMORY_SIZE_BYTES,
+                                           ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                             ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                        },
+                                        { 0,                0,                    0                                                        },
+                                        { 0,                0,                    0                                                        },
+                                        { 0,                0,                    0                                                        },
+                                        { 0,                0,                    0                                                        },
+                                        { 0,                0,                    0                                                        },
+                                        { 0,                0,                    0                                                        },
+                                        { 0,                0,                    0                                                        },
+                                        { 0,                0,                    0                                                        },
+                                        { 0,                0,                    0                                                        },
+                                        { 0,                0,                    0                                                        }
+                                    }
+            };
+
+    xTaskCreateRestricted( &( xQueueOverwriteTask ), NULL );
 }
 /*-----------------------------------------------------------*/
 
@@ -109,7 +115,6 @@ static void prvQueueOverwriteTask( void * pvParameters )
 
     /* Create the queue.  xQueueOverwrite() should only be used on queues that
      * have a length of 1. */
-
     xTaskQueue = xQueueCreate( uxQueueLength, ( UBaseType_t ) sizeof( uint32_t ) );
     configASSERT( xTaskQueue );
 
@@ -163,7 +168,7 @@ static void prvQueueOverwriteTask( void * pvParameters )
         {
             /* Increment a counter to show this task is still running without
              * error. */
-            ulLoopCounter[0]++;
+            ulLoopCounter[ 0 ]++;
         }
 
         #if ( configUSE_PREEMPTION == 0 )
@@ -181,7 +186,7 @@ BaseType_t xIsQueueOverwriteTaskStillRunning( void )
     {
         xReturn = pdFAIL;
     }
-    else if( ulLoopCounter > 0 )
+    else if( ulLoopCounter[ 0 ] > 0 )
     {
         xReturn = pdPASS;
     }
@@ -191,7 +196,7 @@ BaseType_t xIsQueueOverwriteTaskStillRunning( void )
         xReturn = pdFAIL;
     }
 
-    ulLoopCounter[0] = 0;
+    ulLoopCounter[ 0 ] = 0;
 
     return xReturn;
 }
