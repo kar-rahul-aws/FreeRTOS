@@ -72,6 +72,9 @@
 #define pollqVALUES_TO_PRODUCE    ( ( BaseType_t ) 3 )
 #define pollqINITIAL_VALUE        ( ( BaseType_t ) 0 )
 
+#define pollqSHARED_MEM_SIZE_WORDS ( 8 )
+#define pollqSHARED_MEM_SIZE_BYTES ( 32 )
+
 /* The task that posts the incrementing number onto the queue. */
 static portTASK_FUNCTION_PROTO( vPolledQueueProducer, pvParameters );
 
@@ -80,18 +83,19 @@ static portTASK_FUNCTION_PROTO( vPolledQueueConsumer, pvParameters );
 
 /* Variables that are used to check that the tasks are still running with no
  * errors. */
-static volatile BaseType_t xPollingConsumerCount = pollqINITIAL_VALUE, xPollingProducerCount = pollqINITIAL_VALUE;
+static volatile BaseType_t xPollingConsumerCount[ pollqSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( pollqSHARED_MEM_SIZE_BYTES ) ) ) = { pollqINITIAL_VALUE };
+static volatile BaseType_t xPollingProducerCount[ pollqSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( pollqSHARED_MEM_SIZE_BYTES ) ) )= { pollqINITIAL_VALUE };
 
 /*-----------------------------------------------------------*/
 
 void vStartPolledQueueTasks( UBaseType_t uxPriority )
 {
-    static QueueHandle_t xPolledQueue;
+    static QueueHandle_t xPolledQueue[ pollqSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( pollqSHARED_MEM_SIZE_BYTES ) ) );
 
     /* Create the queue used by the producer and consumer. */
-    xPolledQueue = xQueueCreate( pollqQUEUE_SIZE, ( UBaseType_t ) sizeof( uint16_t ) );
+    xPolledQueue[ 0 ] = xQueueCreate( pollqQUEUE_SIZE, ( UBaseType_t ) sizeof( uint16_t ) );
 
-    if( xPolledQueue != NULL )
+    if( xPolledQueue[ 0 ] != NULL )
     {
         /* vQueueAddToRegistry() adds the queue to the queue registry, if one is
          * in use.  The queue registry is provided as a means for kernel aware
@@ -99,62 +103,72 @@ void vStartPolledQueueTasks( UBaseType_t uxPriority )
          * is not being used.  The call to vQueueAddToRegistry() will be removed
          * by the pre-processor if configQUEUE_REGISTRY_SIZE is not defined or is
          * defined to be less than 1. */
-        vQueueAddToRegistry( xPolledQueue, "Poll_Test_Queue" );
+        vQueueAddToRegistry( xPolledQueue[ 0 ], "Poll_Test_Queue" );
 
         /* Spawn the producer and consumer. */
 
-    	static StackType_t xPolledQueueConsumerStack[ pollqSTACK_SIZE ] __attribute__( ( aligned( pollqSTACK_SIZE * sizeof( StackType_t ) ) ) );
-    	static StackType_t xPolledQueueProducerStack[ pollqSTACK_SIZE ] __attribute__( ( aligned( pollqSTACK_SIZE * sizeof( StackType_t ) ) ) );
-    	TaskParameters_t xvPolledQueueConsumer =
-    	{
-    		.pvTaskCode		= vPolledQueueConsumer,
-    		.pcName			= "QConsNB",
-    		.usStackDepth	= pollqSTACK_SIZE,
-    		.pvParameters	= ( void * ) &xPolledQueue,
-    		.uxPriority		= uxPriority,
-    		.puxStackBuffer	= xPolledQueueConsumerStack,
-    		.xRegions		=	{
-    								{ ucSharedMemory1,	SHARED_MEMORY_SIZE,	portMPU_REGION_PRIVILEGED_READ_WRITE_UNPRIV_READ_ONLY | portMPU_REGION_EXECUTE_NEVER},
-    								{ ucSharedMemory2,	SHARED_MEMORY_SIZE,	portMPU_REGION_PRIVILEGED_READ_WRITE_UNPRIV_READ_ONLY | portMPU_REGION_EXECUTE_NEVER},
-    								{ ucSharedMemory3,	SHARED_MEMORY_SIZE,	portMPU_REGION_PRIVILEGED_READ_WRITE_UNPRIV_READ_ONLY | portMPU_REGION_EXECUTE_NEVER},
-    								{ ucSharedMemory4,	SHARED_MEMORY_SIZE,	portMPU_REGION_PRIVILEGED_READ_WRITE_UNPRIV_READ_ONLY | portMPU_REGION_EXECUTE_NEVER},
-    								{ ucSharedMemory5,	SHARED_MEMORY_SIZE,	portMPU_REGION_PRIVILEGED_READ_WRITE_UNPRIV_READ_ONLY | portMPU_REGION_EXECUTE_NEVER},
-    								{ ucSharedMemory6,	SHARED_MEMORY_SIZE,	portMPU_REGION_PRIVILEGED_READ_WRITE_UNPRIV_READ_ONLY | portMPU_REGION_EXECUTE_NEVER},
-    								{ 0,				0,					0														},
-    								{ 0,				0,					0														},
-    								{ 0,				0,					0														},
-    								{ 0,				0,					0														},
-    								{ 0,				0,					0														}
-    							}
-    	};
+        static StackType_t xPolledQueueConsumerStack[ pollqSTACK_SIZE ] __attribute__( ( aligned( pollqSTACK_SIZE * sizeof( StackType_t ) ) ) );
+        static StackType_t xPolledQueueProducerStack[ pollqSTACK_SIZE ] __attribute__( ( aligned( pollqSTACK_SIZE * sizeof( StackType_t ) ) ) );
+        TaskParameters_t xvPolledQueueConsumer =
+        {
+            .pvTaskCode      = vPolledQueueConsumer,
+            .pcName          = "QConsNB",
+            .usStackDepth    = pollqSTACK_SIZE,
+            .pvParameters    = ( void * ) &( xPolledQueue[ 0 ] ),
+            .uxPriority      = uxPriority,
+            .puxStackBuffer  = xPolledQueueConsumerStack,
+            .xRegions        =    {
+                                    { ( void * ) &( xPollingConsumerCount[ 0 ] ), pollqSHARED_MEM_SIZE_BYTES,
+                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                        ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                    },
+                                    { ( void * ) &( xPolledQueue[ 0 ] ), pollqSHARED_MEM_SIZE_BYTES,
+                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                        ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                    },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        }
+                                }
+        };
 
-    	TaskParameters_t xvPolledQueueProducer =
-    	    	{
-    	    		.pvTaskCode		= vPolledQueueProducer,
-    	    		.pcName			= "QProdNB",
-    	    		.usStackDepth	= pollqSTACK_SIZE,
-    	    		.pvParameters	= ( void * ) &xPolledQueue,
-    	    		.uxPriority		= uxPriority,
-    	    		.puxStackBuffer	= xPolledQueueProducerStack,
-    	    		.xRegions		=	{
-    	    								{ ucSharedMemory1,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-    	    								{ ucSharedMemory2,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-    	    								{ ucSharedMemory3,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-    	    								{ ucSharedMemory4,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-    	    								{ ucSharedMemory5,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-    	    								{ ucSharedMemory6,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-    	    								{ 0,				0,					0														},
-    	    								{ 0,				0,					0														},
-    	    								{ 0,				0,					0														},
-    	    								{ 0,				0,					0														},
-    	    								{ 0,				0,					0														}
-    	    							}
-    	    	};
+        TaskParameters_t xvPolledQueueProducer =
+        {
+            .pvTaskCode      = vPolledQueueProducer,
+            .pcName          = "QProdNB",
+            .usStackDepth    = pollqSTACK_SIZE,
+            .pvParameters    = ( void * ) &( xPolledQueue[ 0 ] ),
+            .uxPriority      = uxPriority,
+            .puxStackBuffer  = xPolledQueueProducerStack,
+            .xRegions        =    {
+                                    { ( void * ) &( xPollingProducerCount[ 0 ] ), pollqSHARED_MEM_SIZE_BYTES,
+                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                        ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                    },
+                                    { ( void * ) &( xPolledQueue[ 0 ] ), pollqSHARED_MEM_SIZE_BYTES,
+                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                        ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                    },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        }
+                                }
+        };
 
-        //xTaskCreate( vPolledQueueConsumer, "QConsNB", pollqSTACK_SIZE, ( void * ) &xPolledQueue, uxPriority, ( TaskHandle_t * ) NULL );
-        //xTaskCreate( vPolledQueueProducer, "QProdNB", pollqSTACK_SIZE, ( void * ) &xPolledQueue, uxPriority, ( TaskHandle_t * ) NULL );
-    	xTaskCreateRestricted( &( xvPolledQueueConsumer ),( TaskHandle_t * ) NULL);
-    	xTaskCreateRestricted( &( xvPolledQueueProducer ),( TaskHandle_t * ) NULL);
+        xTaskCreateRestricted( &( xvPolledQueueConsumer ), ( TaskHandle_t * ) NULL);
+        xTaskCreateRestricted( &( xvPolledQueueProducer ), ( TaskHandle_t * ) NULL);
     }
 }
 /*-----------------------------------------------------------*/
@@ -169,7 +183,7 @@ static portTASK_FUNCTION( vPolledQueueProducer, pvParameters )
         for( xLoop = 0; xLoop < pollqVALUES_TO_PRODUCE; xLoop++ )
         {
             /* Send an incrementing number on the queue without blocking. */
-            if( xQueueSend( *( ( QueueHandle_t * ) pvParameters ),  &usValue, pollqNO_DELAY ) != pdPASS )
+            if( xQueueSend( *( ( QueueHandle_t * ) pvParameters ), ( void * ) &usValue, pollqNO_DELAY ) != pdPASS )
             {
                 /* We should never find the queue full so if we get here there
                  * has been an error. */
@@ -182,7 +196,7 @@ static portTASK_FUNCTION( vPolledQueueProducer, pvParameters )
                     /* If an error has ever been recorded we stop incrementing the
                      * check variable. */
                     portENTER_CRITICAL();
-                    xPollingProducerCount++;
+                    xPollingProducerCount[ 0 ]++;
                     portEXIT_CRITICAL();
                 }
 
@@ -227,7 +241,7 @@ static portTASK_FUNCTION( vPolledQueueConsumer, pvParameters )
                         /* Only increment the check variable if no errors have
                          * occurred. */
                         portENTER_CRITICAL();
-                        xPollingConsumerCount++;
+                        xPollingConsumerCount[ 0 ]++;
                         portEXIT_CRITICAL();
                     }
                 }
@@ -266,8 +280,8 @@ BaseType_t xArePollingQueuesStillRunning( void )
 
     /* Set the check variables back down so we know if they have been
      * incremented the next time around. */
-    xPollingConsumerCount = pollqINITIAL_VALUE;
-    xPollingProducerCount = pollqINITIAL_VALUE;
+    xPollingConsumerCount[ 0 ] = pollqINITIAL_VALUE;
+    xPollingProducerCount[ 0 ] = pollqINITIAL_VALUE;
 
     return xReturn;
 }

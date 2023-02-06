@@ -151,7 +151,7 @@ See http://www.FreeRTOS.org/RTOS-Cortex-M3-M4.html. */
 #define configSTART_TASK_NOTIFY_ARRAY_TESTS       0
 #define configSTART_BLOCKING_QUEUE_TESTS          1
 #define configSTART_SEMAPHORE_TESTS               0
-#define configSTART_POLLED_QUEUE_TESTS            0
+#define configSTART_POLLED_QUEUE_TESTS            1
 #define configSTART_INTEGER_MATH_TESTS            0
 #define configSTART_GENERIC_QUEUE_TESTS           1
 #define configSTART_PEEK_QUEUE_TESTS              0
@@ -173,7 +173,7 @@ See http://www.FreeRTOS.org/RTOS-Cortex-M3-M4.html. */
 #define configSTART_REGISTER_TESTS                0
 #define configSTART_DELETE_SELF_TESTS             0
 
-#define configALLOW_UNPRIVILEGED_CRITICAL_SECTIONS 0
+#define configALLOW_UNPRIVILEGED_CRITICAL_SECTIONS 1 /* PolledQ tests need it. */
 /*------------------------------------------------------------------------------------------------------------*/
 
 #endif /* FREERTOS_CONFIG_H */
