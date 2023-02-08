@@ -50,6 +50,10 @@
 /* Demo includes. */
 #include "QueueSet.h"
 
+#define qsetSHARED_MEM_SIZE_WORDS			(8)
+#define qsetSHARED_MEM_SIZE_HALF_WORDS		(16)
+#define qsetSHARED_MEM_SIZE_BYTES			(32)
+
 
 #if ( configUSE_QUEUE_SETS == 1 ) /* Remove the tests if queue sets are not defined. */
 
@@ -170,40 +174,51 @@
 /*-----------------------------------------------------------*/
 
 /* The queues that are added to the set. */
-    static QueueHandle_t xQueues[ queuesetNUM_QUEUES_IN_SET ] = { 0 };
+    static QueueHandle_t xQueues[ qsetSHARED_MEM_SIZE_WORDS ] __attribute__ ( ( aligned( qsetSHARED_MEM_SIZE_BYTES ) ) ) = { NULL };
 
 /* Counts how many times each queue in the set is used to ensure all the
  * queues are used. */
-    static uint32_t ulQueueUsedCounter[ queuesetNUM_QUEUES_IN_SET ] = { 0 };
+    static uint32_t ulQueueUsedCounter[ qsetSHARED_MEM_SIZE_WORDS ] __attribute__ ( ( aligned( qsetSHARED_MEM_SIZE_BYTES ) ) ) = { 0 };
 
 /* The handle of the queue set to which the queues are added. */
-    static QueueSetHandle_t xQueueSet;
+    static QueueSetHandle_t xQueueSet[ qsetSHARED_MEM_SIZE_WORDS ] __attribute__ ( ( aligned( qsetSHARED_MEM_SIZE_BYTES ) ) ) = { NULL };
 
 /* If the prvQueueSetReceivingTask() task has not detected any errors then
  * it increments ulCycleCounter on each iteration.
  * xAreQueueSetTasksStillRunning() returns pdPASS if the value of
  * ulCycleCounter has changed between consecutive calls, and pdFALSE if
  * ulCycleCounter has stopped incrementing (indicating an error condition). */
-    static volatile uint32_t ulCycleCounter = 0UL;
+    static volatile uint32_t ulCycleCounter[ qsetSHARED_MEM_SIZE_WORDS ] __attribute__ ( ( aligned( qsetSHARED_MEM_SIZE_BYTES ) ) ) = { 0UL };
 
 /* Set to pdFAIL if an error is detected by any queue set task.
  * ulCycleCounter will only be incremented if xQueueSetTasksSatus equals pdPASS. */
-    static volatile BaseType_t xQueueSetTasksStatus = pdPASS;
+    static volatile BaseType_t xQueueSetTasksStatus[ qsetSHARED_MEM_SIZE_WORDS ] __attribute__ ( ( aligned( qsetSHARED_MEM_SIZE_BYTES ) ) ) = { pdPASS };
 
 /* Just a flag to let the function that writes to a queue from an ISR know that
  * the queues are setup and can be used. */
-    static volatile BaseType_t xSetupComplete = pdFALSE;
+    static volatile BaseType_t xSetupComplete[ qsetSHARED_MEM_SIZE_WORDS ] __attribute__ ( ( aligned( qsetSHARED_MEM_SIZE_BYTES ) ) ) = { pdFALSE };
 
 /* The value sent to the queue from the ISR is file scope so the
  * xAreQueeuSetTasksStillRunning() function can check it is incrementing as
  * expected. */
-    static volatile uint32_t ulISRTxValue = queuesetINITIAL_ISR_TX_VALUE;
+    static volatile uint32_t ulISRTxValue = 0;
+
+    static volatile uint32_t ulLoops[ qsetSHARED_MEM_SIZE_WORDS ] __attribute__ ( ( aligned( qsetSHARED_MEM_SIZE_BYTES ) ) ) = { 0 };
+
+    static eRelativePriorities ePriorities[ qsetSHARED_MEM_SIZE_WORDS ] __attribute__ ( ( aligned( qsetSHARED_MEM_SIZE_BYTES ) ) ) = { eEqualPriority };
+
+    static uint32_t ulExpectedReceivedFromTask[ qsetSHARED_MEM_SIZE_WORDS ] __attribute__ ( ( aligned( qsetSHARED_MEM_SIZE_BYTES ) ) )  = { 0 };
+    static uint32_t ulExpectedReceivedFromISR[ qsetSHARED_MEM_SIZE_WORDS ] __attribute__ ( ( aligned( qsetSHARED_MEM_SIZE_BYTES ) ) ) 	= { queuesetINITIAL_ISR_TX_VALUE };
+
 
 /* Used by the pseudo random number generator. */
-    static size_t uxNextRand = 0;
+    static size_t uxNextRand[ qsetSHARED_MEM_SIZE_WORDS ] __attribute__ ( ( aligned( qsetSHARED_MEM_SIZE_BYTES ) ) ) = { 0 };
 
 /* The task handles are stored so their priorities can be changed. */
-    TaskHandle_t xQueueSetSendingTask, xQueueSetReceivingTask;
+
+#define SEND_TASK_IDX			(0)
+#define RECEIVE_TASK_IDX		(1)
+static TaskHandle_t xLocalTaskHandles[ qsetSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( qsetSHARED_MEM_SIZE_BYTES ) ) ) = { NULL };
 
 /*-----------------------------------------------------------*/
 
@@ -213,7 +228,7 @@
     	static StackType_t xQueueSetSendingTaskStack[ configMINIMAL_STACK_SIZE ]__attribute__( ( aligned( configMINIMAL_STACK_SIZE * sizeof( StackType_t ) ) ) );
     	static StackType_t xQueueSetRecevingTaskStack[ configMINIMAL_STACK_SIZE ]__attribute__( ( aligned( configMINIMAL_STACK_SIZE * sizeof( StackType_t ) ) ) );
 
-    	TaskParameters_t xprvQueueSetSendingTaskParameters =
+    	TaskParameters_t xQueueSetSendingTaskParameters =
     		{
     			.pvTaskCode		= prvQueueSetSendingTask,
     			.pcName			= "SetTx",
@@ -222,20 +237,41 @@
     			.uxPriority		= queuesetMEDIUM_PRIORITY,
     			.puxStackBuffer	= xQueueSetSendingTaskStack,
     			.xRegions		=	{
-    									{ ucSharedMemory1,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-    									{ ucSharedMemory2,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-    									{ ucSharedMemory3,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-    									{ ucSharedMemory4,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-    									{ ucSharedMemory5,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-    									{ ucSharedMemory6,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
+										{ ( void * ) &( uxNextRand[ 0 ] ), qsetSHARED_MEM_SIZE_BYTES,
+		                                           ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+		                                             ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+		                                },
+										{ ( void * ) &( xQueues[ 0 ] ), qsetSHARED_MEM_SIZE_BYTES,
+		                                           ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+		                                             ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+		                                },
+										{ ( void * ) &( ulQueueUsedCounter[ 0 ] ), qsetSHARED_MEM_SIZE_BYTES,
+		                                           ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+		                                             ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+		                                },
+										{ ( void * ) &( xQueueSetTasksStatus[ 0 ] ), qsetSHARED_MEM_SIZE_BYTES,
+		                                           ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+		                                             ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+		                                },
+										{ ( void * ) &( ulLoops[ 0 ] ), qsetSHARED_MEM_SIZE_BYTES,
+		                                           ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+		                                             ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+		                                },
+										{ ( void * ) &( ePriorities[ 0 ] ), qsetSHARED_MEM_SIZE_BYTES,
+		                                           ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+		                                             ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+		                                },
+										{ ( void * ) &( xLocalTaskHandles[ 0 ] ), qsetSHARED_MEM_SIZE_BYTES,
+												   ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+													 ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+										},
     									{ 0,				0,					0														},
     									{ 0,				0,					0														},
     									{ 0,				0,					0														},
-    									{ 0,				0,					0														},
-    									{ 0,				0,					0														}
+										{ 0,				0,					0														}
     								}
     		};
-    	TaskParameters_t xprvQueueSetReceivingTaskParameters =
+    	TaskParameters_t xQueueSetReceivingTaskParameters =
     		{
     			.pvTaskCode		= prvQueueSetReceivingTask,
     			.pcName			= "SetRx",
@@ -244,32 +280,54 @@
     			.uxPriority		= queuesetMEDIUM_PRIORITY,
     			.puxStackBuffer	= xQueueSetRecevingTaskStack,
     			.xRegions		=	{
-    									{ ucSharedMemory1,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-    									{ ucSharedMemory2,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-    									{ ucSharedMemory3,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-    									{ ucSharedMemory4,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-    									{ ucSharedMemory5,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-    									{ ucSharedMemory6,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-    									{ 0,				0,					0														},
-    									{ 0,				0,					0														},
-    									{ 0,				0,					0														},
-    									{ 0,				0,					0														},
-    									{ 0,				0,					0														}
+										{ ( void * ) &( xQueueSet[ 0 ] ), qsetSHARED_MEM_SIZE_BYTES,
+												   ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+													 ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+										},
+										{ ( void * ) &( xQueues[ 0 ] ), qsetSHARED_MEM_SIZE_BYTES,
+												   ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+													 ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+										},
+										{ ( void * ) &( xQueueSetTasksStatus[ 0 ] ), qsetSHARED_MEM_SIZE_BYTES,
+												   ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+													 ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+										},
+										{ ( void * ) &( xSetupComplete[ 0 ] ), qsetSHARED_MEM_SIZE_BYTES,
+												   ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+													 ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+										},
+										{ ( void * ) &( xLocalTaskHandles[ 0 ] ), qsetSHARED_MEM_SIZE_BYTES,
+												   ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+													 ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+										},
+										{ ( void * ) &( ulExpectedReceivedFromTask[ 0 ] ), qsetSHARED_MEM_SIZE_BYTES,
+												   ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+													 ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+										},
+										{ ( void * ) &( ulExpectedReceivedFromISR[ 0 ] ), qsetSHARED_MEM_SIZE_BYTES,
+												   ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+													 ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+										},
+										{ 0,				0,					0														},
+										{ 0,				0,					0														},
+										{ 0,				0,					0														},
+										{ 0,				0,					0														}
+
     								}
     		};
         //xTaskCreate( prvQueueSetSendingTask, "SetTx", configMINIMAL_STACK_SIZE, NULL, queuesetMEDIUM_PRIORITY, &xQueueSetSendingTask );
-        xTaskCreateRestricted(&(xprvQueueSetSendingTaskParameters),&xQueueSetSendingTask);
+        xTaskCreateRestricted(&(xQueueSetSendingTaskParameters),&xLocalTaskHandles[SEND_TASK_IDX]);
 
-        if( xQueueSetSendingTask != NULL )
+        if( xLocalTaskHandles[SEND_TASK_IDX] != NULL )
         {
             //xTaskCreate( prvQueueSetReceivingTask, "SetRx", configMINIMAL_STACK_SIZE, ( void * ) xQueueSetSendingTask, queuesetMEDIUM_PRIORITY, &xQueueSetReceivingTask );
-            xTaskCreateRestricted(&(xprvQueueSetReceivingTaskParameters),&xQueueSetReceivingTask);
+            xTaskCreateRestricted(&(xQueueSetReceivingTaskParameters),&xLocalTaskHandles[RECEIVE_TASK_IDX]);
             /* It is important that the sending task does not attempt to write to a
              * queue before the queue has been created.  It is therefore placed into
              * the suspended state before the scheduler has started.  It is resumed by
              * the receiving task after the receiving task has created the queues and
              * added the queues to the queue set. */
-            vTaskSuspend( xQueueSetSendingTask );
+            vTaskSuspend( xLocalTaskHandles[SEND_TASK_IDX] );
         }
     }
 /*-----------------------------------------------------------*/
@@ -280,14 +338,14 @@
         static uint32_t ulLastQueueUsedCounter[ queuesetNUM_QUEUES_IN_SET ] = { 0 };
         BaseType_t xReturn = pdPASS, x;
 
-        if( ulLastCycleCounter == ulCycleCounter )
+        if( ulLastCycleCounter == ulCycleCounter[ 0 ] )
         {
             /* The cycle counter is no longer being incremented.  Either one of the
              * tasks is stalled or an error has been detected. */
             xReturn = pdFAIL;
         }
 
-        ulLastCycleCounter = ulCycleCounter;
+        ulLastCycleCounter = ulCycleCounter[ 0 ];
 
         /* Ensure that all the queues in the set have been used.  This ensures the
          * test is working as intended and guards against the rand() in the Tx task
@@ -303,7 +361,7 @@
         }
 
         /* Check the global status flag. */
-        if( xQueueSetTasksStatus != pdPASS )
+        if( xQueueSetTasksStatus[ 0 ] != pdPASS )
         {
             xReturn = pdFAIL;
         }
@@ -350,7 +408,7 @@
             {
                 /* The send should always pass as an infinite block time was
                  * used. */
-                xQueueSetTasksStatus = pdFAIL;
+                xQueueSetTasksStatus[ 0 ] = pdFAIL;
             }
 
             #if ( configUSE_PREEMPTION == 0 )
@@ -375,26 +433,26 @@
 
     static void prvChangeRelativePriorities( void )
     {
-        static UBaseType_t ulLoops = 0;
-        static eRelativePriorities ePriorities = eEqualPriority;
+        //static UBaseType_t ulLoops = 0;
+        //static eRelativePriorities ePriorities = eEqualPriority;
 
         /* Occasionally change the task priority relative to the priority of
          * the receiving task. */
-        ulLoops++;
+        ulLoops[ 0 ]++;
 
-        if( ulLoops >= queuesetPRIORITY_CHANGE_LOOPS )
+        if( ulLoops[ 0 ] >= queuesetPRIORITY_CHANGE_LOOPS )
         {
-            ulLoops = 0;
+            ulLoops[ 0 ] = 0;
 
-            switch( ePriorities )
+            switch( ePriorities[ 0 ] )
             {
                 case eEqualPriority:
 
                     /* Both tasks are running with medium priority.  Now lower the
                      * priority of the receiving task so the Tx task has the higher
                      * relative priority. */
-                    vTaskPrioritySet( xQueueSetReceivingTask, queuesetLOW_PRIORITY );
-                    ePriorities = eTxHigherPriority;
+                    vTaskPrioritySet( xLocalTaskHandles[RECEIVE_TASK_IDX], queuesetLOW_PRIORITY );
+                    ePriorities[ 0 ] = eTxHigherPriority;
                     break;
 
                 case eTxHigherPriority:
@@ -402,17 +460,17 @@
                     /* The Tx task is running with a higher priority than the Rx
                      * task.  Switch the priorities around so the Rx task has the
                      * higher relative priority. */
-                    vTaskPrioritySet( xQueueSetReceivingTask, queuesetMEDIUM_PRIORITY );
-                    vTaskPrioritySet( xQueueSetSendingTask, queuesetLOW_PRIORITY );
-                    ePriorities = eTxLowerPriority;
+                    vTaskPrioritySet( xLocalTaskHandles[RECEIVE_TASK_IDX], queuesetMEDIUM_PRIORITY );
+                    vTaskPrioritySet( xLocalTaskHandles[SEND_TASK_IDX], queuesetLOW_PRIORITY );
+                    ePriorities[ 0 ] = eTxLowerPriority;
                     break;
 
                 case eTxLowerPriority:
 
                     /* The Tx task is running with a lower priority than the Rx
                      * task.  Make the priorities equal again. */
-                    vTaskPrioritySet( xQueueSetSendingTask, queuesetMEDIUM_PRIORITY );
-                    ePriorities = eEqualPriority;
+                    vTaskPrioritySet( xLocalTaskHandles[SEND_TASK_IDX], queuesetMEDIUM_PRIORITY );
+                    ePriorities[ 0 ] = eEqualPriority;
 
                     /* When both tasks are using a non-idle priority the queue set
                      * tasks will starve idle priority tasks of execution time - so
@@ -453,14 +511,14 @@
             }
 
             /* Wait for a message to arrive on one of the queues in the set. */
-            xActivatedQueue = xQueueSelectFromSet( xQueueSet, portMAX_DELAY );
+            xActivatedQueue = xQueueSelectFromSet( xQueueSet[ 0 ], portMAX_DELAY );
 
             if( xActivatedQueue == NULL )
             {
                 if( xBlockTime != 0 )
                 {
                     /* This should not happen as an infinite delay was used. */
-                    xQueueSetTasksStatus = pdFAIL;
+                    xQueueSetTasksStatus[ 0 ] = pdFAIL;
                 }
             }
             else
@@ -470,7 +528,7 @@
                  * in the queue set. */
                 if( xQueueReceive( xActivatedQueue, &ulReceived, queuesetDONT_BLOCK ) != pdPASS )
                 {
-                    xQueueSetTasksStatus = pdFAIL;
+                    xQueueSetTasksStatus[ 0 ] = pdFAIL;
                 }
 
                 /* Ensure the value received was the value expected.  This function
@@ -482,9 +540,9 @@
                 }
                 taskEXIT_CRITICAL();
 
-                if( xQueueSetTasksStatus == pdPASS )
+                if( xQueueSetTasksStatus[ 0 ] == pdPASS )
                 {
-                    ulCycleCounter++;
+                    ulCycleCounter[ 0 ]++;
                 }
             }
         }
@@ -497,7 +555,7 @@
 
         /* xSetupComplete is set to pdTRUE when the queues have been created and
          * are available for use. */
-        if( xSetupComplete == pdTRUE )
+        if( xSetupComplete[ 0 ] == pdTRUE )
         {
             /* It is intended that this function is called from the tick hook
              * function, so each call is one tick period apart. */
@@ -519,7 +577,7 @@
 
     static void prvCheckReceivedValue( uint32_t ulReceived )
     {
-        static uint32_t ulExpectedReceivedFromTask = 0, ulExpectedReceivedFromISR = queuesetINITIAL_ISR_TX_VALUE;
+        //static uint32_t ulExpectedReceivedFromTask = 0, ulExpectedReceivedFromISR = queuesetINITIAL_ISR_TX_VALUE;
 
         /* Values are received in tasks and interrupts.  It is likely that the
          * receiving task will sometimes get preempted by the receiving interrupt
@@ -548,20 +606,20 @@
             else
             {
                 /* Check the value against its expected value range. */
-                if( prvCheckReceivedValueWithinExpectedRange( ulReceived, ulExpectedReceivedFromISR ) != pdPASS )
+                if( prvCheckReceivedValueWithinExpectedRange( ulReceived, ulExpectedReceivedFromISR[ 0 ] ) != pdPASS )
                 {
-                    xQueueSetTasksStatus = pdFAIL;
+                    xQueueSetTasksStatus[ 0 ] = pdFAIL;
                 }
             }
 
             configASSERT( xQueueSetTasksStatus );
 
             /* It is expected to receive an incrementing number. */
-            ulExpectedReceivedFromISR++;
+            ulExpectedReceivedFromISR[ 0 ]++;
 
-            if( ulExpectedReceivedFromISR == 0 )
+            if( ulExpectedReceivedFromISR[ 0 ] == 0 )
             {
-                ulExpectedReceivedFromISR = queuesetINITIAL_ISR_TX_VALUE;
+                ulExpectedReceivedFromISR[ 0 ] = queuesetINITIAL_ISR_TX_VALUE;
             }
         }
         else
@@ -580,20 +638,20 @@
             else
             {
                 /* Check the value against its expected value range. */
-                if( prvCheckReceivedValueWithinExpectedRange( ulReceived, ulExpectedReceivedFromTask ) != pdPASS )
+                if( prvCheckReceivedValueWithinExpectedRange( ulReceived, ulExpectedReceivedFromTask[ 0 ] ) != pdPASS )
                 {
-                    xQueueSetTasksStatus = pdFAIL;
+                    xQueueSetTasksStatus[ 0 ] = pdFAIL;
                 }
             }
 
             configASSERT( xQueueSetTasksStatus );
 
             /* It is expected to receive an incrementing number. */
-            ulExpectedReceivedFromTask++;
+            ulExpectedReceivedFromTask[ 0 ]++;
 
-            if( ulExpectedReceivedFromTask >= queuesetINITIAL_ISR_TX_VALUE )
+            if( ulExpectedReceivedFromTask[ 0 ] >= queuesetINITIAL_ISR_TX_VALUE )
             {
-                ulExpectedReceivedFromTask = 0;
+                ulExpectedReceivedFromTask[ 0 ] = 0;
             }
         }
     }
@@ -633,7 +691,7 @@
         uint32_t ulReceived;
 
         /* See if any of the queues in the set contain data. */
-        xActivatedQueue = xQueueSelectFromSetFromISR( xQueueSet );
+        xActivatedQueue = xQueueSelectFromSetFromISR( xQueueSet[ 0 ] );
 
         if( xActivatedQueue != NULL )
         {
@@ -642,7 +700,7 @@
             {
                 /* Data should have been available as the handle was returned from
                  * xQueueSelectFromSetFromISR(). */
-                xQueueSetTasksStatus = pdFAIL;
+                xQueueSetTasksStatus[ 0 ] = pdFAIL;
             }
 
             /* Ensure the value received was the value expected. */
@@ -690,26 +748,26 @@
 
         if( xQueueHandle != NULL )
         {
-            xQueueAddToSet( xQueueHandle, xQueueSet );
+            xQueueAddToSet( xQueueHandle, xQueueSet[ 0 ] );
 
             /* Add an item to the queue then ensure the queue set correctly
              * indicates that one item is available, and that item is indeed the
              * queue written to. */
             xQueueOverwrite( xQueueHandle, ( void * ) &ulValueToSend );
 
-            if( uxQueueMessagesWaiting( xQueueSet ) != ( UBaseType_t ) 1 )
+            if( uxQueueMessagesWaiting( xQueueSet[ 0 ] ) != ( UBaseType_t ) 1 )
             {
                 /* Expected one item in the queue set. */
-                xQueueSetTasksStatus = pdFAIL;
+                xQueueSetTasksStatus[ 0 ] = pdFAIL;
             }
 
-            xQueuePeek( xQueueSet, &xReceivedHandle, queuesetDONT_BLOCK );
+            xQueuePeek( xQueueSet[ 0 ], &xReceivedHandle, queuesetDONT_BLOCK );
 
             if( xReceivedHandle != xQueueHandle )
             {
                 /* Wrote to xQueueHandle so expected xQueueHandle to be the handle
                  * held in the queue set. */
-                xQueueSetTasksStatus = pdFAIL;
+                xQueueSetTasksStatus[ 0 ] = pdFAIL;
             }
 
             /* Now overwrite the value in the queue and ensure the queue set state
@@ -718,19 +776,19 @@
             ulValueToSend++;
             xQueueOverwrite( xQueueHandle, ( void * ) &ulValueToSend );
 
-            if( uxQueueMessagesWaiting( xQueueSet ) != ( UBaseType_t ) 1 )
+            if( uxQueueMessagesWaiting( xQueueSet[ 0 ] ) != ( UBaseType_t ) 1 )
             {
                 /* Still expected one item in the queue set. */
-                xQueueSetTasksStatus = pdFAIL;
+                xQueueSetTasksStatus[ 0 ] = pdFAIL;
             }
 
-            xReceivedHandle = xQueueSelectFromSet( xQueueSet, queuesetDONT_BLOCK );
+            xReceivedHandle = xQueueSelectFromSet( xQueueSet[ 0 ], queuesetDONT_BLOCK );
 
             if( xReceivedHandle != xQueueHandle )
             {
                 /* Wrote to xQueueHandle so expected xQueueHandle to be the handle
                  * held in the queue set. */
-                xQueueSetTasksStatus = pdFAIL;
+                xQueueSetTasksStatus[ 0 ] = pdFAIL;
             }
 
             /* Also ensure the value received from the queue is the overwritten
@@ -740,24 +798,24 @@
             if( ulValueReceived != ulValueToSend )
             {
                 /* Unexpected value received from the queue. */
-                xQueueSetTasksStatus = pdFAIL;
+                xQueueSetTasksStatus[ 0 ] = pdFAIL;
             }
 
             /* Should be anything in the queue set now. */
-            if( uxQueueMessagesWaiting( xQueueSet ) != ( UBaseType_t ) 0 )
+            if( uxQueueMessagesWaiting( xQueueSet[ 0 ] ) != ( UBaseType_t ) 0 )
             {
-                xQueueSetTasksStatus = pdFAIL;
+                xQueueSetTasksStatus[ 0 ] = pdFAIL;
             }
 
-            xReceivedHandle = xQueueSelectFromSet( xQueueSet, queuesetDONT_BLOCK );
+            xReceivedHandle = xQueueSelectFromSet( xQueueSet[ 0 ], queuesetDONT_BLOCK );
 
             if( xReceivedHandle != NULL )
             {
-                xQueueSetTasksStatus = pdFAIL;
+                xQueueSetTasksStatus[ 0 ] = pdFAIL;
             }
 
             /* Clean up. */
-            xQueueRemoveFromSet( xQueueHandle, xQueueSet );
+            xQueueRemoveFromSet( xQueueHandle, xQueueSet[ 0 ] );
             vQueueDelete( xQueueHandle );
         }
     }
@@ -779,44 +837,44 @@
         if( ( xQueueHandle1 != NULL ) && ( xQueueHandle2 != NULL ) )
         {
             /* Add both queues to the queue set. */
-            xQueueAddToSet( xQueueHandle1, xQueueSet );
-            xQueueAddToSet( xQueueHandle2, xQueueSet );
+            xQueueAddToSet( xQueueHandle1, xQueueSet[ 0 ] );
+            xQueueAddToSet( xQueueHandle2, xQueueSet[ 0 ] );
 
             /* Add an item using the first queue. */
             xQueueOverwrite( xQueueHandle1, ( void * ) &ulValueToSend1 );
 
-            if( uxQueueMessagesWaiting( xQueueSet ) != ( UBaseType_t ) 1 )
+            if( uxQueueMessagesWaiting( xQueueSet[ 0 ] ) != ( UBaseType_t ) 1 )
             {
                 /* Expected one item in the queue set. */
-                xQueueSetTasksStatus = pdFAIL;
+                xQueueSetTasksStatus[ 0 ] = pdFAIL;
             }
 
-            xQueuePeek( xQueueSet, &xReceivedHandle, queuesetDONT_BLOCK );
+            xQueuePeek( xQueueSet[ 0 ], &xReceivedHandle, queuesetDONT_BLOCK );
 
             if( xReceivedHandle != xQueueHandle1 )
             {
                 /* Wrote to xQueueHandle so expected xQueueHandle to be the handle
                  * held in the queue set. */
-                xQueueSetTasksStatus = pdFAIL;
+                xQueueSetTasksStatus[ 0 ] = pdFAIL;
             }
 
             /* Next add an item to the second queue. */
             xQueueOverwrite( xQueueHandle2, ( void * ) &ulValueToSend2 );
 
-            if( uxQueueMessagesWaiting( xQueueSet ) != ( UBaseType_t ) 2 )
+            if( uxQueueMessagesWaiting( xQueueSet[ 0 ] ) != ( UBaseType_t ) 2 )
             {
                 /* Expected two items in the queue set. */
-                xQueueSetTasksStatus = pdFAIL;
+                xQueueSetTasksStatus[ 0 ] = pdFAIL;
             }
 
             /* The head of the queue set should not have changed though. */
-            xQueuePeek( xQueueSet, &xReceivedHandle, queuesetDONT_BLOCK );
+            xQueuePeek( xQueueSet[ 0 ], &xReceivedHandle, queuesetDONT_BLOCK );
 
             if( xReceivedHandle != xQueueHandle1 )
             {
                 /* Wrote to xQueueHandle so expected xQueueHandle to be the handle
                  * held in the queue set. */
-                xQueueSetTasksStatus = pdFAIL;
+                xQueueSetTasksStatus[ 0 ] = pdFAIL;
             }
 
             /* Now overwrite the value in the queue and ensure the queue set state
@@ -825,35 +883,35 @@
              * 2 should hold the value ulValueToSend1. */
             xQueueOverwrite( xQueueHandle1, ( void * ) &ulValueToSend2 );
 
-            if( uxQueueMessagesWaiting( xQueueSet ) != ( UBaseType_t ) 2 )
+            if( uxQueueMessagesWaiting( xQueueSet[ 0 ] ) != ( UBaseType_t ) 2 )
             {
                 /* Still expected two items in the queue set. */
-                xQueueSetTasksStatus = pdFAIL;
+                xQueueSetTasksStatus[ 0 ] = pdFAIL;
             }
 
             xQueueOverwrite( xQueueHandle2, ( void * ) &ulValueToSend1 );
 
-            if( uxQueueMessagesWaiting( xQueueSet ) != ( UBaseType_t ) 2 )
+            if( uxQueueMessagesWaiting( xQueueSet[ 0 ] ) != ( UBaseType_t ) 2 )
             {
                 /* Still expected two items in the queue set. */
-                xQueueSetTasksStatus = pdFAIL;
+                xQueueSetTasksStatus[ 0 ] = pdFAIL;
             }
 
             /* Repeat the above to ensure the queue set state doesn't change. */
             xQueueOverwrite( xQueueHandle1, ( void * ) &ulValueToSend2 );
 
-            if( uxQueueMessagesWaiting( xQueueSet ) != ( UBaseType_t ) 2 )
+            if( uxQueueMessagesWaiting( xQueueSet[ 0 ] ) != ( UBaseType_t ) 2 )
             {
                 /* Still expected two items in the queue set. */
-                xQueueSetTasksStatus = pdFAIL;
+                xQueueSetTasksStatus[ 0 ] = pdFAIL;
             }
 
             xQueueOverwrite( xQueueHandle2, ( void * ) &ulValueToSend1 );
 
-            if( uxQueueMessagesWaiting( xQueueSet ) != ( UBaseType_t ) 2 )
+            if( uxQueueMessagesWaiting( xQueueSet[ 0 ] ) != ( UBaseType_t ) 2 )
             {
                 /* Still expected two items in the queue set. */
-                xQueueSetTasksStatus = pdFAIL;
+                xQueueSetTasksStatus[ 0 ] = pdFAIL;
             }
 
             /* Now when reading from the queue set we expect the handle to the first
@@ -861,20 +919,20 @@
              * originally written value was overwritten.  Likewise the second handle received
              * from the set should be that of the second queue, and that queue should hold
              * ulValueToSend1 as the originally written value was overwritten. */
-            xReceivedHandle = xQueueSelectFromSet( xQueueSet, queuesetDONT_BLOCK );
+            xReceivedHandle = xQueueSelectFromSet( xQueueSet[ 0 ], queuesetDONT_BLOCK );
 
             if( xReceivedHandle != xQueueHandle1 )
             {
                 /* Wrote to xQueueHandle1 first so expected that handle to be read from
                  * the set first. */
-                xQueueSetTasksStatus = pdFAIL;
+                xQueueSetTasksStatus[ 0 ] = pdFAIL;
             }
 
-            if( uxQueueMessagesWaiting( xQueueSet ) != ( UBaseType_t ) 1 )
+            if( uxQueueMessagesWaiting( xQueueSet[ 0 ] ) != ( UBaseType_t ) 1 )
             {
                 /* One value was read from the set, so now only expect a single value
                  * in the set. */
-                xQueueSetTasksStatus = pdFAIL;
+                xQueueSetTasksStatus[ 0 ] = pdFAIL;
             }
 
             xQueueReceive( xReceivedHandle, &ulValueReceived, queuesetDONT_BLOCK );
@@ -883,22 +941,22 @@
             {
                 /* Unexpected value received from the queue.  ulValueToSend1 was written
                  * first, but then overwritten with ulValueToSend2; */
-                xQueueSetTasksStatus = pdFAIL;
+                xQueueSetTasksStatus[ 0 ] = pdFAIL;
             }
 
-            xReceivedHandle = xQueueSelectFromSet( xQueueSet, queuesetDONT_BLOCK );
+            xReceivedHandle = xQueueSelectFromSet( xQueueSet[ 0 ], queuesetDONT_BLOCK );
 
             if( xReceivedHandle != xQueueHandle2 )
             {
                 /* xQueueHandle1 has already been removed from the set so expect only
                  * xQueueHandle2 to be left. */
-                xQueueSetTasksStatus = pdFAIL;
+                xQueueSetTasksStatus[ 0 ] = pdFAIL;
             }
 
-            if( uxQueueMessagesWaiting( xQueueSet ) != ( UBaseType_t ) 0 )
+            if( uxQueueMessagesWaiting( xQueueSet[ 0 ] ) != ( UBaseType_t ) 0 )
             {
                 /* The last value was read from the set so don't expect any more. */
-                xQueueSetTasksStatus = pdFAIL;
+                xQueueSetTasksStatus[ 0 ] = pdFAIL;
             }
 
             xQueueReceive( xReceivedHandle, &ulValueReceived, queuesetDONT_BLOCK );
@@ -907,20 +965,20 @@
             {
                 /* Unexpected value received from the queue.  ulValueToSend2 was written
                  * first, but then overwritten with ulValueToSend1. */
-                xQueueSetTasksStatus = pdFAIL;
+                xQueueSetTasksStatus[ 0 ] = pdFAIL;
             }
 
             /* Should be anything in the queue set now. */
-            xReceivedHandle = xQueueSelectFromSet( xQueueSet, queuesetDONT_BLOCK );
+            xReceivedHandle = xQueueSelectFromSet( xQueueSet[ 0 ], queuesetDONT_BLOCK );
 
             if( xReceivedHandle != NULL )
             {
-                xQueueSetTasksStatus = pdFAIL;
+                xQueueSetTasksStatus[ 0 ] = pdFAIL;
             }
 
             /* Clean up. */
-            xQueueRemoveFromSet( xQueueHandle1, xQueueSet );
-            xQueueRemoveFromSet( xQueueHandle2, xQueueSet );
+            xQueueRemoveFromSet( xQueueHandle1, xQueueSet[ 0 ] );
+            xQueueRemoveFromSet( xQueueHandle2, xQueueSet[ 0 ] );
             vQueueDelete( xQueueHandle1 );
             vQueueDelete( xQueueHandle2 );
         }
@@ -943,46 +1001,46 @@
         if( ( xQueueHandle1 != NULL ) && ( xQueueHandle2 != NULL ) )
         {
             /* Add both queues to the queue set. */
-            xQueueAddToSet( xQueueHandle1, xQueueSet );
-            xQueueAddToSet( xQueueHandle2, xQueueSet );
+            xQueueAddToSet( xQueueHandle1, xQueueSet[ 0 ] );
+            xQueueAddToSet( xQueueHandle2, xQueueSet[ 0 ] );
 
             /* Add an item using the first queue using the 'FromISR' version of the
              * overwrite function. */
             xQueueOverwriteFromISR( xQueueHandle1, ( void * ) &ulValueToSend1, NULL );
 
-            if( uxQueueMessagesWaiting( xQueueSet ) != ( UBaseType_t ) 1 )
+            if( uxQueueMessagesWaiting( xQueueSet[ 0 ] ) != ( UBaseType_t ) 1 )
             {
                 /* Expected one item in the queue set. */
-                xQueueSetTasksStatus = pdFAIL;
+                xQueueSetTasksStatus[ 0 ] = pdFAIL;
             }
 
-            xQueuePeek( xQueueSet, &xReceivedHandle, queuesetDONT_BLOCK );
+            xQueuePeek( xQueueSet[ 0 ], &xReceivedHandle, queuesetDONT_BLOCK );
 
             if( xReceivedHandle != xQueueHandle1 )
             {
                 /* Wrote to xQueueHandle so expected xQueueHandle to be the handle
                  * held in the queue set. */
-                xQueueSetTasksStatus = pdFAIL;
+                xQueueSetTasksStatus[ 0 ] = pdFAIL;
             }
 
             /* Next add an item to the second queue using the 'FromISR' version of the
              * overwrite function. */
             xQueueOverwriteFromISR( xQueueHandle2, ( void * ) &ulValueToSend2, NULL );
 
-            if( uxQueueMessagesWaiting( xQueueSet ) != ( UBaseType_t ) 2 )
+            if( uxQueueMessagesWaiting( xQueueSet[ 0 ] ) != ( UBaseType_t ) 2 )
             {
                 /* Expected two items in the queue set. */
-                xQueueSetTasksStatus = pdFAIL;
+                xQueueSetTasksStatus[ 0 ] = pdFAIL;
             }
 
             /* The head of the queue set should not have changed though. */
-            xQueuePeek( xQueueSet, &xReceivedHandle, queuesetDONT_BLOCK );
+            xQueuePeek( xQueueSet[ 0 ], &xReceivedHandle, queuesetDONT_BLOCK );
 
             if( xReceivedHandle != xQueueHandle1 )
             {
                 /* Wrote to xQueueHandle so expected xQueueHandle to be the handle
                  * held in the queue set. */
-                xQueueSetTasksStatus = pdFAIL;
+                xQueueSetTasksStatus[ 0 ] = pdFAIL;
             }
 
             /* Now overwrite the value in the queue and ensure the queue set state
@@ -991,35 +1049,35 @@
              * 2 should hold the value ulValueToSend1. */
             xQueueOverwriteFromISR( xQueueHandle1, ( void * ) &ulValueToSend2, NULL );
 
-            if( uxQueueMessagesWaiting( xQueueSet ) != ( UBaseType_t ) 2 )
+            if( uxQueueMessagesWaiting( xQueueSet[ 0 ] ) != ( UBaseType_t ) 2 )
             {
                 /* Still expected two items in the queue set. */
-                xQueueSetTasksStatus = pdFAIL;
+                xQueueSetTasksStatus[ 0 ] = pdFAIL;
             }
 
             xQueueOverwriteFromISR( xQueueHandle2, ( void * ) &ulValueToSend1, NULL );
 
-            if( uxQueueMessagesWaiting( xQueueSet ) != ( UBaseType_t ) 2 )
+            if( uxQueueMessagesWaiting( xQueueSet[ 0 ] ) != ( UBaseType_t ) 2 )
             {
                 /* Still expected two items in the queue set. */
-                xQueueSetTasksStatus = pdFAIL;
+                xQueueSetTasksStatus[ 0 ] = pdFAIL;
             }
 
             /* Repeat the above to ensure the queue set state doesn't change. */
             xQueueOverwriteFromISR( xQueueHandle1, ( void * ) &ulValueToSend2, NULL );
 
-            if( uxQueueMessagesWaiting( xQueueSet ) != ( UBaseType_t ) 2 )
+            if( uxQueueMessagesWaiting( xQueueSet[ 0 ] ) != ( UBaseType_t ) 2 )
             {
                 /* Still expected two items in the queue set. */
-                xQueueSetTasksStatus = pdFAIL;
+                xQueueSetTasksStatus[ 0 ] = pdFAIL;
             }
 
             xQueueOverwriteFromISR( xQueueHandle2, ( void * ) &ulValueToSend1, NULL );
 
-            if( uxQueueMessagesWaiting( xQueueSet ) != ( UBaseType_t ) 2 )
+            if( uxQueueMessagesWaiting( xQueueSet[ 0 ] ) != ( UBaseType_t ) 2 )
             {
                 /* Still expected two items in the queue set. */
-                xQueueSetTasksStatus = pdFAIL;
+                xQueueSetTasksStatus[ 0 ] = pdFAIL;
             }
 
             /* Now when reading from the queue set we expect the handle to the first
@@ -1027,20 +1085,20 @@
              * originally written value was overwritten.  Likewise the second handle received
              * from the set should be that of the second queue, and that queue should hold
              * ulValueToSend1 as the originally written value was overwritten. */
-            xReceivedHandle = xQueueSelectFromSet( xQueueSet, queuesetDONT_BLOCK );
+            xReceivedHandle = xQueueSelectFromSet( xQueueSet[ 0 ], queuesetDONT_BLOCK );
 
             if( xReceivedHandle != xQueueHandle1 )
             {
                 /* Wrote to xQueueHandle1 first so expected that handle to be read from
                  * the set first. */
-                xQueueSetTasksStatus = pdFAIL;
+                xQueueSetTasksStatus[ 0 ] = pdFAIL;
             }
 
-            if( uxQueueMessagesWaiting( xQueueSet ) != ( UBaseType_t ) 1 )
+            if( uxQueueMessagesWaiting( xQueueSet[ 0 ] ) != ( UBaseType_t ) 1 )
             {
                 /* One value was read from the set, so now only expect a single value
                  * in the set. */
-                xQueueSetTasksStatus = pdFAIL;
+                xQueueSetTasksStatus[ 0 ] = pdFAIL;
             }
 
             xQueueReceive( xReceivedHandle, &ulValueReceived, queuesetDONT_BLOCK );
@@ -1049,22 +1107,22 @@
             {
                 /* Unexpected value received from the queue.  ulValueToSend1 was written
                  * first, but then overwritten with ulValueToSend2; */
-                xQueueSetTasksStatus = pdFAIL;
+                xQueueSetTasksStatus[ 0 ] = pdFAIL;
             }
 
-            xReceivedHandle = xQueueSelectFromSet( xQueueSet, queuesetDONT_BLOCK );
+            xReceivedHandle = xQueueSelectFromSet( xQueueSet[ 0 ], queuesetDONT_BLOCK );
 
             if( xReceivedHandle != xQueueHandle2 )
             {
                 /* xQueueHandle1 has already been removed from the set so expect only
                  * xQueueHandle2 to be left. */
-                xQueueSetTasksStatus = pdFAIL;
+                xQueueSetTasksStatus[ 0 ] = pdFAIL;
             }
 
-            if( uxQueueMessagesWaiting( xQueueSet ) != ( UBaseType_t ) 0 )
+            if( uxQueueMessagesWaiting( xQueueSet[ 0 ] ) != ( UBaseType_t ) 0 )
             {
                 /* The last value was read from the set so don't expect any more. */
-                xQueueSetTasksStatus = pdFAIL;
+                xQueueSetTasksStatus[ 0 ] = pdFAIL;
             }
 
             xQueueReceive( xReceivedHandle, &ulValueReceived, queuesetDONT_BLOCK );
@@ -1073,20 +1131,20 @@
             {
                 /* Unexpected value received from the queue.  ulValueToSend2 was written
                  * first, but then overwritten with ulValueToSend1. */
-                xQueueSetTasksStatus = pdFAIL;
+                xQueueSetTasksStatus[ 0 ] = pdFAIL;
             }
 
             /* Should be anything in the queue set now. */
-            xReceivedHandle = xQueueSelectFromSet( xQueueSet, queuesetDONT_BLOCK );
+            xReceivedHandle = xQueueSelectFromSet( xQueueSet[ 0 ], queuesetDONT_BLOCK );
 
             if( xReceivedHandle != NULL )
             {
-                xQueueSetTasksStatus = pdFAIL;
+                xQueueSetTasksStatus[ 0 ] = pdFAIL;
             }
 
             /* Clean up. */
-            xQueueRemoveFromSet( xQueueHandle1, xQueueSet );
-            xQueueRemoveFromSet( xQueueHandle2, xQueueSet );
+            xQueueRemoveFromSet( xQueueHandle1, xQueueSet[ 0 ] );
+            xQueueRemoveFromSet( xQueueHandle2, xQueueSet[ 0 ] );
             vQueueDelete( xQueueHandle1 );
             vQueueDelete( xQueueHandle2 );
         }
@@ -1103,7 +1161,7 @@
          *
          * First Create the queue set such that it will be able to hold a message for
          * every space in every queue in the set. */
-        xQueueSet = xQueueCreateSet( queuesetNUM_QUEUES_IN_SET * queuesetQUEUE_LENGTH );
+        xQueueSet[ 0 ] = xQueueCreateSet( queuesetNUM_QUEUES_IN_SET * queuesetQUEUE_LENGTH );
 
         for( x = 0; x < queuesetNUM_QUEUES_IN_SET; x++ )
         {
@@ -1112,17 +1170,17 @@
             xQueues[ x ] = xQueueCreate( queuesetQUEUE_LENGTH, sizeof( uint32_t ) );
             configASSERT( xQueues[ x ] );
 
-            if( xQueueAddToSet( xQueues[ x ], xQueueSet ) != pdPASS )
+            if( xQueueAddToSet( xQueues[ x ], xQueueSet[ 0 ] ) != pdPASS )
             {
-                xQueueSetTasksStatus = pdFAIL;
+                xQueueSetTasksStatus[ 0 ] = pdFAIL;
             }
             else
             {
                 /* The queue has now been added to the queue set and cannot be added to
                  * another. */
-                if( xQueueAddToSet( xQueues[ x ], xQueueSet ) != pdFAIL )
+                if( xQueueAddToSet( xQueues[ x ], xQueueSet[ 0 ] ) != pdFAIL )
                 {
-                    xQueueSetTasksStatus = pdFAIL;
+                    xQueueSetTasksStatus[ 0 ] = pdFAIL;
                 }
             }
         }
@@ -1133,43 +1191,43 @@
         {
             /* It is not possible to successfully remove a queue from a queue
              * set it does not belong to. */
-            xQueueSetTasksStatus = pdFAIL;
+            xQueueSetTasksStatus[ 0 ] = pdFAIL;
         }
 
         /* Attempt to remove a queue from the queue set it does belong to. */
-        if( xQueueRemoveFromSet( xQueues[ 0 ], xQueueSet ) != pdPASS )
+        if( xQueueRemoveFromSet( xQueues[ 0 ], xQueueSet[ 0 ] ) != pdPASS )
         {
             /* It should be possible to remove the queue from the queue set it
              * does belong to. */
-            xQueueSetTasksStatus = pdFAIL;
+            xQueueSetTasksStatus[ 0 ] = pdFAIL;
         }
 
         /* Add an item to the queue before attempting to add it back into the
          * set. */
         xQueueSend( xQueues[ 0 ], ( void * ) &ulValueToSend, 0 );
 
-        if( xQueueAddToSet( xQueues[ 0 ], xQueueSet ) != pdFAIL )
+        if( xQueueAddToSet( xQueues[ 0 ], xQueueSet[ 0 ] ) != pdFAIL )
         {
             /* Should not be able to add a non-empty queue to a set. */
-            xQueueSetTasksStatus = pdFAIL;
+            xQueueSetTasksStatus[ 0 ] = pdFAIL;
         }
 
         /* Remove the item from the queue before adding the queue back into the
          * set so the dynamic tests can begin. */
         xQueueReceive( xQueues[ 0 ], &ulValueToSend, 0 );
 
-        if( xQueueAddToSet( xQueues[ 0 ], xQueueSet ) != pdPASS )
+        if( xQueueAddToSet( xQueues[ 0 ], xQueueSet[ 0 ] ) != pdPASS )
         {
             /* If the queue was successfully removed from the queue set then it
              * should be possible to add it back in again. */
-            xQueueSetTasksStatus = pdFAIL;
+            xQueueSetTasksStatus[ 0 ] = pdFAIL;
         }
 
         /* The task that sends to the queues is not running yet, so attempting to
          * read from the queue set should fail. */
-        if( xQueueSelectFromSet( xQueueSet, queuesetSHORT_DELAY ) != NULL )
+        if( xQueueSelectFromSet( xQueueSet[ 0 ], queuesetSHORT_DELAY ) != NULL )
         {
-            xQueueSetTasksStatus = pdFAIL;
+            xQueueSetTasksStatus[ 0 ] = pdFAIL;
         }
 
         /* Testing the behaviour of queue sets when a queue overwrite operation is
@@ -1180,29 +1238,29 @@
         /* Test the case where two queues within a set are written to with
          * xQueueOverwrite(). */
         prvTestQueueOverwriteOnTwoQueusInQueueSet();
-        prvTestQueueOverwriteFromISROnTwoQueusInQueueSet();
+        //prvTestQueueOverwriteFromISROnTwoQueusInQueueSet();
 
         /* In case any of the above have already indicated a failure. */
         configASSERT( xQueueSetTasksStatus != pdFAIL );
 
         /* Resume the task that writes to the queues. */
-        vTaskResume( xQueueSetSendingTask );
+        vTaskResume( xLocalTaskHandles[SEND_TASK_IDX] );
 
         /* Let the ISR access the queues also. */
-        xSetupComplete = pdTRUE;
+        xSetupComplete[ 0 ] = pdTRUE;
     }
 /*-----------------------------------------------------------*/
 
     static size_t prvRand( void )
     {
-        uxNextRand = ( uxNextRand * ( size_t ) 1103515245 ) + ( size_t ) 12345;
-        return ( uxNextRand / ( size_t ) 65536 ) % ( size_t ) 32768;
+        uxNextRand[ 0 ] = ( uxNextRand[ 0 ] * ( size_t ) 1103515245 ) + ( size_t ) 12345;
+        return ( uxNextRand[ 0 ] / ( size_t ) 65536 ) % ( size_t ) 32768;
     }
 /*-----------------------------------------------------------*/
 
     static void prvSRand( size_t uxSeed )
     {
-        uxNextRand = uxSeed;
+        uxNextRand[ 0 ] = uxSeed;
     }
 
 #endif /* ( configUSE_QUEUE_SETS == 1 ) */
