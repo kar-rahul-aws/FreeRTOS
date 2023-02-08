@@ -50,6 +50,10 @@
 /* Demo includes. */
 #include "QueueSetPolling.h"
 
+#define qsetPollSHARED_MEM_SIZE_WORDS		(8)
+#define qsetPollSHARED_MEM_SIZE_HALF_WORDS	(16)
+#define qsetPollSHARED_MEM_SIZE_BYTES 		(32)
+
 #if ( configUSE_QUEUE_SETS == 1 ) /* Remove tests if queue sets are not defined. */
 
 /* The length of each created queue. */
@@ -69,17 +73,17 @@
 /*-----------------------------------------------------------*/
 
 /* The queue that is added to the set. */
-    static QueueHandle_t xQueue = NULL;
+    static QueueHandle_t xQueue[ qsetPollSHARED_MEM_SIZE_WORDS ] __attribute__ ( ( aligned( qsetPollSHARED_MEM_SIZE_BYTES ) ) ) = { NULL };
 
 /* The handle of the queue set to which the queue is added. */
-    static QueueSetHandle_t xQueueSet = NULL;
+    static QueueSetHandle_t xQueueSet[ qsetPollSHARED_MEM_SIZE_WORDS ] __attribute__ ( ( aligned( qsetPollSHARED_MEM_SIZE_BYTES ) ) ) = { NULL };
 
 /* Set to pdFAIL if an error is detected by any queue set task.
  * ulCycleCounter will only be incremented if xQueueSetTasksSatus equals pdPASS. */
-    static volatile BaseType_t xQueueSetPollStatus = pdPASS;
+    static volatile BaseType_t xQueueSetPollStatus[ qsetPollSHARED_MEM_SIZE_WORDS ] __attribute__ ( ( aligned( qsetPollSHARED_MEM_SIZE_BYTES ) ) ) = { pdPASS };
 
 /* Counter used to ensure the task is still running. */
-    static uint32_t ulCycleCounter = 0;
+    static uint32_t ulCycleCounter[ qsetPollSHARED_MEM_SIZE_WORDS ] __attribute__ ( ( aligned( qsetPollSHARED_MEM_SIZE_BYTES ) ) ) = { 0 };
 
 /*-----------------------------------------------------------*/
 
@@ -87,8 +91,8 @@
     {
         /* Create the queue that is added to the set, the set, and add the queue to
          * the set. */
-        xQueue = xQueueCreate( setpollQUEUE_LENGTH, sizeof( uint32_t ) );
-        xQueueSet = xQueueCreateSet( setpollQUEUE_LENGTH );
+        xQueue[ 0 ] = xQueueCreate( setpollQUEUE_LENGTH, sizeof( uint32_t ) );
+        xQueueSet[ 0 ] = xQueueCreateSet( setpollQUEUE_LENGTH );
 
         static StackType_t xQueueSetRecevingTaskStack[ configMINIMAL_STACK_SIZE ]__attribute__( ( aligned( configMINIMAL_STACK_SIZE * sizeof( StackType_t ) ) ) );
 
@@ -101,12 +105,18 @@
             			.uxPriority		= tskIDLE_PRIORITY,
             			.puxStackBuffer	= xQueueSetRecevingTaskStack,
             			.xRegions		=	{
-            									{ ucSharedMemory1,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-            									{ ucSharedMemory2,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-            									{ ucSharedMemory3,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-            									{ ucSharedMemory4,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-            									{ ucSharedMemory5,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-            									{ ucSharedMemory6,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
+            									{ (void *) &( xQueueSet[ 0 ] ), qsetPollSHARED_MEM_SIZE_BYTES,
+            												( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+            									},
+            									{ (void *) &( xQueueSetPollStatus[ 0 ] ), qsetPollSHARED_MEM_SIZE_BYTES,
+            												( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+            									},
+            									{ (void *) &( ulCycleCounter[ 0 ] ), qsetPollSHARED_MEM_SIZE_BYTES,
+            												( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+            									},
+												{ 0,				0,					0														},
+												{ 0,				0,					0														},
+												{ 0,				0,					0														},
             									{ 0,				0,					0														},
             									{ 0,				0,					0														},
             									{ 0,				0,					0														},
@@ -117,7 +127,7 @@
 
         if( ( xQueue != NULL ) && ( xQueueSet != NULL ) )
         {
-            xQueueAddToSet( xQueue, xQueueSet );
+            xQueueAddToSet( xQueue[ 0 ], xQueueSet[ 0 ] );
 
             /* Create the task. */
             //xTaskCreate( prvQueueSetReceivingTask, "SetPoll", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY, NULL );
@@ -138,7 +148,7 @@
         {
             /* Is a message waiting?  A block time is not used to ensure the queue
              * set is polled while it is being written to from an interrupt. */
-            xActivatedQueue = xQueueSelectFromSet( xQueueSet, setpollDONT_BLOCK );
+            xActivatedQueue = xQueueSelectFromSet( xQueueSet[ 0 ], setpollDONT_BLOCK );
 
             if( xActivatedQueue != NULL )
             {
@@ -147,7 +157,7 @@
                  * in the queue set. */
                 if( xQueueReceive( xActivatedQueue, &ulReceived, setpollDONT_BLOCK ) != pdPASS )
                 {
-                    xQueueSetPollStatus = pdFAIL;
+                    xQueueSetPollStatus[ 0 ] = pdFAIL;
                 }
 
                 if( ulReceived == ulExpected )
@@ -156,12 +166,12 @@
                 }
                 else
                 {
-                    xQueueSetPollStatus = pdFAIL;
+                    xQueueSetPollStatus[ 0 ] = pdFAIL;
                 }
 
-                if( xQueueSetPollStatus == pdPASS )
+                if( xQueueSetPollStatus[ 0 ] == pdPASS )
                 {
-                    ulCycleCounter++;
+                    ulCycleCounter[ 0 ]++;
                 }
             }
         }
@@ -180,7 +190,7 @@
         {
             ulCallCount = 0;
 
-            if( xQueueSendFromISR( xQueue, ( void * ) &ulValueToSend, NULL ) == pdPASS )
+            if( xQueueSendFromISR( xQueue[ 0 ], ( void * ) &ulValueToSend, NULL ) == pdPASS )
             {
                 /* Send the next value next time. */
                 ulValueToSend++;
@@ -193,14 +203,14 @@
     {
         static uint32_t ulLastCycleCounter = 0;
 
-        if( ulLastCycleCounter == ulCycleCounter )
+        if( ulLastCycleCounter == ulCycleCounter[ 0 ] )
         {
-            xQueueSetPollStatus = pdFAIL;
+            xQueueSetPollStatus[ 0 ] = pdFAIL;
         }
 
-        ulLastCycleCounter = ulCycleCounter;
+        ulLastCycleCounter = ulCycleCounter[ 0 ];
 
-        return xQueueSetPollStatus;
+        return xQueueSetPollStatus[ 0 ];
     }
 /*-----------------------------------------------------------*/
 
