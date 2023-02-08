@@ -88,22 +88,32 @@
     #define recmuRECURSIVE_MUTEX_TEST_TASK_STACK_SIZE    configMINIMAL_STACK_SIZE
 #endif
 
+#define recmuSHARED_MEM_SIZE_WORDS             ( 8 )
+#define recmuSHARED_MEM_SIZE_HALF_WORDS		   ( 16 )
+#define recmuSHARED_MEM_SIZE_BYTES             ( 32 )
+
 /* The three tasks as described at the top of this file. */
 static void prvRecursiveMutexControllingTask( void * pvParameters );
 static void prvRecursiveMutexBlockingTask( void * pvParameters );
 static void prvRecursiveMutexPollingTask( void * pvParameters );
 
 /* The mutex used by the demo. */
-static SemaphoreHandle_t xMutex[8] = {0};
+static SemaphoreHandle_t xMutex[recmuSHARED_MEM_SIZE_WORDS] __attribute__( ( aligned( recmuSHARED_MEM_SIZE_BYTES ) ) ) = { 0 };
 
 /* Variables used to detect and latch errors. */
-static volatile BaseType_t xErrorOccurred[8] = {pdFALSE}, xControllingIsSuspended[8] = {pdFALSE}, xBlockingIsSuspended[8] = {pdFALSE};
-static volatile UBaseType_t uxControllingCycles[8] = {0}, uxBlockingCycles[8] = {0}, uxPollingCycles[8] = {0};
+static volatile BaseType_t xErrorOccurred[recmuSHARED_MEM_SIZE_WORDS] __attribute__( ( aligned( recmuSHARED_MEM_SIZE_BYTES ) ) ) = { pdFALSE };
+static volatile BaseType_t xControllingIsSuspended[recmuSHARED_MEM_SIZE_WORDS] __attribute__( ( aligned( recmuSHARED_MEM_SIZE_BYTES ) ) ) = { pdFALSE };
+static volatile BaseType_t xBlockingIsSuspended[recmuSHARED_MEM_SIZE_WORDS] __attribute__( ( aligned( recmuSHARED_MEM_SIZE_BYTES ) ) ) = { pdFALSE };
+static volatile UBaseType_t uxControllingCycles[recmuSHARED_MEM_SIZE_WORDS] __attribute__( ( aligned( recmuSHARED_MEM_SIZE_BYTES ) ) ) = { 0 };
+static volatile UBaseType_t uxBlockingCycles[recmuSHARED_MEM_SIZE_WORDS] __attribute__( ( aligned( recmuSHARED_MEM_SIZE_BYTES ) ) ) = { 0 };
+static volatile UBaseType_t uxPollingCycles[recmuSHARED_MEM_SIZE_WORDS] __attribute__( ( aligned( recmuSHARED_MEM_SIZE_BYTES ) ) ) = { 0 };
 
 /* Handles of the two higher priority tasks, required so they can be resumed
  * (unsuspended). */
-static TaskHandle_t xControllingTaskHandle, xBlockingTaskHandle;
-
+#define CONTROLLING_TASK_IDX    0
+#define BLOCKING_TASK_IDX     	1
+//static TaskHandle_t xControllingTaskHandle, xBlockingTaskHandle;
+static TaskHandle_t xLocalTaskHandles[ recmuSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( recmuSHARED_MEM_SIZE_BYTES ) ) ) = { NULL };
 /*-----------------------------------------------------------*/
 
 void vStartRecursiveMutexTasks( void )
@@ -125,16 +135,24 @@ void vStartRecursiveMutexTasks( void )
 			.uxPriority		= recmuCONTROLLING_TASK_PRIORITY,
 			.puxStackBuffer	= xRecursiveMutexControllingTaskStack,
 			.xRegions		=	{
-									{ ucSharedMemory1,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-									{ ucSharedMemory2,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-									{ ucSharedMemory3,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-									{ ucSharedMemory4,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-									{ ucSharedMemory5,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-									{ ucSharedMemory6,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-									{ (void *)uxControllingCycles, SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-									{ (void *)xMutex,   SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-									{ (void *)xErrorOccurred,   SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-									{ (void *)xControllingIsSuspended,   SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
+									{ (void *)&uxControllingCycles[ 0 ], recmuSHARED_MEM_SIZE_BYTES,
+											( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+									},
+									{ (void *)&xMutex[ 0 ], recmuSHARED_MEM_SIZE_BYTES,
+											( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+									},
+									{ (void *)&xErrorOccurred[ 0 ], recmuSHARED_MEM_SIZE_BYTES,
+											( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+									},
+									{ (void *)&xControllingIsSuspended[ 0 ], recmuSHARED_MEM_SIZE_BYTES,
+											( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+									},
+									{	0,										0,								0},
+									{	0,										0,								0},
+									{	0,										0,								0},
+									{	0,										0,								0},
+									{	0,										0,								0},
+									{	0,										0,								0},
 									{	0,										0,								0}
 								}
 		};
@@ -147,16 +165,28 @@ void vStartRecursiveMutexTasks( void )
 			.uxPriority		= recmuBLOCKING_TASK_PRIORITY,
 			.puxStackBuffer	= xRecursiveMutexBlockingStack,
 			.xRegions		=	{
-									{ ucSharedMemory1,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-									{ ucSharedMemory2,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-									{ ucSharedMemory3,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-									{ ucSharedMemory4,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-									{ ucSharedMemory5,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-									{ ucSharedMemory6,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-									{ (void *)uxBlockingCycles,	SHARED_MEMORY_SIZE, portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-									{ (void *)xMutex,   SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-									{ (void *)xErrorOccurred,   SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-									{ (void *)uxControllingCycles, SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
+									{ (void *)&uxBlockingCycles[ 0 ], recmuSHARED_MEM_SIZE_BYTES,
+											( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+									},
+									{ (void *)&uxControllingCycles[ 0 ], recmuSHARED_MEM_SIZE_BYTES,
+											( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+									},
+									{ (void *)&xMutex[ 0 ], recmuSHARED_MEM_SIZE_BYTES,
+											( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+									},
+									{ (void *)&xErrorOccurred[ 0 ], recmuSHARED_MEM_SIZE_BYTES,
+											( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+									},
+									{ (void *)&xBlockingIsSuspended[ 0 ], recmuSHARED_MEM_SIZE_BYTES,
+											( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+									},
+									{ (void *)&xControllingIsSuspended[ 0 ], recmuSHARED_MEM_SIZE_BYTES,
+											( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+									},
+									{	0,										0,								0},
+									{	0,										0,								0},
+									{	0,										0,								0},
+									{	0,										0,								0},
 									{	0,										0,								0}
 								}
 		};
@@ -169,17 +199,29 @@ void vStartRecursiveMutexTasks( void )
 			.uxPriority		= recmuPOLLING_TASK_PRIORITY,
 			.puxStackBuffer	= xRecursiveMutexPollingTask,
 			.xRegions		=	{
-									{ ucSharedMemory1,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-									{ ucSharedMemory2,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-									{ ucSharedMemory3,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-									{ ucSharedMemory4,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-									{ ucSharedMemory5,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-									{ ucSharedMemory6,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-									{(void *)uxPollingCycles,	SHARED_MEMORY_SIZE, portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-									{(void *)xMutex,   SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-									{(void *)xErrorOccurred,   SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-									{(void *)xControllingIsSuspended,   SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-									{(void *)xBlockingIsSuspended,   SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER}
+									{ (void *)&xBlockingIsSuspended[ 0 ], recmuSHARED_MEM_SIZE_BYTES,
+											( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+									},
+									{ (void *)&xControllingIsSuspended[ 0 ], recmuSHARED_MEM_SIZE_BYTES,
+											( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+									},
+									{ (void *)&xMutex[ 0 ], recmuSHARED_MEM_SIZE_BYTES,
+											( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+									},
+									{ (void *)&xErrorOccurred[ 0 ], recmuSHARED_MEM_SIZE_BYTES,
+											( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+									},
+									{ (void *)&uxPollingCycles[ 0 ], recmuSHARED_MEM_SIZE_BYTES,
+											( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+									},
+									{ (void *)&xLocalTaskHandles[ 0 ], recmuSHARED_MEM_SIZE_BYTES,
+											( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+									},
+									{	0,										0,								0},
+									{	0,										0,								0},
+									{	0,										0,								0},
+									{	0,										0,								0},
+									{	0,										0,								0}
 								}
 		};
 
@@ -198,8 +240,8 @@ void vStartRecursiveMutexTasks( void )
         //xTaskCreate( prvRecursiveMutexBlockingTask, "Rec2", recmuRECURSIVE_MUTEX_TEST_TASK_STACK_SIZE, NULL, recmuBLOCKING_TASK_PRIORITY, &xBlockingTaskHandle );
         //xTaskCreate( prvRecursiveMutexPollingTask, "Rec3", recmuRECURSIVE_MUTEX_TEST_TASK_STACK_SIZE, NULL, recmuPOLLING_TASK_PRIORITY, NULL );
 
-        xTaskCreateRestricted(&(xRecursiveMutexControllingTaskParameters),&xControllingTaskHandle );
-        xTaskCreateRestricted(&(xRecursiveMutexBlockingTaskParameters),&xBlockingTaskHandle );
+        xTaskCreateRestricted(&(xRecursiveMutexControllingTaskParameters),&xLocalTaskHandles[CONTROLLING_TASK_IDX] );
+        xTaskCreateRestricted(&(xRecursiveMutexBlockingTaskParameters),&xLocalTaskHandles[BLOCKING_TASK_IDX] );
         xTaskCreateRestricted(&(xRecursiveMutexPollingTaskParameters),NULL);
 
     }
@@ -315,7 +357,7 @@ static void prvRecursiveMutexBlockingTask( void * pvParameters )
             {
                 /* Give the mutex back before suspending ourselves to allow
                  * the polling task to obtain the mutex. */
-                if( xSemaphoreGiveRecursive( xMutex ) != pdPASS )
+                if( xSemaphoreGiveRecursive( xMutex[ 0 ] ) != pdPASS )
                 {
                     xErrorOccurred[0] = pdTRUE;
                 }
@@ -359,8 +401,8 @@ static void prvRecursiveMutexPollingTask( void * pvParameters )
         {
             #if ( INCLUDE_eTaskGetState == 1 )
             {
-                configASSERT( eTaskGetState( xControllingTaskHandle ) == eSuspended );
-                configASSERT( eTaskGetState( xBlockingTaskHandle ) == eSuspended );
+                configASSERT( eTaskGetState( xLocalTaskHandles[ CONTROLLING_TASK_IDX ] ) == eSuspended );
+                configASSERT( eTaskGetState( xLocalTaskHandles[ BLOCKING_TASK_IDX ] ) == eSuspended );
             }
             #endif /* INCLUDE_eTaskGetState */
 
@@ -384,12 +426,12 @@ static void prvRecursiveMutexPollingTask( void * pvParameters )
                  * Controlling task will only block for a fixed period and an
                  * error will be latched if the polling task has not returned the
                  * mutex by the time this fixed period has expired. */
-                vTaskResume( xBlockingTaskHandle );
+                vTaskResume( xLocalTaskHandles[ BLOCKING_TASK_IDX ] );
                 #if ( configUSE_PREEMPTION == 0 )
                     taskYIELD();
                 #endif
 
-                vTaskResume( xControllingTaskHandle );
+                vTaskResume( xLocalTaskHandles[ CONTROLLING_TASK_IDX ] );
                 #if ( configUSE_PREEMPTION == 0 )
                     taskYIELD();
                 #endif
@@ -410,12 +452,12 @@ static void prvRecursiveMutexPollingTask( void * pvParameters )
 
                 #if ( INCLUDE_eTaskGetState == 1 )
                 {
-                    configASSERT( eTaskGetState( xControllingTaskHandle ) == eBlocked );
-                    configASSERT( eTaskGetState( xBlockingTaskHandle ) == eBlocked );
+                    configASSERT( eTaskGetState( xLocalTaskHandles[ CONTROLLING_TASK_IDX ] ) == eBlocked );
+                    configASSERT( eTaskGetState( xLocalTaskHandles[ BLOCKING_TASK_IDX ] ) == eBlocked );
                 }
                 #endif /* INCLUDE_eTaskGetState */
 
-                /* Release the mutex, disinheriting the higher priority again. */
+                /* Release the mutex, dis-inheriting the higher priority again. */
                 if( xSemaphoreGiveRecursive( xMutex[0] ) != pdPASS )
                 {
                     xErrorOccurred[0] = pdTRUE;
@@ -423,7 +465,7 @@ static void prvRecursiveMutexPollingTask( void * pvParameters )
 
                 #if ( INCLUDE_uxTaskPriorityGet == 1 )
                 {
-                    /* Check priority disinherited. */
+                    /* Check priority dis-inherited. */
                     configASSERT( uxTaskPriorityGet( NULL ) == recmuPOLLING_TASK_PRIORITY );
                 }
                 #endif /* INCLUDE_uxTaskPriorityGet */

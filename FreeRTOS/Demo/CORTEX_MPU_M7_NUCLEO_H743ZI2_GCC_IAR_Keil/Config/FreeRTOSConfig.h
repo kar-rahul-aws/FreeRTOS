@@ -156,8 +156,8 @@ See http://www.FreeRTOS.org/RTOS-Cortex-M3-M4.html. */
 #define configSTART_GENERIC_QUEUE_TESTS           0
 #define configSTART_PEEK_QUEUE_TESTS              0
 #define configSTART_MATH_TESTS                    0
-#define configSTART_RECURSIVE_MUTEX_TESTS         0
-#define configSTART_COUNTING_SEMAPHORE_TESTS      1
+#define configSTART_RECURSIVE_MUTEX_TESTS         1
+#define configSTART_COUNTING_SEMAPHORE_TESTS      0
 #define configSTART_QUEUE_SET_TESTS               0
 #define configSTART_QUEUE_OVERWRITE_TESTS         0
 #define configSTART_EVENT_GROUP_TESTS             0
