@@ -37,6 +37,10 @@
 /* Demo program include files. */
 #include "countsem.h"
 
+#define countSHARED_MEM_SIZE_WORDS             ( 8 )
+#define countSHARED_MEM_SIZE_HALF_WORDS		   ( 16 )
+#define countSHARED_MEM_SIZE_BYTES             ( 32 )
+
 /* The maximum count value that the semaphore used for the demo can hold. */
 #define countMAX_COUNT_VALUE       ( 200 )
 
@@ -54,9 +58,9 @@
 
 /*-----------------------------------------------------------*/
 
-/* Flag that will be latched to pdTRUE should any unexpected behaviour be
+/* Flag that will be latched to pdTRUE should any unexpected behavior be
  * detected in any of the tasks. */
-static volatile BaseType_t xErrorDetected = pdFALSE;
+static volatile BaseType_t xErrorDetected[countSHARED_MEM_SIZE_WORDS] __attribute__( ( aligned( countSHARED_MEM_SIZE_BYTES ) ) ) = { pdFALSE };
 
 /*-----------------------------------------------------------*/
 
@@ -98,10 +102,13 @@ typedef struct COUNT_SEM_STRUCT
     /* Incremented on each cycle of the demo task.  Used to detect a stalled
      * task. */
     volatile UBaseType_t uxLoopCounter;
+
+    uint32_t unused[ 5 ];
 } xCountSemStruct;
 
 /* Two structures are defined, one is passed to each test task. */
-static xCountSemStruct xParameters[ countNUM_TEST_TASKS ];
+static xCountSemStruct xParameters1 __attribute__( ( aligned( countSHARED_MEM_SIZE_BYTES ) ) );
+static xCountSemStruct xParameters2 __attribute__( ( aligned( countSHARED_MEM_SIZE_BYTES ) ) );
 
 /*-----------------------------------------------------------*/
 
@@ -110,32 +117,36 @@ void vStartCountingSemaphoreTasks( void )
     /* Create the semaphores that we are going to use for the test/demo.  The
      * first should be created such that it starts at its maximum count value,
      * the second should be created such that it starts with a count value of zero. */
-    xParameters[ 0 ].xSemaphore = xSemaphoreCreateCounting( countMAX_COUNT_VALUE, countMAX_COUNT_VALUE );
-    xParameters[ 0 ].uxExpectedStartCount = countSTART_AT_MAX_COUNT;
-    xParameters[ 0 ].uxLoopCounter = 0;
+    xParameters1.xSemaphore = xSemaphoreCreateCounting( countMAX_COUNT_VALUE, countMAX_COUNT_VALUE );
+    xParameters1.uxExpectedStartCount = countSTART_AT_MAX_COUNT;
+    xParameters1.uxLoopCounter = 0;
 
-    xParameters[ 1 ].xSemaphore = xSemaphoreCreateCounting( countMAX_COUNT_VALUE, 0 );
-    xParameters[ 1 ].uxExpectedStartCount = 0;
-    xParameters[ 1 ].uxLoopCounter = 0;
+    xParameters2.xSemaphore = xSemaphoreCreateCounting( countMAX_COUNT_VALUE, 0 );
+    xParameters2.uxExpectedStartCount = 0;
+    xParameters2.uxLoopCounter = 0;
 
-    static StackType_t xprvCountingSemaphoreTaskStack1[ configMINIMAL_STACK_SIZE ] __attribute__( ( aligned( configMINIMAL_STACK_SIZE * sizeof( StackType_t ) ) ) );
-    static StackType_t xprvCountingSemaphoreTaskStack2[ configMINIMAL_STACK_SIZE ]__attribute__( ( aligned( configMINIMAL_STACK_SIZE * sizeof( StackType_t ) ) ) );
+    static StackType_t xCountingSemaphoreTaskStack1[ configMINIMAL_STACK_SIZE ] __attribute__( ( aligned( configMINIMAL_STACK_SIZE * sizeof( StackType_t ) ) ) );
+    static StackType_t xCountingSemaphoreTaskStack2[ configMINIMAL_STACK_SIZE ]__attribute__( ( aligned( configMINIMAL_STACK_SIZE * sizeof( StackType_t ) ) ) );
 
-	TaskParameters_t xprvCountingSemaphoreTask1 =
+	TaskParameters_t xCountingSemaphoreTask1 =
 	{
 		.pvTaskCode		= prvCountingSemaphoreTask,
 		.pcName			= "CNT1",
 		.usStackDepth	= configMINIMAL_STACK_SIZE,
-		.pvParameters	= ( void * ) &( xParameters[ 0 ] ),
+		.pvParameters	= ( void * ) &( xParameters1 ),
 		.uxPriority		= tskIDLE_PRIORITY,
-		.puxStackBuffer	= xprvCountingSemaphoreTaskStack1,
+		.puxStackBuffer	= xCountingSemaphoreTaskStack1,
 		.xRegions		=	{
-								{ ucSharedMemory1,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-								{ ucSharedMemory2,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-								{ ucSharedMemory3,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-								{ ucSharedMemory4,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-								{ ucSharedMemory5,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-								{ ucSharedMemory6,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
+								{ (void *) &( xErrorDetected[ 0 ] ), countSHARED_MEM_SIZE_BYTES,
+				                    ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+				                },
+				                { &( xParameters1 ), countSHARED_MEM_SIZE_BYTES,
+				                    ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+				                },
+								{ 0,				0,					0														},
+								{ 0,				0,					0														},
+								{ 0,				0,					0														},
+								{ 0,				0,					0														},
 								{ 0,				0,					0														},
 								{ 0,				0,					0														},
 								{ 0,				0,					0														},
@@ -143,21 +154,25 @@ void vStartCountingSemaphoreTasks( void )
 								{ 0,				0,					0														}
 							}
 	};
-	TaskParameters_t xprvCountingSemaphoreTask2 =
+	TaskParameters_t xCountingSemaphoreTask2 =
 	{
 		.pvTaskCode		= prvCountingSemaphoreTask,
 		.pcName			= "CNT2",
 		.usStackDepth	= configMINIMAL_STACK_SIZE,
-		.pvParameters	= ( void * ) &( xParameters[ 1 ] ),
+		.pvParameters	= ( void * ) &( xParameters2 ),
 		.uxPriority		= tskIDLE_PRIORITY,
-		.puxStackBuffer	= xprvCountingSemaphoreTaskStack2,
+		.puxStackBuffer	= xCountingSemaphoreTaskStack2,
 		.xRegions		=	{
-								{ ucSharedMemory1,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-								{ ucSharedMemory2,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-								{ ucSharedMemory3,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-								{ ucSharedMemory4,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-								{ ucSharedMemory5,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
-								{ ucSharedMemory6,	SHARED_MEMORY_SIZE,	portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER},
+								{ (void *) &( xErrorDetected[ 0 ] ), countSHARED_MEM_SIZE_BYTES,
+									( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+								},
+								{ &( xParameters2 ), countSHARED_MEM_SIZE_BYTES,
+									( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+								},
+								{ 0,				0,					0														},
+								{ 0,				0,					0														},
+								{ 0,				0,					0														},
+								{ 0,				0,					0														},
 								{ 0,				0,					0														},
 								{ 0,				0,					0														},
 								{ 0,				0,					0														},
@@ -167,7 +182,7 @@ void vStartCountingSemaphoreTasks( void )
 	};
 
     /* Were the semaphores created? */
-    if( ( xParameters[ 0 ].xSemaphore != NULL ) || ( xParameters[ 1 ].xSemaphore != NULL ) )
+    if( ( xParameters1.xSemaphore != NULL ) || ( xParameters2.xSemaphore != NULL ) )
     {
         /* vQueueAddToRegistry() adds the semaphore to the registry, if one is
          * in use.  The registry is provided as a means for kernel aware
@@ -175,14 +190,14 @@ void vStartCountingSemaphoreTasks( void )
          * debugger is not being used.  The call to vQueueAddToRegistry() will be
          * removed by the pre-processor if configQUEUE_REGISTRY_SIZE is not
          * defined or is defined to be less than 1. */
-        vQueueAddToRegistry( ( QueueHandle_t ) xParameters[ 0 ].xSemaphore, "Counting_Sem_1" );
-        vQueueAddToRegistry( ( QueueHandle_t ) xParameters[ 1 ].xSemaphore, "Counting_Sem_2" );
+        vQueueAddToRegistry( ( QueueHandle_t ) xParameters1.xSemaphore, "Counting_Sem_1" );
+        vQueueAddToRegistry( ( QueueHandle_t ) xParameters2.xSemaphore, "Counting_Sem_2" );
 
         /* Create the demo tasks, passing in the semaphore to use as the parameter. */
         //xTaskCreate( prvCountingSemaphoreTask, "CNT1", configMINIMAL_STACK_SIZE, ( void * ) &( xParameters[ 0 ] ), tskIDLE_PRIORITY, NULL );
         //xTaskCreate( prvCountingSemaphoreTask, "CNT2", configMINIMAL_STACK_SIZE, ( void * ) &( xParameters[ 1 ] ), tskIDLE_PRIORITY, NULL );
-        xTaskCreateRestricted( &(xprvCountingSemaphoreTask1),	NULL );
-        xTaskCreateRestricted( &(xprvCountingSemaphoreTask2), 	NULL);
+        xTaskCreateRestricted( &(xCountingSemaphoreTask1),	NULL );
+        xTaskCreateRestricted( &(xCountingSemaphoreTask2), 	NULL);
 
     }
 }
@@ -197,7 +212,7 @@ static void prvDecrementSemaphoreCount( SemaphoreHandle_t xSemaphore,
      * 'give' the semaphore. */
     if( xSemaphoreGive( xSemaphore ) == pdPASS )
     {
-        xErrorDetected = pdTRUE;
+        xErrorDetected[ 0 ] = pdTRUE;
     }
 
     /* We should be able to 'take' the semaphore countMAX_COUNT_VALUE times. */
@@ -208,7 +223,7 @@ static void prvDecrementSemaphoreCount( SemaphoreHandle_t xSemaphore,
         if( xSemaphoreTake( xSemaphore, countDONT_BLOCK ) != pdPASS )
         {
             /* We expected to be able to take the semaphore. */
-            xErrorDetected = pdTRUE;
+            xErrorDetected[ 0 ] = pdTRUE;
         }
 
         ( *puxLoopCounter )++;
@@ -224,7 +239,7 @@ static void prvDecrementSemaphoreCount( SemaphoreHandle_t xSemaphore,
 
     if( xSemaphoreTake( xSemaphore, countDONT_BLOCK ) == pdPASS )
     {
-        xErrorDetected = pdTRUE;
+        xErrorDetected[ 0 ] = pdTRUE;
     }
 }
 /*-----------------------------------------------------------*/
@@ -238,7 +253,7 @@ static void prvIncrementSemaphoreCount( SemaphoreHandle_t xSemaphore,
      * the semaphore. */
     if( xSemaphoreTake( xSemaphore, countDONT_BLOCK ) == pdPASS )
     {
-        xErrorDetected = pdTRUE;
+        xErrorDetected[ 0 ] = pdTRUE;
     }
 
     /* We should be able to 'give' the semaphore countMAX_COUNT_VALUE times. */
@@ -249,7 +264,7 @@ static void prvIncrementSemaphoreCount( SemaphoreHandle_t xSemaphore,
         if( xSemaphoreGive( xSemaphore ) != pdPASS )
         {
             /* We expected to be able to take the semaphore. */
-            xErrorDetected = pdTRUE;
+            xErrorDetected[ 0 ] = pdTRUE;
         }
 
         ( *puxLoopCounter )++;
@@ -263,7 +278,7 @@ static void prvIncrementSemaphoreCount( SemaphoreHandle_t xSemaphore,
      * 'give' the semaphore. */
     if( xSemaphoreGive( xSemaphore ) == pdPASS )
     {
-        xErrorDetected = pdTRUE;
+        xErrorDetected[ 0 ] = pdTRUE;
     }
 }
 /*-----------------------------------------------------------*/
@@ -295,7 +310,7 @@ static void prvCountingSemaphoreTask( void * pvParameters )
      * error if we can take the semaphore. */
     if( xSemaphoreTake( pxParameter->xSemaphore, 0 ) == pdPASS )
     {
-        xErrorDetected = pdTRUE;
+        xErrorDetected[ 0 ] = pdTRUE;
     }
 
     for( ; ; )
@@ -313,28 +328,28 @@ BaseType_t xAreCountingSemaphoreTasksStillRunning( void )
 
     /* Return fail if any 'give' or 'take' did not result in the expected
      * behaviour. */
-    if( xErrorDetected != pdFALSE )
+    if( xErrorDetected[ 0 ] != pdFALSE )
     {
         xReturn = pdFAIL;
     }
 
     /* Return fail if either task is not still incrementing its loop counter. */
-    if( uxLastCount0 == xParameters[ 0 ].uxLoopCounter )
+    if( uxLastCount0 == xParameters1.uxLoopCounter )
     {
         xReturn = pdFAIL;
     }
     else
     {
-        uxLastCount0 = xParameters[ 0 ].uxLoopCounter;
+        uxLastCount0 = xParameters1.uxLoopCounter;
     }
 
-    if( uxLastCount1 == xParameters[ 1 ].uxLoopCounter )
+    if( uxLastCount1 == xParameters2.uxLoopCounter )
     {
         xReturn = pdFAIL;
     }
     else
     {
-        uxLastCount1 = xParameters[ 1 ].uxLoopCounter;
+        uxLastCount1 = xParameters2.uxLoopCounter;
     }
 
     return xReturn;
