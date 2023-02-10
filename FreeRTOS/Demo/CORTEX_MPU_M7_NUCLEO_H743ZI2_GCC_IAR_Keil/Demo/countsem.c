@@ -38,7 +38,6 @@
 #include "countsem.h"
 
 #define countSHARED_MEM_SIZE_WORDS             ( 8 )
-#define countSHARED_MEM_SIZE_HALF_WORDS		   ( 16 )
 #define countSHARED_MEM_SIZE_BYTES             ( 32 )
 
 /* The maximum count value that the semaphore used for the demo can hold. */
@@ -60,7 +59,7 @@
 
 /* Flag that will be latched to pdTRUE should any unexpected behavior be
  * detected in any of the tasks. */
-static volatile BaseType_t xErrorDetected[countSHARED_MEM_SIZE_WORDS] __attribute__( ( aligned( countSHARED_MEM_SIZE_BYTES ) ) ) = { pdFALSE };
+static volatile BaseType_t xErrorDetected[ countSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( countSHARED_MEM_SIZE_BYTES ) ) ) = { pdFALSE };
 
 /*-----------------------------------------------------------*/
 
@@ -128,58 +127,62 @@ void vStartCountingSemaphoreTasks( void )
     static StackType_t xCountingSemaphoreTaskStack1[ configMINIMAL_STACK_SIZE ] __attribute__( ( aligned( configMINIMAL_STACK_SIZE * sizeof( StackType_t ) ) ) );
     static StackType_t xCountingSemaphoreTaskStack2[ configMINIMAL_STACK_SIZE ]__attribute__( ( aligned( configMINIMAL_STACK_SIZE * sizeof( StackType_t ) ) ) );
 
-	TaskParameters_t xCountingSemaphoreTask1 =
-	{
-		.pvTaskCode		= prvCountingSemaphoreTask,
-		.pcName			= "CNT1",
-		.usStackDepth	= configMINIMAL_STACK_SIZE,
-		.pvParameters	= ( void * ) &( xParameters1 ),
-		.uxPriority		= tskIDLE_PRIORITY,
-		.puxStackBuffer	= xCountingSemaphoreTaskStack1,
-		.xRegions		=	{
-								{ (void *) &( xErrorDetected[ 0 ] ), countSHARED_MEM_SIZE_BYTES,
-				                    ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-				                },
-				                { &( xParameters1 ), countSHARED_MEM_SIZE_BYTES,
-				                    ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-				                },
-								{ 0,				0,					0														},
-								{ 0,				0,					0														},
-								{ 0,				0,					0														},
-								{ 0,				0,					0														},
-								{ 0,				0,					0														},
-								{ 0,				0,					0														},
-								{ 0,				0,					0														},
-								{ 0,				0,					0														},
-								{ 0,				0,					0														}
-							}
-	};
-	TaskParameters_t xCountingSemaphoreTask2 =
-	{
-		.pvTaskCode		= prvCountingSemaphoreTask,
-		.pcName			= "CNT2",
-		.usStackDepth	= configMINIMAL_STACK_SIZE,
-		.pvParameters	= ( void * ) &( xParameters2 ),
-		.uxPriority		= tskIDLE_PRIORITY,
-		.puxStackBuffer	= xCountingSemaphoreTaskStack2,
-		.xRegions		=	{
-								{ (void *) &( xErrorDetected[ 0 ] ), countSHARED_MEM_SIZE_BYTES,
-									( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-								},
-								{ &( xParameters2 ), countSHARED_MEM_SIZE_BYTES,
-									( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-								},
-								{ 0,				0,					0														},
-								{ 0,				0,					0														},
-								{ 0,				0,					0														},
-								{ 0,				0,					0														},
-								{ 0,				0,					0														},
-								{ 0,				0,					0														},
-								{ 0,				0,					0														},
-								{ 0,				0,					0														},
-								{ 0,				0,					0														}
-							}
-	};
+    TaskParameters_t xCountingSemaphoreTask1 =
+    {
+        .pvTaskCode      = prvCountingSemaphoreTask,
+        .pcName          = "CNT1",
+        .usStackDepth    = configMINIMAL_STACK_SIZE,
+        .pvParameters    = ( void * ) &( xParameters1 ),
+        .uxPriority      = tskIDLE_PRIORITY,
+        .puxStackBuffer  = xCountingSemaphoreTaskStack1,
+        .xRegions        =  {
+                                { ( void * ) &( xErrorDetected[ 0 ] ), countSHARED_MEM_SIZE_BYTES,
+                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                },
+                                { &( xParameters1 ), countSHARED_MEM_SIZE_BYTES,
+                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        }
+                            }
+    };
+    TaskParameters_t xCountingSemaphoreTask2 =
+    {
+        .pvTaskCode      = prvCountingSemaphoreTask,
+        .pcName          = "CNT2",
+        .usStackDepth    = configMINIMAL_STACK_SIZE,
+        .pvParameters    = ( void * ) &( xParameters2 ),
+        .uxPriority      = tskIDLE_PRIORITY,
+        .puxStackBuffer  = xCountingSemaphoreTaskStack2,
+        .xRegions        =  {
+                                { ( void * ) &( xErrorDetected[ 0 ] ), countSHARED_MEM_SIZE_BYTES,
+                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                },
+                                { &( xParameters2 ), countSHARED_MEM_SIZE_BYTES,
+                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        }
+                            }
+    };
 
     /* Were the semaphores created? */
     if( ( xParameters1.xSemaphore != NULL ) || ( xParameters2.xSemaphore != NULL ) )
@@ -194,11 +197,8 @@ void vStartCountingSemaphoreTasks( void )
         vQueueAddToRegistry( ( QueueHandle_t ) xParameters2.xSemaphore, "Counting_Sem_2" );
 
         /* Create the demo tasks, passing in the semaphore to use as the parameter. */
-        //xTaskCreate( prvCountingSemaphoreTask, "CNT1", configMINIMAL_STACK_SIZE, ( void * ) &( xParameters[ 0 ] ), tskIDLE_PRIORITY, NULL );
-        //xTaskCreate( prvCountingSemaphoreTask, "CNT2", configMINIMAL_STACK_SIZE, ( void * ) &( xParameters[ 1 ] ), tskIDLE_PRIORITY, NULL );
-        xTaskCreateRestricted( &(xCountingSemaphoreTask1),	NULL );
-        xTaskCreateRestricted( &(xCountingSemaphoreTask2), 	NULL);
-
+        xTaskCreateRestricted( &( xCountingSemaphoreTask1 ), NULL );
+        xTaskCreateRestricted( &( xCountingSemaphoreTask2 ), NULL );
     }
 }
 /*-----------------------------------------------------------*/
@@ -233,7 +233,7 @@ static void prvDecrementSemaphoreCount( SemaphoreHandle_t xSemaphore,
         taskYIELD();
     #endif
 
-    /* If the semaphore count is zero then we should not be able to	'take'
+    /* If the semaphore count is zero then we should not be able to    'take'
      * the semaphore. */
     configASSERT( uxSemaphoreGetCount( xSemaphore ) == 0 );
 
@@ -249,7 +249,7 @@ static void prvIncrementSemaphoreCount( SemaphoreHandle_t xSemaphore,
 {
     UBaseType_t ux;
 
-    /* If the semaphore count is zero then we should not be able to	'take'
+    /* If the semaphore count is zero then we should not be able to    'take'
      * the semaphore. */
     if( xSemaphoreTake( xSemaphore, countDONT_BLOCK ) == pdPASS )
     {
@@ -354,3 +354,4 @@ BaseType_t xAreCountingSemaphoreTasksStillRunning( void )
 
     return xReturn;
 }
+/*-----------------------------------------------------------*/
