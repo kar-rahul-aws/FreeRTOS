@@ -59,7 +59,7 @@
 #include "semtest.h"
 
 #define semqSHARED_MEM_SIZE_WORDS             ( 8 )
-#define semqSHARED_MEM_SIZE_HALF_WORDS		  ( 16 )
+#define semqSHARED_MEM_SIZE_HALF_WORDS        ( 16 )
 #define semqSHARED_MEM_SIZE_BYTES             ( 32 )
 
 /* The value to which the shared variables are counted. */
@@ -78,10 +78,10 @@ static portTASK_FUNCTION_PROTO( prvSemaphoreTest, pvParameters );
 /* Structure used to pass parameters to each task. */
 typedef struct SEMAPHORE_PARAMETERS
 {
-	SemaphoreHandle_t xSemaphore;
+    SemaphoreHandle_t xSemaphore;
     volatile uint32_t * pulSharedVariable;
     TickType_t xBlockTime;
-    uint32_t unused[5];
+    uint32_t unused[ 5 ];
 } xSemaphoreParameters;
 
 /* Variables used to check that all the tasks are still running without errors. */
@@ -126,79 +126,77 @@ void vStartSemaphoreTasks( UBaseType_t uxPriority )
             pxFirstSemaphoreParameters->xBlockTime = ( TickType_t ) 0;
 
             /* Spawn the first two tasks.  As they poll they operate at the idle priority. */
-        	TaskParameters_t xSemaphoreTest1Parameters =
-        		{
-        			.pvTaskCode		= prvSemaphoreTest,
-        			.pcName			= "PolSEM1",
-        			.usStackDepth	= semtstSTACK_SIZE,
-        			.pvParameters	= ( void * ) pxFirstSemaphoreParameters,
-        			.uxPriority		= tskIDLE_PRIORITY,
-        			.puxStackBuffer	= xSemesterTest1Stack,
-        			.xRegions		=	{
-        										{ ( void * ) &( sCheckVariables[ 0 ] ), semqSHARED_MEM_SIZE_BYTES,
-        					                         ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-        					                          ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-        					                    },
-        					                    { ( void * ) &( sNextCheckVariable[ 0 ] ), semqSHARED_MEM_SIZE_BYTES,
-        					                          ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-        					                           ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-        					                    },
-												{ &( xSemaphoreParameters1 ), semqSHARED_MEM_SIZE_BYTES,
-												     ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-												     ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-												},
-												{ ( void * ) &( sSharedVariable[ 0 ] ), semqSHARED_MEM_SIZE_BYTES,
-														( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-												        ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-												},
-        					                    { 0,                0,                    0                                                        },
-        					                    { 0,                0,                    0                                                        },
-        					                    { 0,                0,                    0                                                        },
-        					                    { 0,                0,                    0                                                        },
-        					                    { 0,                0,                    0                                                        },
-        					                    { 0,                0,                    0                                                        },
-        					                    { 0,                0,                    0                                                        }
+            TaskParameters_t xSemaphoreTest1Parameters =
+            {
+                .pvTaskCode      = prvSemaphoreTest,
+                .pcName          = "PolSEM1",
+                .usStackDepth    = semtstSTACK_SIZE,
+                .pvParameters    = ( void * ) pxFirstSemaphoreParameters,
+                .uxPriority      = tskIDLE_PRIORITY,
+                .puxStackBuffer  = xSemesterTest1Stack,
+                .xRegions        =  {
+                                        { ( void * ) &( sCheckVariables[ 0 ] ), semqSHARED_MEM_SIZE_BYTES,
+                                          ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                            ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                        },
+                                        { ( void * ) &( sNextCheckVariable[ 0 ] ), semqSHARED_MEM_SIZE_BYTES,
+                                          ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                            ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                        },
+                                        { &( xSemaphoreParameters1 ), semqSHARED_MEM_SIZE_BYTES,
+                                          ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                            ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                        },
+                                        { ( void * ) &( sSharedVariable[ 0 ] ), semqSHARED_MEM_SIZE_BYTES,
+                                          ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                            ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                        },
+                                        { 0,                0,                    0                                                        },
+                                        { 0,                0,                    0                                                        },
+                                        { 0,                0,                    0                                                        },
+                                        { 0,                0,                    0                                                        },
+                                        { 0,                0,                    0                                                        },
+                                        { 0,                0,                    0                                                        },
+                                        { 0,                0,                    0                                                        }
+                                    }
+            };
+            TaskParameters_t xSemaphoreTest2Parameters =
+            {
+                .pvTaskCode      = prvSemaphoreTest,
+                .pcName          = "PolSEM2",
+                .usStackDepth    = semtstSTACK_SIZE,
+                .pvParameters    = ( void * ) pxFirstSemaphoreParameters,
+                .uxPriority      = tskIDLE_PRIORITY,
+                .puxStackBuffer  = xSemesterTest2Stack,
+                .xRegions        =  {
+                                        { ( void * ) &( sCheckVariables[ 0 ] ), semqSHARED_MEM_SIZE_BYTES,
+                                          ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                            ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                        },
+                                        { ( void * ) &( sNextCheckVariable[ 0 ] ), semqSHARED_MEM_SIZE_BYTES,
+                                          ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                            ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                        },
+                                        { &( xSemaphoreParameters1 ), semqSHARED_MEM_SIZE_BYTES,
+                                          ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                            ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                        },
+                                        { ( void * ) &( sSharedVariable[ 0 ] ), semqSHARED_MEM_SIZE_BYTES,
+                                          ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                            ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                        },
+                                        { 0,                0,                    0                                                        },
+                                        { 0,                0,                    0                                                        },
+                                        { 0,                0,                    0                                                        },
+                                        { 0,                0,                    0                                                        },
+                                        { 0,                0,                    0                                                        },
+                                        { 0,                0,                    0                                                        },
+                                        { 0,                0,                    0                                                        }
+                                    }
+            };
 
-        								}
-        		};
-        	TaskParameters_t xSemaphoreTest2Parameters =
-        		{
-        			.pvTaskCode		= prvSemaphoreTest,
-        			.pcName			= "PolSEM2",
-        			.usStackDepth	= semtstSTACK_SIZE,
-        			.pvParameters	= ( void * ) pxFirstSemaphoreParameters,
-        			.uxPriority		= tskIDLE_PRIORITY,
-        			.puxStackBuffer	= xSemesterTest2Stack,
-        			.xRegions		=	{
-        										{ ( void * ) &( sCheckVariables[ 0 ] ), semqSHARED_MEM_SIZE_BYTES,
-        					                         ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-        					                          ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-        					                    },
-        					                    { ( void * ) &( sNextCheckVariable[ 0 ] ), semqSHARED_MEM_SIZE_BYTES,
-        					                          ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-        					                           ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-        					                    },
-												{ &( xSemaphoreParameters1 ), semqSHARED_MEM_SIZE_BYTES,
-												     ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-												     ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-												},
-												{ ( void * ) &( sSharedVariable[ 0 ] ), semqSHARED_MEM_SIZE_BYTES,
-														( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-												        ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-												},
-        					                    { 0,                0,                    0                                                        },
-        					                    { 0,                0,                    0                                                        },
-        					                    { 0,                0,                    0                                                        },
-        					                    { 0,                0,                    0                                                        },
-        					                    { 0,                0,                    0                                                        },
-        					                    { 0,                0,                    0                                                        },
-        					                    { 0,                0,                    0                                                        }
-
-        								}
-        		};
-
-        	xTaskCreateRestricted(&(xSemaphoreTest1Parameters),NULL);
-        	xTaskCreateRestricted(&(xSemaphoreTest2Parameters),NULL);
+            xTaskCreateRestricted( &( xSemaphoreTest1Parameters ), NULL );
+            xTaskCreateRestricted( &( xSemaphoreTest2Parameters ), NULL );
 
             /* vQueueAddToRegistry() adds the semaphore to the registry, if one
              * is in use.  The registry is provided as a means for kernel aware
@@ -226,79 +224,77 @@ void vStartSemaphoreTasks( UBaseType_t uxPriority )
             *( pxSecondSemaphoreParameters->pulSharedVariable ) = semtstBLOCKING_EXPECTED_VALUE;
             pxSecondSemaphoreParameters->xBlockTime = xBlockTime / portTICK_PERIOD_MS;
 
-        	TaskParameters_t xSemaphoreTest3Parameters =
-        		{
-        			.pvTaskCode		= prvSemaphoreTest,
-        			.pcName			= "BlkSEM1",
-        			.usStackDepth	= semtstSTACK_SIZE,
-        			.pvParameters	= ( void * ) pxSecondSemaphoreParameters,
-        			.uxPriority		= tskIDLE_PRIORITY,
-        			.puxStackBuffer	= xSemesterTest3Stack,
-        			.xRegions		=	{
-        										{ ( void * ) &( sCheckVariables[ 0 ] ), semqSHARED_MEM_SIZE_BYTES,
-        					                         ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-        					                          ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-        					                    },
-        					                    { ( void * ) &( sNextCheckVariable[ 0 ] ), semqSHARED_MEM_SIZE_BYTES,
-        					                          ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-        					                           ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-        					                    },
-												{ &( xSemaphoreParameters2 ), semqSHARED_MEM_SIZE_BYTES,
-												     ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-												     ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-												},
-												{ ( void * ) &( sSharedVariable[ 0 ] ), semqSHARED_MEM_SIZE_BYTES,
-														( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-												        ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-												},
-        					                    { 0,                0,                    0                                                        },
-        					                    { 0,                0,                    0                                                        },
-        					                    { 0,                0,                    0                                                        },
-        					                    { 0,                0,                    0                                                        },
-        					                    { 0,                0,                    0                                                        },
-        					                    { 0,                0,                    0                                                        },
-        					                    { 0,                0,                    0                                                        }
+            TaskParameters_t xSemaphoreTest3Parameters =
+            {
+                .pvTaskCode      = prvSemaphoreTest,
+                .pcName          = "BlkSEM1",
+                .usStackDepth    = semtstSTACK_SIZE,
+                .pvParameters    = ( void * ) pxSecondSemaphoreParameters,
+                .uxPriority      = tskIDLE_PRIORITY,
+                .puxStackBuffer  = xSemesterTest3Stack,
+                .xRegions        =  {
+                                            { ( void * ) &( sCheckVariables[ 0 ] ), semqSHARED_MEM_SIZE_BYTES,
+                                              ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                                ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                            },
+                                            { ( void * ) &( sNextCheckVariable[ 0 ] ), semqSHARED_MEM_SIZE_BYTES,
+                                              ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                                ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                            },
+                                            { &( xSemaphoreParameters2 ), semqSHARED_MEM_SIZE_BYTES,
+                                              ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                                ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                            },
+                                            { ( void * ) &( sSharedVariable[ 0 ] ), semqSHARED_MEM_SIZE_BYTES,
+                                              ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                                ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                            },
+                                            { 0,                0,                    0                                                        },
+                                            { 0,                0,                    0                                                        },
+                                            { 0,                0,                    0                                                        },
+                                            { 0,                0,                    0                                                        },
+                                            { 0,                0,                    0                                                        },
+                                            { 0,                0,                    0                                                        },
+                                            { 0,                0,                    0                                                        }
+                                        }
+            };
+            TaskParameters_t xSemaphoreTest4Parameters =
+            {
+                .pvTaskCode      = prvSemaphoreTest,
+                .pcName          = "BlkSEM2",
+                .usStackDepth    = semtstSTACK_SIZE,
+                .pvParameters    = ( void * ) pxSecondSemaphoreParameters,
+                .uxPriority      = tskIDLE_PRIORITY,
+                .puxStackBuffer  = xSemesterTest4Stack,
+                .xRegions        =  {
+                                        { ( void * ) &( sCheckVariables[ 0 ] ), semqSHARED_MEM_SIZE_BYTES,
+                                          ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                            ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                        },
+                                        { ( void * ) &( sNextCheckVariable[ 0 ] ), semqSHARED_MEM_SIZE_BYTES,
+                                          ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                            ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                        },
+                                        { &( xSemaphoreParameters2 ), semqSHARED_MEM_SIZE_BYTES,
+                                          ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                            ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                        },
+                                        { ( void * ) &( sSharedVariable[ 0 ] ), semqSHARED_MEM_SIZE_BYTES,
+                                          ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                            ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                        },
+                                        { 0,                0,                    0                                                        },
+                                        { 0,                0,                    0                                                        },
+                                        { 0,                0,                    0                                                        },
+                                        { 0,                0,                    0                                                        },
+                                        { 0,                0,                    0                                                        },
+                                        { 0,                0,                    0                                                        },
+                                        { 0,                0,                    0                                                        }
+                                    }
+            };
 
-        								}
-        		};
-        	TaskParameters_t xSemaphoreTest4Parameters =
-        		{
-        			.pvTaskCode		= prvSemaphoreTest,
-        			.pcName			= "BlkSEM2",
-        			.usStackDepth	= semtstSTACK_SIZE,
-        			.pvParameters	= ( void * ) pxSecondSemaphoreParameters,
-        			.uxPriority		= tskIDLE_PRIORITY,
-        			.puxStackBuffer	= xSemesterTest4Stack,
-        			.xRegions		=	{
-        										{ ( void * ) &( sCheckVariables[ 0 ] ), semqSHARED_MEM_SIZE_BYTES,
-        					                         ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-        					                          ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-        					                    },
-        					                    { ( void * ) &( sNextCheckVariable[ 0 ] ), semqSHARED_MEM_SIZE_BYTES,
-        					                          ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-        					                           ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-        					                    },
-												{ &( xSemaphoreParameters2 ), semqSHARED_MEM_SIZE_BYTES,
-												     ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-												     ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-												},
-												{ ( void * ) &( sSharedVariable[ 0 ] ), semqSHARED_MEM_SIZE_BYTES,
-														( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-												        ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-												},
-        					                    { 0,                0,                    0                                                        },
-        					                    { 0,                0,                    0                                                        },
-        					                    { 0,                0,                    0                                                        },
-        					                    { 0,                0,                    0                                                        },
-        					                    { 0,                0,                    0                                                        },
-        					                    { 0,                0,                    0                                                        },
-        					                    { 0,                0,                    0                                                        }
-
-        								}
-        		};
-
-        	xTaskCreateRestricted(&(xSemaphoreTest3Parameters),NULL);
-        	xTaskCreateRestricted(&(xSemaphoreTest4Parameters),NULL);
+            xTaskCreateRestricted( &( xSemaphoreTest3Parameters ), NULL );
+            xTaskCreateRestricted( &( xSemaphoreTest4Parameters ), NULL );
 
             /* vQueueAddToRegistry() adds the semaphore to the registry, if one
              * is in use.  The registry is provided as a means for kernel aware
@@ -385,7 +381,7 @@ static portTASK_FUNCTION( prvSemaphoreTest, pvParameters )
 
             /* If we have a block time then we are running at a priority higher
              * than the idle priority.  This task takes a long time to complete
-             * a cycle	(deliberately so to test the guarding) so will be starving
+             * a cycle (deliberately so to test the guarding) so will be starving
              * out lower priority tasks.  Block for some time to allow give lower
              * priority tasks some processor time. */
             if( pxParameters->xBlockTime != ( TickType_t ) 0 )
@@ -425,3 +421,4 @@ BaseType_t xAreSemaphoreTasksStillRunning( void )
 
     return xReturn;
 }
+/*-----------------------------------------------------------*/
