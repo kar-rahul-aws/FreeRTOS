@@ -50,9 +50,8 @@
 /* Demo includes. */
 #include "QueueSetPolling.h"
 
-#define qsetPollSHARED_MEM_SIZE_WORDS		(8)
-#define qsetPollSHARED_MEM_SIZE_HALF_WORDS	(16)
-#define qsetPollSHARED_MEM_SIZE_BYTES 		(32)
+#define qsetPollSHARED_MEM_SIZE_WORDS           ( 8 )
+#define qsetPollSHARED_MEM_SIZE_BYTES           ( 32 )
 
 #if ( configUSE_QUEUE_SETS == 1 ) /* Remove tests if queue sets are not defined. */
 
@@ -73,7 +72,7 @@
 /*-----------------------------------------------------------*/
 
 /* The queue that is added to the set. */
-    static QueueHandle_t xQueue[ qsetPollSHARED_MEM_SIZE_WORDS ] __attribute__ ( ( aligned( qsetPollSHARED_MEM_SIZE_BYTES ) ) ) = { NULL };
+    static QueueHandle_t xQueue = NULL;
 
 /* The handle of the queue set to which the queue is added. */
     static QueueSetHandle_t xQueueSet[ qsetPollSHARED_MEM_SIZE_WORDS ] __attribute__ ( ( aligned( qsetPollSHARED_MEM_SIZE_BYTES ) ) ) = { NULL };
@@ -91,47 +90,49 @@
     {
         /* Create the queue that is added to the set, the set, and add the queue to
          * the set. */
-        xQueue[ 0 ] = xQueueCreate( setpollQUEUE_LENGTH, sizeof( uint32_t ) );
+        xQueue = xQueueCreate( setpollQUEUE_LENGTH, sizeof( uint32_t ) );
         xQueueSet[ 0 ] = xQueueCreateSet( setpollQUEUE_LENGTH );
 
-        static StackType_t xQueueSetRecevingTaskStack[ configMINIMAL_STACK_SIZE ]__attribute__( ( aligned( configMINIMAL_STACK_SIZE * sizeof( StackType_t ) ) ) );
+        static StackType_t xQueueSetReceivingTaskStack[ configMINIMAL_STACK_SIZE ]__attribute__( ( aligned( configMINIMAL_STACK_SIZE * sizeof( StackType_t ) ) ) );
 
         TaskParameters_t xQueueSetReceivingTaskParameters =
-            		{
-            			.pvTaskCode		= prvQueueSetReceivingTask,
-            			.pcName			= "SetPoll",
-            			.usStackDepth	= configMINIMAL_STACK_SIZE,
-            			.pvParameters	= NULL,
-            			.uxPriority		= tskIDLE_PRIORITY,
-            			.puxStackBuffer	= xQueueSetRecevingTaskStack,
-            			.xRegions		=	{
-            									{ (void *) &( xQueueSet[ 0 ] ), qsetPollSHARED_MEM_SIZE_BYTES,
-            												( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-            									},
-            									{ (void *) &( xQueueSetPollStatus[ 0 ] ), qsetPollSHARED_MEM_SIZE_BYTES,
-            												( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-            									},
-            									{ (void *) &( ulCycleCounter[ 0 ] ), qsetPollSHARED_MEM_SIZE_BYTES,
-            												( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-            									},
-												{ 0,				0,					0														},
-												{ 0,				0,					0														},
-												{ 0,				0,					0														},
-            									{ 0,				0,					0														},
-            									{ 0,				0,					0														},
-            									{ 0,				0,					0														},
-            									{ 0,				0,					0														},
-            									{ 0,				0,					0														}
-            								}
-            		};
+                    {
+                        .pvTaskCode      = prvQueueSetReceivingTask,
+                        .pcName          = "SetPoll",
+                        .usStackDepth    = configMINIMAL_STACK_SIZE,
+                        .pvParameters    = NULL,
+                        .uxPriority      = tskIDLE_PRIORITY,
+                        .puxStackBuffer  = xQueueSetReceivingTaskStack,
+                        .xRegions        =    {
+                                                { ( void * ) &( xQueueSet[ 0 ] ), qsetPollSHARED_MEM_SIZE_BYTES,
+                                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                                },
+                                                { ( void * ) &( xQueueSetPollStatus[ 0 ] ), qsetPollSHARED_MEM_SIZE_BYTES,
+                                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                                },
+                                                { ( void * ) &( ulCycleCounter[ 0 ] ), qsetPollSHARED_MEM_SIZE_BYTES,
+                                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                                },
+                                                { 0,                0,                    0                                                        },
+                                                { 0,                0,                    0                                                        },
+                                                { 0,                0,                    0                                                        },
+                                                { 0,                0,                    0                                                        },
+                                                { 0,                0,                    0                                                        },
+                                                { 0,                0,                    0                                                        },
+                                                { 0,                0,                    0                                                        },
+                                                { 0,                0,                    0                                                        }
+                                            }
+                    };
 
         if( ( xQueue != NULL ) && ( xQueueSet != NULL ) )
         {
-            xQueueAddToSet( xQueue[ 0 ], xQueueSet[ 0 ] );
+            xQueueAddToSet( xQueue, xQueueSet[ 0 ] );
 
             /* Create the task. */
-            //xTaskCreate( prvQueueSetReceivingTask, "SetPoll", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY, NULL );
-            xTaskCreateRestricted(&(xQueueSetReceivingTaskParameters),NULL);
+            xTaskCreateRestricted( &( xQueueSetReceivingTaskParameters ), NULL );
         }
     }
 /*-----------------------------------------------------------*/
@@ -190,7 +191,7 @@
         {
             ulCallCount = 0;
 
-            if( xQueueSendFromISR( xQueue[ 0 ], ( void * ) &ulValueToSend, NULL ) == pdPASS )
+            if( xQueueSendFromISR( xQueue, ( void * ) &ulValueToSend, NULL ) == pdPASS )
             {
                 /* Send the next value next time. */
                 ulValueToSend++;
