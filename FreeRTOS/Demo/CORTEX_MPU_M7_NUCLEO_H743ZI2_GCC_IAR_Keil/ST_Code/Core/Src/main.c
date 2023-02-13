@@ -71,6 +71,8 @@ ETH_HandleTypeDef heth;
 
 UART_HandleTypeDef huart3;
 
+TIM_HandleTypeDef htim7;
+
 PCD_HandleTypeDef hpcd_USB_OTG_FS;
 
 /* USER CODE BEGIN PV */
@@ -83,6 +85,7 @@ static void MX_GPIO_Init(void);
 static void MX_ETH_Init(void);
 static void MX_USART3_UART_Init(void);
 static void MX_USB_OTG_FS_PCD_Init(void);
+static void MX_TIM7_Init(void);
 
 /* USER CODE BEGIN PFP */
 static void CPU_CACHE_Enable(void);
@@ -134,6 +137,7 @@ int main(void)
   MX_ETH_Init();
   MX_USART3_UART_Init();
   MX_USB_OTG_FS_PCD_Init();
+  MX_TIM7_Init();
   /* USER CODE BEGIN 2 */
   /* Call our entry point. */
   app_main();
@@ -260,6 +264,78 @@ static void MX_ETH_Init(void)
   /* USER CODE BEGIN ETH_Init 2 */
 
   /* USER CODE END ETH_Init 2 */
+
+}
+
+/**
+  * @brief TIM7 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_TIM7_Init(void)
+{
+  /* USER CODE BEGIN TIM7_Init 0 */
+  RCC_ClkInitTypeDef    clkconfig;
+  uint32_t              uwTimclock, uwAPB1Prescaler;
+
+  uint32_t              uwPrescalerValue;
+  uint32_t              pFLatency;
+
+  /* Enable TIM7 clock */
+  __HAL_RCC_TIM7_CLK_ENABLE();
+
+  /* Get clock configuration */
+  HAL_RCC_GetClockConfig(&clkconfig, &pFLatency);
+
+  /* Get APB1 prescaler */
+  uwAPB1Prescaler = clkconfig.APB1CLKDivider;
+  /* Compute TIM7 clock */
+  if (uwAPB1Prescaler == RCC_HCLK_DIV1)
+  {
+    uwTimclock = HAL_RCC_GetPCLK1Freq();
+  }
+  else
+  {
+    uwTimclock = 2UL * HAL_RCC_GetPCLK1Freq();
+  }
+
+  /* Compute the prescaler value to have TIM7 counter clock equal to 1MHz */
+  uwPrescalerValue = (uint32_t) ((uwTimclock / 1000000U) - 1U);
+
+  /* Initialize TIM7 */
+  htim7.Instance = TIM7;
+
+  /* Initialize TIMx peripheral as follow:
+  + Period = [(TIM7CLK/100000) - 1]. to have a (1/10000) s time base.
+  + Prescaler = (uwTimclock/1000000 - 1) to have a 1MHz counter clock.
+  + ClockDivision = 0
+  + Counter direction = Up
+  */
+  htim7.Init.Period = (1000000U / 10000U) - 1U;
+  htim7.Init.Prescaler = uwPrescalerValue;
+  htim7.Init.ClockDivision = 0;
+  htim7.Init.CounterMode = TIM_COUNTERMODE_UP;
+
+  if(HAL_TIM_Base_Init(&htim7) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+  /* Start the TIM time Base generation in interrupt mode */
+  if(HAL_TIM_Base_Start_IT(&htim7) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+  /* USER CODE END TIM7_Init 0 */
+
+  /* USER CODE BEGIN TIM7_Init 1 */
+
+  /* USER CODE END TIM7_Init 1 */
+
+  /* USER CODE BEGIN TIM7_Init 2 */
+
+  /* USER CODE END TIM7_Init 2 */
 
 }
 
@@ -437,6 +513,10 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
   }
   /* USER CODE BEGIN Callback 1 */
 
+  extern void IntQueueTestTimerHandler( void );
+  if (htim->Instance == TIM7) {
+    IntQueueTestTimerHandler();
+  }
   /* USER CODE END Callback 1 */
 }
 

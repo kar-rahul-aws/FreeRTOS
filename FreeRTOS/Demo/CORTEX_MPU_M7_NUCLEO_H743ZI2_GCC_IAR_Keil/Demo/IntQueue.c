@@ -49,12 +49,12 @@
 
 /* Demo app includes. */
 #include "IntQueue.h"
-//#include "IntQueueTimer.h"
+#include "IntQueueTimer.h"
 
-#define intqSHARED_MEM_SIZE_WORDS			(8)
-#define intqSHARED_MEM_SIZE_HALF_WORDS		(16)
-#define intqSHARED_MEM_SIZE_BYTES			(32)
-#define intqSHARED_MEM_SIZE_VALUES_TO_LOG	(256)
+#define intqSHARED_MEM_SIZE_WORDS               ( 8 )
+#define intqSHARED_MEM_SIZE_HALF_WORDS          ( 16 )
+#define intqSHARED_MEM_SIZE_BYTES               ( 32 )
+#define intqSHARED_MEM_SIZE_VALUES_TO_LOG       ( 256 )
 
 #if ( INCLUDE_eTaskGetState != 1 )
     #error INCLUDE_eTaskGetState must be set to 1 in FreeRTOSConfig.h to use this demo file.
@@ -99,15 +99,15 @@
 /* Send the next value to the queue that is normally empty.  This is called
  * from within the interrupts. */
 #define timerNORMALLY_EMPTY_TX()                                                                                                          \
-    if( xQueueIsQueueFullFromISR( xNormallyEmptyQueue[ 0 ] ) != pdTRUE )                                                                       \
+    if( xQueueIsQueueFullFromISR( xNormallyEmptyQueue[ 0 ] ) != pdTRUE )                                                                  \
     {                                                                                                                                     \
         UBaseType_t uxSavedInterruptStatus;                                                                                               \
         uxSavedInterruptStatus = portSET_INTERRUPT_MASK_FROM_ISR();                                                                       \
         {                                                                                                                                 \
-            uxValueForNormallyEmptyQueue[ 0 ]++;                                                                                               \
+            uxValueForNormallyEmptyQueue[ 0 ]++;                                                                                          \
             if( xQueueSendFromISR( xNormallyEmptyQueue[ 0 ], ( void * ) &uxValueForNormallyEmptyQueue[ 0 ], &xHigherPriorityTaskWoken ) != pdPASS ) \
             {                                                                                                                             \
-                uxValueForNormallyEmptyQueue[ 0 ]--;                                                                                           \
+                uxValueForNormallyEmptyQueue[ 0 ]--;                                                                                      \
             }                                                                                                                             \
         }                                                                                                                                 \
         portCLEAR_INTERRUPT_MASK_FROM_ISR( uxSavedInterruptStatus );                                                                      \
@@ -117,15 +117,15 @@
 /* Send the next value to the queue that is normally full.  This is called
  * from within the interrupts. */
 #define timerNORMALLY_FULL_TX()                                                                                                         \
-    if( xQueueIsQueueFullFromISR( xNormallyFullQueue[ 0 ] ) != pdTRUE )                                                                      \
+    if( xQueueIsQueueFullFromISR( xNormallyFullQueue[ 0 ] ) != pdTRUE )                                                                 \
     {                                                                                                                                   \
         UBaseType_t uxSavedInterruptStatus;                                                                                             \
         uxSavedInterruptStatus = portSET_INTERRUPT_MASK_FROM_ISR();                                                                     \
         {                                                                                                                               \
-            uxValueForNormallyFullQueue[ 0 ]++;                                                                                              \
+            uxValueForNormallyFullQueue[ 0 ]++;                                                                                         \
             if( xQueueSendFromISR( xNormallyFullQueue[ 0 ], ( void * ) &uxValueForNormallyFullQueue[ 0 ], &xHigherPriorityTaskWoken ) != pdPASS ) \
             {                                                                                                                           \
-                uxValueForNormallyFullQueue[ 0 ]--;                                                                                          \
+                uxValueForNormallyFullQueue[ 0 ]--;                                                                                     \
             }                                                                                                                           \
         }                                                                                                                               \
         portCLEAR_INTERRUPT_MASK_FROM_ISR( uxSavedInterruptStatus );                                                                    \
@@ -156,36 +156,35 @@
 /*-----------------------------------------------------------*/
 
 /* The two queues used by the test. */
-static QueueHandle_t xNormallyEmptyQueue[ intqSHARED_MEM_SIZE_WORDS ] __attribute__ ( ( aligned( intqSHARED_MEM_SIZE_BYTES ) ) ) = { NULL } ;
-static QueueHandle_t xNormallyFullQueue[ intqSHARED_MEM_SIZE_WORDS ] __attribute__ ( ( aligned( intqSHARED_MEM_SIZE_BYTES ) ) ) = { NULL } ;
+static QueueHandle_t xNormallyEmptyQueue[ intqSHARED_MEM_SIZE_WORDS ] __attribute__ ( ( aligned( intqSHARED_MEM_SIZE_BYTES ) ) ) = { NULL };
+static QueueHandle_t xNormallyFullQueue[ intqSHARED_MEM_SIZE_WORDS ] __attribute__ ( ( aligned( intqSHARED_MEM_SIZE_BYTES ) ) ) = { NULL };
 
 /* Variables used to detect a stall in one of the tasks. */
-static volatile UBaseType_t uxHighPriorityLoops1[ intqSHARED_MEM_SIZE_WORDS ] __attribute__ ( ( aligned( intqSHARED_MEM_SIZE_BYTES ) ) ) = { 0 } ;
-static volatile UBaseType_t uxHighPriorityLoops2[ intqSHARED_MEM_SIZE_WORDS ] __attribute__ ( ( aligned( intqSHARED_MEM_SIZE_BYTES ) ) ) = { 0 } ;
-static volatile UBaseType_t uxLowPriorityLoops1[ intqSHARED_MEM_SIZE_WORDS ] __attribute__ ( ( aligned( intqSHARED_MEM_SIZE_BYTES ) ) ) = { 0 } ;
-static volatile UBaseType_t uxLowPriorityLoops2[ intqSHARED_MEM_SIZE_WORDS ] __attribute__ ( ( aligned( intqSHARED_MEM_SIZE_BYTES ) ) ) = { 0 } ;
+static volatile UBaseType_t uxHighPriorityLoops1[ intqSHARED_MEM_SIZE_WORDS ] __attribute__ ( ( aligned( intqSHARED_MEM_SIZE_BYTES ) ) ) = { 0 };
+static volatile UBaseType_t uxHighPriorityLoops2[ intqSHARED_MEM_SIZE_WORDS ] __attribute__ ( ( aligned( intqSHARED_MEM_SIZE_BYTES ) ) ) = { 0 };
+static volatile UBaseType_t uxLowPriorityLoops1[ intqSHARED_MEM_SIZE_WORDS ] __attribute__ ( ( aligned( intqSHARED_MEM_SIZE_BYTES ) ) ) = { 0 };
+static volatile UBaseType_t uxLowPriorityLoops2[ intqSHARED_MEM_SIZE_WORDS ] __attribute__ ( ( aligned( intqSHARED_MEM_SIZE_BYTES ) ) ) = { 0 };
 
 /* Any unexpected behaviour sets xErrorStatus to fail and log the line that
  * caused the error in xErrorLine. */
-static BaseType_t xErrorStatus[ intqSHARED_MEM_SIZE_WORDS ] __attribute__ ( ( aligned( intqSHARED_MEM_SIZE_BYTES ) ) ) = { pdPASS } ;
-static volatile UBaseType_t xErrorLine[ intqSHARED_MEM_SIZE_WORDS ] __attribute__ ( ( aligned( intqSHARED_MEM_SIZE_BYTES ) ) ) = { ( UBaseType_t ) 0 } ;
+BaseType_t xErrorStatus[ intqSHARED_MEM_SIZE_WORDS ] __attribute__ ( ( aligned( intqSHARED_MEM_SIZE_BYTES ) ) ) = { pdPASS };
+static volatile UBaseType_t xErrorLine[ intqSHARED_MEM_SIZE_WORDS ] __attribute__ ( ( aligned( intqSHARED_MEM_SIZE_BYTES ) ) ) = { ( UBaseType_t ) 0 };
 
 /* Used for sequencing between tasks. */
-static BaseType_t xWasSuspended[ intqSHARED_MEM_SIZE_WORDS ] __attribute__ ( ( aligned( intqSHARED_MEM_SIZE_BYTES ) ) ) = { pdFALSE } ;
+static BaseType_t xWasSuspended[ intqSHARED_MEM_SIZE_WORDS ] __attribute__ ( ( aligned( intqSHARED_MEM_SIZE_BYTES ) ) ) = { pdFALSE };
 
 /* The values that are sent to the queues.  An incremented value is sent each
  * time to each queue. */
-static volatile UBaseType_t uxValueForNormallyEmptyQueue[ intqSHARED_MEM_SIZE_WORDS ] __attribute__ ( ( aligned( intqSHARED_MEM_SIZE_BYTES ) ) ) = { 0 } ;
-static volatile UBaseType_t uxValueForNormallyFullQueue[ intqSHARED_MEM_SIZE_WORDS ] __attribute__ ( ( aligned( intqSHARED_MEM_SIZE_BYTES ) ) ) = { 0 } ;
+static volatile UBaseType_t uxValueForNormallyEmptyQueue[ intqSHARED_MEM_SIZE_WORDS ] __attribute__ ( ( aligned( intqSHARED_MEM_SIZE_BYTES ) ) ) = { 0 };
+static volatile UBaseType_t uxValueForNormallyFullQueue[ intqSHARED_MEM_SIZE_WORDS ] __attribute__ ( ( aligned( intqSHARED_MEM_SIZE_BYTES ) ) ) = { 0 };
 
 /* A handle to some of the tasks is required so they can be suspended/resumed. */
-//TaskHandle_t xHighPriorityNormallyEmptyTask1, xHighPriorityNormallyEmptyTask2, xHighPriorityNormallyFullTask1, xHighPriorityNormallyFullTask2;
-#define LOW_PRIO_EMPTY_TASK_IDX				(0)
-#define LOW_PRIO_FULL_TASK_IDX				(1)
-#define FIRST_HIGH_PRIO_EMPTY_TASK_IDX		(2)
-#define SECOND_HIGH_PRIO_EMPTY_TASK_IDX		(3)
-#define FIRST_HIGH_PRIO_FULL_TASK_IDX		(4)
-#define SECOND_HIGH_PRIO_FULL_TASK_IDX		(5)
+#define LOW_PRIO_EMPTY_TASK_IDX                 ( 0 )
+#define LOW_PRIO_FULL_TASK_IDX                  ( 1 )
+#define FIRST_HIGH_PRIO_EMPTY_TASK_IDX          ( 2 )
+#define SECOND_HIGH_PRIO_EMPTY_TASK_IDX         ( 3 )
+#define FIRST_HIGH_PRIO_FULL_TASK_IDX           ( 4 )
+#define SECOND_HIGH_PRIO_FULL_TASK_IDX          ( 5 )
 
 static TaskHandle_t xLocalTaskHandles[ intqSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( intqSHARED_MEM_SIZE_BYTES ) ) ) = { NULL };
 
@@ -212,297 +211,271 @@ static void prvRecordValue_NormallyFull( UBaseType_t uxValue,
 
 /* Logs the line on which an error occurred. */
 static void prvQueueAccessLogError( UBaseType_t uxLine );
-
-UBaseType_t uxValueToTx[ intqSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( intqSHARED_MEM_SIZE_BYTES ) ) ) = { 0 };
-UBaseType_t uxRxed[ intqSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( intqSHARED_MEM_SIZE_BYTES ) ) ) = { 0 };
-
 /*-----------------------------------------------------------*/
 
 void vStartInterruptQueueTasks( void )
 {
     /* Start the test tasks. */
 
-	static StackType_t x1stHigherPriorityNormallyEmptyTaskStack[ configMINIMAL_STACK_SIZE ]__attribute__( ( aligned( configMINIMAL_STACK_SIZE * sizeof( StackType_t ) ) ) );
-	static StackType_t x2ndHigherPriorityNormallyEmptyTaskStack[ configMINIMAL_STACK_SIZE ]__attribute__( ( aligned( configMINIMAL_STACK_SIZE * sizeof( StackType_t ) ) ) );
-	static StackType_t xLowerPriorityNormallyEmptyTaskStack[ configMINIMAL_STACK_SIZE ]__attribute__( ( aligned( configMINIMAL_STACK_SIZE * sizeof( StackType_t ) ) ) );
-	static StackType_t x1stHigherPriorityNormallyFullTaskStack[ configMINIMAL_STACK_SIZE ]__attribute__( ( aligned( configMINIMAL_STACK_SIZE * sizeof( StackType_t ) ) ) );
-	static StackType_t x2ndHigherPriorityNormallyFullTaskStack[ configMINIMAL_STACK_SIZE ]__attribute__( ( aligned( configMINIMAL_STACK_SIZE * sizeof( StackType_t ) ) ) );
-	static StackType_t xLowerPriorityNormallyFullTaskStack[ configMINIMAL_STACK_SIZE ]__attribute__( ( aligned( configMINIMAL_STACK_SIZE * sizeof( StackType_t ) ) ) );
-/*
-    xTaskCreate( prvHigherPriorityNormallyEmptyTask, "H1QRx", configMINIMAL_STACK_SIZE, ( void * ) intqHIGH_PRIORITY_TASK1, intqHIGHER_PRIORITY, &xHighPriorityNormallyEmptyTask1 );
-    xTaskCreate( prvHigherPriorityNormallyEmptyTask, "H2QRx", configMINIMAL_STACK_SIZE, ( void * ) intqHIGH_PRIORITY_TASK2, intqHIGHER_PRIORITY, &xHighPriorityNormallyEmptyTask2 );
-    xTaskCreate( prvLowerPriorityNormallyEmptyTask, "L1QRx", configMINIMAL_STACK_SIZE, NULL, intqLOWER_PRIORITY, NULL );
-    xTaskCreate( prv1stHigherPriorityNormallyFullTask, "H1QTx", configMINIMAL_STACK_SIZE, ( void * ) intqHIGH_PRIORITY_TASK1, intqHIGHER_PRIORITY, &xHighPriorityNormallyFullTask1 );
-    xTaskCreate( prv2ndHigherPriorityNormallyFullTask, "H2QTx", configMINIMAL_STACK_SIZE, ( void * ) intqHIGH_PRIORITY_TASK2, intqHIGHER_PRIORITY, &xHighPriorityNormallyFullTask2 );
-    xTaskCreate( prvLowerPriorityNormallyFullTask, "L2QRx", configMINIMAL_STACK_SIZE, NULL, intqLOWER_PRIORITY, NULL );
-*/
-	TaskParameters_t x1stHigherPriorityNormallyEmptyTaskParameters =
-		{
-			.pvTaskCode		= prvHigherPriorityNormallyEmptyTask,
-			.pcName			= "H1QRx",
-			.usStackDepth	= configMINIMAL_STACK_SIZE,
-			.pvParameters	= ( void * ) intqHIGH_PRIORITY_TASK1,
-			.uxPriority		= intqHIGHER_PRIORITY,
-			.puxStackBuffer	= x1stHigherPriorityNormallyEmptyTaskStack,
-			.xRegions		=	{
-									{ ( void * ) &( xNormallyEmptyQueue[ 0 ] ), intqSHARED_MEM_SIZE_BYTES,
-									  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-										( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-									},
-									{ ( void * ) &( xErrorStatus[ 0 ] ), intqSHARED_MEM_SIZE_BYTES,
-									  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-										( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-									},
-									{ ( void * ) &( xErrorLine[ 0 ] ), intqSHARED_MEM_SIZE_BYTES,
-									  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-										( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-									},
-									{ ( void * ) &( ucNormallyEmptyReceivedValues[ 0 ] ), intqSHARED_MEM_SIZE_VALUES_TO_LOG,
-									  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-										( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-									},
-									{ ( void * ) &( uxValueForNormallyEmptyQueue[ 0 ] ), intqSHARED_MEM_SIZE_VALUES_TO_LOG,
-									  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-										( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-									},
-									{ ( void * ) &( xLocalTaskHandles[ 0 ] ), intqSHARED_MEM_SIZE_VALUES_TO_LOG,
-									  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-										( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-									},
-									{ ( void * ) &( uxHighPriorityLoops1[ 0 ] ), intqSHARED_MEM_SIZE_VALUES_TO_LOG,
-									  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-										( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-									},
-									{ ( void * ) &( uxRxed[ 0 ] ), intqSHARED_MEM_SIZE_VALUES_TO_LOG,
-									  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-										( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-									},
-									{ 0,				0,					0														},
-									{ 0,				0,					0														},
-									{ 0,				0,					0														}
-								}
-		};
+    static StackType_t x1stHigherPriorityNormallyEmptyTaskStack[ configMINIMAL_STACK_SIZE ]__attribute__( ( aligned( configMINIMAL_STACK_SIZE * sizeof( StackType_t ) ) ) );
+    static StackType_t x2ndHigherPriorityNormallyEmptyTaskStack[ configMINIMAL_STACK_SIZE ]__attribute__( ( aligned( configMINIMAL_STACK_SIZE * sizeof( StackType_t ) ) ) );
+    static StackType_t xLowerPriorityNormallyEmptyTaskStack[ configMINIMAL_STACK_SIZE ]__attribute__( ( aligned( configMINIMAL_STACK_SIZE * sizeof( StackType_t ) ) ) );
+    static StackType_t x1stHigherPriorityNormallyFullTaskStack[ configMINIMAL_STACK_SIZE ]__attribute__( ( aligned( configMINIMAL_STACK_SIZE * sizeof( StackType_t ) ) ) );
+    static StackType_t x2ndHigherPriorityNormallyFullTaskStack[ configMINIMAL_STACK_SIZE ]__attribute__( ( aligned( configMINIMAL_STACK_SIZE * sizeof( StackType_t ) ) ) );
+    static StackType_t xLowerPriorityNormallyFullTaskStack[ configMINIMAL_STACK_SIZE ]__attribute__( ( aligned( configMINIMAL_STACK_SIZE * sizeof( StackType_t ) ) ) );
 
-	TaskParameters_t x2ndHigherPriorityNormallyEmptyTaskParameters =
-		{
-			.pvTaskCode		= prvHigherPriorityNormallyEmptyTask,
-			.pcName			= "H2QRx",
-			.usStackDepth	= configMINIMAL_STACK_SIZE,
-			.pvParameters	= ( void * ) intqHIGH_PRIORITY_TASK2,
-			.uxPriority		= intqHIGHER_PRIORITY,
-			.puxStackBuffer	= x2ndHigherPriorityNormallyEmptyTaskStack,
-			.xRegions		=	{
-									{ ( void * ) &( xNormallyEmptyQueue[ 0 ] ), intqSHARED_MEM_SIZE_BYTES,
-									  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-										( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-									},
-									{ ( void * ) &( xErrorStatus[ 0 ] ), intqSHARED_MEM_SIZE_BYTES,
-									  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-										( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-									},
-									{ ( void * ) &( xErrorLine[ 0 ] ), intqSHARED_MEM_SIZE_BYTES,
-									  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-										( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-									},
-									{ ( void * ) &( ucNormallyEmptyReceivedValues[ 0 ] ), intqSHARED_MEM_SIZE_VALUES_TO_LOG,
-									  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-										( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-									},
-									{ ( void * ) &( uxValueForNormallyEmptyQueue[ 0 ] ), intqSHARED_MEM_SIZE_VALUES_TO_LOG,
-									  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-										( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-									},
-									{ ( void * ) &( xLocalTaskHandles[ 0 ] ), intqSHARED_MEM_SIZE_VALUES_TO_LOG,
-									  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-										( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-									},
-									{ ( void * ) &( uxHighPriorityLoops1[ 0 ] ), intqSHARED_MEM_SIZE_VALUES_TO_LOG,
-									  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-										( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-									},
-									{ ( void * ) &( uxRxed[ 0 ] ), intqSHARED_MEM_SIZE_VALUES_TO_LOG,
-									  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-										( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-									},
-									{ 0,				0,					0														},
-									{ 0,				0,					0														},
-									{ 0,				0,					0														}
-								}
-		};
-	TaskParameters_t xLowerPriorityNormallyEmptyTaskParameters =
-		{
-			.pvTaskCode		= prvLowerPriorityNormallyEmptyTask,
-			.pcName			= "L1QRx",
-			.usStackDepth	= configMINIMAL_STACK_SIZE,
-			.pvParameters	= NULL,
-			.uxPriority		= intqLOWER_PRIORITY,
-			.puxStackBuffer	= xLowerPriorityNormallyEmptyTaskStack,
-			.xRegions		=	{
-									{ ( void * ) &( xNormallyEmptyQueue[ 0 ] ), intqSHARED_MEM_SIZE_BYTES,
-									  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-										( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-									},
-									{ ( void * ) &( xLocalTaskHandles[ 0 ] ), intqSHARED_MEM_SIZE_VALUES_TO_LOG,
-									  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-										( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-									},
-									{ ( void * ) &( uxLowPriorityLoops1[ 0 ] ), intqSHARED_MEM_SIZE_VALUES_TO_LOG,
-									  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-										( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-									},
-									{ ( void * ) &( uxValueForNormallyEmptyQueue[ 0 ] ), intqSHARED_MEM_SIZE_VALUES_TO_LOG,
-									  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-										( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-									},
-									{ ( void * ) &( uxRxed[ 0 ] ), intqSHARED_MEM_SIZE_VALUES_TO_LOG,
-									  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-										( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-									},
-									{ ( void * ) &( ucNormallyEmptyReceivedValues[ 0 ] ), intqSHARED_MEM_SIZE_VALUES_TO_LOG,
-									  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-										( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-									},
-									{ 0,				0,					0														},
-									{ 0,				0,					0														},
-									{ 0,				0,					0														},
-									{ 0,				0,					0														},
-									{ 0,				0,					0														}
-								}
-		};
-	TaskParameters_t x1stHigherPriorityNormallyFullTaskParameters =
-		{
-			.pvTaskCode		= prv1stHigherPriorityNormallyFullTask,
-			.pcName			= "H1QTx",
-			.usStackDepth	= configMINIMAL_STACK_SIZE,
-			.pvParameters	= ( void * ) intqHIGH_PRIORITY_TASK1,
-			.uxPriority		= intqHIGHER_PRIORITY,
-			.puxStackBuffer	= x1stHigherPriorityNormallyFullTaskStack,
-			.xRegions		=	{
-									{ ( void * ) &( uxValueForNormallyFullQueue[ 0 ] ), intqSHARED_MEM_SIZE_VALUES_TO_LOG,
-									  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-										( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-									},
-									{ ( void * ) &( xNormallyFullQueue[ 0 ] ), intqSHARED_MEM_SIZE_BYTES,
-									  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-										( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-									},
-									{ ( void * ) &( xLocalTaskHandles[ 0 ] ), intqSHARED_MEM_SIZE_VALUES_TO_LOG,
-									  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-										( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-									},
-									{ ( void * ) &( xWasSuspended[ 0 ] ), intqSHARED_MEM_SIZE_VALUES_TO_LOG,
-									  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-										( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-									},
-									{ ( void * ) &( ucNormallyFullReceivedValues[ 0 ] ), intqSHARED_MEM_SIZE_VALUES_TO_LOG,
-									  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-										( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-									},
-									{ ( void * ) &( uxHighPriorityLoops2[ 0 ] ), intqSHARED_MEM_SIZE_VALUES_TO_LOG,
-									  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-										( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-									},
-									{ ( void * ) &( uxValueToTx[ 0 ] ), intqSHARED_MEM_SIZE_VALUES_TO_LOG,
-									  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-										( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-									},
-									{ ( void * ) &( xErrorStatus[ 0 ] ), intqSHARED_MEM_SIZE_BYTES,
-									  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-										( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-									},
-									{ ( void * ) &( xErrorLine[ 0 ] ), intqSHARED_MEM_SIZE_BYTES,
-									  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-										( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-									},
-									{ 0,				0,					0														},
-									{ 0,				0,					0														}
-								}
-		};
-	TaskParameters_t x2ndHigherPriorityNormallyFullTaskParameters =
-		{
-			.pvTaskCode		= prv2ndHigherPriorityNormallyFullTask,
-			.pcName			= "H2QTx",
-			.usStackDepth	= configMINIMAL_STACK_SIZE,
-			.pvParameters	= ( void * ) intqHIGH_PRIORITY_TASK2,
-			.uxPriority		= intqHIGHER_PRIORITY,
-			.puxStackBuffer	= x2ndHigherPriorityNormallyFullTaskStack,
-			.xRegions		=	{
-									{ ( void * ) &( uxValueForNormallyFullQueue[ 0 ] ), intqSHARED_MEM_SIZE_VALUES_TO_LOG,
-									  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-										( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-									},
-									{ ( void * ) &( xNormallyFullQueue[ 0 ] ), intqSHARED_MEM_SIZE_BYTES,
-									  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-										( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-									},
-									{ ( void * ) &( xWasSuspended[ 0 ] ), intqSHARED_MEM_SIZE_VALUES_TO_LOG,
-									  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-										( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-									},
-									{ ( void * ) &( uxValueForNormallyFullQueue[ 0 ] ), intqSHARED_MEM_SIZE_VALUES_TO_LOG,
-									  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-										( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-									},
-									{ ( void * ) &( uxValueToTx[ 0 ] ), intqSHARED_MEM_SIZE_VALUES_TO_LOG,
-									  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-										( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-									},
-									{ 0,				0,					0														},
-									{ 0,				0,					0														},
-									{ 0,				0,					0														},
-									{ 0,				0,					0														},
-									{ 0,				0,					0														},
-									{ 0,				0,					0														}
-								}
-		};
-	//uxValueForNormallyFullQueue
-	TaskParameters_t xLowerPriorityNormallyFullTaskParameters =
-		{
-			.pvTaskCode		= prvLowerPriorityNormallyFullTask,
-			.pcName			= "L2QRx",
-			.usStackDepth	= configMINIMAL_STACK_SIZE,
-			.pvParameters	= NULL,
-			.uxPriority		= intqLOWER_PRIORITY,
-			.puxStackBuffer	= xLowerPriorityNormallyFullTaskStack,
-			.xRegions		=	{
-									{ ( void * ) &( xNormallyFullQueue[ 0 ] ), intqSHARED_MEM_SIZE_BYTES,
-									  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-										( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-									},
-									{ ( void * ) &( xLocalTaskHandles[ 0 ] ), intqSHARED_MEM_SIZE_VALUES_TO_LOG,
-									  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-										( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-									},
-									{ ( void * ) &( uxLowPriorityLoops2[ 0 ] ), intqSHARED_MEM_SIZE_VALUES_TO_LOG,
-									  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-										( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-									},
-									{ ( void * ) &( ucNormallyFullReceivedValues[ 0 ] ), intqSHARED_MEM_SIZE_VALUES_TO_LOG,
-									  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-										( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-									},
-									{ ( void * ) &( xErrorStatus[ 0 ] ), intqSHARED_MEM_SIZE_BYTES,
-									  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-										( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-									},
-									{ ( void * ) &( xErrorLine[ 0 ] ), intqSHARED_MEM_SIZE_BYTES,
-									  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-										( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-									},
-									{ 0,				0,					0														},
-									{ 0,				0,					0														},
-									{ 0,				0,					0														},
-									{ 0,				0,					0														},
-									{ 0,				0,					0														}
-								}
-		};
+    TaskParameters_t x1stHigherPriorityNormallyEmptyTaskParameters =
+    {
+        .pvTaskCode      = prvHigherPriorityNormallyEmptyTask,
+        .pcName          = "H1QRx",
+        .usStackDepth    = configMINIMAL_STACK_SIZE,
+        .pvParameters    = ( void * ) intqHIGH_PRIORITY_TASK1,
+        .uxPriority      = intqHIGHER_PRIORITY,
+        .puxStackBuffer  = x1stHigherPriorityNormallyEmptyTaskStack,
+        .xRegions        =  {
+                                { ( void * ) &( xNormallyEmptyQueue[ 0 ] ), intqSHARED_MEM_SIZE_BYTES,
+                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                },
+                                { ( void * ) &( xErrorStatus[ 0 ] ), intqSHARED_MEM_SIZE_BYTES,
+                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                },
+                                { ( void * ) &( xErrorLine[ 0 ] ), intqSHARED_MEM_SIZE_BYTES,
+                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                },
+                                { ( void * ) &( ucNormallyEmptyReceivedValues[ 0 ] ), intqSHARED_MEM_SIZE_VALUES_TO_LOG,
+                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                },
+                                { ( void * ) &( uxValueForNormallyEmptyQueue[ 0 ] ), intqSHARED_MEM_SIZE_VALUES_TO_LOG,
+                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                },
+                                { ( void * ) &( xLocalTaskHandles[ 0 ] ), intqSHARED_MEM_SIZE_VALUES_TO_LOG,
+                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                },
+                                { ( void * ) &( uxHighPriorityLoops1[ 0 ] ), intqSHARED_MEM_SIZE_VALUES_TO_LOG,
+                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        }
+                            }
+    };
 
-	xTaskCreateRestricted(&(x1stHigherPriorityNormallyEmptyTaskParameters),&xLocalTaskHandles[2]);
-	xTaskCreateRestricted(&(x2ndHigherPriorityNormallyEmptyTaskParameters),&xLocalTaskHandles[3]);
-	xTaskCreateRestricted(&(xLowerPriorityNormallyEmptyTaskParameters),&xLocalTaskHandles[0]);
-	xTaskCreateRestricted(&(x1stHigherPriorityNormallyFullTaskParameters),&xLocalTaskHandles[4]);
-	xTaskCreateRestricted(&(x2ndHigherPriorityNormallyFullTaskParameters),&xLocalTaskHandles[5]);
-	xTaskCreateRestricted(&(xLowerPriorityNormallyFullTaskParameters),&xLocalTaskHandles[1]);
+    TaskParameters_t x2ndHigherPriorityNormallyEmptyTaskParameters =
+    {
+        .pvTaskCode      = prvHigherPriorityNormallyEmptyTask,
+        .pcName          = "H2QRx",
+        .usStackDepth    = configMINIMAL_STACK_SIZE,
+        .pvParameters    = ( void * ) intqHIGH_PRIORITY_TASK2,
+        .uxPriority      = intqHIGHER_PRIORITY,
+        .puxStackBuffer  = x2ndHigherPriorityNormallyEmptyTaskStack,
+        .xRegions        =  {
+                                { ( void * ) &( xNormallyEmptyQueue[ 0 ] ), intqSHARED_MEM_SIZE_BYTES,
+                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                },
+                                { ( void * ) &( xErrorStatus[ 0 ] ), intqSHARED_MEM_SIZE_BYTES,
+                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                },
+                                { ( void * ) &( xErrorLine[ 0 ] ), intqSHARED_MEM_SIZE_BYTES,
+                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                },
+                                { ( void * ) &( ucNormallyEmptyReceivedValues[ 0 ] ), intqSHARED_MEM_SIZE_VALUES_TO_LOG,
+                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                },
+                                { ( void * ) &( uxValueForNormallyEmptyQueue[ 0 ] ), intqSHARED_MEM_SIZE_VALUES_TO_LOG,
+                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                },
+                                { ( void * ) &( xLocalTaskHandles[ 0 ] ), intqSHARED_MEM_SIZE_VALUES_TO_LOG,
+                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                },
+                                { ( void * ) &( uxHighPriorityLoops1[ 0 ] ), intqSHARED_MEM_SIZE_VALUES_TO_LOG,
+                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        }
+                            }
+    };
+    TaskParameters_t xLowerPriorityNormallyEmptyTaskParameters =
+    {
+        .pvTaskCode      = prvLowerPriorityNormallyEmptyTask,
+        .pcName          = "L1QRx",
+        .usStackDepth    = configMINIMAL_STACK_SIZE,
+        .pvParameters    = NULL,
+        .uxPriority      = intqLOWER_PRIORITY,
+        .puxStackBuffer  = xLowerPriorityNormallyEmptyTaskStack,
+        .xRegions        =  {
+                                { ( void * ) &( xNormallyEmptyQueue[ 0 ] ), intqSHARED_MEM_SIZE_BYTES,
+                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                },
+                                { ( void * ) &( xLocalTaskHandles[ 0 ] ), intqSHARED_MEM_SIZE_VALUES_TO_LOG,
+                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                },
+                                { ( void * ) &( uxLowPriorityLoops1[ 0 ] ), intqSHARED_MEM_SIZE_VALUES_TO_LOG,
+                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                },
+                                { ( void * ) &( uxValueForNormallyEmptyQueue[ 0 ] ), intqSHARED_MEM_SIZE_VALUES_TO_LOG,
+                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                },
+                                { ( void * ) &( ucNormallyEmptyReceivedValues[ 0 ] ), intqSHARED_MEM_SIZE_VALUES_TO_LOG,
+                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        }
+                            }
+    };
+    TaskParameters_t x1stHigherPriorityNormallyFullTaskParameters =
+    {
+        .pvTaskCode      = prv1stHigherPriorityNormallyFullTask,
+        .pcName          = "H1QTx",
+        .usStackDepth    = configMINIMAL_STACK_SIZE,
+        .pvParameters    = ( void * ) intqHIGH_PRIORITY_TASK1,
+        .uxPriority      = intqHIGHER_PRIORITY,
+        .puxStackBuffer  = x1stHigherPriorityNormallyFullTaskStack,
+        .xRegions        =  {
+                                { ( void * ) &( uxValueForNormallyFullQueue[ 0 ] ), intqSHARED_MEM_SIZE_VALUES_TO_LOG,
+                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                },
+                                { ( void * ) &( xNormallyFullQueue[ 0 ] ), intqSHARED_MEM_SIZE_BYTES,
+                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                },
+                                { ( void * ) &( xLocalTaskHandles[ 0 ] ), intqSHARED_MEM_SIZE_VALUES_TO_LOG,
+                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                },
+                                { ( void * ) &( xWasSuspended[ 0 ] ), intqSHARED_MEM_SIZE_VALUES_TO_LOG,
+                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                },
+                                { ( void * ) &( ucNormallyFullReceivedValues[ 0 ] ), intqSHARED_MEM_SIZE_VALUES_TO_LOG,
+                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                },
+                                { ( void * ) &( uxHighPriorityLoops2[ 0 ] ), intqSHARED_MEM_SIZE_VALUES_TO_LOG,
+                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                },
+                                { ( void * ) &( xErrorStatus[ 0 ] ), intqSHARED_MEM_SIZE_BYTES,
+                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                },
+                                { ( void * ) &( xErrorLine[ 0 ] ), intqSHARED_MEM_SIZE_BYTES,
+                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        }
+                            }
+    };
+    TaskParameters_t x2ndHigherPriorityNormallyFullTaskParameters =
+    {
+        .pvTaskCode      = prv2ndHigherPriorityNormallyFullTask,
+        .pcName          = "H2QTx",
+        .usStackDepth    = configMINIMAL_STACK_SIZE,
+        .pvParameters    = ( void * ) intqHIGH_PRIORITY_TASK2,
+        .uxPriority      = intqHIGHER_PRIORITY,
+        .puxStackBuffer  = x2ndHigherPriorityNormallyFullTaskStack,
+        .xRegions        =  {
+                                { ( void * ) &( uxValueForNormallyFullQueue[ 0 ] ), intqSHARED_MEM_SIZE_VALUES_TO_LOG,
+                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                },
+                                { ( void * ) &( xNormallyFullQueue[ 0 ] ), intqSHARED_MEM_SIZE_BYTES,
+                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                },
+                                { ( void * ) &( xWasSuspended[ 0 ] ), intqSHARED_MEM_SIZE_VALUES_TO_LOG,
+                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                },
+                                { ( void * ) &( uxValueForNormallyFullQueue[ 0 ] ), intqSHARED_MEM_SIZE_VALUES_TO_LOG,
+                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        }
+                            }
+    };
+
+    TaskParameters_t xLowerPriorityNormallyFullTaskParameters =
+    {
+        .pvTaskCode      = prvLowerPriorityNormallyFullTask,
+        .pcName          = "L2QRx",
+        .usStackDepth    = configMINIMAL_STACK_SIZE,
+        .pvParameters    = NULL,
+        .uxPriority      = intqLOWER_PRIORITY,
+        .puxStackBuffer  = xLowerPriorityNormallyFullTaskStack,
+        .xRegions        =  {
+                                { ( void * ) &( xNormallyFullQueue[ 0 ] ), intqSHARED_MEM_SIZE_BYTES,
+                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                },
+                                { ( void * ) &( xLocalTaskHandles[ 0 ] ), intqSHARED_MEM_SIZE_VALUES_TO_LOG,
+                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                },
+                                { ( void * ) &( uxLowPriorityLoops2[ 0 ] ), intqSHARED_MEM_SIZE_VALUES_TO_LOG,
+                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                },
+                                { ( void * ) &( ucNormallyFullReceivedValues[ 0 ] ), intqSHARED_MEM_SIZE_VALUES_TO_LOG,
+                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                },
+                                { ( void * ) &( xErrorStatus[ 0 ] ), intqSHARED_MEM_SIZE_BYTES,
+                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                },
+                                { ( void * ) &( xErrorLine[ 0 ] ), intqSHARED_MEM_SIZE_BYTES,
+                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        }
+                            }
+    };
+
+    xTaskCreateRestricted( &( x1stHigherPriorityNormallyEmptyTaskParameters ), &( xLocalTaskHandles[ FIRST_HIGH_PRIO_EMPTY_TASK_IDX ] ) );
+    xTaskCreateRestricted( &( x2ndHigherPriorityNormallyEmptyTaskParameters ), &( xLocalTaskHandles[ SECOND_HIGH_PRIO_EMPTY_TASK_IDX ] ) );
+    xTaskCreateRestricted( &( xLowerPriorityNormallyEmptyTaskParameters ), &( xLocalTaskHandles[ LOW_PRIO_EMPTY_TASK_IDX ] ) );
+    xTaskCreateRestricted( &( x1stHigherPriorityNormallyFullTaskParameters ), &( xLocalTaskHandles[ FIRST_HIGH_PRIO_FULL_TASK_IDX ] ) );
+    xTaskCreateRestricted( &( x2ndHigherPriorityNormallyFullTaskParameters ), &( xLocalTaskHandles[ SECOND_HIGH_PRIO_FULL_TASK_IDX ] ) );
+    xTaskCreateRestricted( &( xLowerPriorityNormallyFullTaskParameters ), &( xLocalTaskHandles[ LOW_PRIO_FULL_TASK_IDX ] ) );
 
     /* Create the queues that are accessed by multiple tasks and multiple
      * interrupts. */
@@ -566,21 +539,21 @@ static void prvQueueAccessLogError( UBaseType_t uxLine )
 
 static void prvHigherPriorityNormallyEmptyTask( void * pvParameters )
 {
-    UBaseType_t ux, uxTask1, uxTask2, uxInterrupts, uxErrorCount1 = 0, uxErrorCount2 = 0;
+    UBaseType_t uxRxed, ux, uxTask1, uxTask2, uxInterrupts, uxErrorCount1 = 0, uxErrorCount2 = 0;
 
     /* The timer should not be started until after the scheduler has started.
      * More than one task is running this code so we check the parameter value
      * to determine which task should start the timer. */
-/*    if( ( UBaseType_t ) pvParameters == intqHIGH_PRIORITY_TASK1 )
+    if( ( UBaseType_t ) pvParameters == intqHIGH_PRIORITY_TASK1 )
     {
         vInitialiseTimerForIntQueueTest();
     }
-*/
+
     for( ; ; )
     {
         /* Block waiting to receive a value from the normally empty queue.
          * Interrupts will write to the queue so we should receive a value. */
-        if( xQueueReceive( xNormallyEmptyQueue[ 0 ], &uxRxed[ 0 ], intqSHORT_DELAY ) != pdPASS )
+        if( xQueueReceive( xNormallyEmptyQueue[ 0 ], &uxRxed, intqSHORT_DELAY ) != pdPASS )
         {
             prvQueueAccessLogError( __LINE__ );
         }
@@ -588,7 +561,7 @@ static void prvHigherPriorityNormallyEmptyTask( void * pvParameters )
         {
             /* Note which value was received so we can check all expected
              * values are received and no values are duplicated. */
-            prvRecordValue_NormallyEmpty( uxRxed[ 0 ], ( UBaseType_t ) pvParameters );
+            prvRecordValue_NormallyEmpty( uxRxed, ( UBaseType_t ) pvParameters );
         }
 
         /* Ensure the other task running this code gets a chance to execute. */
@@ -599,7 +572,7 @@ static void prvHigherPriorityNormallyEmptyTask( void * pvParameters )
             /* Have we received all the expected values? */
             if( uxValueForNormallyEmptyQueue[ 0 ] > ( intqNUM_VALUES_TO_LOG + intqVALUE_OVERRUN ) )
             {
-                vTaskSuspend( xLocalTaskHandles[ 3 ] );
+                vTaskSuspend( xLocalTaskHandles[ SECOND_HIGH_PRIO_EMPTY_TASK_IDX ] );
 
                 uxTask1 = 0;
                 uxTask2 = 0;
@@ -682,7 +655,7 @@ static void prvHigherPriorityNormallyEmptyTask( void * pvParameters )
                  * if it receives something.  We will then resume the other
                  * higher priority task. */
                 vTaskSuspend( NULL );
-                vTaskResume( xLocalTaskHandles[ 3 ] );
+                vTaskResume( xLocalTaskHandles[ SECOND_HIGH_PRIO_EMPTY_TASK_IDX ] );
             }
         }
     }
@@ -691,26 +664,26 @@ static void prvHigherPriorityNormallyEmptyTask( void * pvParameters )
 
 static void prvLowerPriorityNormallyEmptyTask( void * pvParameters )
 {
-    UBaseType_t uxValue;
+    UBaseType_t uxValue, uxRxed;
 
     /* The parameters are not being used so avoid compiler warnings. */
     ( void ) pvParameters;
 
     for( ; ; )
     {
-        if( xQueueReceive( xNormallyEmptyQueue[ 0 ], &uxRxed[ 0 ], intqONE_TICK_DELAY ) != errQUEUE_EMPTY )
+        if( xQueueReceive( xNormallyEmptyQueue[ 0 ], &uxRxed, intqONE_TICK_DELAY ) != errQUEUE_EMPTY )
         {
             /* A value should only be obtained when the high priority task is
              * suspended. */
-            if( eTaskGetState( xLocalTaskHandles[ 2 ] ) != eSuspended )
+            if( eTaskGetState( xLocalTaskHandles[ FIRST_HIGH_PRIO_EMPTY_TASK_IDX ] ) != eSuspended )
             {
                 prvQueueAccessLogError( __LINE__ );
             }
 
-            prvRecordValue_NormallyEmpty( uxRxed[ 0 ], intqLOW_PRIORITY_TASK );
+            prvRecordValue_NormallyEmpty( uxRxed, intqLOW_PRIORITY_TASK );
 
             /* Wake the higher priority task again. */
-            vTaskResume( xLocalTaskHandles[ 2 ] );
+            vTaskResume( xLocalTaskHandles[ FIRST_HIGH_PRIO_EMPTY_TASK_IDX ] );
             uxLowPriorityLoops1[ 0 ]++;
         }
         else
@@ -739,7 +712,7 @@ static void prvLowerPriorityNormallyEmptyTask( void * pvParameters )
 
 static void prv1stHigherPriorityNormallyFullTask( void * pvParameters )
 {
-    UBaseType_t ux, uxInterrupts;
+    UBaseType_t uxValueToTx, ux, uxInterrupts;
 
     /* The parameters are not being used so avoid compiler warnings. */
     ( void ) pvParameters;
@@ -751,11 +724,11 @@ static void prv1stHigherPriorityNormallyFullTask( void * pvParameters )
         portENTER_CRITICAL();
         {
             uxValueForNormallyFullQueue[ 0 ]++;
-            uxValueToTx[ 0 ] = uxValueForNormallyFullQueue[ 0 ];
+            uxValueToTx = uxValueForNormallyFullQueue[ 0 ];
         }
         portEXIT_CRITICAL();
 
-        xQueueSend( xNormallyFullQueue[ 0 ], &uxValueToTx[ 0 ], intqSHORT_DELAY );
+        xQueueSend( xNormallyFullQueue[ 0 ], &uxValueToTx, intqSHORT_DELAY );
     }
 
     for( ; ; )
@@ -763,11 +736,11 @@ static void prv1stHigherPriorityNormallyFullTask( void * pvParameters )
         portENTER_CRITICAL();
         {
             uxValueForNormallyFullQueue[ 0 ]++;
-            uxValueToTx[ 0 ] = uxValueForNormallyFullQueue[ 0 ];
+            uxValueToTx = uxValueForNormallyFullQueue[ 0 ];
         }
         portEXIT_CRITICAL();
 
-        if( xQueueSend( xNormallyFullQueue[ 0 ], &uxValueToTx[ 0 ], intqSHORT_DELAY ) != pdPASS )
+        if( xQueueSend( xNormallyFullQueue[ 0 ], &uxValueToTx, intqSHORT_DELAY ) != pdPASS )
         {
             /* intqHIGH_PRIORITY_TASK2 is never suspended so we would not
              * expect it to ever time out. */
@@ -778,13 +751,13 @@ static void prv1stHigherPriorityNormallyFullTask( void * pvParameters )
         taskYIELD();
 
         /* Have all the expected values been sent to the queue? */
-        if( uxValueToTx[ 0 ] > ( intqNUM_VALUES_TO_LOG + intqVALUE_OVERRUN ) )
+        if( uxValueToTx > ( intqNUM_VALUES_TO_LOG + intqVALUE_OVERRUN ) )
         {
             /* Make sure the other high priority task completes its send of
              * any values below intqNUM_VALUE_TO_LOG. */
             vTaskDelay( intqSHORT_DELAY );
 
-            vTaskSuspend( xLocalTaskHandles[ 5 ] );
+            vTaskSuspend( xLocalTaskHandles[ SECOND_HIGH_PRIO_FULL_TASK_IDX ] );
 
             if( xWasSuspended[ 0 ] == pdTRUE )
             {
@@ -834,7 +807,7 @@ static void prv1stHigherPriorityNormallyFullTask( void * pvParameters )
              * if it receives something.  We will then resume the other
              * higher priority task. */
             vTaskSuspend( NULL );
-            vTaskResume( xLocalTaskHandles[ 5 ] );
+            vTaskResume( xLocalTaskHandles[ SECOND_HIGH_PRIO_FULL_TASK_IDX ] );
         }
     }
 }
@@ -842,7 +815,7 @@ static void prv1stHigherPriorityNormallyFullTask( void * pvParameters )
 
 static void prv2ndHigherPriorityNormallyFullTask( void * pvParameters )
 {
-    UBaseType_t  ux;
+    UBaseType_t uxValueToTx, ux;
 
     /* The parameters are not being used so avoid compiler warnings. */
     ( void ) pvParameters;
@@ -854,11 +827,11 @@ static void prv2ndHigherPriorityNormallyFullTask( void * pvParameters )
         portENTER_CRITICAL();
         {
             uxValueForNormallyFullQueue[ 0 ]++;
-            uxValueToTx[ 0 ] = uxValueForNormallyFullQueue[ 0 ];
+            uxValueToTx = uxValueForNormallyFullQueue[ 0 ];
         }
         portEXIT_CRITICAL();
 
-        xQueueSend( xNormallyFullQueue[ 0 ], &uxValueToTx[ 0 ], intqSHORT_DELAY );
+        xQueueSend( xNormallyFullQueue[ 0 ], &uxValueToTx, intqSHORT_DELAY );
     }
 
     for( ; ; )
@@ -866,11 +839,11 @@ static void prv2ndHigherPriorityNormallyFullTask( void * pvParameters )
         portENTER_CRITICAL();
         {
             uxValueForNormallyFullQueue[ 0 ]++;
-            uxValueToTx[ 0 ] = uxValueForNormallyFullQueue[ 0 ];
+            uxValueToTx = uxValueForNormallyFullQueue[ 0 ];
         }
         portEXIT_CRITICAL();
 
-        if( xQueueSend( xNormallyFullQueue[ 0 ], &uxValueToTx[ 0 ], intqSHORT_DELAY ) != pdPASS )
+        if( xQueueSend( xNormallyFullQueue[ 0 ], &uxValueToTx, intqSHORT_DELAY ) != pdPASS )
         {
             if( xWasSuspended[ 0 ] != pdTRUE )
             {
@@ -898,12 +871,12 @@ static void prvLowerPriorityNormallyFullTask( void * pvParameters )
         if( xQueueSend( xNormallyFullQueue[ 0 ], &uxTxed, intqONE_TICK_DELAY ) != errQUEUE_FULL )
         {
             /* Should only succeed when the higher priority task is suspended */
-            if( eTaskGetState( xLocalTaskHandles[ 4 ] ) != eSuspended )
+            if( eTaskGetState( xLocalTaskHandles[ FIRST_HIGH_PRIO_FULL_TASK_IDX ] ) != eSuspended )
             {
                 prvQueueAccessLogError( __LINE__ );
             }
 
-            vTaskResume( xLocalTaskHandles[ 4 ] );
+            vTaskResume( xLocalTaskHandles[ FIRST_HIGH_PRIO_FULL_TASK_IDX ] );
             uxLowPriorityLoops2[ 0 ]++;
         }
         else
@@ -1028,3 +1001,4 @@ BaseType_t xAreIntQueueTasksStillRunning( void )
 
     return xErrorStatus[ 0 ];
 }
+/*-----------------------------------------------------------*/
