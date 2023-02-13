@@ -40,9 +40,8 @@
 /* Demo program include files. */
 #include "IntSemTest.h"
 
-#define intsSHARED_MEM_SIZE_WORDS			(8)
-#define intsSHARED_MEM_SIZE_HALF_WORDS		(16)
-#define intsSHARED_MEM_SIZE_BYTES			(32)
+#define intsSHARED_MEM_SIZE_WORDS            ( 8 )
+#define intsSHARED_MEM_SIZE_BYTES            ( 32 )
 
 /*-----------------------------------------------------------*/
 
@@ -151,119 +150,112 @@ void vStartInterruptSemaphoreTasks( void )
     static StackType_t xInterruptMutexMasterTaskStack[ configMINIMAL_STACK_SIZE ] __attribute__( ( aligned( configMINIMAL_STACK_SIZE * sizeof( StackType_t ) ) ) );
     static StackType_t xInterruptCountingSemaphoreTaskStack[ configMINIMAL_STACK_SIZE ] __attribute__( ( aligned( configMINIMAL_STACK_SIZE * sizeof( StackType_t ) ) ) );
 
-    /* Create the tasks that share mutexes between then and with interrupts. */
-   // xTaskCreate( vInterruptMutexSlaveTask, "IntMuS", configMINIMAL_STACK_SIZE, NULL, intsemSLAVE_PRIORITY, &xSlaveHandle );
-   // xTaskCreate( vInterruptMutexMasterTask, "IntMuM", configMINIMAL_STACK_SIZE, NULL, intsemMASTER_PRIORITY, NULL );
+    TaskParameters_t xInterruptMutexSlaveTaskParameters =
+    {
+        .pvTaskCode      = vInterruptMutexSlaveTask,
+        .pcName          = "IntMuS",
+        .usStackDepth    = configMINIMAL_STACK_SIZE,
+        .pvParameters    = NULL,
+        .uxPriority      = intsemSLAVE_PRIORITY,
+        .puxStackBuffer  = xInterruptMutexSlaveTaskStack,
+        .xRegions        =  {
+                                { ( void * ) &( xMasterSlaveMutex[ 0 ] ), intsSHARED_MEM_SIZE_BYTES,
+                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                },
+                                { ( void * ) &( xErrorDetected[ 0 ] ), intsSHARED_MEM_SIZE_BYTES,
+                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        },
+                            }
+    };
+    TaskParameters_t xInterruptMutexMasterTaskParameters =
+        {
+            .pvTaskCode        = vInterruptMutexMasterTask,
+            .pcName            = "IntMuM",
+            .usStackDepth    = configMINIMAL_STACK_SIZE,
+            .pvParameters    = NULL,
+            .uxPriority        = intsemMASTER_PRIORITY,
+            .puxStackBuffer    = xInterruptMutexMasterTaskStack,
+            .xRegions        =    {
+                                    { ( void * ) &( xSlaveHandle[ 0 ] ), intsSHARED_MEM_SIZE_BYTES,
+                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                        ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                    },
+                                    { ( void * ) &( ulMasterLoops[ 0 ] ), intsSHARED_MEM_SIZE_BYTES,
+                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                        ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                    },
+                                    { ( void * ) &( xOkToGiveMutex[ 0 ] ), intsSHARED_MEM_SIZE_BYTES,
+                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                        ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                    },
+                                    { ( void * ) &( xISRMutex[ 0 ] ), intsSHARED_MEM_SIZE_BYTES,
+                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                        ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                    },
+                                    { ( void * ) &( xMasterSlaveMutex[ 0 ] ), intsSHARED_MEM_SIZE_BYTES,
+                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                        ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                    },
+                                    { ( void * ) &( xErrorDetected[ 0 ] ), intsSHARED_MEM_SIZE_BYTES,
+                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                        ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                    },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        }
+                                }
+        };
+    TaskParameters_t xInterruptCountingSemaphoreTaskParameters =
+        {
+            .pvTaskCode        = vInterruptCountingSemaphoreTask,
+            .pcName            = "IntCnt",
+            .usStackDepth    = configMINIMAL_STACK_SIZE,
+            .pvParameters    = NULL,
+            .uxPriority        = tskIDLE_PRIORITY,
+            .puxStackBuffer    = xInterruptCountingSemaphoreTaskStack,
+            .xRegions        =    {
+                                    { ( void * ) &( xOkToGiveCountingSemaphore[ 0 ] ), intsSHARED_MEM_SIZE_BYTES,
+                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                        ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                    },
+                                    { ( void * ) &( xErrorDetected[ 0 ] ), intsSHARED_MEM_SIZE_BYTES,
+                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                        ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                    },
+                                    { ( void * ) &( xISRCountingSemaphore[ 0 ] ), intsSHARED_MEM_SIZE_BYTES,
+                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                        ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                    },
+                                    { ( void * ) &( ulCountingSemaphoreLoops[ 0 ] ), intsSHARED_MEM_SIZE_BYTES,
+                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                        ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                    },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        }
+                                }
+        };
 
-    /* Create the task that blocks on the counting semaphore. */
-   // xTaskCreate( vInterruptCountingSemaphoreTask, "IntCnt", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY, NULL );
-
-	TaskParameters_t xInterruptMutexSlaveTaskParameters =
-		{
-			.pvTaskCode		= vInterruptMutexSlaveTask,
-			.pcName			= "IntMuS",
-			.usStackDepth	= configMINIMAL_STACK_SIZE,
-			.pvParameters	= NULL,
-			.uxPriority		= intsemSLAVE_PRIORITY,
-			.puxStackBuffer	= xInterruptMutexSlaveTaskStack,
-			.xRegions		=	{
-									{ ( void * ) &( xMasterSlaveMutex[ 0 ] ), intsSHARED_MEM_SIZE_BYTES,
-									  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-										( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-									},
-									{ ( void * ) &( xErrorDetected[ 0 ] ), intsSHARED_MEM_SIZE_BYTES,
-									  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-										( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-									},
-									{ 0,				0,					0														},
-									{ 0,				0,					0														},
-									{ 0,				0,					0														},
-									{ 0,				0,					0														},
-									{ 0,				0,					0														},
-									{ 0,				0,					0														},
-									{ 0,				0,					0														},
-									{ 0,				0,					0														},
-									{ 0,				0,					0														},
-								}
-		};
-	TaskParameters_t xInterruptMutexMasterTaskParameters =
-		{
-			.pvTaskCode		= vInterruptMutexMasterTask,
-			.pcName			= "IntMuM",
-			.usStackDepth	= configMINIMAL_STACK_SIZE,
-			.pvParameters	= NULL,
-			.uxPriority		= intsemMASTER_PRIORITY,
-			.puxStackBuffer	= xInterruptMutexMasterTaskStack,
-			.xRegions		=	{
-									{ ( void * ) &( xSlaveHandle[ 0 ] ), intsSHARED_MEM_SIZE_BYTES,
-									  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-										( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-									},
-									{ ( void * ) &( ulMasterLoops[ 0 ] ), intsSHARED_MEM_SIZE_BYTES,
-									  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-										( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-									},
-									{ ( void * ) &( xOkToGiveMutex[ 0 ] ), intsSHARED_MEM_SIZE_BYTES,
-									  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-										( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-									},
-									{ ( void * ) &( xISRMutex[ 0 ] ), intsSHARED_MEM_SIZE_BYTES,
-									  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-										( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-									},
-									{ ( void * ) &( xMasterSlaveMutex[ 0 ] ), intsSHARED_MEM_SIZE_BYTES,
-									  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-										( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-									},
-									{ ( void * ) &( xErrorDetected[ 0 ] ), intsSHARED_MEM_SIZE_BYTES,
-									  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-										( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-									},
-									{ 0,				0,					0														},
-									{ 0,				0,					0														},
-									{ 0,				0,					0														},
-									{ 0,				0,					0														},
-									{ 0,				0,					0														}
-								}
-		};
-	TaskParameters_t xInterruptCountingSemaphoreTaskParameters =
-		{
-			.pvTaskCode		= vInterruptCountingSemaphoreTask,
-			.pcName			= "IntCnt",
-			.usStackDepth	= configMINIMAL_STACK_SIZE,
-			.pvParameters	= NULL,
-			.uxPriority		= tskIDLE_PRIORITY,
-			.puxStackBuffer	= xInterruptCountingSemaphoreTaskStack,
-			.xRegions		=	{
-									{ ( void * ) &( xOkToGiveCountingSemaphore[ 0 ] ), intsSHARED_MEM_SIZE_BYTES,
-									  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-										( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-									},
-									{ ( void * ) &( xErrorDetected[ 0 ] ), intsSHARED_MEM_SIZE_BYTES,
-									  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-										( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-									},
-									{ ( void * ) &( xISRCountingSemaphore[ 0 ] ), intsSHARED_MEM_SIZE_BYTES,
-									  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-										( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-									},
-									{ ( void * ) &( ulCountingSemaphoreLoops[ 0 ] ), intsSHARED_MEM_SIZE_BYTES,
-									  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-										( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-									},
-									{ 0,				0,					0														},
-									{ 0,				0,					0														},
-									{ 0,				0,					0														},
-									{ 0,				0,					0														},
-									{ 0,				0,					0														},
-									{ 0,				0,					0														},
-									{ 0,				0,					0														}
-								}
-		};
-
-	xTaskCreateRestricted( &( xInterruptMutexSlaveTaskParameters ),  &xSlaveHandle[ 0 ] );
-	xTaskCreateRestricted( &( xInterruptMutexMasterTaskParameters ), NULL );
-	xTaskCreateRestricted( &( xInterruptCountingSemaphoreTaskParameters ), NULL );
+    xTaskCreateRestricted( &( xInterruptMutexSlaveTaskParameters ),  &( xSlaveHandle[ 0 ] ) );
+    xTaskCreateRestricted( &( xInterruptMutexMasterTaskParameters ), NULL );
+    xTaskCreateRestricted( &( xInterruptCountingSemaphoreTaskParameters ), NULL );
 
 }
 /*-----------------------------------------------------------*/
@@ -646,3 +638,4 @@ BaseType_t xAreInterruptSemaphoreTasksStillRunning( void )
 
     return ( BaseType_t ) !xErrorDetected[ 0 ];
 }
+/*-----------------------------------------------------------*/
