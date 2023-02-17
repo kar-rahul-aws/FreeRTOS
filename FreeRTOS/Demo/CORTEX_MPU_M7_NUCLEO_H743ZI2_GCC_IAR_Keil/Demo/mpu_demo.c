@@ -243,8 +243,9 @@ static void prvRWAccessTask( void * pvParameters )
 		qHandle = xQueueCreate( 5, sizeof( uint32_t ) );
 #endif
 #if ( configSUPPORT_STATIC_ALLOCATION == 1 )
+		static StaticQueue_t xQueueBuffer;
 		static uint8_t ucQueueStorageArea[ 4 ];
-		qHandle = xQueueCreateStatic( 1, sizeof( uint32_t ), sizeof( uint32_t ), ucQueueStorageArea );
+		qHandle = xQueueCreateStatic( 1, sizeof( uint32_t ),  ucQueueStorageArea , &xQueueBuffer );
 #endif
 /*		MPU_xQueueCreate						*/
 
@@ -300,9 +301,8 @@ static void prvRWAccessTask( void * pvParameters )
 			qHandle2 = xQueueCreate( 5, sizeof( uint32_t ) );
 		#endif
 		#if ( configSUPPORT_STATIC_ALLOCATION == 1 )
-			static uint8_t ucQueueStorageArea[ 4 ];
-			qHandle1 = xQueueCreateStatic( 1, sizeof( uint32_t ), sizeof( uint32_t ), ucQueueStorageArea );
-			qHandle2 = xQueueCreateStatic( 1, sizeof( uint32_t ), sizeof( uint32_t ), ucQueueStorageArea );
+			qHandle1 = xQueueCreateStatic( 1, sizeof( uint32_t ),  ucQueueStorageArea , &xQueueBuffer );
+			qHandle2 = xQueueCreateStatic( 1, sizeof( uint32_t ),  ucQueueStorageArea , &xQueueBuffer );
 		#endif
 
 		vQueueAddToRegistry( qHandle1, "Queue Handle 1" );

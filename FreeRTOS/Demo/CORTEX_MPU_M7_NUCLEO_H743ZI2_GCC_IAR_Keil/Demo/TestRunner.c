@@ -58,6 +58,7 @@
 #include "StaticAllocation.h"
 #include "blocktim.h"
 #include "AbortDelay.h"
+#include "dynamic.h"
 #include "MessageBufferDemo.h"
 #include "StreamBufferDemo.h"
 #include "StreamBufferInterrupt.h"
@@ -235,6 +236,12 @@ void vStartTests( void )
 			vCreateAbortDelayTasks();
 		}
 		#endif /* configSTART_ABORT_DELAY_TESTS */
+
+		#if( configSTAR_DYNAMIC_TASK_TESTS == 1 )
+		{
+			vStartDynamicPriorityTasks();
+		}
+		#endif /* configSTAR_DYNAMIC_TASK_TESTS */
 
 		#if( configSTART_MESSAGE_BUFFER_TESTS == 1 )
 		{
@@ -536,6 +543,15 @@ const TickType_t xCycleFrequency = pdMS_TO_TICKS( 5000UL );
 			}
 		}
 		#endif /* configSTART_ABORT_DELAY_TESTS */
+
+	#if( configSTART_DYNAMIC_TASK_TESTS == 1 )
+	{
+		if( xAreDynamicPriorityTasksStillRunning() != pdPASS )
+		{
+			pcStatusMessage = "Error: Dynamic Task";
+		}
+	}
+	#endif /* configSTAR_DYNAMIC_TASK_TESTS */
 
 		#if( configSTART_MESSAGE_BUFFER_TESTS == 1 )
 		{
