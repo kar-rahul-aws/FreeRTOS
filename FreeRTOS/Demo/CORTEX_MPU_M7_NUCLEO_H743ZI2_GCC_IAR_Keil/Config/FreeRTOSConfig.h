@@ -55,7 +55,7 @@
 #define configTICK_RATE_HZ						( ( TickType_t ) 1000 )
 #define configMAX_PRIORITIES					( 56 )
 #define configMINIMAL_STACK_SIZE				( ( uint16_t ) 512 )
-#define configTOTAL_HEAP_SIZE					( ( size_t ) 30 * 1024 )
+#define configTOTAL_HEAP_SIZE					( ( size_t ) 15 * 1024 )
 #define configMAX_TASK_NAME_LEN					( 16 )
 #define configUSE_TRACE_FACILITY				1
 #define configUSE_16_BIT_TICKS					0
@@ -140,7 +140,7 @@ See http://www.FreeRTOS.org/RTOS-Cortex-M3-M4.html. */
  * used. TEX=0, S=0, C=1, B=1. */
 #define configTEX_S_C_B_SRAM						( 0x03UL )
 
-#define configPROTECTED_KERNEL_OBJECT_HANDLE_POOL_SIZE				( 65 )
+#define configPROTECTED_KERNEL_OBJECT_HANDLE_POOL_SIZE				( 50 )
 /* Defines for Testing Project https://github.com/FreeRTOS/FreeRTOS/tree/main/FreeRTOS/Demo/ThirdParty/Template*/
 
 #define configTASK_NOTIFICATION_ARRAY_ENTRIES 	3

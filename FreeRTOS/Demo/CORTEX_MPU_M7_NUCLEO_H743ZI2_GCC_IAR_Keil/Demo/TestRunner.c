@@ -237,7 +237,7 @@ void vStartTests( void )
 		}
 		#endif /* configSTART_ABORT_DELAY_TESTS */
 
-		#if( configSTAR_DYNAMIC_TASK_TESTS == 1 )
+		#if( configSTART_DYNAMIC_TASK_TESTS == 1 )
 		{
 			vStartDynamicPriorityTasks();
 		}
@@ -374,7 +374,7 @@ const TickType_t xCycleFrequency = pdMS_TO_TICKS( 5000UL );
 	/* Silence compiler warnings about unused variables. */
 	( void ) pvParameters;
 
-	/* Initialise xNextWakeTime - this only needs to be done once. */
+	/* Initialize xNextWakeTime - this only needs to be done once. */
 	xNextWakeTime = xTaskGetTickCount();
 
 	for( ;; )
