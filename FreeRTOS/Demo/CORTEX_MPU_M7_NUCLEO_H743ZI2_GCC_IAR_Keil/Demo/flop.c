@@ -54,10 +54,10 @@
 
 #define mathNUMBER_OF_TASKS    ( 4 )
 
-#define mathSHARED_MEM_SIZE_WORDS			( 8 )
-#define mathSHARED_MEM_SIZE_HALF_WORDS		( 16 )
-#define mathSHARED_MEM_SIZE_BYTES			( 32 )
-#define mathSHARED_MEM_ARRAY_SIZE			( 128 )
+#define mathSHARED_MEM_SIZE_WORDS           ( 8 )
+#define mathSHARED_MEM_SIZE_HALF_WORDS      ( 16 )
+#define mathSHARED_MEM_SIZE_BYTES           ( 32 )
+#define mathSHARED_MEM_ARRAY_SIZE           ( 128 )
 
 /* Four tasks, each of which performs a different floating point calculation.
  * Each of the four is created twice. */
@@ -70,17 +70,16 @@ static portTASK_FUNCTION_PROTO( vCompetingMathTask4, pvParameters );
  * task gets a calculation wrong it will stop setting its check variable. */
 static uint16_t usTaskCheck[ mathSHARED_MEM_SIZE_HALF_WORDS ] __attribute__( ( aligned( mathSHARED_MEM_SIZE_BYTES ) ) ) = { ( uint16_t ) 0 };
 
-static StackType_t xCompletingMathTask1Stack[ mathSTACK_SIZE ] __attribute__( ( aligned( mathSTACK_SIZE * sizeof( StackType_t ) ) ) );
-static StackType_t xCompletingMathTask2Stack[ mathSTACK_SIZE ] __attribute__( ( aligned( mathSTACK_SIZE * sizeof( StackType_t ) ) ) );
-static StackType_t xCompletingMathTask3Stack[ mathSTACK_SIZE ] __attribute__( ( aligned( mathSTACK_SIZE * sizeof( StackType_t ) ) ) );
-static StackType_t xCompletingMathTask4Stack[ mathSTACK_SIZE ] __attribute__( ( aligned( mathSTACK_SIZE * sizeof( StackType_t ) ) ) );
-
 static volatile portDOUBLE xArray1[ mathSHARED_MEM_SIZE_HALF_WORDS ] __attribute__( ( aligned( mathSHARED_MEM_ARRAY_SIZE ) ) ) = { ( portDOUBLE ) 0 };
 static volatile portDOUBLE xArray2[ mathSHARED_MEM_SIZE_HALF_WORDS ] __attribute__( ( aligned( mathSHARED_MEM_ARRAY_SIZE ) ) ) = { ( portDOUBLE ) 0 };
 /*-----------------------------------------------------------*/
 
 void vStartMathTasks( UBaseType_t uxPriority )
 {
+static StackType_t xCompletingMathTask1Stack[ mathSTACK_SIZE ] __attribute__( ( aligned( mathSTACK_SIZE * sizeof( StackType_t ) ) ) );
+static StackType_t xCompletingMathTask2Stack[ mathSTACK_SIZE ] __attribute__( ( aligned( mathSTACK_SIZE * sizeof( StackType_t ) ) ) );
+static StackType_t xCompletingMathTask3Stack[ mathSTACK_SIZE ] __attribute__( ( aligned( mathSTACK_SIZE * sizeof( StackType_t ) ) ) );
+static StackType_t xCompletingMathTask4Stack[ mathSTACK_SIZE ] __attribute__( ( aligned( mathSTACK_SIZE * sizeof( StackType_t ) ) ) );
 
     TaskParameters_t xCompletingMathTask1Parameters =
     {
@@ -90,11 +89,11 @@ void vStartMathTasks( UBaseType_t uxPriority )
             .pvParameters    = ( void * ) &( usTaskCheck[ 0 ] ),
             .uxPriority      = uxPriority,
             .puxStackBuffer  = xCompletingMathTask1Stack,
-            .xRegions        =    {
-                    				{ ( void * ) &( usTaskCheck[ 0 ] ), mathSHARED_MEM_SIZE_BYTES,
-                    					( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-                    					( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-                    				},
+            .xRegions        =  {
+                                    { ( void * ) &( usTaskCheck[ 0 ] ), mathSHARED_MEM_SIZE_BYTES,
+                                        ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                        ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                    },
                                     { 0,                0,                    0                                                        },
                                     { 0,                0,                    0                                                        },
                                     { 0,                0,                    0                                                        },
@@ -115,11 +114,11 @@ void vStartMathTasks( UBaseType_t uxPriority )
             .pvParameters    = ( void * ) &( usTaskCheck[ 1 ] ),
             .uxPriority      = uxPriority,
             .puxStackBuffer  = xCompletingMathTask2Stack,
-            .xRegions        =    {
-                    				{ ( void * ) &( usTaskCheck[ 0 ] ), mathSHARED_MEM_SIZE_BYTES,
-                    					( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-                    					( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-                    				},
+            .xRegions        =  {
+                                    { ( void * ) &( usTaskCheck[ 0 ] ), mathSHARED_MEM_SIZE_BYTES,
+                                        ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                        ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                    },
                                     { 0,                0,                    0                                                        },
                                     { 0,                0,                    0                                                        },
                                     { 0,                0,                    0                                                        },
@@ -140,15 +139,15 @@ void vStartMathTasks( UBaseType_t uxPriority )
             .pvParameters    = ( void * ) &( usTaskCheck[ 2 ] ),
             .uxPriority      = uxPriority,
             .puxStackBuffer  = xCompletingMathTask3Stack,
-            .xRegions        =    {
-                    				{ ( void * ) &( usTaskCheck[ 0 ] ), mathSHARED_MEM_SIZE_BYTES,
-                    					( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-                    					( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-                    				},
-                    				{ ( void * ) &( xArray1[ 0 ] ), mathSHARED_MEM_ARRAY_SIZE,
-                    					( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-                    					( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-                    				},
+            .xRegions        =  {
+                                    { ( void * ) &( usTaskCheck[ 0 ] ), mathSHARED_MEM_SIZE_BYTES,
+                                        ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                        ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                    },
+                                    { ( void * ) &( xArray1[ 0 ] ), mathSHARED_MEM_ARRAY_SIZE,
+                                        ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                        ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                    },
                                     { 0,                0,                    0                                                        },
                                     { 0,                0,                    0                                                        },
                                     { 0,                0,                    0                                                        },
@@ -168,15 +167,15 @@ void vStartMathTasks( UBaseType_t uxPriority )
             .pvParameters    = ( void * ) &( usTaskCheck[ 3 ] ),
             .uxPriority      = uxPriority,
             .puxStackBuffer  = xCompletingMathTask4Stack,
-            .xRegions        =    {
-                    				{ ( void * ) &( usTaskCheck[ 0 ] ), mathSHARED_MEM_SIZE_BYTES,
-                    					( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-                    					( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-                    				},
-                    				{ ( void * ) &( xArray2[ 0 ] ), mathSHARED_MEM_ARRAY_SIZE,
-                    					( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-                    					( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-                    				},
+            .xRegions        =  {
+                                    { ( void * ) &( usTaskCheck[ 0 ] ), mathSHARED_MEM_SIZE_BYTES,
+                                        ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                        ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                    },
+                                    { ( void * ) &( xArray2[ 0 ] ), mathSHARED_MEM_ARRAY_SIZE,
+                                        ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                        ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                    },
                                     { 0,                0,                    0                                                        },
                                     { 0,                0,                    0                                                        },
                                     { 0,                0,                    0                                                        },
@@ -189,11 +188,10 @@ void vStartMathTasks( UBaseType_t uxPriority )
                                 }
     };
 
-    xTaskCreateRestricted(&(xCompletingMathTask1Parameters),NULL);
-    xTaskCreateRestricted(&(xCompletingMathTask2Parameters),NULL);
-    xTaskCreateRestricted(&(xCompletingMathTask3Parameters),NULL);
-    xTaskCreateRestricted(&(xCompletingMathTask4Parameters),NULL);
-
+    xTaskCreateRestricted( &( xCompletingMathTask1Parameters ), NULL );
+    xTaskCreateRestricted( &( xCompletingMathTask2Parameters ), NULL );
+    xTaskCreateRestricted( &( xCompletingMathTask3Parameters ), NULL );
+    xTaskCreateRestricted( &( xCompletingMathTask4Parameters ), NULL );
 }
 /*-----------------------------------------------------------*/
 
@@ -339,7 +337,7 @@ static portTASK_FUNCTION( vCompetingMathTask3, pvParameters )
 
         for( xPosition = 0; xPosition < xArraySize; xPosition++ )
         {
-        	xArray1[ xPosition ] = ( portDOUBLE ) xPosition + 5.5;
+            xArray1[ xPosition ] = ( portDOUBLE ) xPosition + 5.5;
             dTotal1 += ( portDOUBLE ) xPosition + 5.5;
         }
 
@@ -390,8 +388,6 @@ static portTASK_FUNCTION( vCompetingMathTask4, pvParameters )
     /* The variable this task increments to show it is still running is passed in
      * as the parameter. */
     pusTaskCheckVariable = ( volatile uint16_t * ) pvParameters;
-
-    //pdArray = xArray ;
 
     /* Keep filling an array, keeping a running total of the values placed in the
      * array.  Then run through the array adding up all the values.  If the two totals
@@ -463,3 +459,4 @@ BaseType_t xAreMathsTaskStillRunning( void )
 
     return xReturn;
 }
+/*-----------------------------------------------------------*/

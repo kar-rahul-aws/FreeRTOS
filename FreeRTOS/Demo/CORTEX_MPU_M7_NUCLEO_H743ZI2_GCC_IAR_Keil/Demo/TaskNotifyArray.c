@@ -57,9 +57,8 @@
 #define notifyUINT32_HIGH_BYTE                    ( ( uint32_t ) 0xff000000 )
 #define notifyUINT32_LOW_BYTE                     ( ( uint32_t ) 0x000000ff )
 
-#define notifyArraySHARED_MEM_SIZE_WORDS				( 8 )
-#define notifyArraySHARED_MEM_SIZE_HALF_WORDS			( 16 )
-#define notifyArraySHARED_MEM_SIZE_BYTES				( 32 )
+#define notifyArraySHARED_MEM_SIZE_WORDS          ( 8 )
+#define notifyArraySHARED_MEM_SIZE_BYTES          ( 32 )
 
 /*-----------------------------------------------------------*/
 
@@ -148,13 +147,12 @@ static size_t uxNextRand[ notifyArraySHARED_MEM_SIZE_WORDS ] __attribute__( ( al
 /* Used to communicate when to send a task notification to the tick hook tests. */
 static volatile BaseType_t xSendNotificationFromISR[ notifyArraySHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( notifyArraySHARED_MEM_SIZE_BYTES ) ) ) = { pdFALSE };
 
-/*Stack Definition*/
-static StackType_t xNotifiedTaskStack[ notifyNOTIFY_ARRAY_TASK_STACK_SIZE ] __attribute__( ( aligned( notifyNOTIFY_ARRAY_TASK_STACK_SIZE * sizeof( StackType_t ) ) ) );
-
 /*-----------------------------------------------------------*/
 
 void vStartTaskNotifyArrayTask( void )
 {
+    static StackType_t xNotifiedTaskStack[ notifyNOTIFY_ARRAY_TASK_STACK_SIZE ] __attribute__( ( aligned( notifyNOTIFY_ARRAY_TASK_STACK_SIZE * sizeof( StackType_t ) ) ) );
+
     const TickType_t xIncrementingIndexTimerPeriod = pdMS_TO_TICKS( 100 );
     const TickType_t xSuspendTimerPeriod = pdMS_TO_TICKS( 50 );
 
@@ -169,51 +167,52 @@ void vStartTaskNotifyArrayTask( void )
      * being notified by both a software timer and an interrupt. */
 
     TaskParameters_t xNotifiedTask =
-        {
-            .pvTaskCode      = prvNotifiedTask,
-            .pcName          = "ArrayNotifed",
-            .usStackDepth    = notifyNOTIFY_ARRAY_TASK_STACK_SIZE,
-            .pvParameters    = NULL,
-            .uxPriority      = ( notifyTASK_PRIORITY | portPRIVILEGE_BIT ),
-            .puxStackBuffer  = xNotifiedTaskStack,
-            .xRegions        =    {
-    								{ ( void * ) &( ulCourseCycleCounter[ 0 ] ), notifyArraySHARED_MEM_SIZE_BYTES,
-    									( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-    									( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-    								},
-    								{ ( void * ) &( xSendNotificationFromISR[ 0 ] ), notifyArraySHARED_MEM_SIZE_BYTES,
-    									( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-    									( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-    								},
-    								{ ( void * ) &( uxNextRand[ 0 ] ), notifyArraySHARED_MEM_SIZE_BYTES,
-    									( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-    									( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-    								},
-    								{ ( void * ) &( xNotifyWhileSuspendedTimer[ 0 ] ), notifyArraySHARED_MEM_SIZE_BYTES,
-    									( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-    									( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-    								},
-    								{ ( void * ) &( xIncrementingIndexTimer[ 0 ] ), notifyArraySHARED_MEM_SIZE_BYTES,
-    									( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-    									( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-    								},
-    								{ ( void * ) &( ulCourseCycleCounter[ 0 ] ), notifyArraySHARED_MEM_SIZE_BYTES,
-    									( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-    									( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-    								},
-    								{ ( void * ) &( xTaskToNotify[ 0 ] ), notifyArraySHARED_MEM_SIZE_BYTES,
-    									( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-    									( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-    								},
-    								{ ( void * ) &( ulFineCycleCount[ 0 ] ), notifyArraySHARED_MEM_SIZE_BYTES,
-    									( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-    									( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-    								},
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        }
-                                }
-        };
+    {
+        .pvTaskCode      = prvNotifiedTask,
+        .pcName          = "ArrayNotified",
+        .usStackDepth    = notifyNOTIFY_ARRAY_TASK_STACK_SIZE,
+        .pvParameters    = NULL,
+        .uxPriority      = notifyTASK_PRIORITY,
+        .puxStackBuffer  = xNotifiedTaskStack,
+        .xRegions        =  {
+                                { ( void * ) &( ulCourseCycleCounter[ 0 ] ), notifyArraySHARED_MEM_SIZE_BYTES,
+                                    ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                },
+                                { ( void * ) &( xSendNotificationFromISR[ 0 ] ), notifyArraySHARED_MEM_SIZE_BYTES,
+                                    ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                },
+                                { ( void * ) &( uxNextRand[ 0 ] ), notifyArraySHARED_MEM_SIZE_BYTES,
+                                    ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                },
+                                { ( void * ) &( xNotifyWhileSuspendedTimer[ 0 ] ), notifyArraySHARED_MEM_SIZE_BYTES,
+                                    ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                },
+                                { ( void * ) &( xIncrementingIndexTimer[ 0 ] ), notifyArraySHARED_MEM_SIZE_BYTES,
+                                    ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                },
+                                { ( void * ) &( ulCourseCycleCounter[ 0 ] ), notifyArraySHARED_MEM_SIZE_BYTES,
+                                    ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                },
+                                { ( void * ) &( xTaskToNotify[ 0 ] ), notifyArraySHARED_MEM_SIZE_BYTES,
+                                    ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                },
+                                { ( void * ) &( ulFineCycleCount[ 0 ] ), notifyArraySHARED_MEM_SIZE_BYTES,
+                                    ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        }
+                            }
+    };
+
     xTaskCreateRestricted( &( xNotifiedTask ), &xTaskToNotify[ 0 ] );
     /* Pseudo seed the random number generator. */
     uxNextRand[ 0 ] = ( size_t ) prvRand;

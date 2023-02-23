@@ -54,9 +54,8 @@
 
 #define notifySUSPENDED_TEST_TIMER_PERIOD     pdMS_TO_TICKS( 50 )
 
-#define notifySHARED_MEM_SIZE_WORDS				( 8 )
-#define notifySHARED_MEM_SIZE_HALF_WORDS		( 16 )
-#define notifySHARED_MEM_SIZE_BYTES				( 32 )
+#define notifySHARED_MEM_SIZE_WORDS             ( 8 )
+#define notifySHARED_MEM_SIZE_BYTES             ( 32 )
 
 /*-----------------------------------------------------------*/
 
@@ -118,54 +117,59 @@ void vStartTaskNotifyTask( void )
 {
     /* Create the task that performs some tests by itself, then loops around
      * being notified by both a software timer and an interrupt. */
-
-	static StackType_t xNotifiedTaskStack[ notifyNOTIFIED_TASK_STACK_SIZE ] __attribute__( ( aligned( notifyNOTIFIED_TASK_STACK_SIZE * sizeof( StackType_t ) ) ) );
+    const TickType_t xMaxPeriod = pdMS_TO_TICKS( 90 );
+    static StackType_t xNotifiedTaskStack[ notifyNOTIFIED_TASK_STACK_SIZE ] __attribute__( ( aligned( notifyNOTIFIED_TASK_STACK_SIZE * sizeof( StackType_t ) ) ) );
     TaskParameters_t xNotifiedTask =
-        {
-            .pvTaskCode      = prvNotifiedTask,
-            .pcName          = "Notified",
-            .usStackDepth    = notifyNOTIFIED_TASK_STACK_SIZE,
-            .pvParameters    = NULL,
-            .uxPriority      = ( notifyTASK_PRIORITY | portPRIVILEGE_BIT ),
-            .puxStackBuffer  = xNotifiedTaskStack,
-            .xRegions        =    {
-    								{ ( void * ) &( ulTimerNotificationsReceived[ 0 ] ), notifySHARED_MEM_SIZE_BYTES,
-    									( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-    									( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-    								},
-    								{ ( void * ) &( ulTimerNotificationsSent[ 0 ] ), notifySHARED_MEM_SIZE_BYTES,
-    									( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-    									( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-    								},
-    								{ ( void * ) &( xTimer[ 0 ] ), notifySHARED_MEM_SIZE_BYTES,
-    									( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-    									( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-    								},
-    								{ ( void * ) &( uxNextRand[ 0 ] ), notifySHARED_MEM_SIZE_BYTES,
-    									( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-    									( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-    								},
-    								{ ( void * ) &( ulNotifyCycleCount[ 0 ] ), notifySHARED_MEM_SIZE_BYTES,
-    									( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-    									( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-    								},
-    								{ ( void * ) &( xErrorStatus[ 0 ] ), notifySHARED_MEM_SIZE_BYTES,
-    									( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-    									( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-    								},
-    								{ ( void * ) &( xTaskToNotify[ 0 ] ), notifySHARED_MEM_SIZE_BYTES,
-    									( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-    									( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-    								},
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        }
-                                }
-        };
-	xTaskCreateRestricted( & ( xNotifiedTask ) , &xTaskToNotify[ 0 ] );
+    {
+        .pvTaskCode      = prvNotifiedTask,
+        .pcName          = "Notified",
+        .usStackDepth    = notifyNOTIFIED_TASK_STACK_SIZE,
+        .pvParameters    = NULL,
+        .uxPriority      = notifyTASK_PRIORITY,
+        .puxStackBuffer  = xNotifiedTaskStack,
+        .xRegions        =  {
+                                { ( void * ) &( ulTimerNotificationsReceived[ 0 ] ), notifySHARED_MEM_SIZE_BYTES,
+                                    ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                },
+                                { ( void * ) &( ulTimerNotificationsSent[ 0 ] ), notifySHARED_MEM_SIZE_BYTES,
+                                    ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                },
+                                { ( void * ) &( xTimer[ 0 ] ), notifySHARED_MEM_SIZE_BYTES,
+                                    ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                },
+                                { ( void * ) &( uxNextRand[ 0 ] ), notifySHARED_MEM_SIZE_BYTES,
+                                    ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                },
+                                { ( void * ) &( ulNotifyCycleCount[ 0 ] ), notifySHARED_MEM_SIZE_BYTES,
+                                    ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                },
+                                { ( void * ) &( xErrorStatus[ 0 ] ), notifySHARED_MEM_SIZE_BYTES,
+                                    ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                },
+                                { ( void * ) &( xTaskToNotify[ 0 ] ), notifySHARED_MEM_SIZE_BYTES,
+                                    ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        }
+                            }
+    };
+    xTaskCreateRestricted( & ( xNotifiedTask ) , &xTaskToNotify[ 0 ] );
     /* Pseudo seed the random number generator. */
     uxNextRand[ 0 ] = ( size_t ) prvRand;
+
+    xTimer[ 0 ] = xTimerCreate( "Notifier", xMaxPeriod, pdFALSE, NULL, prvNotifyingTimer );
+    configASSERT( xTimer[ 0 ] );
+    xTimer[ 1 ] = xTimerCreate( "SingleNotify", notifySUSPENDED_TEST_TIMER_PERIOD, pdFALSE, NULL, prvSuspendedTaskTimerTestCallback );
+    configASSERT( xTimer[ 1 ] );
 }
 /*-----------------------------------------------------------*/
 
@@ -177,7 +181,6 @@ static void prvSingleTaskTests( void )
     TickType_t xTimeOnEntering;
     const uint32_t ulFirstNotifiedConst = 100001UL, ulSecondNotifiedValueConst = 5555UL, ulMaxLoops = 5UL;
     const uint32_t ulBit0 = 0x01UL, ulBit1 = 0x02UL;
-    TimerHandle_t xSingleTaskTimer;
 
 
     /* ------------------------------------------------------------------------
@@ -315,7 +318,7 @@ static void prvSingleTaskTests( void )
 
 
     /*-------------------------------------------------------------------------
-     * Check all bits can be set by notifying the task with one additional bit	set
+     * Check all bits can be set by notifying the task with one additional bit set
      * on each notification, and exiting the loop when all the bits are found to be
      * set.  As there are 32-bits the loop should execute 32 times before all the
      * bits are found to be set. */
@@ -467,11 +470,6 @@ static void prvSingleTaskTests( void )
 
 
 
-    /* ------------------------------------------------------------------------
-     * Create a timer that will try notifying this task while it is suspended. */
-    xSingleTaskTimer = xTimerCreate( "SingleNotify", notifySUSPENDED_TEST_TIMER_PERIOD, pdFALSE, NULL, prvSuspendedTaskTimerTestCallback );
-    configASSERT( xSingleTaskTimer );
-
     /* Incremented to show the task is still running. */
     ulNotifyCycleCount[ 0 ]++;
 
@@ -487,7 +485,7 @@ static void prvSingleTaskTests( void )
      * executes the timer will suspend the task, then resume the task, without
      * ever sending a notification to the task. */
     ulNotifiedValue = 0;
-    xTimerStart( xSingleTaskTimer, portMAX_DELAY );
+    xTimerStart( xTimer[ 1 ], portMAX_DELAY );
 
     /* Check a notification is not received. */
     xReturned = xTaskNotifyWait( 0, 0, &ulNotifiedValue, portMAX_DELAY );
@@ -502,7 +500,7 @@ static void prvSingleTaskTests( void )
      * suspended, then wait for a notification.  The second time the callback
      * executes the timer will suspend the task, notify the task, then resume the
      * task (previously it was suspended and resumed without being notified). */
-    xTimerStart( xSingleTaskTimer, portMAX_DELAY );
+    xTimerStart( xTimer[ 1 ], portMAX_DELAY );
 
     /* Check a notification is received. */
     xReturned = xTaskNotifyWait( 0, 0, &ulNotifiedValue, portMAX_DELAY );
@@ -513,7 +511,7 @@ static void prvSingleTaskTests( void )
     /* Return the task to its proper priority and delete the timer as it is
      * not used again. */
     vTaskPrioritySet( NULL, notifyTASK_PRIORITY );
-    xTimerDelete( xSingleTaskTimer, portMAX_DELAY );
+    xTimerDelete( xTimer[ 1 ], portMAX_DELAY );
 
     /* Incremented to show the task is still running. */
     ulNotifyCycleCount[ 0 ]++;
@@ -588,9 +586,8 @@ static void prvNotifiedTask( void * pvParameters )
      * main loop. */
     prvSingleTaskTests();
 
-    /* Create the software timer that is used to send notifications to this
-     * task.  Notifications are also received from an interrupt. */
-    xTimer[ 0 ] = xTimerCreate( "Notifier", xMaxPeriod, pdFALSE, NULL, prvNotifyingTimer );
+    /* Indicate the ISR that it can now send notifications. */
+    xTimer[ 2 ] = ( TimerHandle_t ) ( 0xFFFFFFFFUL );
 
     for( ; ; )
     {
@@ -678,10 +675,10 @@ void xNotifyTaskFromISR( void )
     configASSERT( xTaskToNotify[ 0 ] );
 
     /* The task performs some tests before starting the timer that gives the
-     * notification from this interrupt.  If the timer has not been created yet
+     * notification from this interrupt.  If the xTimer[ 2 ] is NULL yet
      * then the initial tests have not yet completed and the notification should
      * not be sent. */
-    if( xTimer[ 0 ] != NULL )
+    if( xTimer[ 2 ] != NULL )
     {
         xCallCount++;
 

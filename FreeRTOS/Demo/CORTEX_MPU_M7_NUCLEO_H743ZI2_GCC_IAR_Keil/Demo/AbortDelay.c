@@ -73,16 +73,10 @@
     #define abtSTREAM_BUFFER_RECEIVE    7
     #define abtMAX_TESTS                8
 
-	#define abortSHARED_MEM_SIZE_WORDS  ( 8 )
-	#define abortSHARED_MEM_SIZE_BYTES  ( 32 )
+    #define abortSHARED_MEM_SIZE_WORDS  ( 8 )
+    #define abortSHARED_MEM_SIZE_BYTES  ( 32 )
 
 /*-----------------------------------------------------------*/
-
-/* Handles to the test tasks.
- */
-	#define 	CONTROLLING_TASK_IDX		( 0 )
-	#define 	BLOCKING_TASK_IDX			( 1 )
-	static TaskHandle_t xLocalTaskHandles[ abortSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( abortSHARED_MEM_SIZE_BYTES ) ) );
 
 /*
  * The two test tasks.  The controlling task specifies which test to executed.
@@ -153,76 +147,70 @@
         static StackType_t xBlockingTaskStack[ configMINIMAL_STACK_SIZE ] __attribute__( ( aligned( configMINIMAL_STACK_SIZE * sizeof( StackType_t ) ) ) );
 
         TaskParameters_t xControllingTaskParameters =
-            {
-                .pvTaskCode      = prvControllingTask,
-                .pcName          = pcControllingTaskName[ 0 ],
-                .usStackDepth    = configMINIMAL_STACK_SIZE,
-                .pvParameters    = NULL,
-                .uxPriority      = abtCONTROLLING_PRIORITY,
-                .puxStackBuffer  = xControllingTaskStack,
-                .xRegions        =    {
-                        				{ ( void * ) &( xLocalTaskHandles[ 0 ] ), abortSHARED_MEM_SIZE_BYTES,
-                        					( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-                        					( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-                        				},
-                        				{ ( void * ) &( pcBlockingTaskName[ 0 ] ), abortSHARED_MEM_SIZE_BYTES,
-                        					( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-                        					( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-                        				},
-                        				{ ( void * ) &( xErrorOccurred[ 0 ] ), abortSHARED_MEM_SIZE_BYTES,
-                        					( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-                        					( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-                        				},
-                        				{ ( void * ) &( xControllingCycles[ 0 ] ), abortSHARED_MEM_SIZE_BYTES,
-                        					( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-                        					( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-                        				},
-                                        { 0,                0,                    0                                                        },
-                                        { 0,                0,                    0                                                        },
-                                        { 0,                0,                    0                                                        },
-                                        { 0,                0,                    0                                                        },
-                                        { 0,                0,                    0                                                        },
-                                        { 0,                0,                    0                                                        },
-                                        { 0,                0,                    0                                                        }
-                                    }
-            };
+        {
+            .pvTaskCode      = prvControllingTask,
+            .pcName          = pcControllingTaskName[ 0 ],
+            .usStackDepth    = configMINIMAL_STACK_SIZE,
+            .pvParameters    = NULL,
+            .uxPriority      = abtCONTROLLING_PRIORITY,
+            .puxStackBuffer  = xControllingTaskStack,
+            .xRegions        =    {
+                                    { ( void * ) &( pcBlockingTaskName[ 0 ] ), abortSHARED_MEM_SIZE_BYTES,
+                                        ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                        ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                    },
+                                    { ( void * ) &( xErrorOccurred[ 0 ] ), abortSHARED_MEM_SIZE_BYTES,
+                                        ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                        ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                    },
+                                    { ( void * ) &( xControllingCycles[ 0 ] ), abortSHARED_MEM_SIZE_BYTES,
+                                        ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                        ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                    },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        }
+                                }
+        };
         TaskParameters_t xBlockingTaskParameters =
-            {
-                .pvTaskCode      = prvBlockingTask,
-                .pcName          = pcBlockingTaskName[ 0 ],
-                .usStackDepth    = configMINIMAL_STACK_SIZE,
-                .pvParameters    = NULL,
-                .uxPriority      = abtBLOCKING_PRIORITY,
-                .puxStackBuffer  = xBlockingTaskStack,
-                .xRegions        =    {
-                        				{ ( void * ) &( xLocalTaskHandles[ 0 ] ), abortSHARED_MEM_SIZE_BYTES,
-                        					( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-                        					( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-                        				},
-                        				{ ( void * ) &( pcControllingTaskName[ 0 ] ), abortSHARED_MEM_SIZE_BYTES,
-                        					( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-                        					( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-                        				},
-                        				{ ( void * ) &( xBlockingCycles[ 0 ] ), abortSHARED_MEM_SIZE_BYTES,
-                        					( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-                        					( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-                        				},
-                        				{ ( void * ) &( xErrorOccurred[ 0 ] ), abortSHARED_MEM_SIZE_BYTES,
-                        					( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-                        					( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-                        				},
-                                        { 0,                0,                    0                                                        },
-                                        { 0,                0,                    0                                                        },
-                                        { 0,                0,                    0                                                        },
-                                        { 0,                0,                    0                                                        },
-                                        { 0,                0,                    0                                                        },
-                                        { 0,                0,                    0                                                        },
-                                        { 0,                0,                    0                                                        }
-                                    }
-            };
+        {
+            .pvTaskCode      = prvBlockingTask,
+            .pcName          = pcBlockingTaskName[ 0 ],
+            .usStackDepth    = configMINIMAL_STACK_SIZE,
+            .pvParameters    = NULL,
+            .uxPriority      = abtBLOCKING_PRIORITY,
+            .puxStackBuffer  = xBlockingTaskStack,
+            .xRegions        =    {
+                                    { ( void * ) &( pcControllingTaskName[ 0 ] ), abortSHARED_MEM_SIZE_BYTES,
+                                        ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                        ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                    },
+                                    { ( void * ) &( xBlockingCycles[ 0 ] ), abortSHARED_MEM_SIZE_BYTES,
+                                        ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                        ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                    },
+                                    { ( void * ) &( xErrorOccurred[ 0 ] ), abortSHARED_MEM_SIZE_BYTES,
+                                        ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                        ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                    },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        }
+                                }
+        };
 
-        xTaskCreateRestricted( &( xControllingTaskParameters ), &xLocalTaskHandles[ CONTROLLING_TASK_IDX ] );
-        xTaskCreateRestricted( &( xBlockingTaskParameters ), &xLocalTaskHandles[ BLOCKING_TASK_IDX ] );
+        xTaskCreateRestricted( &( xControllingTaskParameters ), NULL );
+        xTaskCreateRestricted( &( xBlockingTaskParameters ), NULL );
 
     }
 /*-----------------------------------------------------------*/

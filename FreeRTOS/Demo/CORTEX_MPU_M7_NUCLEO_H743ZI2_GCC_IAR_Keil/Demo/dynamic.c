@@ -115,16 +115,16 @@ static portTASK_FUNCTION_PROTO( vQueueSendWhenSuspendedTask, pvParameters );
 #define priSUSPENDED_QUEUE_LENGTH              ( 1 )
 
 
-#define dynamicSHARED_MEM_SIZE_WORDS			( 8 )
-#define dynamicSHARED_MEM_SIZE_HALF_WORDS		( 16 )
-#define dynamicSHARED_MEM_SIZE_BYTES			( 32 )
+#define dynamicSHARED_MEM_SIZE_WORDS           ( 8 )
+#define dynamicSHARED_MEM_SIZE_HALF_WORDS      ( 16 )
+#define dynamicSHARED_MEM_SIZE_BYTES           ( 32 )
 
 /*-----------------------------------------------------------*/
 
 /* Handles to the two counter tasks.  These could be passed in as parameters
  * to the controller task to prevent them having to be file scope. */
-#define CONTINUOUS_INCREMENT_IDX				( 0 )
-#define LIMITED_INCREMENT_IDX					( 1 )
+#define CONTINUOUS_INCREMENT_TASK_IDX           ( 0 )
+#define LIMITED_INCREMENT_TASK_IDX              ( 1 )
 static TaskHandle_t xLocalTaskHandles[ dynamicSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( dynamicSHARED_MEM_SIZE_BYTES ) ) ) = { NULL };
 
 /* The shared counter variable.  This is passed in as a parameter to the two
@@ -148,13 +148,6 @@ QueueHandle_t xSuspendedTestQueue[ dynamicSHARED_MEM_SIZE_WORDS ] __attribute__(
 static uint32_t ulExpectedValue[ dynamicSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( dynamicSHARED_MEM_SIZE_BYTES ) ) ) = { 0 };
 static uint32_t ulValueToSend[ dynamicSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( dynamicSHARED_MEM_SIZE_BYTES ) ) ) = { ( uint32_t ) 0 };
 
-/* Stack definitions*/
-static StackType_t xContinuousIncrementTaskStack[ priSTACK_SIZE ] __attribute__( ( aligned( priSTACK_SIZE * sizeof( StackType_t ) ) ) );
-static StackType_t xLimitedIncrementTaskStack[ priSTACK_SIZE ] __attribute__( ( aligned( priSTACK_SIZE * sizeof( StackType_t ) ) ) );
-static StackType_t xCounterControlTaskStack[ priSUSPENDED_RX_TASK_STACK_SIZE ] __attribute__( ( aligned( priSUSPENDED_RX_TASK_STACK_SIZE * sizeof( StackType_t ) ) ) );
-static StackType_t xQueueSendWhenSuspendedTaskStack[ priSTACK_SIZE ] __attribute__( ( aligned( priSTACK_SIZE * sizeof( StackType_t ) ) ) );
-static StackType_t xQueueReceiveWhenSuspendedTaskStack[ priSUSPENDED_RX_TASK_STACK_SIZE ] __attribute__( ( aligned( priSUSPENDED_RX_TASK_STACK_SIZE * sizeof( StackType_t ) ) ) );
-
 /*-----------------------------------------------------------*/
 
 /*
@@ -163,6 +156,12 @@ static StackType_t xQueueReceiveWhenSuspendedTaskStack[ priSUSPENDED_RX_TASK_STA
  */
 void vStartDynamicPriorityTasks( void )
 {
+static StackType_t xContinuousIncrementTaskStack[ priSTACK_SIZE ] __attribute__( ( aligned( priSTACK_SIZE * sizeof( StackType_t ) ) ) );
+static StackType_t xLimitedIncrementTaskStack[ priSTACK_SIZE ] __attribute__( ( aligned( priSTACK_SIZE * sizeof( StackType_t ) ) ) );
+static StackType_t xCounterControlTaskStack[ priSUSPENDED_RX_TASK_STACK_SIZE ] __attribute__( ( aligned( priSUSPENDED_RX_TASK_STACK_SIZE * sizeof( StackType_t ) ) ) );
+static StackType_t xQueueSendWhenSuspendedTaskStack[ priSTACK_SIZE ] __attribute__( ( aligned( priSTACK_SIZE * sizeof( StackType_t ) ) ) );
+static StackType_t xQueueReceiveWhenSuspendedTaskStack[ priSUSPENDED_RX_TASK_STACK_SIZE ] __attribute__( ( aligned( priSUSPENDED_RX_TASK_STACK_SIZE * sizeof( StackType_t ) ) ) );
+
     xSuspendedTestQueue[ 0 ] = xQueueCreate( priSUSPENDED_QUEUE_LENGTH, sizeof( uint32_t ) );
 
     if( xSuspendedTestQueue[ 0 ] != NULL )
@@ -176,151 +175,151 @@ void vStartDynamicPriorityTasks( void )
         vQueueAddToRegistry( xSuspendedTestQueue[ 0 ], "Suspended_Test_Queue" );
 
         TaskParameters_t xContinuousIncrementTask =
-            {
-                .pvTaskCode      = vContinuousIncrementTask,
-                .pcName          = "CNT_INC",
-                .usStackDepth    = priSTACK_SIZE,
-                .pvParameters    = ( void * ) &ulCounter[ 0 ],
-                .uxPriority      = tskIDLE_PRIORITY,
-                .puxStackBuffer  = xContinuousIncrementTaskStack,
-                .xRegions        =    {
-										{ ( void * ) &( ulCounter[ 0 ] ), dynamicSHARED_MEM_SIZE_BYTES,
-										  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-											( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-										},
-										{ 0,                0,                    0                                                        },
-										{ 0,                0,                    0                                                        },
-										{ 0,                0,                    0                                                        },
-										{ 0,                0,                    0                                                        },
-										{ 0,                0,                    0                                                        },
-										{ 0,                0,                    0                                                        },
-										{ 0,                0,                    0                                                        },
-										{ 0,                0,                    0                                                        },
-										{ 0,                0,                    0                                                        },
-										{ 0,                0,                    0                                                        }
-                                    }
-            };
+        {
+            .pvTaskCode      = vContinuousIncrementTask,
+            .pcName          = "CNT_INC",
+            .usStackDepth    = priSTACK_SIZE,
+            .pvParameters    = ( void * ) &ulCounter[ 0 ],
+            .uxPriority      = tskIDLE_PRIORITY,
+            .puxStackBuffer  = xContinuousIncrementTaskStack,
+            .xRegions        =  {
+                                    { ( void * ) &( ulCounter[ 0 ] ), dynamicSHARED_MEM_SIZE_BYTES,
+                                        ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                        ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                    },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        }
+                                }
+        };
         TaskParameters_t xLimitedIncrementTask =
-            {
-                .pvTaskCode      = vLimitedIncrementTask,
-                .pcName          = "LIM_INC",
-                .usStackDepth    = priSTACK_SIZE,
-                .pvParameters    = ( void * ) &ulCounter[ 0 ],
-                .uxPriority      = tskIDLE_PRIORITY + 1,
-                .puxStackBuffer  = xLimitedIncrementTaskStack,
-                .xRegions        =    {
-                                        { ( void * ) &( ulCounter[ 0 ] ), dynamicSHARED_MEM_SIZE_BYTES,
-                                          ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-                                            ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-                                        },
-										{ 0,                0,                    0                                                        },
-                                        { 0,                0,                    0                                                        },
-                                        { 0,                0,                    0                                                        },
-                                        { 0,                0,                    0                                                        },
-                                        { 0,                0,                    0                                                        },
-                                        { 0,                0,                    0                                                        },
-                                        { 0,                0,                    0                                                        },
-                                        { 0,                0,                    0                                                        },
-                                        { 0,                0,                    0                                                        },
-                                        { 0,                0,                    0                                                        }
-                                    }
-            };
+        {
+            .pvTaskCode      = vLimitedIncrementTask,
+            .pcName          = "LIM_INC",
+            .usStackDepth    = priSTACK_SIZE,
+            .pvParameters    = ( void * ) &ulCounter[ 0 ],
+            .uxPriority      = tskIDLE_PRIORITY + 1,
+            .puxStackBuffer  = xLimitedIncrementTaskStack,
+            .xRegions        =  {
+                                    { ( void * ) &( ulCounter[ 0 ] ), dynamicSHARED_MEM_SIZE_BYTES,
+                                        ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                        ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                    },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        }
+                                }
+        };
         TaskParameters_t xCounterControlTask =
-            {
-                .pvTaskCode      = vCounterControlTask,
-                .pcName          = "C_CTRL",
-                .usStackDepth    = priSUSPENDED_RX_TASK_STACK_SIZE,
-                .pvParameters    = NULL,
-                .uxPriority      = tskIDLE_PRIORITY,
-                .puxStackBuffer  = xCounterControlTaskStack,
-                .xRegions        =    {
-                						{ ( void * ) &( ulCounter[ 0 ] ), dynamicSHARED_MEM_SIZE_BYTES,
-                		                   ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-                		                   ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-                		                },
-										{ ( void * ) &( xLocalTaskHandles[ 0 ] ), dynamicSHARED_MEM_SIZE_BYTES,
-										  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-											( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-										},
-										{ ( void * ) &( usCheckVariable[ 0 ] ), dynamicSHARED_MEM_SIZE_BYTES,
-										  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-											( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-										},
-                                        { 0,                0,                    0                                                        },
-                                        { 0,                0,                    0                                                        },
-                                        { 0,                0,                    0                                                        },
-                                        { 0,                0,                    0                                                        },
-                                        { 0,                0,                    0                                                        },
-                                        { 0,                0,                    0                                                        },
-                                        { 0,                0,                    0                                                        },
-                                        { 0,                0,                    0                                                        }
-                                    }
-            };
+        {
+            .pvTaskCode      = vCounterControlTask,
+            .pcName          = "C_CTRL",
+            .usStackDepth    = priSUSPENDED_RX_TASK_STACK_SIZE,
+            .pvParameters    = NULL,
+            .uxPriority      = tskIDLE_PRIORITY,
+            .puxStackBuffer  = xCounterControlTaskStack,
+            .xRegions        =  {
+                                    { ( void * ) &( ulCounter[ 0 ] ), dynamicSHARED_MEM_SIZE_BYTES,
+                                        ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                        ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                    },
+                                    { ( void * ) &( xLocalTaskHandles[ CONTINUOUS_INCREMENT_TASK_IDX ] ), dynamicSHARED_MEM_SIZE_BYTES,
+                                        ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                        ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                    },
+                                    { ( void * ) &( usCheckVariable[ 0 ] ), dynamicSHARED_MEM_SIZE_BYTES,
+                                        ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                        ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                    },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        }
+                                }
+        };
         TaskParameters_t xQueueSendWhenSuspendedTask =
-            {
-                .pvTaskCode      = vQueueSendWhenSuspendedTask,
-                .pcName          = "SUSP_TX",
-                .usStackDepth    = priSTACK_SIZE,
-                .pvParameters    = NULL,
-                .uxPriority      = tskIDLE_PRIORITY,
-                .puxStackBuffer  = xQueueSendWhenSuspendedTaskStack,
-                .xRegions        =    {
-										{ ( void * ) &( xSuspendedTestQueue[ 0 ] ), dynamicSHARED_MEM_SIZE_BYTES,
-										  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-											( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-										},
-										{ ( void * ) &( xSuspendedQueueSendError[ 0 ] ), dynamicSHARED_MEM_SIZE_BYTES,
-										  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-											( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-										},
-										{ ( void * ) &( ulValueToSend[ 0 ] ), dynamicSHARED_MEM_SIZE_BYTES,
-											( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-											( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-										},
-                                        { 0,                0,                    0                                                        },
-                                        { 0,                0,                    0                                                        },
-                                        { 0,                0,                    0                                                        },
-                                        { 0,                0,                    0                                                        },
-                                        { 0,                0,                    0                                                        },
-                                        { 0,                0,                    0                                                        },
-                                        { 0,                0,                    0                                                        },
-                                        { 0,                0,                    0                                                        }
-                                    }
-            };
+        {
+            .pvTaskCode      = vQueueSendWhenSuspendedTask,
+            .pcName          = "SUSP_TX",
+            .usStackDepth    = priSTACK_SIZE,
+            .pvParameters    = NULL,
+            .uxPriority      = tskIDLE_PRIORITY,
+            .puxStackBuffer  = xQueueSendWhenSuspendedTaskStack,
+            .xRegions        =  {
+                                    { ( void * ) &( xSuspendedTestQueue[ 0 ] ), dynamicSHARED_MEM_SIZE_BYTES,
+                                        ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                        ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                    },
+                                    { ( void * ) &( xSuspendedQueueSendError[ 0 ] ), dynamicSHARED_MEM_SIZE_BYTES,
+                                        ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                        ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                    },
+                                    { ( void * ) &( ulValueToSend[ 0 ] ), dynamicSHARED_MEM_SIZE_BYTES,
+                                        ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                        ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                    },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        }
+                                }
+        };
         TaskParameters_t xQueueReceiveWhenSuspendedTask =
-            {
-                .pvTaskCode      = vQueueReceiveWhenSuspendedTask,
-                .pcName          = "SUSP_RX",
-                .usStackDepth    = priSUSPENDED_RX_TASK_STACK_SIZE,
-                .pvParameters    = NULL,
-                .uxPriority      = tskIDLE_PRIORITY,
-                .puxStackBuffer  = xQueueReceiveWhenSuspendedTaskStack,
-                .xRegions        =    {
-										{ ( void * ) &( xSuspendedTestQueue[ 0 ] ), dynamicSHARED_MEM_SIZE_BYTES,
-										  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-											( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-										},
-										{ ( void * ) &( xSuspendedQueueReceiveError[ 0 ] ), dynamicSHARED_MEM_SIZE_BYTES,
-										  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-											( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-										},
-										{ ( void * ) &( ulExpectedValue[ 0 ] ), dynamicSHARED_MEM_SIZE_BYTES,
-												( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-											( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-										},
-                                        { 0,                0,                    0                                                        },
-                                        { 0,                0,                    0                                                        },
-                                        { 0,                0,                    0                                                        },
-                                        { 0,                0,                    0                                                        },
-                                        { 0,                0,                    0                                                        },
-                                        { 0,                0,                    0                                                        },
-                                        { 0,                0,                    0                                                        },
-                                        { 0,                0,                    0                                                        }
-                                    }
-            };
+        {
+            .pvTaskCode      = vQueueReceiveWhenSuspendedTask,
+            .pcName          = "SUSP_RX",
+            .usStackDepth    = priSUSPENDED_RX_TASK_STACK_SIZE,
+            .pvParameters    = NULL,
+            .uxPriority      = tskIDLE_PRIORITY,
+            .puxStackBuffer  = xQueueReceiveWhenSuspendedTaskStack,
+            .xRegions        =    {
+                                    { ( void * ) &( xSuspendedTestQueue[ 0 ] ), dynamicSHARED_MEM_SIZE_BYTES,
+                                        ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                        ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                    },
+                                    { ( void * ) &( xSuspendedQueueReceiveError[ 0 ] ), dynamicSHARED_MEM_SIZE_BYTES,
+                                        ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                        ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                    },
+                                    { ( void * ) &( ulExpectedValue[ 0 ] ), dynamicSHARED_MEM_SIZE_BYTES,
+                                            ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                        ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                    },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        }
+                                }
+        };
 
-        xTaskCreateRestricted( &( xContinuousIncrementTask ), &( xLocalTaskHandles[ 0 ] ) );
-        xTaskCreateRestricted( &( xLimitedIncrementTask ), &( xLocalTaskHandles[ 1 ] ) );
+        xTaskCreateRestricted( &( xContinuousIncrementTask ), &( xLocalTaskHandles[ CONTINUOUS_INCREMENT_TASK_IDX ] ) );
+        xTaskCreateRestricted( &( xLimitedIncrementTask ), &( xLocalTaskHandles[ LIMITED_INCREMENT_TASK_IDX ] ) );
         xTaskCreateRestricted( &( xCounterControlTask ), NULL );
         xTaskCreateRestricted( &( xQueueSendWhenSuspendedTask ), NULL );
         xTaskCreateRestricted( &( xQueueReceiveWhenSuspendedTask ), NULL );
@@ -420,17 +419,17 @@ static portTASK_FUNCTION( vCounterControlTask, pvParameters )
              * shared variable without risk of corruption.  This is not really
              * needed as the other task raises its priority above this task's
              * priority. */
-            vTaskSuspend( xLocalTaskHandles[ 0 ] );
+            vTaskSuspend( xLocalTaskHandles[ CONTINUOUS_INCREMENT_TASK_IDX ] );
             {
                 #if ( INCLUDE_eTaskGetState == 1 )
                 {
-                    configASSERT( eTaskGetState( xLocalTaskHandles[ 0 ] ) == eSuspended );
+                    configASSERT( eTaskGetState( xLocalTaskHandles[ CONTINUOUS_INCREMENT_TASK_IDX ] ) == eSuspended );
                 }
                 #endif /* INCLUDE_eTaskGetState */
 
                 ulLastCounter = ulCounter[ 0 ];
             }
-            vTaskResume( xLocalTaskHandles[ 0 ] );
+            vTaskResume( xLocalTaskHandles[ CONTINUOUS_INCREMENT_TASK_IDX ] );
 
             #if ( configUSE_PREEMPTION == 0 )
                 taskYIELD();
@@ -438,7 +437,7 @@ static portTASK_FUNCTION( vCounterControlTask, pvParameters )
 
             #if ( INCLUDE_eTaskGetState == 1 )
             {
-                configASSERT( eTaskGetState( xLocalTaskHandles[ 0 ] ) == eReady );
+                configASSERT( eTaskGetState( xLocalTaskHandles[ CONTINUOUS_INCREMENT_TASK_IDX ] ) == eReady );
             }
             #endif /* INCLUDE_eTaskGetState */
 
@@ -464,21 +463,21 @@ static portTASK_FUNCTION( vCounterControlTask, pvParameters )
 
         /* Suspend the continuous counter task so it stops accessing the shared
          * variable. */
-        vTaskSuspend( xLocalTaskHandles[ 0 ] );
+        vTaskSuspend( xLocalTaskHandles[ CONTINUOUS_INCREMENT_TASK_IDX ] );
 
         /* Reset the variable. */
         ulCounter[ 0 ] = ( uint32_t ) 0;
 
         #if ( INCLUDE_eTaskGetState == 1 )
         {
-            configASSERT( eTaskGetState( xLocalTaskHandles[ 1 ] ) == eSuspended );
+            configASSERT( eTaskGetState( xLocalTaskHandles[ LIMITED_INCREMENT_TASK_IDX ] ) == eSuspended );
         }
         #endif /* INCLUDE_eTaskGetState */
 
         /* Resume the limited count task which has a higher priority than us.
          * We should therefore not return from this call until the limited count
          * task has suspended itself with a known value in the counter variable. */
-        vTaskResume( xLocalTaskHandles[ 1 ] );
+        vTaskResume( xLocalTaskHandles[ LIMITED_INCREMENT_TASK_IDX ] );
 
         #if ( configUSE_PREEMPTION == 0 )
             taskYIELD();
@@ -488,7 +487,7 @@ static portTASK_FUNCTION( vCounterControlTask, pvParameters )
          * suspended itself. */
         #if ( INCLUDE_eTaskGetState == 1 )
         {
-            configASSERT( eTaskGetState( xLocalTaskHandles[ 1 ] ) == eSuspended );
+            configASSERT( eTaskGetState( xLocalTaskHandles[ LIMITED_INCREMENT_TASK_IDX ] ) == eSuspended );
         }
         #endif /* INCLUDE_eTaskGetState */
 
@@ -507,7 +506,7 @@ static portTASK_FUNCTION( vCounterControlTask, pvParameters )
         }
 
         /* Resume the continuous count task and do it all again. */
-        vTaskResume( xLocalTaskHandles[ 0 ] );
+        vTaskResume( xLocalTaskHandles[ CONTINUOUS_INCREMENT_TASK_IDX ] );
 
         #if ( configUSE_PREEMPTION == 0 )
             taskYIELD();

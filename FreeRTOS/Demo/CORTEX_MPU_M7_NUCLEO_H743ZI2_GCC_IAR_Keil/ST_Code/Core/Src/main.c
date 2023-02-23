@@ -76,7 +76,7 @@ TIM_HandleTypeDef htim7;
 PCD_HandleTypeDef hpcd_USB_OTG_FS;
 
 /* USER CODE BEGIN PV */
-
+uint32_t ulTim7Tick = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -493,6 +493,18 @@ int _write( int file, char *ptr, int len )
   return len;
 }
 /*-----------------------------------------------------------*/
+
+void vIncrementTim7Tick( void )
+{
+  ulTim7Tick++;
+}
+/*-----------------------------------------------------------*/
+
+uint32_t ulGetTim7Tick( void )
+{
+  return ulTim7Tick;
+}
+/*-----------------------------------------------------------*/
 /* USER CODE END 4 */
 
 /**
@@ -515,6 +527,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 
   extern void IntQueueTestTimerHandler( void );
   if (htim->Instance == TIM7) {
+    vIncrementTim7Tick();
     IntQueueTestTimerHandler();
   }
   /* USER CODE END Callback 1 */

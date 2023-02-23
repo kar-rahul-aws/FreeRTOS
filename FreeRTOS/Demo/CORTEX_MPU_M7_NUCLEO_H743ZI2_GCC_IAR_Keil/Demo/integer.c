@@ -47,13 +47,10 @@
 #define intgCONST4             ( ( long ) 7 )
 #define intgEXPECTED_ANSWER    ( ( ( intgCONST1 + intgCONST2 ) * intgCONST3 ) / intgCONST4 )
 
-#define intgSHARED_MEM_SIZE_WORDS             ( 8 )
-#define intgSHARED_MEM_SIZE_BYTES			  ( 32 )
+#define intgSHARED_MEM_SIZE_WORDS           ( 8 )
+#define intgSHARED_MEM_SIZE_BYTES           ( 32 )
 
 #define intgSTACK_SIZE         configMINIMAL_STACK_SIZE
-
-/* As this is the minimal version, we will only create one task. */
-#define intgNUMBER_OF_TASKS    ( 1 )
 
 /* The task function.  Repeatedly performs a 32 bit calculation, checking the
  * result against the expected result.  If the result is incorrect then the
@@ -70,38 +67,33 @@ static BaseType_t xTaskCheck[ intgSHARED_MEM_SIZE_WORDS ] __attribute__( ( align
 
 void vStartIntegerMathTasks( UBaseType_t uxPriority )
 {
-    short sTask;
-
-    for( sTask = 0; sTask < intgNUMBER_OF_TASKS; sTask++ )
+    static StackType_t xCompletingIntMathTaskStack[ intgSTACK_SIZE ] __attribute__( ( aligned( intgSTACK_SIZE * sizeof( StackType_t ) ) ) );
+    TaskParameters_t xCompletingIntMathTaskParameters =
     {
-    	static StackType_t xCompletingIntMathTaskStack[ intgSTACK_SIZE ] __attribute__( ( aligned( intgSTACK_SIZE * sizeof( StackType_t ) ) ) );
-        TaskParameters_t xCompletingIntMathTaskParameters =
-            {
-                .pvTaskCode      = vCompeteingIntMathTask,
-                .pcName          = "IntMath",
-                .usStackDepth    = intgSTACK_SIZE,
-                .pvParameters    = ( void * ) &( xTaskCheck[ sTask ] ),
-                .uxPriority      = uxPriority,
-                .puxStackBuffer  = xCompletingIntMathTaskStack,
-                .xRegions        =    {
-                        				{ ( void * ) &( xTaskCheck[ 0 ] ), intgSHARED_MEM_SIZE_BYTES,
-                        					( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-                        					( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-                        				},
-                                        { 0,                0,                    0                                                        },
-                                        { 0,                0,                    0                                                        },
-                                        { 0,                0,                    0                                                        },
-                                        { 0,                0,                    0                                                        },
-                                        { 0,                0,                    0                                                        },
-                                        { 0,                0,                    0                                                        },
-                                        { 0,                0,                    0                                                        },
-                                        { 0,                0,                    0                                                        },
-                                        { 0,                0,                    0                                                        },
-                                        { 0,                0,                    0                                                        }
-                                    }
-            };
-    	xTaskCreateRestricted(&(xCompletingIntMathTaskParameters),NULL);
-    }
+        .pvTaskCode      = vCompeteingIntMathTask,
+        .pcName          = "IntMath",
+        .usStackDepth    = intgSTACK_SIZE,
+        .pvParameters    = ( void * ) &( xTaskCheck[ 0 ] ),
+        .uxPriority      = uxPriority,
+        .puxStackBuffer  = xCompletingIntMathTaskStack,
+        .xRegions        =    {
+                                { ( void * ) &( xTaskCheck[ 0 ] ), intgSHARED_MEM_SIZE_BYTES,
+                                    ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        }
+                            }
+    };
+    xTaskCreateRestricted( &( xCompletingIntMathTaskParameters ), NULL );
 }
 /*-----------------------------------------------------------*/
 
@@ -169,22 +161,19 @@ static portTASK_FUNCTION( vCompeteingIntMathTask, pvParameters )
 BaseType_t xAreIntegerMathsTaskStillRunning( void )
 {
     BaseType_t xReturn = pdTRUE;
-    short sTask;
 
     /* Check the maths tasks are still running by ensuring their check variables
      * are still being set to true. */
-    for( sTask = 0; sTask < intgNUMBER_OF_TASKS; sTask++ )
+    if( xTaskCheck[ 0 ] == pdFALSE )
     {
-        if( xTaskCheck[ sTask ] == pdFALSE )
-        {
-            /* The check has not incremented so an error exists. */
-            xReturn = pdFALSE;
-        }
-
-        /* Reset the check variable so we can tell if it has been set by
-         * the next time around. */
-        xTaskCheck[ sTask ] = pdFALSE;
+        /* The check has not incremented so an error exists. */
+        xReturn = pdFALSE;
     }
+
+    /* Reset the check variable so we can tell if it has been set by
+        * the next time around. */
+    xTaskCheck[ 0 ] = pdFALSE;
 
     return xReturn;
 }
+/*-----------------------------------------------------------*/
