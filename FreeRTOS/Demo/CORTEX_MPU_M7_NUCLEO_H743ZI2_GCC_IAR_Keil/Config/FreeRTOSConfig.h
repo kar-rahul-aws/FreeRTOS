@@ -169,7 +169,7 @@ See http://www.FreeRTOS.org/RTOS-Cortex-M3-M4.html. */
 #define configSTART_COUNTING_SEMAPHORE_TESTS      1
 #define configSTART_QUEUE_SET_TESTS               1
 #define configSTART_QUEUE_OVERWRITE_TESTS         1
-#define configSTART_EVENT_GROUP_TESTS             0
+#define configSTART_EVENT_GROUP_TESTS             1
 #define configSTART_INTERRUPT_SEMAPHORE_TESTS     1
 #define configSTART_QUEUE_SET_POLLING_TESTS       1
 #define configSTART_BLOCK_TIME_TESTS              0

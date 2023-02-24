@@ -94,9 +94,8 @@
     #define ebEVENT_GROUP_SET_BITS_TEST_TASK_STACK_SIZE    configMINIMAL_STACK_SIZE
 #endif
 
-#define eventgrpSHARED_MEM_SIZE_WORDS			( 8 )
-#define eventgrpSHARED_MEM_SIZE_HALF_WORDS		( 16 )
-#define eventgrpSHARED_MEM_SIZE_BYTES			( 32 )
+#define eventgrpSHARED_MEM_SIZE_WORDS           ( 8 )
+#define eventgrpSHARED_MEM_SIZE_BYTES           ( 32 )
 
 /*-----------------------------------------------------------*/
 
@@ -174,17 +173,9 @@ static EventGroupHandle_t xEventGroup[ eventgrpSHARED_MEM_SIZE_WORDS ] __attribu
 static EventGroupHandle_t xISREventGroup = NULL;
 
 /* Handles to the tasks that only take part in the synchronization calls. */
-#define SYNC_TASK_ONE		( 0 )
-#define SYNC_TASK_TWO		( 1 )
+#define SYNC_TASK_ONE_IDX        ( 0 )
+#define SYNC_TASK_TWO_IDX        ( 1 )
 static TaskHandle_t xSyncTaskHandle[ eventgrpSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( eventgrpSHARED_MEM_SIZE_BYTES ) ) ) = { NULL };
-static TaskHandle_t xTestSlaveTaskHandle[ eventgrpSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( eventgrpSHARED_MEM_SIZE_BYTES ) ) ) = { NULL };
-
-
-/* Stack definitions */
-static StackType_t xTestSlaveTaskStack[ ebRENDESVOUS_TEST_TASK_STACK_SIZE ] __attribute__( ( aligned( ebRENDESVOUS_TEST_TASK_STACK_SIZE * sizeof( StackType_t ) ) ) );
-static StackType_t xTestMasterTaskStack[ ebEVENT_GROUP_SET_BITS_TEST_TASK_STACK_SIZE ] __attribute__( ( aligned( ebEVENT_GROUP_SET_BITS_TEST_TASK_STACK_SIZE * sizeof( StackType_t ) ) ) );
-static StackType_t xSyncTaskStack[ ebRENDESVOUS_TEST_TASK_STACK_SIZE ] __attribute__( ( aligned( ebRENDESVOUS_TEST_TASK_STACK_SIZE * sizeof( StackType_t ) ) ) );
-
 
 /*-----------------------------------------------------------*/
 
@@ -202,145 +193,136 @@ void vStartEventGroupTasks( void )
      *
      * Create the test tasks as described at the top of this file.
      */
+    static StackType_t xTestSlaveTaskStack[ ebRENDESVOUS_TEST_TASK_STACK_SIZE ] __attribute__( ( aligned( ebRENDESVOUS_TEST_TASK_STACK_SIZE * sizeof( StackType_t ) ) ) );
+    static StackType_t xTestMasterTaskStack[ ebEVENT_GROUP_SET_BITS_TEST_TASK_STACK_SIZE ] __attribute__( ( aligned( ebEVENT_GROUP_SET_BITS_TEST_TASK_STACK_SIZE * sizeof( StackType_t ) ) ) );
+    static StackType_t xSyncTaskOneStack[ ebRENDESVOUS_TEST_TASK_STACK_SIZE ] __attribute__( ( aligned( ebRENDESVOUS_TEST_TASK_STACK_SIZE * sizeof( StackType_t ) ) ) );
+    static StackType_t xSyncTaskTwoStack[ ebRENDESVOUS_TEST_TASK_STACK_SIZE ] __attribute__( ( aligned( ebRENDESVOUS_TEST_TASK_STACK_SIZE * sizeof( StackType_t ) ) ) );
+    TaskHandle_t xTestSlaveTaskHandle;
 
-    /*
-    xTaskCreate( prvTestSlaveTask, "WaitO", ebRENDESVOUS_TEST_TASK_STACK_SIZE, NULL, ebWAIT_BIT_TASK_PRIORITY, &xTestSlaveTaskHandle );
-    xTaskCreate( prvTestMasterTask, "SetB", ebEVENT_GROUP_SET_BITS_TEST_TASK_STACK_SIZE, ( void * ) xTestSlaveTaskHandle, ebSET_BIT_TASK_PRIORITY, NULL );
-    xTaskCreate( prvSyncTask, "Rndv", ebRENDESVOUS_TEST_TASK_STACK_SIZE, ( void * ) ebRENDESVOUS_TASK_1_SYNC_BIT, ebWAIT_BIT_TASK_PRIORITY, &xSyncTask1 );
-    xTaskCreate( prvSyncTask, "Rndv", ebRENDESVOUS_TEST_TASK_STACK_SIZE, ( void * ) ebRENDESVOUS_TASK_2_SYNC_BIT, ebWAIT_BIT_TASK_PRIORITY, &xSyncTask2 );
-    */
-    TaskParameters_t xTestSlaveTask =
-        {
-            .pvTaskCode      = prvTestSlaveTask,
-            .pcName          = "WaitO",
-            .usStackDepth    = ebRENDESVOUS_TEST_TASK_STACK_SIZE,
-            .pvParameters    = NULL,
-            .uxPriority      = ebWAIT_BIT_TASK_PRIORITY,
-            .puxStackBuffer  = xTestSlaveTaskStack,
-            .xRegions        =    {
-									{ ( void * ) &( xEventGroup[ 0 ] ), eventgrpSHARED_MEM_SIZE_BYTES,
-									  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-										( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-									},
-									{ ( void * ) &( ulTestSlaveCycles[ 0 ] ), eventgrpSHARED_MEM_SIZE_BYTES,
-									  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-										( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-									},
-									{ 0,                0,                    0                                                        },
-									{ 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        }
-                                }
-        };
-    TaskParameters_t xTestMasterTask =
-        {
-            .pvTaskCode      = prvTestMasterTask,
-            .pcName          = "SetB",
-            .usStackDepth    = ebEVENT_GROUP_SET_BITS_TEST_TASK_STACK_SIZE,
-            .pvParameters    = ( void * ) xTestSlaveTaskHandle[ 0 ],
-            .uxPriority      = ebSET_BIT_TASK_PRIORITY,
-            .puxStackBuffer  = xTestMasterTaskStack,
-            .xRegions        =    {
-									{ ( void * ) &( xEventGroup[ 0 ] ), eventgrpSHARED_MEM_SIZE_BYTES,
-									  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-										( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-									},
-									{ ( void * ) &( xSyncTaskHandle[ 0 ] ), eventgrpSHARED_MEM_SIZE_BYTES,
-									  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-										( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-									},
-									{ ( void * ) &( ulTestMasterCycles[ 0 ] ), eventgrpSHARED_MEM_SIZE_BYTES,
-									  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-										( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-									},
-									{ ( void * ) &( xTestSlaveTaskHandle[ 0 ] ), eventgrpSHARED_MEM_SIZE_BYTES,
-									  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-										( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-									},
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        }
-                                }
-        };
-    TaskParameters_t xSyncTaskOne =
-        {
-            .pvTaskCode      = prvSyncTask,
-            .pcName          = "Rndv",
-            .usStackDepth    = ebRENDESVOUS_TEST_TASK_STACK_SIZE,
-            .pvParameters    = ( void * ) ebRENDESVOUS_TASK_1_SYNC_BIT,
-            .uxPriority      = ebWAIT_BIT_TASK_PRIORITY,
-            .puxStackBuffer  = xSyncTaskStack,
-            .xRegions        =    {
-									{ ( void * ) &( xEventGroup[ 0 ] ), eventgrpSHARED_MEM_SIZE_BYTES,
-									  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-										( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-									},
-									{ ( void * ) &( xSyncTaskHandle[ 0 ] ), eventgrpSHARED_MEM_SIZE_BYTES,
-									  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-										( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-									},
-									{ 0,                0,                    0                                                        },
-									{ 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        }
-                                }
-        };
-    TaskParameters_t xSyncTaskTwo =
-        {
-            .pvTaskCode      = prvSyncTask,
-            .pcName          = "Rndv",
-            .usStackDepth    = ebRENDESVOUS_TEST_TASK_STACK_SIZE,
-            .pvParameters    = ( void * ) ebRENDESVOUS_TASK_2_SYNC_BIT,
-            .uxPriority      = ebWAIT_BIT_TASK_PRIORITY,
-            .puxStackBuffer  = xSyncTaskStack,
-            .xRegions        =    {
-									{ ( void * ) &( xEventGroup[ 0 ] ), eventgrpSHARED_MEM_SIZE_BYTES,
-									  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-										( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-									},
-									{ ( void * ) &( xSyncTaskHandle[ 0 ] ), eventgrpSHARED_MEM_SIZE_BYTES,
-									  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-										( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-									},
-									{ 0,                0,                    0                                                        },
-									{ 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        }
-                                }
-        };
-    /*
-    xTaskCreate( prvTestSlaveTask, "WaitO", ebRENDESVOUS_TEST_TASK_STACK_SIZE, NULL, ebWAIT_BIT_TASK_PRIORITY, &xTestSlaveTaskHandle );
-    xTaskCreate( prvTestMasterTask, "SetB", ebEVENT_GROUP_SET_BITS_TEST_TASK_STACK_SIZE, ( void * ) xTestSlaveTaskHandle, ebSET_BIT_TASK_PRIORITY, NULL );
-    xTaskCreate( prvSyncTask, "Rndv", ebRENDESVOUS_TEST_TASK_STACK_SIZE, ( void * ) ebRENDESVOUS_TASK_1_SYNC_BIT, ebWAIT_BIT_TASK_PRIORITY, &xSyncTask1 );
-    xTaskCreate( prvSyncTask, "Rndv", ebRENDESVOUS_TEST_TASK_STACK_SIZE, ( void * ) ebRENDESVOUS_TASK_2_SYNC_BIT, ebWAIT_BIT_TASK_PRIORITY, &xSyncTask2 );
-    */
-    xTaskCreateRestricted( &( xTestSlaveTask ), &xTestSlaveTaskHandle[ 0 ] );
-    xTaskCreateRestricted( &( xTestMasterTask ), NULL );
-    xTaskCreateRestricted( &( xSyncTaskOne ), &xSyncTaskHandle[ SYNC_TASK_ONE ]);
-    xTaskCreateRestricted( &( xSyncTaskTwo ), &xSyncTaskHandle[ SYNC_TASK_TWO ]);
+    TaskParameters_t xTestSlaveTaskParams =
+    {
+        .pvTaskCode      = prvTestSlaveTask,
+        .pcName          = "WaitO",
+        .usStackDepth    = ebRENDESVOUS_TEST_TASK_STACK_SIZE,
+        .pvParameters    = NULL,
+        .uxPriority      = ebWAIT_BIT_TASK_PRIORITY,
+        .puxStackBuffer  = xTestSlaveTaskStack,
+        .xRegions        =  {
+                                { ( void * ) &( xEventGroup[ 0 ] ), eventgrpSHARED_MEM_SIZE_BYTES,
+                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                },
+                                { ( void * ) &( ulTestSlaveCycles[ 0 ] ), eventgrpSHARED_MEM_SIZE_BYTES,
+                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        }
+                            }
+    };
+    TaskParameters_t xTestMasterTaskParams =
+    {
+        .pvTaskCode      = prvTestMasterTask,
+        .pcName          = "SetB",
+        .usStackDepth    = ebEVENT_GROUP_SET_BITS_TEST_TASK_STACK_SIZE,
+        .pvParameters    = NULL,
+        .uxPriority      = ebSET_BIT_TASK_PRIORITY,
+        .puxStackBuffer  = xTestMasterTaskStack,
+        .xRegions        =  {
+                                { ( void * ) &( xEventGroup[ 0 ] ), eventgrpSHARED_MEM_SIZE_BYTES,
+                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                },
+                                { ( void * ) &( xSyncTaskHandle[ SYNC_TASK_ONE_IDX ] ), eventgrpSHARED_MEM_SIZE_BYTES,
+                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                },
+                                { ( void * ) &( ulTestMasterCycles[ 0 ] ), eventgrpSHARED_MEM_SIZE_BYTES,
+                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        }
+                            }
+    };
+    TaskParameters_t xSyncTaskOneParams =
+    {
+        .pvTaskCode      = prvSyncTask,
+        .pcName          = "Rndv",
+        .usStackDepth    = ebRENDESVOUS_TEST_TASK_STACK_SIZE,
+        .pvParameters    = ( void * ) ebRENDESVOUS_TASK_1_SYNC_BIT,
+        .uxPriority      = ebWAIT_BIT_TASK_PRIORITY,
+        .puxStackBuffer  = xSyncTaskOneStack,
+        .xRegions        =  {
+                                { ( void * ) &( xEventGroup[ 0 ] ), eventgrpSHARED_MEM_SIZE_BYTES,
+                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                },
+                                { ( void * ) &( xSyncTaskHandle[ SYNC_TASK_ONE_IDX ] ), eventgrpSHARED_MEM_SIZE_BYTES,
+                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        }
+                            }
+    };
+    TaskParameters_t xSyncTaskTwoParams =
+    {
+        .pvTaskCode      = prvSyncTask,
+        .pcName          = "Rndv",
+        .usStackDepth    = ebRENDESVOUS_TEST_TASK_STACK_SIZE,
+        .pvParameters    = ( void * ) ebRENDESVOUS_TASK_2_SYNC_BIT,
+        .uxPriority      = ebWAIT_BIT_TASK_PRIORITY,
+        .puxStackBuffer  = xSyncTaskTwoStack,
+        .xRegions        =  {
+                                { ( void * ) &( xEventGroup[ 0 ] ), eventgrpSHARED_MEM_SIZE_BYTES,
+                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                },
+                                { ( void * ) &( xSyncTaskHandle[ SYNC_TASK_ONE_IDX ] ), eventgrpSHARED_MEM_SIZE_BYTES,
+                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        }
+                            }
+    };
 
+    xTaskCreateRestricted( &( xTestSlaveTaskParams ), &( xTestSlaveTaskHandle ) );
+    xTestMasterTaskParams.pvParameters = ( void * ) xTestSlaveTaskHandle;
+    xTaskCreateRestricted( &( xTestMasterTaskParams ), NULL );
+    xTaskCreateRestricted( &( xSyncTaskOneParams ), &xSyncTaskHandle[ SYNC_TASK_ONE_IDX ]);
+    xTaskCreateRestricted( &( xSyncTaskTwoParams ), &xSyncTaskHandle[ SYNC_TASK_TWO_IDX ]);
 
     /* If the last task was created then the others will have been too. */
-    configASSERT( xSyncTaskHandle[ 1 ] );
+    configASSERT( xSyncTaskHandle[ SYNC_TASK_TWO_IDX ] );
 
     /* Create the event group used by the ISR tests.  The event group used by
      * the tasks is created by the tasks themselves. */
@@ -391,12 +373,12 @@ static void prvTestMasterTask( void * pvParameters )
             xError = pdTRUE;
         }
 
-        if( eTaskGetState( xSyncTaskHandle[ 0 ] ) != eSuspended )
+        if( eTaskGetState( xSyncTaskHandle[ SYNC_TASK_ONE_IDX ] ) != eSuspended )
         {
             xError = pdTRUE;
         }
 
-        if( eTaskGetState( xSyncTaskHandle[ 1 ] ) != eSuspended )
+        if( eTaskGetState( xSyncTaskHandle[ SYNC_TASK_TWO_IDX ] ) != eSuspended )
         {
             xError = pdTRUE;
         }
@@ -661,12 +643,12 @@ static BaseType_t prvPerformTaskSyncTests( BaseType_t xError,
         xError = pdTRUE;
     }
 
-    if( eTaskGetState( xSyncTaskHandle[ 0 ] ) != eSuspended )
+    if( eTaskGetState( xSyncTaskHandle[ SYNC_TASK_ONE_IDX ] ) != eSuspended )
     {
         xError = pdTRUE;
     }
 
-    if( eTaskGetState( xSyncTaskHandle[ 1 ] ) != eSuspended )
+    if( eTaskGetState( xSyncTaskHandle[ SYNC_TASK_TWO_IDX ] ) != eSuspended )
     {
         xError = pdTRUE;
     }
@@ -707,20 +689,20 @@ static BaseType_t prvPerformTaskSyncTests( BaseType_t xError,
     /* Unsuspend the other tasks then check they have executed up to the
      * synchronisation point. */
     vTaskResume( xTestSlaveTaskHandle );
-    vTaskResume( xSyncTaskHandle[ 0 ] );
-    vTaskResume( xSyncTaskHandle[ 1 ] );
+    vTaskResume( xSyncTaskHandle[ SYNC_TASK_ONE_IDX ] );
+    vTaskResume( xSyncTaskHandle[ SYNC_TASK_TWO_IDX ] );
 
     if( eTaskGetState( xTestSlaveTaskHandle ) != eBlocked )
     {
         xError = pdTRUE;
     }
 
-    if( eTaskGetState( xSyncTaskHandle[ 0 ] ) != eBlocked )
+    if( eTaskGetState( xSyncTaskHandle[ SYNC_TASK_ONE_IDX ] ) != eBlocked )
     {
         xError = pdTRUE;
     }
 
-    if( eTaskGetState( xSyncTaskHandle[ 1 ] ) != eBlocked )
+    if( eTaskGetState( xSyncTaskHandle[ SYNC_TASK_TWO_IDX ] ) != eBlocked )
     {
         xError = pdTRUE;
     }
@@ -751,35 +733,35 @@ static BaseType_t prvPerformTaskSyncTests( BaseType_t xError,
         xError = pdTRUE;
     }
 
-    if( eTaskGetState( xSyncTaskHandle[ 0 ] ) != eSuspended )
+    if( eTaskGetState( xSyncTaskHandle[ SYNC_TASK_ONE_IDX ] ) != eSuspended )
     {
         xError = pdTRUE;
     }
 
-    if( eTaskGetState( xSyncTaskHandle[ 1 ] ) != eSuspended )
+    if( eTaskGetState( xSyncTaskHandle[ SYNC_TASK_TWO_IDX ] ) != eSuspended )
     {
         xError = pdTRUE;
     }
 
     /* Sync again - but this time set the last necessary bit as the
      * highest priority task, rather than the lowest priority task.  Unsuspend
-     * the other tasks then check they have executed up to the	synchronisation
+     * the other tasks then check they have executed up to the    synchronisation
      * point. */
     vTaskResume( xTestSlaveTaskHandle );
-    vTaskResume( xSyncTaskHandle[ 0 ] );
-    vTaskResume( xSyncTaskHandle[ 1 ] );
+    vTaskResume( xSyncTaskHandle[ SYNC_TASK_ONE_IDX ] );
+    vTaskResume( xSyncTaskHandle[ SYNC_TASK_TWO_IDX ] );
 
     if( eTaskGetState( xTestSlaveTaskHandle ) != eBlocked )
     {
         xError = pdTRUE;
     }
 
-    if( eTaskGetState( xSyncTaskHandle[ 0 ] ) != eBlocked )
+    if( eTaskGetState( xSyncTaskHandle[ SYNC_TASK_ONE_IDX ] ) != eBlocked )
     {
         xError = pdTRUE;
     }
 
-    if( eTaskGetState( xSyncTaskHandle[ 1 ] ) != eBlocked )
+    if( eTaskGetState( xSyncTaskHandle[ SYNC_TASK_TWO_IDX ] ) != eBlocked )
     {
         xError = pdTRUE;
     }
@@ -810,12 +792,12 @@ static BaseType_t prvPerformTaskSyncTests( BaseType_t xError,
         xError = pdTRUE;
     }
 
-    if( eTaskGetState( xSyncTaskHandle[ 0 ] ) != eReady )
+    if( eTaskGetState( xSyncTaskHandle[ SYNC_TASK_ONE_IDX ] ) != eReady )
     {
         xError = pdTRUE;
     }
 
-    if( eTaskGetState( xSyncTaskHandle[ 1 ] ) != eReady )
+    if( eTaskGetState( xSyncTaskHandle[ SYNC_TASK_TWO_IDX ] ) != eReady )
     {
         xError = pdTRUE;
     }
@@ -830,12 +812,12 @@ static BaseType_t prvPerformTaskSyncTests( BaseType_t xError,
         xError = pdTRUE;
     }
 
-    if( eTaskGetState( xSyncTaskHandle[ 0 ] ) != eBlocked )
+    if( eTaskGetState( xSyncTaskHandle[ SYNC_TASK_ONE_IDX ] ) != eBlocked )
     {
         xError = pdTRUE;
     }
 
-    if( eTaskGetState( xSyncTaskHandle[ 1 ] ) != eBlocked )
+    if( eTaskGetState( xSyncTaskHandle[ SYNC_TASK_TWO_IDX ] ) != eBlocked )
     {
         xError = pdTRUE;
     }
@@ -977,7 +959,7 @@ static void prvSelectiveBitsTestSlaveFunction( void )
      * This function is called by two different tasks - each of which will use a
      * different bit.  Check the task handle to see which task the function was
      * called by. */
-    if( xTaskGetCurrentTaskHandle() == xSyncTaskHandle[ 0 ] )
+    if( xTaskGetCurrentTaskHandle() == xSyncTaskHandle[ SYNC_TASK_ONE_IDX ] )
     {
         uxPendBits = ebSELECTIVE_BITS_1;
     }
@@ -1014,12 +996,12 @@ static BaseType_t prvSelectiveBitsTestMasterFunction( void )
      * this test.
      *
      * Both other tasks should start in the suspended state. */
-    if( eTaskGetState( xSyncTaskHandle[ 0 ] ) != eSuspended )
+    if( eTaskGetState( xSyncTaskHandle[ SYNC_TASK_ONE_IDX ] ) != eSuspended )
     {
         xError = pdTRUE;
     }
 
-    if( eTaskGetState( xSyncTaskHandle[ 1 ] ) != eSuspended )
+    if( eTaskGetState( xSyncTaskHandle[ SYNC_TASK_TWO_IDX ] ) != eSuspended )
     {
         xError = pdTRUE;
     }
@@ -1028,16 +1010,16 @@ static BaseType_t prvSelectiveBitsTestMasterFunction( void )
     for( uxBit = 0x01; uxBit < 0x100; uxBit <<= 1 )
     {
         /* Resume both tasks. */
-        vTaskResume( xSyncTaskHandle[ 0 ] );
-        vTaskResume( xSyncTaskHandle[ 1 ] );
+        vTaskResume( xSyncTaskHandle[ SYNC_TASK_ONE_IDX ] );
+        vTaskResume( xSyncTaskHandle[ SYNC_TASK_TWO_IDX ] );
 
         /* Now both tasks should be blocked on the event group. */
-        if( eTaskGetState( xSyncTaskHandle[ 0 ] ) != eBlocked )
+        if( eTaskGetState( xSyncTaskHandle[ SYNC_TASK_ONE_IDX ] ) != eBlocked )
         {
             xError = pdTRUE;
         }
 
-        if( eTaskGetState( xSyncTaskHandle[ 1 ] ) != eBlocked )
+        if( eTaskGetState( xSyncTaskHandle[ SYNC_TASK_TWO_IDX ] ) != eBlocked )
         {
             xError = pdTRUE;
         }
@@ -1050,7 +1032,7 @@ static BaseType_t prvSelectiveBitsTestMasterFunction( void )
         if( ( uxBit & ebSELECTIVE_BITS_1 ) == 0 )
         {
             /* Task should not have unblocked. */
-            if( eTaskGetState( xSyncTaskHandle[ 0 ] ) != eBlocked )
+            if( eTaskGetState( xSyncTaskHandle[ SYNC_TASK_ONE_IDX ] ) != eBlocked )
             {
                 xError = pdTRUE;
             }
@@ -1058,7 +1040,7 @@ static BaseType_t prvSelectiveBitsTestMasterFunction( void )
         else
         {
             /* Task should have unblocked and returned to the suspended state. */
-            if( eTaskGetState( xSyncTaskHandle[ 0 ] ) != eSuspended )
+            if( eTaskGetState( xSyncTaskHandle[ SYNC_TASK_ONE_IDX ] ) != eSuspended )
             {
                 xError = pdTRUE;
             }
@@ -1068,7 +1050,7 @@ static BaseType_t prvSelectiveBitsTestMasterFunction( void )
         if( ( uxBit & ebSELECTIVE_BITS_2 ) == 0 )
         {
             /* Task should not have unblocked. */
-            if( eTaskGetState( xSyncTaskHandle[ 1 ] ) != eBlocked )
+            if( eTaskGetState( xSyncTaskHandle[ SYNC_TASK_TWO_IDX ] ) != eBlocked )
             {
                 xError = pdTRUE;
             }
@@ -1076,7 +1058,7 @@ static BaseType_t prvSelectiveBitsTestMasterFunction( void )
         else
         {
             /* Task should have unblocked and returned to the suspended state. */
-            if( eTaskGetState( xSyncTaskHandle[ 1 ] ) != eSuspended )
+            if( eTaskGetState( xSyncTaskHandle[ SYNC_TASK_TWO_IDX ] ) != eSuspended )
             {
                 xError = pdTRUE;
             }
@@ -1085,8 +1067,8 @@ static BaseType_t prvSelectiveBitsTestMasterFunction( void )
 
     /* Ensure both tasks are blocked on the event group again, then delete the
      * event group so the other tasks leave this portion of the test. */
-    vTaskResume( xSyncTaskHandle[ 0 ] );
-    vTaskResume( xSyncTaskHandle[ 1 ] );
+    vTaskResume( xSyncTaskHandle[ SYNC_TASK_ONE_IDX ] );
+    vTaskResume( xSyncTaskHandle[ SYNC_TASK_TWO_IDX ] );
 
     /* Deleting the event group is the signal that the two other tasks should
      * leave the prvSelectiveBitsTestSlaveFunction() function and continue to the main
@@ -1173,6 +1155,7 @@ void vPeriodicEventGroupsProcessing( void )
 }
 
 /*-----------------------------------------------------------*/
+
 /* This is called to check that all the created tasks are still running. */
 BaseType_t xAreEventGroupTasksStillRunning( void )
 {
@@ -1203,3 +1186,4 @@ BaseType_t xAreEventGroupTasksStillRunning( void )
 
     return xStatus;
 }
+/*-----------------------------------------------------------*/
