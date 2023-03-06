@@ -27,6 +27,7 @@
 /* Standard includes. */
 #include "stdio.h"
 #include "string.h"
+#include "stdlib.h"
 
 /* FreeRTOS includes. */
 #include "FreeRTOS.h"
@@ -117,9 +118,11 @@ static void prvNonBlockingSenderTask( void * pvParameters );
 
     static void prvSpaceAvailableCoherenceActor( void * pvParameters );
     static void prvSpaceAvailableCoherenceTester( void * pvParameters );
-    static MessageBufferHandle_t xCoherenceTestMessageBuffer = NULL;
+    static MessageBufferHandle_t xCoherenceTestMessageBuffer[ mbSHARED_MEM_SIZE_WORDS ] __attribute__((aligned(mbSHARED_MEM_SIZE_BYTES))) = { NULL };
 
-    static uint32_t ulSizeCoherencyTestCycles = 0UL;
+    static uint32_t ulSizeCoherencyTestCycles[ mbSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( mbSHARED_MEM_SIZE_BYTES ) ) ) = { 0UL };
+
+    static char cTxString[ mbSHARED_MEM_SIZE_BYTES ] __attribute__( ( aligned( mbSHARED_MEM_SIZE_BYTES ) ) ) = { "12345" };
 #endif /* if ( configRUN_ADDITIONAL_TESTS == 1 ) */
 
 /*-----------------------------------------------------------*/
@@ -546,11 +549,73 @@ void vStartMessageBufferTasks( configSTACK_DEPTH_TYPE xStackSize )
 
     #if ( configRUN_ADDITIONAL_TESTS == 1 )
     {
-        xCoherenceTestMessageBuffer = xMessageBufferCreate( mbCOHERENCE_TEST_BUFFER_SIZE );
-        configASSERT( xCoherenceTestMessageBuffer );
+        xCoherenceTestMessageBuffer[ 0 ] = xMessageBufferCreate( mbCOHERENCE_TEST_BUFFER_SIZE );
+        configASSERT( xCoherenceTestMessageBuffer[ 0 ] );
 
-        xTaskCreate( prvSpaceAvailableCoherenceActor, "mbsanity1", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY, NULL );
-        xTaskCreate( prvSpaceAvailableCoherenceTester, "mbsanity2", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY, NULL );
+        static StackType_t xCoherenceActorTaskStack[ configMINIMAL_STACK_SIZE ] __attribute__( ( aligned( configMINIMAL_STACK_SIZE * sizeof( StackType_t ) ) ) );
+        static StackType_t xCoherenceTesterTaskStack[ configMINIMAL_STACK_SIZE ] __attribute__( ( aligned( configMINIMAL_STACK_SIZE * sizeof( StackType_t ) ) ) );
+
+        TaskParameters_t xCoherenceActorTaskParameters =
+        {
+            .pvTaskCode = prvSpaceAvailableCoherenceActor,
+            .pcName = "mbsanity1",
+            .usStackDepth = configMINIMAL_STACK_SIZE,
+            .pvParameters = NULL,
+            .uxPriority = mbHIGHER_PRIORITY,
+            .puxStackBuffer = xCoherenceActorTaskStack,
+	        .xRegions        =    {
+									{ ( void * ) &( xCoherenceTestMessageBuffer[ 0 ] ), mbSHARED_MEM_SIZE_BYTES,
+									   ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+										 ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+									},
+									{ ( void * ) &( cTxString[ 0 ] ), mbSHARED_MEM_SIZE_BYTES,
+									   ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+										 ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+									},
+									{ 0,                0,                    0                                                        },
+									{ 0,                0,                    0                                                        },
+									{ 0,                0,                    0                                                        },
+									{ 0,                0,                    0                                                        },
+									{ 0,                0,                    0                                                        },
+									{ 0,                0,                    0                                                        },
+									{ 0,                0,                    0                                                        },
+									{ 0,                0,                    0                                                        },
+									{ 0,                0,                    0                                                        }
+	                            }
+	    };
+
+        TaskParameters_t xCoherenceTesterTaskParameters =
+        {
+            .pvTaskCode = prvSpaceAvailableCoherenceTester,
+            .pcName = "mbsanity2",
+            .usStackDepth = configMINIMAL_STACK_SIZE,
+            .pvParameters = NULL,
+            .uxPriority = mbHIGHER_PRIORITY,
+            .puxStackBuffer = xCoherenceTesterTaskStack,
+	        .xRegions        =    {
+									{ ( void * ) &( xCoherenceTestMessageBuffer[ 0 ] ), mbSHARED_MEM_SIZE_BYTES,
+									   ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+										 ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+									},
+									{ ( void * ) &( ulSizeCoherencyTestCycles[ 0 ] ), mbSHARED_MEM_SIZE_BYTES,
+									   ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+										 ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+									},
+									{ 0,                0,                    0                                                        },
+									{ 0,                0,                    0                                                        },
+									{ 0,                0,                    0                                                        },
+									{ 0,                0,                    0                                                        },
+									{ 0,                0,                    0                                                        },
+									{ 0,                0,                    0                                                        },
+									{ 0,                0,                    0                                                        },
+									{ 0,                0,                    0                                                        },
+									{ 0,                0,                    0                                                        }
+	                            }
+	    };
+
+        xTaskCreateRestricted( &( xCoherenceActorTaskParameters ), NULL );
+        xTaskCreateRestricted( &( xCoherenceTesterTaskParameters ), NULL );
+
     }
     #endif
 }
@@ -1238,22 +1303,19 @@ static void prvEchoServer( void * pvParameters )
 
     static void prvSpaceAvailableCoherenceActor( void * pvParameters )
     {
-        static char * cTxString = "12345";
         char cRxString[ mbCOHERENCE_TEST_BYTES_WRITTEN + 1 ]; /* +1 for NULL terminator. */
-
-        ( void ) pvParameters;
 
         for( ; ; )
         {
             /* Add bytes to the buffer so the other task should see
              * mbEXPECTED_FREE_BYTES_AFTER_WRITING_STRING bytes free. */
-            xMessageBufferSend( xCoherenceTestMessageBuffer, ( void * ) cTxString, strlen( cTxString ), 0 );
-            configASSERT( xMessageBufferSpacesAvailable( xCoherenceTestMessageBuffer ) == mbEXPECTED_FREE_BYTES_AFTER_WRITING_STRING );
+            xMessageBufferSend( xCoherenceTestMessageBuffer[ 0 ], ( void * ) cTxString, strlen( cTxString ), 0 );
+            configASSERT( xMessageBufferSpacesAvailable( xCoherenceTestMessageBuffer[ 0 ] ) == mbEXPECTED_FREE_BYTES_AFTER_WRITING_STRING );
 
             /* Read out message again so the other task should read the full
              * mbCOHERENCE_TEST_BUFFER_SIZE bytes free again. */
             memset( ( void * ) cRxString, 0x00, sizeof( cRxString ) );
-            xMessageBufferReceive( xCoherenceTestMessageBuffer, ( void * ) cRxString, mbCOHERENCE_TEST_BYTES_WRITTEN, 0 );
+            xMessageBufferReceive( xCoherenceTestMessageBuffer[ 0 ], ( void * ) cRxString, mbCOHERENCE_TEST_BYTES_WRITTEN, 0 );
             configASSERT( strcmp( cTxString, cRxString ) == 0 );
         }
     }
@@ -1264,14 +1326,12 @@ static void prvEchoServer( void * pvParameters )
         size_t xSpaceAvailable;
         BaseType_t xErrorFound = pdFALSE;
 
-        ( void ) pvParameters;
-
         for( ; ; )
         {
             /* This message buffer is only ever empty or contains 5 bytes.  So all
              * queries of its free space should result in one of the two values tested
              * below. */
-            xSpaceAvailable = xMessageBufferSpacesAvailable( xCoherenceTestMessageBuffer );
+            xSpaceAvailable = xMessageBufferSpacesAvailable( xCoherenceTestMessageBuffer[ 0 ] );
 
             if( ( xSpaceAvailable == mbCOHERENCE_TEST_BUFFER_SIZE ) ||
                 ( xSpaceAvailable == mbEXPECTED_FREE_BYTES_AFTER_WRITING_STRING ) )
@@ -1280,7 +1340,7 @@ static void prvEchoServer( void * pvParameters )
                  * is still executing if no errors have been found. */
                 if( xErrorFound == pdFALSE )
                 {
-                    ulSizeCoherencyTestCycles++;
+                    ulSizeCoherencyTestCycles[ 0 ]++;
                 }
             }
             else
@@ -1344,13 +1404,13 @@ BaseType_t xAreMessageBufferTasksStillRunning( void )
     {
         static uint32_t ullastSizeCoherencyTestCycles = 0UL;
 
-        if( ullastSizeCoherencyTestCycles == ulSizeCoherencyTestCycles )
+        if( ullastSizeCoherencyTestCycles == ulSizeCoherencyTestCycles[ 0 ] )
         {
             xReturn = pdFAIL;
         }
         else
         {
-            ullastSizeCoherencyTestCycles = ulSizeCoherencyTestCycles;
+            ullastSizeCoherencyTestCycles = ulSizeCoherencyTestCycles[ 0 ];
         }
     }
     #endif /* if ( configRUN_ADDITIONAL_TESTS == 1 ) */
