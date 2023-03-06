@@ -1142,9 +1142,6 @@ static void prvNonBlockingReceiverTask( void * pvParameters )
 
         xStreamBuffer = ( StreamBufferHandle_t )pvParameters;
 
-        vTaskSuspend( xReceiverTaskHandles[ 0 ]);
-        vTaskSuspend( xReceiverTaskHandles[ 1 ]);
-
         /* Now the stream buffer has been created the receiver task can be
          * created.  If this sender task has the higher priority then the receiver
          * task is created at the lower priority - if this sender task has the
@@ -1190,7 +1187,7 @@ static void prvNonBlockingReceiverTask( void * pvParameters )
              * still running as expected. */
             ulSenderLoopCounters[ uxIndex ]++;
 
-            if( uxTaskPriorityGet( NULL ) == sbHIGHER_PRIORITY )
+            if( uxTaskPriorityGet( NULL ) == sbHIGHEST_PRIORITY )
             {
                 /* Allow other tasks to run. */
                 vTaskDelay( xShortDelay );
