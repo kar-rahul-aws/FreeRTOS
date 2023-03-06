@@ -105,7 +105,7 @@ static void prvNonBlockingSenderTask( void * pvParameters );
 
     static StaticMessageBuffer_t xStaticMessageBuffers[ mbNUMBER_OF_ECHO_CLIENTS ];
     static uint8_t ucBufferStorage[ mbNUMBER_OF_SENDER_TASKS ][ mbMESSAGE_BUFFER_LENGTH_BYTES + 1 ];
-    static uint32_t ulSenderLoopCounters[ mbNUMBER_OF_SENDER_TASKS ] = { 0 };
+    static uint32_t ulSenderLoopCounters[ mbSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( mbSHARED_MEM_SIZE_BYTES ) ) ) = { 0 };
 #endif /* configSUPPORT_STATIC_ALLOCATION */
 
 
@@ -485,10 +485,6 @@ void vStartMessageBufferTasks( configSTACK_DEPTH_TYPE xStackSize )
             .uxPriority = mbHIGHEST_PRIORITY,
             .puxStackBuffer = xSenderTask1Stack,
 	        .xRegions        =    {
-									{ ( void * ) &( pucFullBuffer[ 0 ] ), mbSHARED_MEM_SIZE_BYTES * 2,
-									   ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-										 ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-									},
 									{ ( void * ) &( ulSenderLoopCounters[ 0 ] ), mbSHARED_MEM_SIZE_BYTES,
 									   ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
 										 ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
@@ -497,6 +493,7 @@ void vStartMessageBufferTasks( configSTACK_DEPTH_TYPE xStackSize )
 									   ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
 										 ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
 									},
+									{ 0,                0,                    0                                                        },
 									{ 0,                0,                    0                                                        },
 									{ 0,                0,                    0                                                        },
 									{ 0,                0,                    0                                                        },
@@ -849,7 +846,7 @@ static void prvNonBlockingSenderTask( void * pvParameters )
      * string will increase and decrease as the value of the number increases
      * then overflows. */
     memset( cTxString, 0x00, sizeof( cTxString ) );
-    //sprintf( cTxString, "%d", ( int ) iDataToSend );
+    itoa(iDataToSend, cTxString, sizeof( cTxString ));
     xStringLength = strlen( cTxString );
 
     for( ; ; )
@@ -869,7 +866,7 @@ static void prvNonBlockingSenderTask( void * pvParameters )
 
             /* Create the next string. */
             memset( cTxString, 0x00, sizeof( cTxString ) );
-            cTxString[ 0 ] = ( int )( iDataToSend );
+            itoa(iDataToSend, cTxString, sizeof( cTxString ));
             xStringLength = strlen( cTxString );
         }
     }
@@ -896,7 +893,7 @@ static void prvNonBlockingReceiverTask( void * pvParameters )
      * the non blocking sender task. */
     memset( cExpectedString, 0x00, sizeof( cExpectedString ) );
     memset( cRxString, 0x00, sizeof( cRxString ) );
-    cExpectedString[ 0 ] = ( char )('A'+ iDataToSend);
+    itoa( iDataToSend, cExpectedString, sizeof(cExpectedString) );
     xStringLength = strlen( cExpectedString );
 
     for( ; ; )
@@ -932,7 +929,7 @@ static void prvNonBlockingReceiverTask( void * pvParameters )
 
             memset( cExpectedString, 0x00, sizeof( cExpectedString ) );
             memset( cRxString, 0x00, sizeof( cRxString ) );
-            cExpectedString[ 0 ] = ( char )('A'+ iDataToSend);
+            itoa( iDataToSend, cExpectedString, sizeof(cExpectedString) );
             xStringLength = strlen( cExpectedString );
 
             if( xNonBlockingReceiveError == pdFALSE )
@@ -971,9 +968,6 @@ static void prvNonBlockingReceiverTask( void * pvParameters )
 
         xMessageBuffer = ( MessageBufferHandle_t )pvParameters;
 
-        vTaskSuspend( xReceiverTaskHandles[ 0 ]);
-        vTaskSuspend( xReceiverTaskHandles[ 1 ]);
-
         /* Now the message buffer has been created the receiver task can be created.
          * If this sender task has the higher priority then the receiver task is
          * created at the lower priority - if this sender task has the lower priority
@@ -988,6 +982,7 @@ static void prvNonBlockingReceiverTask( void * pvParameters )
         }
         else
         {
+
         	vTaskPrioritySet( xReceiverTaskHandles[ 0 ], mbHIGHER_PRIORITY );
         	vTaskResume( xReceiverTaskHandles[ 0 ] );
         }
@@ -998,7 +993,7 @@ static void prvNonBlockingReceiverTask( void * pvParameters )
              * string will increase and decrease as the value of the number increases
              * then overflows. */
             memset( cTxString, 0x00, sizeof( cTxString ) );
-            cTxString[ 0 ] = ( char )( 'A' + iDataToSend );
+            itoa(iDataToSend, cTxString, sizeof( cTxString ));
 
             do
             {
@@ -1011,9 +1006,11 @@ static void prvNonBlockingReceiverTask( void * pvParameters )
             {
                 /* Increment a loop counter so a check task can tell this task is
                  * still running as expected. */
-                ulSenderLoopCounters[ uxIndex ]++;
 
-                if( uxTaskPriorityGet( NULL ) == mbHIGHER_PRIORITY )
+            	ulSenderLoopCounters[ uxIndex ]++;
+
+
+                if( uxTaskPriorityGet( NULL ) == mbHIGHEST_PRIORITY )
                 {
                     /* Allow other tasks to run. */
                     vTaskDelay( xShortDelay );
@@ -1025,6 +1022,7 @@ static void prvNonBlockingReceiverTask( void * pvParameters )
                  * the buffer is set to point to the cTxString array - this is
                  * ok because nothing is actually written to the memory. */
                 xTempMessageBuffer = xMessageBufferCreateStatic( sizeof( cTxString ), ( uint8_t * ) cTxString, &xStaticMessageBuffer );
+                xMessageBufferReset( xTempMessageBuffer );
                 vMessageBufferDelete( xTempMessageBuffer );
             }
         }
@@ -1048,7 +1046,7 @@ static void prvNonBlockingReceiverTask( void * pvParameters )
         {
             /* Generate the next expected string in the cExpectedString buffer. */
             memset( cExpectedString, 0x00, sizeof( cExpectedString ) );
-            cExpectedString[ 0 ] = ( char )('A' + iExpectedData );
+            itoa(iExpectedData, cExpectedString, sizeof( cExpectedString ));
 
             /* Receive the next string from the message buffer. */
             memset( cReceivedString, 0x00, sizeof( cReceivedString ) );

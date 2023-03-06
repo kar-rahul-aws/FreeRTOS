@@ -47,7 +47,7 @@
 #endif
 
 #define configUSE_PREEMPTION					1
-#define configSUPPORT_STATIC_ALLOCATION			0
+#define configSUPPORT_STATIC_ALLOCATION			1
 #define configSUPPORT_DYNAMIC_ALLOCATION		1
 #define configUSE_IDLE_HOOK						0
 #define configUSE_TICK_HOOK						1
@@ -175,9 +175,9 @@ See http://www.FreeRTOS.org/RTOS-Cortex-M3-M4.html. */
 #define configSTART_BLOCK_TIME_TESTS              0
 #define configSTART_ABORT_DELAY_TESTS             0
 #define configSTART_DYNAMIC_TASK_TESTS            0
-#define configSTART_MESSAGE_BUFFER_TESTS          0
+#define configSTART_MESSAGE_BUFFER_TESTS          1
 #define configSTART_STREAM_BUFFER_TESTS           1
-#define configSTART_STREAM_BUFFER_INTERRUPT_TESTS 0
+#define configSTART_STREAM_BUFFER_INTERRUPT_TESTS 1
 #define configSTART_TIMER_TESTS                   0
 #define configSTART_INTERRUPT_QUEUE_TESTS         0
 #define configSTART_REGISTER_TESTS                0
