@@ -1142,6 +1142,10 @@ static void prvNonBlockingReceiverTask( void * pvParameters )
 
         xStreamBuffer = ( StreamBufferHandle_t )pvParameters;
 
+        /*Suspend the receiver tasks*/
+        vTaskSuspend( xReceiverTaskHandles[ 0 ] );
+        vTaskSuspend( xReceiverTaskHandles[ 1 ] );
+
         /* Now the stream buffer has been created the receiver task can be
          * created.  If this sender task has the higher priority then the receiver
          * task is created at the lower priority - if this sender task has the
@@ -1154,6 +1158,7 @@ static void prvNonBlockingReceiverTask( void * pvParameters )
             prvSingleTaskTests( xStreamBuffer );
         	vTaskPrioritySet( xReceiverTaskHandles[ 1 ], sbHIGHEST_PRIORITY );
         	vTaskResume( xReceiverTaskHandles[ 1 ] );
+        	vTaskResume( xReceiverTaskHandles[ 0 ] );
 
         }
         else
@@ -1425,6 +1430,7 @@ static void prvEchoServer( void * pvParameters )
     {
     	vTaskPrioritySet( xEchoClientTaskHandle[ 1 ], sbHIGHEST_PRIORITY );
     	vTaskResume( xEchoClientTaskHandle[ 1 ] );
+    	vTaskResume( xEchoClientTaskHandle[ 0 ] );
     }
     else
     {

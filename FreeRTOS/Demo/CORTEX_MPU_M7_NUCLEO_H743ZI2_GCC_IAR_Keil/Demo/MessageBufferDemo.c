@@ -1033,6 +1033,10 @@ static void prvNonBlockingReceiverTask( void * pvParameters )
 
         xMessageBuffer = ( MessageBufferHandle_t )pvParameters;
 
+        /*Suspend the receiver tasks*/
+        vTaskSuspend( xReceiverTaskHandles[ 0 ] );
+        vTaskSuspend( xReceiverTaskHandles[ 1 ] );
+
         /* Now the message buffer has been created the receiver task can be created.
          * If this sender task has the higher priority then the receiver task is
          * created at the lower priority - if this sender task has the lower priority
@@ -1044,6 +1048,7 @@ static void prvNonBlockingReceiverTask( void * pvParameters )
             prvSingleTaskTests( xMessageBuffer );
         	vTaskPrioritySet( xReceiverTaskHandles[ 1 ], mbHIGHEST_PRIORITY );
         	vTaskResume( xReceiverTaskHandles[ 1 ] );
+        	vTaskResume( xReceiverTaskHandles[ 0 ] );
         }
         else
         {
@@ -1156,12 +1161,9 @@ static void prvEchoClient( void * pvParameters )
  * using the task's parameter. */
     EchoMessageBuffers_t * pxMessageBuffers = ( EchoMessageBuffers_t * ) pvParameters;
 
-
-    /* Create the buffer into which strings to send to the server will be
+    /* The buffer into which strings to send to the server will be
      * created, and the buffer into which strings echoed back from the server will
      * be copied. */
-    //pcStringToSend = ( char * ) pvPortMalloc( mbMESSAGE_BUFFER_LENGTH_BYTES );
-    //pcStringReceived = ( char * ) pvPortMalloc( mbMESSAGE_BUFFER_LENGTH_BYTES );
 
     configASSERT( pcStringToSend );
     configASSERT( pcStringReceived );
@@ -1264,6 +1266,7 @@ static void prvEchoServer( void * pvParameters )
     {
     	vTaskPrioritySet( xEchoClientTaskHandle[ 1 ], mbHIGHEST_PRIORITY );
     	vTaskResume( xEchoClientTaskHandle[ 1 ] );
+    	vTaskResume( xEchoClientTaskHandle[ 0 ] );
     }
     else
     {
