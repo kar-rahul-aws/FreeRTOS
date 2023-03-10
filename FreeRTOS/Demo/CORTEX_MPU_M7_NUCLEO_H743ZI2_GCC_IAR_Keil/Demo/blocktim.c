@@ -63,12 +63,12 @@
 /* In case the demo does not have software timers enabled, as this file uses
  * the configTIMER_TASK_PRIORITY setting. */
 #ifndef configTIMER_TASK_PRIORITY
-    #define configTIMER_TASK_PRIORITY    ( configMAX_PRIORITIES - 1 )
+    #define configTIMER_TASK_PRIORITY           ( configMAX_PRIORITIES - 1 )
 #endif
 
-#define blocktimerSHARED_MEM_SIZE_WORDS				( 8 )
-#define blocktimerSHARED_MEM_SIZE_HALF_WORDS		( 16 )
-#define blocktimerSHARED_MEM_SIZE_BYTES				( 32 )
+#define blocktimerSHARED_MEM_SIZE_WORDS         ( 8 )
+#define blocktimerSHARED_MEM_SIZE_HALF_WORDS    ( 16 )
+#define blocktimerSHARED_MEM_SIZE_BYTES         ( 32 )
 
 /*-----------------------------------------------------------*/
 
@@ -125,74 +125,67 @@ void vCreateBlockTimeTasks( void )
         /* Create the two test tasks. */
         TaskParameters_t xPrimaryBlockTimerTestTaskParameters =
         {
-            .pvTaskCode = vPrimaryBlockTimeTestTask,
-            .pcName = "BTest1",
-            .usStackDepth = bktBLOCK_TIME_TASK_STACK_SIZE,
-            .pvParameters = (void*)xTestQueue[ 0 ],
-            .uxPriority = bktPRIMARY_PRIORITY,
+            .pvTaskCode     = vPrimaryBlockTimeTestTask,
+            .pcName         = "BTest1",
+            .usStackDepth   = bktBLOCK_TIME_TASK_STACK_SIZE,
+            .pvParameters   = ( void * ) xTestQueue[ 0 ],
+            .uxPriority     = bktPRIMARY_PRIORITY,
             .puxStackBuffer = xPrimaryBlockTimeTestTaskStack,
-            .xRegions = {
-									{ ( void * ) &( xTestQueue[ 0 ] ), blocktimerSHARED_MEM_SIZE_BYTES,
-									  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-										( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-									},
-									{ ( void * ) &( xErrorOccurred[ 0 ] ), blocktimerSHARED_MEM_SIZE_BYTES,
-									  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-										( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-									},
-									{ ( void * ) &( xRunIndicator[ 0 ] ), blocktimerSHARED_MEM_SIZE_BYTES,
-									  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-										( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-									},
-									{ ( void * ) &( xSecondary[ 0 ] ), blocktimerSHARED_MEM_SIZE_BYTES,
-									  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-										( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-									},
-									{ ( void * ) &( xPrimaryCycles[ 0 ] ), blocktimerSHARED_MEM_SIZE_BYTES,
-									  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-										( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-									},
-                                    { 0,                0,                    0                                     },
-                                    { 0,                0,                    0                                     },
-                                    { 0,                0,                    0                                     },
-                                    { 0,                0,                    0                                     },
-                                    { 0,                0,                    0                                     },
-                                    { 0,                0,                    0                                     }
-                                }
+            .xRegions       =
+            {
+                { ( void * ) &( xTestQueue[ 0 ] ),     blocktimerSHARED_MEM_SIZE_BYTES,
+                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) ) },
+                { ( void * ) &( xErrorOccurred[ 0 ] ), blocktimerSHARED_MEM_SIZE_BYTES,
+                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) ) },
+                { ( void * ) &( xRunIndicator[ 0 ] ),  blocktimerSHARED_MEM_SIZE_BYTES,
+                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) ) },
+                { ( void * ) &( xSecondary[ 0 ] ),     blocktimerSHARED_MEM_SIZE_BYTES,
+                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) ) },
+                { ( void * ) &( xPrimaryCycles[ 0 ] ), blocktimerSHARED_MEM_SIZE_BYTES,
+                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) ) },
+                { 0,                                   0,                              0  },
+                { 0,                                   0,                              0  },
+                { 0,                                   0,                              0  },
+                { 0,                                   0,                              0  },
+                { 0,                                   0,                              0  },
+                { 0,                                   0,                              0  }
+            }
         };
         TaskParameters_t xSecondaryBlockTimerTestTaskParameters =
         {
-            .pvTaskCode = vSecondaryBlockTimeTestTask,
-            .pcName = "BTest2",
-            .usStackDepth = bktBLOCK_TIME_TASK_STACK_SIZE,
-            .pvParameters = (void*)xTestQueue[ 0 ],
-            .uxPriority = bktSECONDARY_PRIORITY,
+            .pvTaskCode     = vSecondaryBlockTimeTestTask,
+            .pcName         = "BTest2",
+            .usStackDepth   = bktBLOCK_TIME_TASK_STACK_SIZE,
+            .pvParameters   = ( void * ) xTestQueue[ 0 ],
+            .uxPriority     = bktSECONDARY_PRIORITY,
             .puxStackBuffer = xSecondaryBlockTimeTestTaskStack,
-            .xRegions = {
-									{ ( void * ) &( xSecondary[ 0 ] ), blocktimerSHARED_MEM_SIZE_BYTES,
-									  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-										( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-									},
-									{ ( void * ) &( xSecondaryCycles[ 0 ] ), blocktimerSHARED_MEM_SIZE_BYTES,
-									  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-										( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-									},
-									{ ( void * ) &( xRunIndicator[ 0 ] ), blocktimerSHARED_MEM_SIZE_BYTES,
-									  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-										( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-									},
-									{ ( void * ) &( xTestQueue[ 0 ] ), blocktimerSHARED_MEM_SIZE_BYTES,
-									  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-										( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-									},
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        }
-                                }
+            .xRegions       =
+            {
+                { ( void * ) &( xSecondary[ 0 ] ),       blocktimerSHARED_MEM_SIZE_BYTES,
+                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) ) },
+                { ( void * ) &( xSecondaryCycles[ 0 ] ), blocktimerSHARED_MEM_SIZE_BYTES,
+                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) ) },
+                { ( void * ) &( xRunIndicator[ 0 ] ),    blocktimerSHARED_MEM_SIZE_BYTES,
+                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) ) },
+                { ( void * ) &( xTestQueue[ 0 ] ),       blocktimerSHARED_MEM_SIZE_BYTES,
+                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) ) },
+                { 0,                                     0,                              0  },
+                { 0,                                     0,                              0  },
+                { 0,                                     0,                              0  },
+                { 0,                                     0,                              0  },
+                { 0,                                     0,                              0  },
+                { 0,                                     0,                              0  },
+                { 0,                                     0,                              0  }
+            }
         };
         xTaskCreateRestricted( &( xPrimaryBlockTimerTestTaskParameters ), NULL );
         xTaskCreateRestricted( &( xSecondaryBlockTimerTestTaskParameters ), &xSecondary[ 0 ] );

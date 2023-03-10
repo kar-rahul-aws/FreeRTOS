@@ -53,9 +53,9 @@
     #define tmrTIMER_TEST_TASK_STACK_SIZE    configMINIMAL_STACK_SIZE
 #endif
 
-#define tmrSHARED_MEM_SIZE_WORDS			( 8 )
-#define tmrSHARED_MEM_SIZE_HALF_WORDS		( 16 )
-#define tmrSHARED_MEM_SIZE_BYTES			( 32 )
+#define tmrSHARED_MEM_SIZE_WORDS             ( 8 )
+#define tmrSHARED_MEM_SIZE_HALF_WORDS        ( 16 )
+#define tmrSHARED_MEM_SIZE_BYTES             ( 32 )
 
 
 /*-----------------------------------------------------------*/
@@ -94,7 +94,7 @@ static volatile BaseType_t xTestStatus[ tmrSHARED_MEM_SIZE_WORDS ]  __attribute_
 /* Flag indicating whether the testing includes the backlog demo.  The backlog
  * demo can be disruptive to other demos because the timer backlog is created by
  * calling xTaskCatchUpTicks(). */
-static uint8_t ucIsBacklogDemoEnabled[ tmrSHARED_MEM_SIZE_BYTES ]  __attribute__( ( aligned( tmrSHARED_MEM_SIZE_BYTES ) ) ) = { ( uint8_t )pdFALSE };
+static uint8_t ucIsBacklogDemoEnabled[ tmrSHARED_MEM_SIZE_BYTES ]  __attribute__( ( aligned( tmrSHARED_MEM_SIZE_BYTES ) ) ) = { ( uint8_t ) pdFALSE };
 
 /* Counter that is incremented on each cycle of a test.  This is used to
  * detect a stalled task - a test that is no longer running. */
@@ -113,7 +113,7 @@ static uint8_t ucIsStopNeededInTimerZeroCallback = ( uint8_t ) pdFALSE;
 /* The one-shot timer is configured to use a callback function that increments
  * ucOneShotTimerCounter each time it gets called. */
 static TimerHandle_t xOneShotTimer[ tmrSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( tmrSHARED_MEM_SIZE_BYTES ) ) ) = { NULL };
-static uint8_t ucOneShotTimerCounter[ tmrSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( tmrSHARED_MEM_SIZE_BYTES ) ) ) = { (uint8_t)0 };
+static uint8_t ucOneShotTimerCounter[ tmrSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( tmrSHARED_MEM_SIZE_BYTES ) ) ) = { ( uint8_t ) 0 };
 
 /* The ISR reload timer is controlled from the tick hook to exercise the timer
  * API functions that can be used from an ISR.  It is configured to increment
@@ -133,9 +133,9 @@ static TickType_t xBasePeriod[ tmrSHARED_MEM_SIZE_WORDS ] __attribute__( ( align
 
 /* The timer used to notify the task. */
 
-//static TimerHandle_t xAutoReloadTimers[ tmrSHARED_MEM_SIZE_BYTES ] __attribute__( ( aligned( tmrSHARED_MEM_SIZE_BYTES ) ) ) = { NULL };
-//static TimerHandle_t xISRAutoReloadTimer[ tmrSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( tmrSHARED_MEM_SIZE_BYTES ) ) ) = { NULL };
-//static TimerHandle_t xISRShotTimer[ tmrSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( tmrSHARED_MEM_SIZE_BYTES ) ) ) = { NULL };
+/*static TimerHandle_t xAutoReloadTimers[ tmrSHARED_MEM_SIZE_BYTES ] __attribute__( ( aligned( tmrSHARED_MEM_SIZE_BYTES ) ) ) = { NULL }; */
+/*static TimerHandle_t xISRAutoReloadTimer[ tmrSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( tmrSHARED_MEM_SIZE_BYTES ) ) ) = { NULL }; */
+/*static TimerHandle_t xISRShotTimer[ tmrSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( tmrSHARED_MEM_SIZE_BYTES ) ) ) = { NULL }; */
 
 /*-----------------------------------------------------------*/
 
@@ -154,11 +154,11 @@ void vStartTimerDemoTask( TickType_t xBasePeriodIn )
     /* Create a one-shot timer for use later on in this test.  For test purposes it
      * is created as an auto-reload timer then converted to a one-shot timer. */
     xOneShotTimer[ 0 ] = xTimerCreate( "Oneshot Timer",              /* Text name to facilitate debugging.  The kernel does not use this itself. */
-                                  tmrdemoONE_SHOT_TIMER_PERIOD, /* The period for the timer. */
-                                  pdFALSE,                      /* Autoreload is false, so created as a one-shot timer. */
-                                  ( void * ) 0,                 /* The timer identifier.  Initialise to 0, then increment each time it is called. */
-                                  prvOneShotTimerCallback );    /* The callback to be called when the timer expires. */
-    configASSERT( xOneShotTimer[ 0 ]);
+                                       tmrdemoONE_SHOT_TIMER_PERIOD, /* The period for the timer. */
+                                       pdFALSE,                      /* Autoreload is false, so created as a one-shot timer. */
+                                       ( void * ) 0,                 /* The timer identifier.  Initialise to 0, then increment each time it is called. */
+                                       prvOneShotTimerCallback );    /* The callback to be called when the timer expires. */
+    configASSERT( xOneShotTimer[ 0 ] );
 
 
     /* Create the task that will control and monitor the timers.  This is
@@ -171,49 +171,42 @@ void vStartTimerDemoTask( TickType_t xBasePeriodIn )
 
     TaskParameters_t xTimerTestTaskParameters =
     {
-            .pvTaskCode      = prvTimerTestTask,
-            .pcName          = "Tmr Tst",
-            .usStackDepth    = tmrTIMER_TEST_TASK_STACK_SIZE,
-            .pvParameters    = NULL,
-            .uxPriority      = configTIMER_TASK_PRIORITY - 1,
-            .puxStackBuffer  = xTimerTestTaskStack,
-            .xRegions        =    {
-									{ ( void * ) &( xTestStatus[ 0 ] ), tmrSHARED_MEM_SIZE_BYTES,
-									  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-										( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-									},
-									{ ( void * ) &( xOneShotTimer[ 0 ] ), tmrSHARED_MEM_SIZE_BYTES,
-									  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-										( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-									},
-									{ ( void * ) &( xAutoReloadTimers[ 0 ] ), ( tmrSHARED_MEM_SIZE_BYTES * 2 ),
-									  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-										( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-									},
-									{ ( void * ) &( xBasePeriod[ 0 ] ), ( tmrSHARED_MEM_SIZE_BYTES ),
-									  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-										( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-									},
-									{ ( void * ) &( ucAutoReloadTimerCounters[ 0 ] ), ( tmrSHARED_MEM_SIZE_BYTES ),
-									  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-										( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-									},
-									{ ( void * ) &( ulLoopCounter[ 0 ] ), ( tmrSHARED_MEM_SIZE_BYTES ),
-									  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-										( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-									},
-									{ ( void * ) &( ucOneShotTimerCounter[ 0 ] ), ( tmrSHARED_MEM_SIZE_BYTES ),
-									  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-										( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-									},
-									{ ( void * ) &( ucIsBacklogDemoEnabled[ 0 ] ), ( tmrSHARED_MEM_SIZE_BYTES ),
-									  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-										( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-									},
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        }
-                                }
+        .pvTaskCode     = prvTimerTestTask,
+        .pcName         = "Tmr Tst",
+        .usStackDepth   = tmrTIMER_TEST_TASK_STACK_SIZE,
+        .pvParameters   = NULL,
+        .uxPriority     = configTIMER_TASK_PRIORITY - 1,
+        .puxStackBuffer = xTimerTestTaskStack,
+        .xRegions       =
+        {
+            { ( void * ) &( xTestStatus[ 0 ] ),               tmrSHARED_MEM_SIZE_BYTES,
+              ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) ) },
+            { ( void * ) &( xOneShotTimer[ 0 ] ),             tmrSHARED_MEM_SIZE_BYTES,
+              ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) ) },
+            { ( void * ) &( xAutoReloadTimers[ 0 ] ),         ( tmrSHARED_MEM_SIZE_BYTES * 2 ),
+              ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) ) },
+            { ( void * ) &( xBasePeriod[ 0 ] ),               ( tmrSHARED_MEM_SIZE_BYTES ),
+              ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) ) },
+            { ( void * ) &( ucAutoReloadTimerCounters[ 0 ] ), ( tmrSHARED_MEM_SIZE_BYTES ),
+              ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) ) },
+            { ( void * ) &( ulLoopCounter[ 0 ] ),             ( tmrSHARED_MEM_SIZE_BYTES ),
+              ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) ) },
+            { ( void * ) &( ucOneShotTimerCounter[ 0 ] ),     ( tmrSHARED_MEM_SIZE_BYTES ),
+              ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) ) },
+            { ( void * ) &( ucIsBacklogDemoEnabled[ 0 ] ),    ( tmrSHARED_MEM_SIZE_BYTES ),
+              ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) ) },
+            { 0,                                              0,                               0  },
+            { 0,                                              0,                               0  },
+            { 0,                                              0,                               0  }
+        }
     };
 
     if( xTestStatus[ 0 ] != pdFAIL )
@@ -347,11 +340,11 @@ static void prvTest1_CreateTimersWithoutSchedulerRunning( void )
          * create and start a timer.  These timers are being started before the
          * scheduler has been started, so their block times should get set to zero
          * within the timer API itself. */
-        xAutoReloadTimers[ xTimer ] = xTimerCreate( "FR Timer",                                      /* Text name to facilitate debugging.  The kernel does not use this itself. */
+        xAutoReloadTimers[ xTimer ] = xTimerCreate( "FR Timer",                                           /* Text name to facilitate debugging.  The kernel does not use this itself. */
                                                     ( ( xTimer + ( TickType_t ) 1 ) * xBasePeriod[ 0 ] ), /* The period for the timer.  The plus 1 ensures a period of zero is not specified. */
-                                                    pdTRUE,                                          /* Auto-reload is set to true. */
-                                                    ( void * ) xTimer,                               /* An identifier for the timer as all the auto-reload timers use the same callback. */
-                                                    prvAutoReloadTimerCallback );                    /* The callback to be called when the timer expires. */
+                                                    pdTRUE,                                               /* Auto-reload is set to true. */
+                                                    ( void * ) xTimer,                                    /* An identifier for the timer as all the auto-reload timers use the same callback. */
+                                                    prvAutoReloadTimerCallback );                         /* The callback to be called when the timer expires. */
 
         if( xAutoReloadTimers[ xTimer ] == NULL )
         {
@@ -377,11 +370,11 @@ static void prvTest1_CreateTimersWithoutSchedulerRunning( void )
     /* The timers queue should now be full, so it should be possible to create
      * another timer, but not possible to start it (the timer queue will not get
      * drained until the scheduler has been started. */
-    xAutoReloadTimers[ configTIMER_QUEUE_LENGTH ] = xTimerCreate( "FR Timer",                                 /* Text name to facilitate debugging.  The kernel does not use this itself. */
+    xAutoReloadTimers[ configTIMER_QUEUE_LENGTH ] = xTimerCreate( "FR Timer",                                      /* Text name to facilitate debugging.  The kernel does not use this itself. */
                                                                   ( configTIMER_QUEUE_LENGTH * xBasePeriod[ 0 ] ), /* The period for the timer. */
-                                                                  pdTRUE,                                     /* Auto-reload is set to true. */
-                                                                  ( void * ) xTimer,                          /* An identifier for the timer as all the auto-reload timers use the same callback. */
-                                                                  prvAutoReloadTimerCallback );               /* The callback executed when the timer expires. */
+                                                                  pdTRUE,                                          /* Auto-reload is set to true. */
+                                                                  ( void * ) xTimer,                               /* An identifier for the timer as all the auto-reload timers use the same callback. */
+                                                                  prvAutoReloadTimerCallback );                    /* The callback executed when the timer expires. */
 
     if( xAutoReloadTimers[ configTIMER_QUEUE_LENGTH ] == NULL )
     {
@@ -903,7 +896,6 @@ void vTimerPeriodicISRTests( void )
     static TickType_t uxTick = ( TickType_t ) -1;
 
     #if ( configTIMER_TASK_PRIORITY != ( configMAX_PRIORITIES - 1 ) )
-
         /* The timer service task is not the highest priority task, so it cannot
          * be assumed that timings will be exact.  Timers should never call their
          * callback before their expiry time, but a margin is permissible for calling
