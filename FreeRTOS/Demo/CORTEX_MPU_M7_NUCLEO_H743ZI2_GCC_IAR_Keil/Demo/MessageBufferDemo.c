@@ -37,10 +37,9 @@
 /* Demo app includes. */
 #include "MessageBufferDemo.h"
 
-#define mbSHARED_MEM_SIZE_CHAR			  	( 4 )
-#define mbSHARED_MEM_SIZE_WORDS             ( 8 )
-#define mbSHARED_MEM_SIZE_HALF_WORDS		( 16 )
-#define mbSHARED_MEM_SIZE_BYTES             ( 32 )
+#define messagebufferSHARED_MEM_SIZE_DOUBLE_WORDS      ( 4 )
+#define messagebufferSHARED_MEM_SIZE_WORDS             ( 8 )
+#define messagebufferSHARED_MEM_SIZE_BYTES             ( 32 )
 
 /* The number of bytes of storage in the message buffers used in this test. */
 #define mbMESSAGE_BUFFER_LENGTH_BYTES      ( ( size_t ) 50 )
@@ -60,7 +59,6 @@
  * priority tasks, and from high to low priority tasks. */
 #define mbLOWER_PRIORITY                   ( tskIDLE_PRIORITY )
 #define mbHIGHER_PRIORITY                  ( tskIDLE_PRIORITY + 1 )
-#define mbHIGHEST_PRIORITY				   ( tskIDLE_PRIORITY + 2 )
 
 /* Block times used when sending and receiving from the message buffers. */
 #define mbRX_TX_BLOCK_TIME                 pdMS_TO_TICKS( 175UL )
@@ -100,13 +98,14 @@ static void prvNonBlockingSenderTask( void * pvParameters );
     static void prvReceiverTask( void * pvParameters );
     static void prvSenderTask( void * pvParameters );
 
-    static TaskHandle_t xReceiverTaskHandles[ mbSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( mbSHARED_MEM_SIZE_BYTES ) ) ) = { NULL };
-
-    static MessageBufferHandle_t xReceiverTaskMsgBuffers[ mbSHARED_MEM_SIZE_WORDS ] __attribute__((aligned(mbSHARED_MEM_SIZE_BYTES))) = { NULL };
-
     static StaticMessageBuffer_t xStaticMessageBuffers[ mbNUMBER_OF_ECHO_CLIENTS ];
     static uint8_t ucBufferStorage[ mbNUMBER_OF_SENDER_TASKS ][ mbMESSAGE_BUFFER_LENGTH_BYTES + 1 ];
-    static uint32_t ulSenderLoopCounters[ mbSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( mbSHARED_MEM_SIZE_BYTES ) ) ) = { 0 };
+    static uint32_t ulSenderLoopCounters[ messagebufferSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( messagebufferSHARED_MEM_SIZE_BYTES ) ) ) = { 0 };
+
+    #define RECEIVER_TASK1_IDX 0
+    #define RECEIVER_TASK2_IDX 1
+    static TaskHandle_t xReceiverTaskHandles[ messagebufferSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( messagebufferSHARED_MEM_SIZE_BYTES ) ) ) = { NULL };
+
 #endif /* configSUPPORT_STATIC_ALLOCATION */
 
 
@@ -118,11 +117,8 @@ static void prvNonBlockingSenderTask( void * pvParameters );
 
     static void prvSpaceAvailableCoherenceActor( void * pvParameters );
     static void prvSpaceAvailableCoherenceTester( void * pvParameters );
-    static MessageBufferHandle_t xCoherenceTestMessageBuffer[ mbSHARED_MEM_SIZE_WORDS ] __attribute__((aligned(mbSHARED_MEM_SIZE_BYTES))) = { NULL };
 
-    static uint32_t ulSizeCoherencyTestCycles[ mbSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( mbSHARED_MEM_SIZE_BYTES ) ) ) = { 0UL };
-
-    static char cTxString[ mbSHARED_MEM_SIZE_BYTES ] __attribute__( ( aligned( mbSHARED_MEM_SIZE_BYTES ) ) ) = { "12345" };
+    static uint32_t ulSizeCoherencyTestCycles[ messagebufferSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( messagebufferSHARED_MEM_SIZE_BYTES ) ) ) = { 0UL };
 #endif /* if ( configRUN_ADDITIONAL_TESTS == 1 ) */
 
 /*-----------------------------------------------------------*/
@@ -134,252 +130,126 @@ typedef struct ECHO_MESSAGE_BUFFERS
     MessageBufferHandle_t xEchoClientBuffer;
     MessageBufferHandle_t xEchoServerBuffer;
 } EchoMessageBuffers_t;
-static uint32_t ulEchoLoopCounters[ mbSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( mbSHARED_MEM_SIZE_BYTES ) ) ) = { 0 };
+static uint32_t ulEchoLoopCounters[ messagebufferSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( messagebufferSHARED_MEM_SIZE_BYTES ) ) ) = { 0 };
 
 /* The non-blocking tasks monitor their operation, and if no errors have been
  * found, increment ulNonBlockingRxCounter.  xAreMessageBufferTasksStillRunning()
  * then checks ulNonBlockingRxCounter and only returns pdPASS if
  * ulNonBlockingRxCounter is still incrementing. */
-static uint32_t ulNonBlockingRxCounter[ mbSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( mbSHARED_MEM_SIZE_BYTES ) ) ) = { 0 };
+static uint32_t ulNonBlockingRxCounter[ messagebufferSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( messagebufferSHARED_MEM_SIZE_BYTES ) ) ) = { 0 };
 
 /* A message that is longer than the buffer, parts of which are written to the
  * message buffer to test writing different lengths at different offsets. */
-static const char * pc55ByteString[ mbSHARED_MEM_SIZE_BYTES * 2 ] __attribute__( ( aligned( mbSHARED_MEM_SIZE_BYTES ) ) ) = { "One two three four five six seven eight nine ten eleven" };
+static char pc55ByteString[ 128 ] __attribute__( ( aligned( 128 ) ) ) = { '\0' };
 
-static EchoMessageBuffers_t xMessageBuffers[ mbSHARED_MEM_SIZE_CHAR ] __attribute__( ( aligned( mbSHARED_MEM_SIZE_BYTES ) ) ) = { NULL };
+#define ECHO_MESSAGE_BUFFERS_1_IDX 0
+#define ECHO_MESSAGE_BUFFERS_2_IDX 1
+static EchoMessageBuffers_t xEchoMessageBuffersArray[ messagebufferSHARED_MEM_SIZE_DOUBLE_WORDS ] __attribute__( ( aligned( messagebufferSHARED_MEM_SIZE_BYTES ) ) ) = { NULL };
 
-static TaskHandle_t xEchoClientTaskHandle[ mbSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( mbSHARED_MEM_SIZE_BYTES ) ) ) = { NULL };
-
-/* Remember the required stack size so tasks can be created at run time (after
- * initialization time. */
-static configSTACK_DEPTH_TYPE xBlockingStackSize = 0;
-
-/* Used to define strings , since pvPortMalloc cannot be used */
-static char pcReceivedString1[ mbSHARED_MEM_SIZE_BYTES * 2 ] __attribute__( ( aligned( mbSHARED_MEM_SIZE_BYTES * 2 ) ) );
-static char pcReceivedString2[ mbSHARED_MEM_SIZE_BYTES * 2 ] __attribute__( ( aligned( mbSHARED_MEM_SIZE_BYTES * 2 ) ) );
-static char pcStringToSend1[ mbSHARED_MEM_SIZE_BYTES * 2 ] __attribute__( ( aligned( mbSHARED_MEM_SIZE_BYTES * 2 ) ) );
-static char pcStringReceived1[ mbSHARED_MEM_SIZE_BYTES * 2 ] __attribute__( ( aligned( mbSHARED_MEM_SIZE_BYTES * 2 ) ) );
-static char pcStringToSend2[ mbSHARED_MEM_SIZE_BYTES * 2 ] __attribute__( ( aligned( mbSHARED_MEM_SIZE_BYTES * 2 ) ) );
-static char pcStringReceived2[ mbSHARED_MEM_SIZE_BYTES * 2 ] __attribute__( ( aligned( mbSHARED_MEM_SIZE_BYTES * 2 ) ) );
-static uint8_t pucFullBuffer[ mbSHARED_MEM_SIZE_BYTES * 2 ] __attribute__( ( aligned( mbSHARED_MEM_SIZE_BYTES * 2 ) ) );
-
+#define ECHO_CLIENT_TASK1_IDX 0
+#define ECHO_CLIENT_TASK2_IDX 1
+static TaskHandle_t xEchoClientTaskHandles[ messagebufferSHARED_MEM_SIZE_DOUBLE_WORDS ] __attribute__( ( aligned( messagebufferSHARED_MEM_SIZE_BYTES ) ) ) = { NULL };
 
 /*-----------------------------------------------------------*/
 
 void vStartMessageBufferTasks( configSTACK_DEPTH_TYPE xStackSize )
 {
     MessageBufferHandle_t xMessageBuffer;
+    static StackType_t xEchoServerTask1Stack[ configMINIMAL_STACK_SIZE * 2 ] __attribute__( ( aligned( configMINIMAL_STACK_SIZE * 2 * sizeof( StackType_t ) ) ) );
+    static StackType_t xEchoServerTask2Stack[ configMINIMAL_STACK_SIZE * 2 ] __attribute__( ( aligned( configMINIMAL_STACK_SIZE * 2 * sizeof( StackType_t ) ) ) );
+    static StackType_t xNonBlockingReceiverTaskStack[ configMINIMAL_STACK_SIZE ] __attribute__( ( aligned( configMINIMAL_STACK_SIZE * sizeof( StackType_t ) ) ) );
+    static StackType_t xNonBlockingSenderTaskStack[ configMINIMAL_STACK_SIZE ] __attribute__( ( aligned( configMINIMAL_STACK_SIZE * sizeof( StackType_t ) ) ) );
+    static StackType_t xEchoClientTask1Stack[ configMINIMAL_STACK_SIZE ] __attribute__( ( aligned( configMINIMAL_STACK_SIZE * sizeof( StackType_t ) ) ) );
+    static StackType_t xEchoClientTask2Stack[ configMINIMAL_STACK_SIZE ] __attribute__( ( aligned( configMINIMAL_STACK_SIZE * sizeof( StackType_t ) ) ) );
 
-    #ifndef configMESSAGE_BUFFER_BLOCK_TASK_STACK_SIZE
-        xBlockingStackSize = ( xStackSize + ( xStackSize >> 1U ) );
-    #else
-        xBlockingStackSize = configMESSAGE_BUFFER_BLOCK_TASK_STACK_SIZE;
-    #endif
+    TaskParameters_t xEchoServerTask1Parameters =
+    {
+        .pvTaskCode      = prvEchoServer,
+        .pcName          = "1EchoServer",
+        .usStackDepth    = configMINIMAL_STACK_SIZE * 2,
+        .pvParameters    = NULL,
+        /* Needs to be privileged because it calls xMessageBufferSendFromISR. */
+        .uxPriority      = ( mbHIGHER_PRIORITY | portPRIVILEGE_BIT ),
+        .puxStackBuffer  = xEchoServerTask1Stack,
+        .xRegions        =    {
+                                { ( void * ) &( xEchoMessageBuffersArray[ 0 ] ), messagebufferSHARED_MEM_SIZE_BYTES,
+                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                     ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                },
+                                { ( void * ) &( xEchoClientTaskHandles[ 0 ] ), messagebufferSHARED_MEM_SIZE_BYTES,
+                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                     ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                },
+                                { ( void * ) &( pc55ByteString[ 0 ] ), 128,
+                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        }
+                            }
+    };
 
-        /*Stack Definitions*/
-        static StackType_t xEchoServerTask1Stack[ configMINIMAL_STACK_SIZE * 2 ] __attribute__( ( aligned( configMINIMAL_STACK_SIZE * 2 * sizeof( StackType_t ) ) ) );
-        static StackType_t xEchoServerTask2Stack[ configMINIMAL_STACK_SIZE * 2 ] __attribute__( ( aligned( configMINIMAL_STACK_SIZE * 2 * sizeof( StackType_t ) ) ) );
-        static StackType_t xNonBlockingReceiverTaskStack[ configMINIMAL_STACK_SIZE ] __attribute__( ( aligned( configMINIMAL_STACK_SIZE * sizeof( StackType_t ) ) ) );
-        static StackType_t xNonBlockingSenderTaskStack[ configMINIMAL_STACK_SIZE ] __attribute__( ( aligned( configMINIMAL_STACK_SIZE * sizeof( StackType_t ) ) ) );
-        static StackType_t xEchoClientTask1Stack[ configMINIMAL_STACK_SIZE * 2	] __attribute__( ( aligned( configMINIMAL_STACK_SIZE * 2 * sizeof( StackType_t ) ) ) );
-        static StackType_t xEchoClientTask2Stack[ configMINIMAL_STACK_SIZE * 2	] __attribute__( ( aligned( configMINIMAL_STACK_SIZE * 2 * sizeof( StackType_t ) ) ) );
-
-        /* Create the message buffer used to send data from the client to the server,
-         * and the message buffer used to echo the data from the server back to the
-         * client. */
-        int idx;
-        for( idx = 0; idx < 2; idx++)
-        {
-            xMessageBuffers[ idx ].xEchoClientBuffer = xMessageBufferCreate( mbMESSAGE_BUFFER_LENGTH_BYTES );
-            xMessageBuffers[ idx ].xEchoServerBuffer = xMessageBufferCreate( mbMESSAGE_BUFFER_LENGTH_BYTES );
-        }
-
-        /* When the stream buffers have been created the echo client task can be
-         * created.  If this server task has the higher priority then the client task
-         * is created at the lower priority - if this server task has the lower
-         * priority then the client task is created at the higher priority.
-         * Currently, keeping the parameters as NULL, will assign then in the server task*/
-
-        TaskParameters_t xEchoClientTask1Parameters =
-        {
-            .pvTaskCode      = 	prvEchoClient,
-            .pcName          = 	"EchoClient",
-            .usStackDepth    = 	configMINIMAL_STACK_SIZE,
-            .pvParameters    = 	(void *) &xMessageBuffers[ 0 ],
-            .uxPriority      =	mbLOWER_PRIORITY ,
-            .puxStackBuffer  = 	xEchoClientTask1Stack,
-            .xRegions        =    {
-									{ ( void * ) &( pcStringToSend1[ 0 ] ), mbSHARED_MEM_SIZE_BYTES * 2,
-									   ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-										 ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-									},
-									{ ( void * ) &( pcStringReceived1[ 0 ] ), mbSHARED_MEM_SIZE_BYTES * 2,
-									   ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-										 ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-									},
-									{ ( void * ) &( ulEchoLoopCounters[ 0 ] ), mbSHARED_MEM_SIZE_BYTES,
-									   ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-										 ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-									},
-									{ ( void * ) &( xMessageBuffers[ 0 ] ), mbSHARED_MEM_SIZE_BYTES,
-									   ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-										 ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-									},
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        }
-                                }
-        };
-
-        TaskParameters_t xEchoClientTask2Parameters =
-        {
-            .pvTaskCode      = 	prvEchoClient,
-            .pcName          = 	"EchoClient",
-            .usStackDepth    = 	configMINIMAL_STACK_SIZE,
-            .pvParameters    = 	(void *) &xMessageBuffers[ 1 ],
-            .uxPriority      =	mbLOWER_PRIORITY ,
-            .puxStackBuffer  = 	xEchoClientTask2Stack,
-            .xRegions        =    {
-									{ ( void * ) &( pcStringToSend2[ 0 ] ), mbSHARED_MEM_SIZE_BYTES * 2,
-									   ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-										 ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-									},
-									{ ( void * ) &( pcStringReceived2[ 0 ] ), mbSHARED_MEM_SIZE_BYTES * 2,
-									   ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-										 ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-									},
-									{ ( void * ) &( ulEchoLoopCounters[ 0 ] ), mbSHARED_MEM_SIZE_BYTES,
-									   ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-										 ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-									},
-									{ ( void * ) &( xMessageBuffers[ 0 ] ), mbSHARED_MEM_SIZE_BYTES,
-									   ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-										 ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-									},
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        }
-                                }
-        };
-
-        /*Creating client task */
-        xTaskCreateRestricted( &( xEchoClientTask1Parameters ), &( xEchoClientTaskHandle[ 0 ] ) );
-        xTaskCreateRestricted( &( xEchoClientTask2Parameters ), &( xEchoClientTaskHandle[ 1 ] ) );
-
-    /* The echo servers sets up the message buffers before creating the echo
-     * client tasks.  One set of tasks has the server as the higher priority, and
-     * the other has the client as the higher priority. */
-
-        TaskParameters_t xEchoServerTask1Parameters =
-        {
-            .pvTaskCode      = prvEchoServer,
-            .pcName          = "1EchoServer",
-            .usStackDepth    = xBlockingStackSize,
-            .pvParameters    = (void *) &xMessageBuffers[ 0 ],
-            .uxPriority      = ( mbHIGHEST_PRIORITY | portPRIVILEGE_BIT ),
-            .puxStackBuffer  = xEchoServerTask1Stack,
-            .xRegions        =    {
-									{ ( void * ) &( pucFullBuffer[ 0 ] ), mbSHARED_MEM_SIZE_BYTES * 2,
-									   ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-										 ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-									},
-									{ ( void * ) &( pcReceivedString2[ 0 ] ), mbSHARED_MEM_SIZE_BYTES * 2,
-									   ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-										 ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-									},
-									{ ( void * ) &( xMessageBuffers[ 0 ] ), mbSHARED_MEM_SIZE_BYTES,
-									   ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-										 ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-									},
-									{ ( void * ) &( xEchoClientTaskHandle[ 0 ] ), mbSHARED_MEM_SIZE_BYTES,
-									   ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-										 ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-									},
-									{ 0,                0,                    0                                                        },
-									{ 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        }
-                                }
-        };
-
-        TaskParameters_t xEchoServerTask2Parameters =
-        {
-            .pvTaskCode      = prvEchoServer,
-            .pcName          = "2StrEchoServer",
-            .usStackDepth    = xBlockingStackSize,
-            .pvParameters    = (void *) &xMessageBuffers[ 1 ],
-            .uxPriority      = mbHIGHER_PRIORITY,
-            .puxStackBuffer  = xEchoServerTask2Stack,
-            .xRegions        =    {
-									{ ( void * ) &( pucFullBuffer[ 0 ] ), mbSHARED_MEM_SIZE_BYTES * 2,
-									   ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-										 ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-									},
-									{ ( void * ) &( pcReceivedString1[ 0 ] ), mbSHARED_MEM_SIZE_BYTES * 2,
-										( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-										( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-									},
-									{ ( void * ) &( xMessageBuffers[ 0 ] ), mbSHARED_MEM_SIZE_BYTES,
-									   ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-										 ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-									},
-									{ ( void * ) &( xEchoClientTaskHandle[ 0 ] ), mbSHARED_MEM_SIZE_BYTES,
-									   ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-										 ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-									},
-									{ 0,                0,                    0                                                        },
-									{ 0,                0,                    0                                                        },
-									{ 0,                0,                    0                                                        },
-									{ 0,                0,                    0                                                        },
-									{ 0,                0,                    0                                                        },
-									{ 0,                0,                    0                                                        },
-									{ 0,                0,                    0                                                        }
-                                }
-        };
-
-        xTaskCreateRestricted( &( xEchoServerTask1Parameters ), NULL );
-        xTaskCreateRestricted( &( xEchoServerTask2Parameters ), NULL );
-
-
-    /* The non blocking tasks run continuously and will interleave with each
-     * other, so must be created at the lowest priority.  The message buffer they
-     * use is created and passed in using the task's parameter. */
-    xMessageBuffer = xMessageBufferCreate( mbMESSAGE_BUFFER_LENGTH_BYTES );
+    TaskParameters_t xEchoServerTask2Parameters =
+    {
+        .pvTaskCode      = prvEchoServer,
+        .pcName          = "2EchoServer",
+        .usStackDepth    = configMINIMAL_STACK_SIZE * 2,
+        .pvParameters    = NULL,
+        .uxPriority      = mbLOWER_PRIORITY,
+        .puxStackBuffer  = xEchoServerTask2Stack,
+        .xRegions        =    {
+                                { ( void * ) &( xEchoMessageBuffersArray[ 0 ] ), messagebufferSHARED_MEM_SIZE_BYTES,
+                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                     ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                },
+                                { ( void * ) &( xEchoClientTaskHandles[ 0 ] ), messagebufferSHARED_MEM_SIZE_BYTES,
+                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                     ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                },
+                                { ( void * ) &( pc55ByteString[ 0 ] ), 128,
+                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        }
+                            }
+    };
 
     TaskParameters_t xNonBlockingReceiverTaskParameters =
     {
         .pvTaskCode      = prvNonBlockingReceiverTask,
         .pcName          = "NonBlkRx",
-        .usStackDepth    = xStackSize,
-        .pvParameters    = (void *) xMessageBuffer,
-        .uxPriority      = mbHIGHER_PRIORITY,
+        .usStackDepth    = configMINIMAL_STACK_SIZE,
+        .pvParameters    = NULL,
+        .uxPriority      = tskIDLE_PRIORITY,
         .puxStackBuffer  = xNonBlockingReceiverTaskStack,
         .xRegions        =    {
-								{ ( void * ) &( ulNonBlockingRxCounter[ 0 ] ), mbSHARED_MEM_SIZE_BYTES,
-								   ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-									 ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-								},
-								{ 0,                0,                    0                                                        },
-								{ 0,                0,                    0                                                        },
-								{ 0,                0,                    0                                                        },
-								{ 0,                0,                    0                                                        },
-								{ 0,                0,                    0                                                        },
-								{ 0,                0,                    0                                                        },
-								{ 0,                0,                    0                                                        },
-								{ 0,                0,                    0                                                        },
-								{ 0,                0,                    0                                                        },
-								{ 0,                0,                    0                                                        }
+                                { ( void * ) &( ulNonBlockingRxCounter[ 0 ] ), messagebufferSHARED_MEM_SIZE_BYTES,
+                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                     ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        }
                             }
     };
 
@@ -387,237 +257,328 @@ void vStartMessageBufferTasks( configSTACK_DEPTH_TYPE xStackSize )
     {
         .pvTaskCode      = prvNonBlockingSenderTask,
         .pcName          = "NonBlkTx",
-        .usStackDepth    = xStackSize,
-        .pvParameters    = (void *) xMessageBuffer,
-        .uxPriority      = mbHIGHER_PRIORITY,
+        .usStackDepth    = configMINIMAL_STACK_SIZE,
+        .pvParameters    = NULL,
+        .uxPriority      = tskIDLE_PRIORITY,
         .puxStackBuffer  = xNonBlockingSenderTaskStack,
         .xRegions        =    {
-								{ 0,                0,                    0                                                        },
-								{ 0,                0,                    0                                                        },
-								{ 0,                0,                    0                                                        },
-								{ 0,                0,                    0                                                        },
-								{ 0,                0,                    0                                                        },
-								{ 0,                0,                    0                                                        },
-								{ 0,                0,                    0                                                        },
-								{ 0,                0,                    0                                                        },
-								{ 0,                0,                    0                                                        },
-								{ 0,                0,                    0                                                        },
-								{ 0,                0,                    0                                                        }
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        }
                             }
     };
 
+    TaskParameters_t xEchoClientTask1Parameters =
+    {
+        .pvTaskCode      = prvEchoClient,
+        .pcName          = "EchoClient",
+        .usStackDepth    = configMINIMAL_STACK_SIZE,
+        .pvParameters    = NULL,
+        .uxPriority      = mbLOWER_PRIORITY,
+        .puxStackBuffer  = xEchoClientTask1Stack,
+        .xRegions        =    {
+                                { ( void * ) &( xEchoMessageBuffersArray[ 0 ] ), messagebufferSHARED_MEM_SIZE_BYTES,
+                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                     ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                },
+                                { ( void * ) &( ulEchoLoopCounters[ 0 ] ), messagebufferSHARED_MEM_SIZE_BYTES,
+                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                     ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        }
+                            }
+    };
+
+    TaskParameters_t xEchoClientTask2Parameters =
+    {
+        .pvTaskCode      = prvEchoClient,
+        .pcName          = "EchoClient",
+        .usStackDepth    = configMINIMAL_STACK_SIZE,
+        .pvParameters    = NULL,
+        .uxPriority      = mbHIGHER_PRIORITY,
+        .puxStackBuffer  = xEchoClientTask2Stack,
+        .xRegions        =    {
+                                { ( void * ) &( xEchoMessageBuffersArray[ 0 ] ), messagebufferSHARED_MEM_SIZE_BYTES,
+                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                     ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                },
+                                { ( void * ) &( ulEchoLoopCounters[ 0 ] ), messagebufferSHARED_MEM_SIZE_BYTES,
+                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                     ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        }
+                            }
+    };
+
+    ( void ) xStackSize;
+
+    /* Setup strings used in the demo. */
+    sprintf( pc55ByteString, "One two three four five six seven eight nine ten eleve" );
+
+    /* Create the message buffer used to send data from the client to the server,
+     * and the message buffer used to echo the data from the server back to the
+     * client. */
+    xEchoMessageBuffersArray[ ECHO_MESSAGE_BUFFERS_1_IDX ].xEchoClientBuffer = xMessageBufferCreate( mbMESSAGE_BUFFER_LENGTH_BYTES );
+    xEchoMessageBuffersArray[ ECHO_MESSAGE_BUFFERS_1_IDX ].xEchoServerBuffer = xMessageBufferCreate( mbMESSAGE_BUFFER_LENGTH_BYTES );
+    configASSERT( xEchoMessageBuffersArray[ ECHO_MESSAGE_BUFFERS_1_IDX ].xEchoClientBuffer );
+    configASSERT( xEchoMessageBuffersArray[ ECHO_MESSAGE_BUFFERS_1_IDX ].xEchoServerBuffer );
+
+    xEchoMessageBuffersArray[ ECHO_MESSAGE_BUFFERS_2_IDX ].xEchoClientBuffer = xMessageBufferCreate( mbMESSAGE_BUFFER_LENGTH_BYTES );
+    xEchoMessageBuffersArray[ ECHO_MESSAGE_BUFFERS_2_IDX ].xEchoServerBuffer = xMessageBufferCreate( mbMESSAGE_BUFFER_LENGTH_BYTES );
+    configASSERT( xEchoMessageBuffersArray[ ECHO_MESSAGE_BUFFERS_2_IDX ].xEchoClientBuffer );
+    configASSERT( xEchoMessageBuffersArray[ ECHO_MESSAGE_BUFFERS_2_IDX ].xEchoServerBuffer );
+
+    /* The echo servers sets up the message buffers before creating the echo
+     * client tasks.  One set of tasks has the server as the higher priority, and
+     * the other has the client as the higher priority. */
+    xEchoServerTask1Parameters.pvParameters = ( void * ) &( xEchoMessageBuffersArray[ ECHO_MESSAGE_BUFFERS_1_IDX ] );
+    xEchoServerTask2Parameters.pvParameters = ( void * ) &( xEchoMessageBuffersArray[ ECHO_MESSAGE_BUFFERS_2_IDX ] );
+    xTaskCreateRestricted( &( xEchoServerTask1Parameters ), NULL );
+    xTaskCreateRestricted( &( xEchoServerTask2Parameters ), NULL );
+
+    /* The non blocking tasks run continuously and will interleave with each
+     * other, so must be created at the lowest priority.  The message buffer they
+     * use is created and passed in using the task's parameter. */
+    xMessageBuffer = xMessageBufferCreate( mbMESSAGE_BUFFER_LENGTH_BYTES );
+    xNonBlockingReceiverTaskParameters.pvParameters = ( void * ) xMessageBuffer;
+    xNonBlockingSenderTaskParameters.pvParameters = ( void * ) xMessageBuffer;
     xTaskCreateRestricted( &( xNonBlockingReceiverTaskParameters ), NULL );
     xTaskCreateRestricted( &( xNonBlockingSenderTaskParameters ), NULL );
 
+    /* Echo client tasks. */
+    xEchoClientTask1Parameters.pvParameters = ( void * ) &( xEchoMessageBuffersArray[ ECHO_MESSAGE_BUFFERS_1_IDX ] );
+    xEchoClientTask2Parameters.pvParameters = ( void * ) &( xEchoMessageBuffersArray[ ECHO_MESSAGE_BUFFERS_2_IDX ] );
+    xTaskCreateRestricted( &( xEchoClientTask1Parameters ), &( xEchoClientTaskHandles[ ECHO_CLIENT_TASK1_IDX ] ) );
+    xTaskCreateRestricted( &( xEchoClientTask2Parameters ), &( xEchoClientTaskHandles[ ECHO_CLIENT_TASK2_IDX ] ) );
+    vTaskSuspend( xEchoClientTaskHandles[ ECHO_CLIENT_TASK1_IDX ] );
+    vTaskSuspend( xEchoClientTaskHandles[ ECHO_CLIENT_TASK2_IDX ] );
+
     #if ( configSUPPORT_STATIC_ALLOCATION == 1 )
     {
-
-    	int idx;
-    	for( idx = 0; idx < 2; idx++)
-    	{
-    		xReceiverTaskMsgBuffers[ idx ] = xMessageBufferCreateStatic( sizeof( ucBufferStorage ) / mbNUMBER_OF_SENDER_TASKS, /* The number of bytes in each buffer in the array. */
-                                                         &( ucBufferStorage[ idx ][ 0 ] ),                 /* The address of the buffer to use within the array. */
-                                                         &( xStaticMessageBuffers[ idx ] ) );              /* The static message buffer structure to use within the array. */
-    	}
-
-        static StackType_t xReceivingTask1Stack[configMINIMAL_STACK_SIZE * 2] __attribute__((aligned(configMINIMAL_STACK_SIZE * 2 * sizeof(StackType_t))));
-        static StackType_t xReceivingTask2Stack[configMINIMAL_STACK_SIZE * 2] __attribute__((aligned(configMINIMAL_STACK_SIZE * 2 * sizeof(StackType_t))));
-
+        MessageBufferHandle_t xMessageBufferForStaticTests1, xMessageBufferForStaticTests2;
+        static StackType_t xSenderTask1Stack[ configMINIMAL_STACK_SIZE * 2 ] __attribute__( ( aligned( configMINIMAL_STACK_SIZE * 2 * sizeof( StackType_t ) ) ) );
+        static StackType_t xSenderTask2Stack[ configMINIMAL_STACK_SIZE * 2 ] __attribute__( ( aligned( configMINIMAL_STACK_SIZE * 2 * sizeof( StackType_t ) ) ) );
+        static StackType_t xReceivingTask1Stack[ configMINIMAL_STACK_SIZE * 2 ] __attribute__( ( aligned( configMINIMAL_STACK_SIZE * 2 * sizeof( StackType_t ) ) ) );
+        static StackType_t xReceivingTask2Stack[ configMINIMAL_STACK_SIZE * 2 ] __attribute__( ( aligned( configMINIMAL_STACK_SIZE * 2 * sizeof( StackType_t ) ) ) );
+        TaskParameters_t xSenderTask1Parameters =
+        {
+            .pvTaskCode      = prvSenderTask,
+            .pcName          = "1Sender",
+            .usStackDepth    = configMINIMAL_STACK_SIZE * 2,
+            .pvParameters    = NULL,
+            .uxPriority      = mbHIGHER_PRIORITY,
+            .puxStackBuffer  = xSenderTask1Stack,
+            .xRegions        =    {
+                                    { ( void * ) &( xReceiverTaskHandles[ 0 ] ), messagebufferSHARED_MEM_SIZE_BYTES,
+                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                        ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                    },
+                                    { ( void * ) &( ulSenderLoopCounters[ 0 ] ), messagebufferSHARED_MEM_SIZE_BYTES,
+                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                        ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                    },
+                                    { ( void * ) &( pc55ByteString[ 0 ] ), 128,
+                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                        ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                    },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        }
+                                }
+        };
+        TaskParameters_t xSenderTask2Parameters =
+        {
+            .pvTaskCode      = prvSenderTask,
+            .pcName          = "2Sender",
+            .usStackDepth    = configMINIMAL_STACK_SIZE * 2,
+            .pvParameters    = NULL,
+            /* Needs to be privileged because it calls xMessageBufferSendFromISR. */
+            .uxPriority      = ( mbLOWER_PRIORITY | portPRIVILEGE_BIT ),
+            .puxStackBuffer  = xSenderTask2Stack,
+            .xRegions        =    {
+                                    { ( void * ) &( xReceiverTaskHandles[ 0 ] ), messagebufferSHARED_MEM_SIZE_BYTES,
+                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                        ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                    },
+                                    { ( void * ) &( ulSenderLoopCounters[ 0 ] ), messagebufferSHARED_MEM_SIZE_BYTES,
+                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                        ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                    },
+                                    { ( void * ) &( pc55ByteString[ 0 ] ), 128,
+                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                        ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                    },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        }
+                                }
+        };
         TaskParameters_t xReceivingTask1Parameters =
         {
-            .pvTaskCode = prvReceiverTask,
-            .pcName = "MsgReceiver",
-            .usStackDepth = xBlockingStackSize,
-            .pvParameters = (void*) xReceiverTaskMsgBuffers[ 0 ],
-            .uxPriority = mbLOWER_PRIORITY,
-            .puxStackBuffer = xReceivingTask1Stack,
-	        .xRegions        =    {
-									{ 0,                0,                    0                                                        },
-									{ 0,                0,                    0                                                        },
-									{ 0,                0,                    0                                                        },
-									{ 0,                0,                    0                                                        },
-									{ 0,                0,                    0                                                        },
-									{ 0,                0,                    0                                                        },
-									{ 0,                0,                    0                                                        },
-									{ 0,                0,                    0                                                        },
-									{ 0,                0,                    0                                                        },
-									{ 0,                0,                    0                                                        },
-									{ 0,                0,                    0                                                        }
-	                            }
-	    };
-
+            .pvTaskCode      = prvReceiverTask,
+            .pcName          = "MsgReceiver",
+            .usStackDepth    = configMINIMAL_STACK_SIZE * 2,
+            .pvParameters    = NULL,
+            .uxPriority      = mbLOWER_PRIORITY,
+            .puxStackBuffer  = xReceivingTask1Stack,
+            .xRegions        =    {
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        }
+                                }
+        };
         TaskParameters_t xReceivingTask2Parameters =
         {
-            .pvTaskCode = prvReceiverTask,
-            .pcName = "MsgReceiver",
-            .usStackDepth = xBlockingStackSize,
-            .pvParameters = (void*) xReceiverTaskMsgBuffers[ 1 ],
-            .uxPriority = mbLOWER_PRIORITY,
-            .puxStackBuffer = xReceivingTask2Stack,
-	        .xRegions        =    {
-									{ 0,                0,                    0                                                        },
-									{ 0,                0,                    0                                                        },
-									{ 0,                0,                    0                                                        },
-									{ 0,                0,                    0                                                        },
-									{ 0,                0,                    0                                                        },
-									{ 0,                0,                    0                                                        },
-									{ 0,                0,                    0                                                        },
-									{ 0,                0,                    0                                                        },
-									{ 0,                0,                    0                                                        },
-									{ 0,                0,                    0                                                        },
-									{ 0,                0,                    0                                                        }
-	                            }
-	    };
+            .pvTaskCode      = prvReceiverTask,
+            .pcName          = "MsgReceiver",
+            .usStackDepth    = configMINIMAL_STACK_SIZE * 2,
+            .pvParameters    = NULL,
+            .uxPriority      = mbHIGHER_PRIORITY,
+            .puxStackBuffer  = xReceivingTask2Stack,
+            .xRegions        =    {
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        }
+                                }
+        };
 
-        xTaskCreateRestricted( &( xReceivingTask1Parameters ), &( xReceiverTaskHandles[ 0 ] ) );
-        xTaskCreateRestricted( &( xReceivingTask2Parameters ), &( xReceiverTaskHandles[ 1 ] ) );
+        xMessageBufferForStaticTests1 = xMessageBufferCreateStatic( sizeof( ucBufferStorage ) / mbNUMBER_OF_SENDER_TASKS, /* The number of bytes in each buffer in the array. */
+                                                                    &( ucBufferStorage[ 1 ][ 0 ] ),                 /* The address of the buffer to use within the array. */
+                                                                    &( xStaticMessageBuffers[ 1 ] ) );              /* The static message buffer structure to use within the array. */
+        xMessageBufferForStaticTests2 = xMessageBufferCreateStatic( sizeof( ucBufferStorage ) / mbNUMBER_OF_SENDER_TASKS, /* The number of bytes in each buffer in the array. */
+                                                                    &( ucBufferStorage[ 0 ][ 0 ] ),                 /* The address of the buffer to use within the array. */
+                                                                    &( xStaticMessageBuffers[ 0 ] ) );              /* The static message buffer structure to use within the array. */
+
+
         /* The sender tasks set up the message buffers before creating the
          * receiver tasks.  Priorities must be 0 and 1 as the priority is used to
          * index into the xStaticMessageBuffers and ucBufferStorage arrays. */
-
-        static StackType_t xSenderTask1Stack[ configMINIMAL_STACK_SIZE * 2 ] __attribute__( ( aligned( configMINIMAL_STACK_SIZE * 2 * sizeof( StackType_t ) ) ) );
-        static StackType_t xSenderTask2Stack[ configMINIMAL_STACK_SIZE * 2 ] __attribute__( ( aligned( configMINIMAL_STACK_SIZE * 2 * sizeof( StackType_t ) ) ) );
-
-
-        TaskParameters_t xSenderTask1Parameters =
-        {
-            .pvTaskCode = prvSenderTask,
-            .pcName = "1Sender",
-            .usStackDepth = xBlockingStackSize,
-            .pvParameters = (void*) xReceiverTaskMsgBuffers[ 0 ],
-            .uxPriority = mbHIGHEST_PRIORITY,
-            .puxStackBuffer = xSenderTask1Stack,
-	        .xRegions        =    {
-									{ ( void * ) &( ulSenderLoopCounters[ 0 ] ), mbSHARED_MEM_SIZE_BYTES,
-									   ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-										 ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-									},
-									{ ( void * ) &( xReceiverTaskHandles[ 0 ] ), mbSHARED_MEM_SIZE_BYTES,
-									   ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-										 ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-									},
-									{ 0,                0,                    0                                                        },
-									{ 0,                0,                    0                                                        },
-									{ 0,                0,                    0                                                        },
-									{ 0,                0,                    0                                                        },
-									{ 0,                0,                    0                                                        },
-									{ 0,                0,                    0                                                        },
-									{ 0,                0,                    0                                                        },
-									{ 0,                0,                    0                                                        },
-									{ 0,                0,                    0                                                        }
-	                            }
-	    };
-
-        TaskParameters_t xSenderTask2Parameters =
-        {
-            .pvTaskCode = prvSenderTask,
-            .pcName = "2Sender",
-            .usStackDepth = xBlockingStackSize,
-            .pvParameters = (void*) xReceiverTaskMsgBuffers[ 1 ],
-            .uxPriority = ( mbHIGHER_PRIORITY | portPRIVILEGE_BIT ),
-            .puxStackBuffer = xSenderTask2Stack,
-	        .xRegions        =    {
-									{ ( void * ) &( ulSenderLoopCounters[ 0 ] ), mbSHARED_MEM_SIZE_BYTES,
-									   ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-										 ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-									},
-									{ ( void * ) &( pucFullBuffer[ 0 ] ), mbSHARED_MEM_SIZE_BYTES * 2,
-									   ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-										 ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-									},
-									{ ( void * ) &( xReceiverTaskHandles[ 0 ] ), mbSHARED_MEM_SIZE_BYTES,
-									   ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-										 ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-									},
-									{ 0,                0,                    0                                                        },
-									{ 0,                0,                    0                                                        },
-									{ 0,                0,                    0                                                        },
-									{ 0,                0,                    0                                                        },
-									{ 0,                0,                    0                                                        },
-									{ 0,                0,                    0                                                        },
-									{ 0,                0,                    0                                                        },
-									{ 0,                0,                    0                                                        }
-	                            }
-	    };
-
+        xSenderTask1Parameters.pvParameters = ( void * ) xMessageBufferForStaticTests1;
+        xSenderTask2Parameters.pvParameters = ( void * ) xMessageBufferForStaticTests2;
         xTaskCreateRestricted( &( xSenderTask1Parameters ), NULL );
         xTaskCreateRestricted( &( xSenderTask2Parameters ), NULL );
 
+        xReceivingTask1Parameters.pvParameters = ( void * ) xMessageBufferForStaticTests1;
+        xReceivingTask2Parameters.pvParameters = ( void * ) xMessageBufferForStaticTests2;
+        xTaskCreateRestricted( &( xReceivingTask1Parameters ), &( xReceiverTaskHandles[ RECEIVER_TASK1_IDX ] ) );
+        xTaskCreateRestricted( &( xReceivingTask2Parameters ), &( xReceiverTaskHandles[ RECEIVER_TASK2_IDX ] ) );
 
+        vTaskSuspend( xReceiverTaskHandles[ RECEIVER_TASK1_IDX ] );
+        vTaskSuspend( xReceiverTaskHandles[ RECEIVER_TASK2_IDX ] );
     }
+
     #endif /* configSUPPORT_STATIC_ALLOCATION */
 
     #if ( configRUN_ADDITIONAL_TESTS == 1 )
     {
-        xCoherenceTestMessageBuffer[ 0 ] = xMessageBufferCreate( mbCOHERENCE_TEST_BUFFER_SIZE );
-        configASSERT( xCoherenceTestMessageBuffer[ 0 ] );
-
         static StackType_t xCoherenceActorTaskStack[ configMINIMAL_STACK_SIZE ] __attribute__( ( aligned( configMINIMAL_STACK_SIZE * sizeof( StackType_t ) ) ) );
         static StackType_t xCoherenceTesterTaskStack[ configMINIMAL_STACK_SIZE ] __attribute__( ( aligned( configMINIMAL_STACK_SIZE * sizeof( StackType_t ) ) ) );
-
         TaskParameters_t xCoherenceActorTaskParameters =
         {
-            .pvTaskCode = prvSpaceAvailableCoherenceActor,
-            .pcName = "mbsanity1",
-            .usStackDepth = configMINIMAL_STACK_SIZE,
-            .pvParameters = NULL,
-            .uxPriority = mbHIGHER_PRIORITY,
-            .puxStackBuffer = xCoherenceActorTaskStack,
-	        .xRegions        =    {
-									{ ( void * ) &( xCoherenceTestMessageBuffer[ 0 ] ), mbSHARED_MEM_SIZE_BYTES,
-									   ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-										 ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-									},
-									{ ( void * ) &( cTxString[ 0 ] ), mbSHARED_MEM_SIZE_BYTES,
-									   ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-										 ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-									},
-									{ 0,                0,                    0                                                        },
-									{ 0,                0,                    0                                                        },
-									{ 0,                0,                    0                                                        },
-									{ 0,                0,                    0                                                        },
-									{ 0,                0,                    0                                                        },
-									{ 0,                0,                    0                                                        },
-									{ 0,                0,                    0                                                        },
-									{ 0,                0,                    0                                                        },
-									{ 0,                0,                    0                                                        }
-	                            }
-	    };
-
+            .pvTaskCode      = prvSpaceAvailableCoherenceActor,
+            .pcName          = "mbsanity1",
+            .usStackDepth    = configMINIMAL_STACK_SIZE,
+            .pvParameters    = NULL,
+            .uxPriority      = tskIDLE_PRIORITY,
+            .puxStackBuffer  = xCoherenceActorTaskStack,
+            .xRegions        =  {
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        }
+                                }
+        };
         TaskParameters_t xCoherenceTesterTaskParameters =
         {
-            .pvTaskCode = prvSpaceAvailableCoherenceTester,
-            .pcName = "mbsanity2",
-            .usStackDepth = configMINIMAL_STACK_SIZE,
-            .pvParameters = NULL,
-            .uxPriority = mbHIGHER_PRIORITY,
-            .puxStackBuffer = xCoherenceTesterTaskStack,
-	        .xRegions        =    {
-									{ ( void * ) &( xCoherenceTestMessageBuffer[ 0 ] ), mbSHARED_MEM_SIZE_BYTES,
-									   ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-										 ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-									},
-									{ ( void * ) &( ulSizeCoherencyTestCycles[ 0 ] ), mbSHARED_MEM_SIZE_BYTES,
-									   ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-										 ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-									},
-									{ 0,                0,                    0                                                        },
-									{ 0,                0,                    0                                                        },
-									{ 0,                0,                    0                                                        },
-									{ 0,                0,                    0                                                        },
-									{ 0,                0,                    0                                                        },
-									{ 0,                0,                    0                                                        },
-									{ 0,                0,                    0                                                        },
-									{ 0,                0,                    0                                                        },
-									{ 0,                0,                    0                                                        }
-	                            }
-	    };
+            .pvTaskCode      = prvSpaceAvailableCoherenceTester,
+            .pcName          = "mbsanity2",
+            .usStackDepth    = configMINIMAL_STACK_SIZE,
+            .pvParameters    = NULL,
+            .uxPriority      = tskIDLE_PRIORITY,
+            .puxStackBuffer  = xCoherenceTesterTaskStack,
+            .xRegions        =  {
+                                    { ( void * ) &( ulSizeCoherencyTestCycles[ 0 ] ), messagebufferSHARED_MEM_SIZE_BYTES,
+                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                         ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                    },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        }
+                                }
+        };
 
+        MessageBufferHandle_t xCoherenceTestMessageBuffer = xMessageBufferCreate( mbCOHERENCE_TEST_BUFFER_SIZE );
+        configASSERT( xCoherenceTestMessageBuffer );
+        xCoherenceActorTaskParameters.pvParameters = ( void * ) xCoherenceTestMessageBuffer;
+        xCoherenceTesterTaskParameters.pvParameters = ( void * ) xCoherenceTestMessageBuffer;
         xTaskCreateRestricted( &( xCoherenceActorTaskParameters ), NULL );
         xTaskCreateRestricted( &( xCoherenceTesterTaskParameters ), NULL );
-
     }
-    #endif
+    #endif /* configRUN_ADDITIONAL_TESTS */
 }
 /*-----------------------------------------------------------*/
 
@@ -626,7 +587,8 @@ static void prvSingleTaskTests( MessageBufferHandle_t xMessageBuffer )
     size_t xReturned, xItem, xExpectedSpace, xNextLength;
     const size_t xMax6ByteMessages = mbMESSAGE_BUFFER_LENGTH_BYTES / ( 6 + mbBYTES_TO_STORE_MESSAGE_LENGTH );
     const size_t x6ByteLength = 6, x17ByteLength = 17;
-    uint8_t * pucData, * pucReadData;
+    uint8_t ucFullBuffer[ mbMESSAGE_BUFFER_LENGTH_BYTES ];
+    uint8_t * pucFullBuffer, * pucData, * pucReadData;
     TickType_t xTimeBeforeCall, xTimeAfterCall;
     const TickType_t xBlockTime = pdMS_TO_TICKS( 25 ), xAllowableMargin = pdMS_TO_TICKS( 3 );
     UBaseType_t uxOriginalPriority;
@@ -634,9 +596,7 @@ static void prvSingleTaskTests( MessageBufferHandle_t xMessageBuffer )
     /* Remove warning in case configASSERT() is not defined. */
     ( void ) xAllowableMargin;
 
-    /* To minimize stack and heap usage a full size buffer is allocated from
-     * the heap, then buffers which hold smaller amounts of data are overlayed
-     * with the larger buffer - just make sure not to use both at once!. */
+    pucFullBuffer = &( ucFullBuffer[ 0 ] );
     configASSERT( pucFullBuffer );
 
     pucData = pucFullBuffer;
@@ -889,7 +849,6 @@ static void prvSingleTaskTests( MessageBufferHandle_t xMessageBuffer )
     configASSERT( memcmp( ( const void * ) pucFullBuffer, pc55ByteString, mbMESSAGE_BUFFER_LENGTH_BYTES - sizeof( size_t ) ) == 0 );
 
     /* Clean up. */
-    memset( ( void * ) pucFullBuffer, ( ( int ) '0' ) , sizeof( pucFullBuffer ) );
     xMessageBufferReset( xMessageBuffer );
 }
 /*-----------------------------------------------------------*/
@@ -911,7 +870,7 @@ static void prvNonBlockingSenderTask( void * pvParameters )
      * string will increase and decrease as the value of the number increases
      * then overflows. */
     memset( cTxString, 0x00, sizeof( cTxString ) );
-    itoa(iDataToSend, cTxString, sizeof( cTxString ));
+    itoa( iDataToSend, cTxString, sizeof( cTxString ) );
     xStringLength = strlen( cTxString );
 
     for( ; ; )
@@ -931,7 +890,7 @@ static void prvNonBlockingSenderTask( void * pvParameters )
 
             /* Create the next string. */
             memset( cTxString, 0x00, sizeof( cTxString ) );
-            itoa(iDataToSend, cTxString, sizeof( cTxString ));
+            itoa( iDataToSend, cTxString, sizeof( cTxString ) );
             xStringLength = strlen( cTxString );
         }
     }
@@ -958,7 +917,7 @@ static void prvNonBlockingReceiverTask( void * pvParameters )
      * the non blocking sender task. */
     memset( cExpectedString, 0x00, sizeof( cExpectedString ) );
     memset( cRxString, 0x00, sizeof( cRxString ) );
-    itoa( iDataToSend, cExpectedString, sizeof(cExpectedString) );
+    itoa( iDataToSend, cExpectedString, sizeof( cExpectedString ) );
     xStringLength = strlen( cExpectedString );
 
     for( ; ; )
@@ -994,7 +953,7 @@ static void prvNonBlockingReceiverTask( void * pvParameters )
 
             memset( cExpectedString, 0x00, sizeof( cExpectedString ) );
             memset( cRxString, 0x00, sizeof( cRxString ) );
-            itoa( iDataToSend, cExpectedString, sizeof(cExpectedString) );
+            itoa( iDataToSend, cExpectedString, sizeof( cExpectedString ) );
             xStringLength = strlen( cExpectedString );
 
             if( xNonBlockingReceiveError == pdFALSE )
@@ -1020,41 +979,30 @@ static void prvNonBlockingReceiverTask( void * pvParameters )
         StaticMessageBuffer_t xStaticMessageBuffer;
         size_t xBytesSent;
 
-
         /* The task's priority is used as an index into the loop counters used to
          * indicate this task is still running. */
         UBaseType_t uxIndex = uxTaskPriorityGet( NULL );
 
         /* Make sure a change in priority does not inadvertently result in an
          * invalid array index. */
-        configASSERT( uxIndex < mbNUMBER_OF_ECHO_CLIENTS + 1 );
+        configASSERT( uxIndex < mbNUMBER_OF_ECHO_CLIENTS );
 
-        /* Avoid compiler warnings about unused parameters. */
-
-        xMessageBuffer = ( MessageBufferHandle_t )pvParameters;
-
-        /*Suspend the receiver tasks*/
-        vTaskSuspend( xReceiverTaskHandles[ 0 ] );
-        vTaskSuspend( xReceiverTaskHandles[ 1 ] );
+        xMessageBuffer = ( MessageBufferHandle_t ) pvParameters;
 
         /* Now the message buffer has been created the receiver task can be created.
          * If this sender task has the higher priority then the receiver task is
          * created at the lower priority - if this sender task has the lower priority
          * then the receiver task is created at the higher priority. */
-        if( uxTaskPriorityGet( NULL ) == mbHIGHER_PRIORITY )
+        if( uxTaskPriorityGet( NULL ) == mbLOWER_PRIORITY )
         {
             /* Here prvSingleTaskTests() performs various tests on a message buffer
              * that was created statically. */
             prvSingleTaskTests( xMessageBuffer );
-        	vTaskPrioritySet( xReceiverTaskHandles[ 1 ], mbHIGHEST_PRIORITY );
-        	vTaskResume( xReceiverTaskHandles[ 1 ] );
-        	vTaskResume( xReceiverTaskHandles[ 0 ] );
+            vTaskResume( xReceiverTaskHandles[ RECEIVER_TASK2_IDX ] );
         }
         else
         {
-
-        	vTaskPrioritySet( xReceiverTaskHandles[ 0 ], mbHIGHER_PRIORITY );
-        	vTaskResume( xReceiverTaskHandles[ 0 ] );
+            vTaskResume( xReceiverTaskHandles[ RECEIVER_TASK1_IDX ] );
         }
 
         for( ; ; )
@@ -1063,7 +1011,7 @@ static void prvNonBlockingReceiverTask( void * pvParameters )
              * string will increase and decrease as the value of the number increases
              * then overflows. */
             memset( cTxString, 0x00, sizeof( cTxString ) );
-            itoa(iDataToSend, cTxString, sizeof( cTxString ));
+            itoa( iDataToSend, cTxString, sizeof( cTxString ) );
 
             do
             {
@@ -1076,11 +1024,9 @@ static void prvNonBlockingReceiverTask( void * pvParameters )
             {
                 /* Increment a loop counter so a check task can tell this task is
                  * still running as expected. */
+                ulSenderLoopCounters[ uxIndex ]++;
 
-            	ulSenderLoopCounters[ uxIndex ]++;
-
-
-                if( uxTaskPriorityGet( NULL ) == mbHIGHEST_PRIORITY )
+                if( uxTaskPriorityGet( NULL ) == mbHIGHER_PRIORITY )
                 {
                     /* Allow other tasks to run. */
                     vTaskDelay( xShortDelay );
@@ -1092,7 +1038,6 @@ static void prvNonBlockingReceiverTask( void * pvParameters )
                  * the buffer is set to point to the cTxString array - this is
                  * ok because nothing is actually written to the memory. */
                 xTempMessageBuffer = xMessageBufferCreateStatic( sizeof( cTxString ), ( uint8_t * ) cTxString, &xStaticMessageBuffer );
-                xMessageBufferReset( xTempMessageBuffer );
                 vMessageBufferDelete( xTempMessageBuffer );
             }
         }
@@ -1116,7 +1061,7 @@ static void prvNonBlockingReceiverTask( void * pvParameters )
         {
             /* Generate the next expected string in the cExpectedString buffer. */
             memset( cExpectedString, 0x00, sizeof( cExpectedString ) );
-            itoa(iExpectedData, cExpectedString, sizeof( cExpectedString ));
+            itoa( iExpectedData, cExpectedString, sizeof( cExpectedString ) );
 
             /* Receive the next string from the message buffer. */
             memset( cReceivedString, 0x00, sizeof( cReceivedString ) );
@@ -1139,34 +1084,18 @@ static void prvNonBlockingReceiverTask( void * pvParameters )
 static void prvEchoClient( void * pvParameters )
 {
     size_t xSendLength = 0, ux;
-    char * pcStringToSend, * pcStringReceived, cNextChar = mbASCII_SPACE;
+    char pcStringToSend[ mbMESSAGE_BUFFER_LENGTH_BYTES ];
+    char pcStringReceived[ mbMESSAGE_BUFFER_LENGTH_BYTES ];
+    char cNextChar = mbASCII_SPACE;
     const TickType_t xTicksToWait = pdMS_TO_TICKS( 50 );
 
-/* The task's priority is used as an index into the loop counters used to
- * indicate this task is still running. */
+    /* The task's priority is used as an index into the loop counters used to
+     * indicate this task is still running. */
     UBaseType_t uxIndex = uxTaskPriorityGet( NULL );
 
-    if( uxIndex == mbHIGHER_PRIORITY )
-    {
-    	pcStringToSend = pcStringToSend1;
-    	pcStringReceived = pcStringReceived1;
-    }
-    else
-    {
-    	pcStringToSend = pcStringToSend2;
-    	pcStringReceived = pcStringReceived2;
-    }
-
-/* Pointers to the client and server message buffers are passed into this task
- * using the task's parameter. */
+    /* Pointers to the client and server message buffers are passed into this task
+     * using the task's parameter. */
     EchoMessageBuffers_t * pxMessageBuffers = ( EchoMessageBuffers_t * ) pvParameters;
-
-    /* The buffer into which strings to send to the server will be
-     * created, and the buffer into which strings echoed back from the server will
-     * be copied. */
-
-    configASSERT( pcStringToSend );
-    configASSERT( pcStringReceived );
 
     for( ; ; )
     {
@@ -1227,54 +1156,32 @@ static void prvEchoServer( void * pvParameters )
 {
     MessageBufferHandle_t xTempMessageBuffer;
     size_t xReceivedLength;
-    char * pcReceivedString;
-    EchoMessageBuffers_t * pxMessageBuffers = ( EchoMessageBuffers_t * ) pvParameters;
+    char pcReceivedString[ mbMESSAGE_BUFFER_LENGTH_BYTES ];
     TickType_t xTimeOnEntering;
     const TickType_t xTicksToBlock = pdMS_TO_TICKS( 250UL );
-
-
-    configASSERT( pxMessageBuffers->xEchoClientBuffer );
-    configASSERT( pxMessageBuffers->xEchoServerBuffer );
-
-    /*Check the priority of the task and then allocate local buffer based on the priority*/
-    UBaseType_t uxIndex = uxTaskPriorityGet( NULL );
-    if( uxIndex == mbHIGHER_PRIORITY)
-    {
-    	pcReceivedString = pcReceivedString1;
-    }
-    else
-    {
-    	pcReceivedString = pcReceivedString2;
-    }
-    configASSERT( pcReceivedString );
-
-    /* Suspend both the client tasks */
-    vTaskSuspend( xEchoClientTaskHandle[ 0 ] );
-    vTaskSuspend( xEchoClientTaskHandle[ 1 ] );
+    EchoMessageBuffers_t * pxMessageBuffers = ( EchoMessageBuffers_t * ) pvParameters;
 
     /* Don't expect to receive anything yet! */
     xTimeOnEntering = xTaskGetTickCount();
     xReceivedLength = xMessageBufferReceive( pxMessageBuffers->xEchoClientBuffer, ( void * ) pcReceivedString, mbMESSAGE_BUFFER_LENGTH_BYTES, xTicksToBlock );
     configASSERT( ( ( TickType_t ) ( xTaskGetTickCount() - xTimeOnEntering ) ) >= xTicksToBlock );
     configASSERT( xReceivedLength == 0 );
+    ( void ) xTimeOnEntering; /* In case configASSERT() is not defined. */
 
     /* Now the message buffers have been created the echo client task can be
      * created.  If this server task has the higher priority then the client task
      * is created at the lower priority - if this server task has the lower
      * priority then the client task is created at the higher priority. */
-    if( uxTaskPriorityGet( NULL ) == mbHIGHER_PRIORITY )
+    if( uxTaskPriorityGet( NULL ) == mbLOWER_PRIORITY )
     {
-    	vTaskPrioritySet( xEchoClientTaskHandle[ 1 ], mbHIGHEST_PRIORITY );
-    	vTaskResume( xEchoClientTaskHandle[ 1 ] );
-    	vTaskResume( xEchoClientTaskHandle[ 0 ] );
+        vTaskResume( xEchoClientTaskHandles[ ECHO_CLIENT_TASK2_IDX ] );
     }
     else
     {
         /* Here prvSingleTaskTests() performs various tests on a message buffer
          * that was created dynamically. */
         prvSingleTaskTests( pxMessageBuffers->xEchoClientBuffer );
-    	vTaskPrioritySet( xEchoClientTaskHandle[ 0 ], mbHIGHER_PRIORITY );
-    	vTaskResume( xEchoClientTaskHandle[ 0 ] );
+        vTaskResume( xEchoClientTaskHandles[ ECHO_CLIENT_TASK1_IDX ] );
     }
 
     for( ; ; )
@@ -1306,19 +1213,22 @@ static void prvEchoServer( void * pvParameters )
 
     static void prvSpaceAvailableCoherenceActor( void * pvParameters )
     {
+        char cTxString[] = "12345";
         char cRxString[ mbCOHERENCE_TEST_BYTES_WRITTEN + 1 ]; /* +1 for NULL terminator. */
+
+        MessageBufferHandle_t xCoherenceTestMessageBuffer = ( MessageBufferHandle_t ) pvParameters;
 
         for( ; ; )
         {
             /* Add bytes to the buffer so the other task should see
              * mbEXPECTED_FREE_BYTES_AFTER_WRITING_STRING bytes free. */
-            xMessageBufferSend( xCoherenceTestMessageBuffer[ 0 ], ( void * ) cTxString, strlen( cTxString ), 0 );
-            configASSERT( xMessageBufferSpacesAvailable( xCoherenceTestMessageBuffer[ 0 ] ) == mbEXPECTED_FREE_BYTES_AFTER_WRITING_STRING );
+            xMessageBufferSend( xCoherenceTestMessageBuffer, ( void * ) cTxString, strlen( cTxString ), 0 );
+            configASSERT( xMessageBufferSpacesAvailable( xCoherenceTestMessageBuffer ) == mbEXPECTED_FREE_BYTES_AFTER_WRITING_STRING );
 
             /* Read out message again so the other task should read the full
              * mbCOHERENCE_TEST_BUFFER_SIZE bytes free again. */
             memset( ( void * ) cRxString, 0x00, sizeof( cRxString ) );
-            xMessageBufferReceive( xCoherenceTestMessageBuffer[ 0 ], ( void * ) cRxString, mbCOHERENCE_TEST_BYTES_WRITTEN, 0 );
+            xMessageBufferReceive( xCoherenceTestMessageBuffer, ( void * ) cRxString, mbCOHERENCE_TEST_BYTES_WRITTEN, 0 );
             configASSERT( strcmp( cTxString, cRxString ) == 0 );
         }
     }
@@ -1329,12 +1239,14 @@ static void prvEchoServer( void * pvParameters )
         size_t xSpaceAvailable;
         BaseType_t xErrorFound = pdFALSE;
 
+        MessageBufferHandle_t xCoherenceTestMessageBuffer = ( MessageBufferHandle_t ) pvParameters;
+
         for( ; ; )
         {
             /* This message buffer is only ever empty or contains 5 bytes.  So all
              * queries of its free space should result in one of the two values tested
              * below. */
-            xSpaceAvailable = xMessageBufferSpacesAvailable( xCoherenceTestMessageBuffer[ 0 ] );
+            xSpaceAvailable = xMessageBufferSpacesAvailable( xCoherenceTestMessageBuffer );
 
             if( ( xSpaceAvailable == mbCOHERENCE_TEST_BUFFER_SIZE ) ||
                 ( xSpaceAvailable == mbEXPECTED_FREE_BYTES_AFTER_WRITING_STRING ) )
@@ -1366,13 +1278,13 @@ BaseType_t xAreMessageBufferTasksStillRunning( void )
 
     for( x = 0; x < mbNUMBER_OF_ECHO_CLIENTS; x++ )
     {
-        if( ulLastEchoLoopCounters[ x ] == ulEchoLoopCounters[ x + 1 ] )
+        if( ulLastEchoLoopCounters[ x ] == ulEchoLoopCounters[ x ] )
         {
             xReturn = pdFAIL;
         }
         else
         {
-            ulLastEchoLoopCounters[ x ] = ulEchoLoopCounters[ x + 1 ];
+            ulLastEchoLoopCounters[ x ] = ulEchoLoopCounters[ x ];
         }
     }
 
@@ -1391,13 +1303,13 @@ BaseType_t xAreMessageBufferTasksStillRunning( void )
 
         for( x = 0; x < mbNUMBER_OF_SENDER_TASKS; x++ )
         {
-            if( ulLastSenderLoopCounters[ x ] == ulSenderLoopCounters[ x + 1 ] )
+            if( ulLastSenderLoopCounters[ x ] == ulSenderLoopCounters[ x ] )
             {
                 xReturn = pdFAIL;
             }
             else
             {
-                ulLastSenderLoopCounters[ x ] = ulSenderLoopCounters[ x + 1 ];
+                ulLastSenderLoopCounters[ x ] = ulSenderLoopCounters[ x ];
             }
         }
     }

@@ -50,9 +50,8 @@
 #define sbiSTREAM_BUFFER_LENGTH_BYTES        ( ( size_t ) 100 )
 #define sbiSTREAM_BUFFER_TRIGGER_LEVEL_10    ( ( BaseType_t ) 10 )
 
-
-#define streambufferSHARED_MEM_SIZE_WORDS             ( 8 )
-#define streambufferSHARED_MEM_SIZE_BYTES             ( 32 )
+#define streambufferSHARED_MEM_SIZE_WORDS     ( 8 )
+#define streambufferSHARED_MEM_SIZE_BYTES     ( 32 )
 
 /*-----------------------------------------------------------*/
 
@@ -66,11 +65,11 @@ static StreamBufferHandle_t xStreamBuffer[ streambufferSHARED_MEM_SIZE_WORDS ] _
 
 /* The string that is sent from the interrupt to the task four bytes at a
  * time.  Must be multiple of 4 bytes long as the ISR sends 4 bytes at a time*/
-static const char * pcStringToSend[ streambufferSHARED_MEM_SIZE_BYTES ] __attribute__( ( aligned( streambufferSHARED_MEM_SIZE_BYTES ) ) ) = { "_____Hello FreeRTOS_____" };
+static const char * pcStringToSend = "_____Hello FreeRTOS_____";
 
 /* The string to task is looking for, which must be a substring of
  * pcStringToSend. */
-static const char * pcStringToReceive[ streambufferSHARED_MEM_SIZE_BYTES ] __attribute__( ( aligned( streambufferSHARED_MEM_SIZE_BYTES ) ) ) = { "Hello FreeRTOS" };
+static const char * pcStringToReceive[ streambufferSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( streambufferSHARED_MEM_SIZE_BYTES ) ) ) = { "Hello FreeRTOS" };
 
 /* Set to pdFAIL if anything unexpected happens. */
 static BaseType_t xDemoStatus[ streambufferSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( streambufferSHARED_MEM_SIZE_BYTES ) ) ) = { pdPASS };
@@ -84,14 +83,13 @@ static uint32_t ulCycleCount[ streambufferSHARED_MEM_SIZE_WORDS ] __attribute__(
 
 void vStartStreamBufferInterruptDemo( void )
 {
+    static StackType_t xReceivingTaskStack[ configMINIMAL_STACK_SIZE ] __attribute__( ( aligned( configMINIMAL_STACK_SIZE * sizeof( StackType_t ) ) ) );
+
     /* Create the stream buffer that sends data from the interrupt to the
      * task, and create the task. */
-    xStreamBuffer[ 0 ] = xStreamBufferCreate( /* The buffer length in bytes. */
-        sbiSTREAM_BUFFER_LENGTH_BYTES,
-        /* The stream buffer's trigger level. */
-        sbiSTREAM_BUFFER_TRIGGER_LEVEL_10 );
-
-    static StackType_t xReceivingTaskStack[ configMINIMAL_STACK_SIZE ] __attribute__( ( aligned( configMINIMAL_STACK_SIZE * sizeof( StackType_t ) ) ) );
+    xStreamBuffer[ 0 ] = xStreamBufferCreate( sbiSTREAM_BUFFER_LENGTH_BYTES, /* The buffer length in bytes. */
+                                              sbiSTREAM_BUFFER_TRIGGER_LEVEL_10 /* The stream buffer's trigger level. */
+                                            );
 
     TaskParameters_t xReceivingTaskParameters =
     {
@@ -102,22 +100,22 @@ void vStartStreamBufferInterruptDemo( void )
         .uxPriority      = tskIDLE_PRIORITY + 2,
         .puxStackBuffer  = xReceivingTaskStack,
         .xRegions        =    {
-								{ ( void * ) &( xDemoStatus[ 0 ] ), streambufferSHARED_MEM_SIZE_BYTES,
-								   ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-									 ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-								},
-								{ ( void * ) &( ulCycleCount[ 0 ] ), streambufferSHARED_MEM_SIZE_BYTES,
-								   ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-									 ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-								},
-								{ ( void * ) &( pcStringToReceive[ 0 ] ), streambufferSHARED_MEM_SIZE_BYTES,
-								   ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-									 ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-								},
-								{ ( void * ) &( xStreamBuffer[ 0 ] ), streambufferSHARED_MEM_SIZE_BYTES,
-								   ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-									 ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-								},
+                                { ( void * ) &( xDemoStatus[ 0 ] ), streambufferSHARED_MEM_SIZE_BYTES,
+                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                },
+                                { ( void * ) &( ulCycleCount[ 0 ] ), streambufferSHARED_MEM_SIZE_BYTES,
+                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                },
+                                { ( void * ) &( pcStringToReceive[ 0 ] ), streambufferSHARED_MEM_SIZE_BYTES,
+                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                },
+                                { ( void * ) &( xStreamBuffer[ 0 ] ), streambufferSHARED_MEM_SIZE_BYTES,
+                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                },
                                 { 0,                0,                    0                                                        },
                                 { 0,                0,                    0                                                        },
                                 { 0,                0,                    0                                                        },
@@ -129,7 +127,6 @@ void vStartStreamBufferInterruptDemo( void )
     };
 
     xTaskCreateRestricted( &( xReceivingTaskParameters ), NULL );
-
 }
 /*-----------------------------------------------------------*/
 
@@ -157,16 +154,11 @@ static void prvReceivingTask( void * pvParameters )
          * Note:  An infinite block time is used to simplify the example.  Infinite
          * block times are not recommended in production code as they do not allow
          * for error recovery. */
-        xStreamBufferReceive( /* The stream buffer data is being received from. */
-            xStreamBuffer[ 0 ],
-            /* Where to place received data. */
-            ( void * ) &( cRxBuffer[ xNextByte ] ),
-            /* The number of bytes to receive. */
-            sizeof( char ),
-
-            /* The time to wait for the next data if the buffer
-             * is empty. */
-            portMAX_DELAY );
+        xStreamBufferReceive( xStreamBuffer[ 0 ], /* The stream buffer data is being received from. */
+                              ( void * ) &( cRxBuffer[ xNextByte ] ), /* Where to place received data. */
+                              sizeof( char ), /* The number of bytes to receive. */
+                              portMAX_DELAY /* The time to wait for the next data if the buffer is empty. */
+                            );
 
         /* If xNextByte is 0 then this task is looking for the start of the
          * string, which is 'H'. */
@@ -231,7 +223,7 @@ void vBasicStreamBufferSendFromISR( void )
 
         /* Send the next four bytes to the stream buffer. */
         xStreamBufferSendFromISR( xStreamBuffer[ 0 ],
-                                  ( const void * ) ( pcStringToSend[ 0 ] + xNextByteToSend ),
+                                  ( const void * ) ( pcStringToSend + xNextByteToSend ),
                                   xBytesToSend,
                                   NULL );
 
@@ -239,7 +231,7 @@ void vBasicStreamBufferSendFromISR( void )
          * of the string if necessary. */
         xNextByteToSend += xBytesToSend;
 
-        if( xNextByteToSend >= strlen( pcStringToSend[ 0 ] ) )
+        if( xNextByteToSend >= strlen( pcStringToSend ) )
         {
             xNextByteToSend = 0;
         }
@@ -263,3 +255,4 @@ BaseType_t xIsInterruptStreamBufferDemoStillRunning( void )
 
     return xDemoStatus[ 0 ];
 }
+/*-----------------------------------------------------------*/

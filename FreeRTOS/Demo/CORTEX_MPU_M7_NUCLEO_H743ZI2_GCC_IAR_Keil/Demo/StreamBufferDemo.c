@@ -26,7 +26,6 @@
 
 /* Standard includes. */
 #include "stdio.h"
-#include "stdlib.h"
 #include "string.h"
 
 /* FreeRTOS includes. */
@@ -37,7 +36,7 @@
 /* Demo app includes. */
 #include "StreamBufferDemo.h"
 
-#define streambufferSHARED_MEM_SIZE_CHAR			  ( 4 )
+#define streambufferSHARED_MEM_SIZE_DOUBLE_WORDS      ( 4 )
 #define streambufferSHARED_MEM_SIZE_WORDS             ( 8 )
 #define streambufferSHARED_MEM_SIZE_BYTES             ( 32 )
 
@@ -59,7 +58,6 @@
  * priority tasks, and from high to low priority tasks. */
 #define sbLOWER_PRIORITY                ( tskIDLE_PRIORITY )
 #define sbHIGHER_PRIORITY               ( tskIDLE_PRIORITY + 1 )
-#define sbHIGHEST_PRIORITY				( tskIDLE_PRIORITY + 2 )
 
 /* Block times used when sending and receiving from the stream buffers. */
 #define sbRX_TX_BLOCK_TIME              pdMS_TO_TICKS( 125UL )
@@ -131,12 +129,9 @@ static void prvInterruptTriggerLevelTest( void * pvParameters );
 
     static StaticStreamBuffer_t xStaticStreamBuffers[ sbNUMBER_OF_ECHO_CLIENTS ];
     static uint32_t ulSenderLoopCounters[ streambufferSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( streambufferSHARED_MEM_SIZE_BYTES ) ) ) = { 0 };
-
-    static StreamBufferHandle_t xReceiverTaskStreamBuffers[ streambufferSHARED_MEM_SIZE_WORDS ] __attribute__((aligned(streambufferSHARED_MEM_SIZE_BYTES))) = { NULL };
-    
+    #define RECEIVER_TASK1_IDX 0
+    #define RECEIVER_TASK2_IDX 1
     static TaskHandle_t xReceiverTaskHandles[ streambufferSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( streambufferSHARED_MEM_SIZE_BYTES ) ) ) = { NULL };
-
-
 #endif /* configSUPPORT_STATIC_ALLOCATION */
 
 /* The +1 is to make the test logic easier as the function that calculates the
@@ -176,41 +171,32 @@ static volatile StreamBufferHandle_t xInterruptStreamBuffer[ streambufferSHARED_
 
 /* The data sent from the tick interrupt to the task that tests the trigger
  * level functionality. */
-static const char pcDataSentFromInterrupt[ streambufferSHARED_MEM_SIZE_BYTES ] __attribute__( ( aligned( streambufferSHARED_MEM_SIZE_BYTES ) ) ) = { "0123456789" };
+static char pcDataSentFromInterrupt[ streambufferSHARED_MEM_SIZE_BYTES ] __attribute__( ( aligned( streambufferSHARED_MEM_SIZE_BYTES ) ) ) = { '\0' };
 
 /* Data that is longer than the buffer that is sent to the buffers as a stream
  * of bytes.  Parts of which are written to the stream buffer to test writing
  * different lengths at different offsets, to many bytes, part streams, streams
  * that wrap, etc..  Two messages are defined to ensure left over data is not
  * accidentally read out of the buffer. */
-static const char pc55ByteString[ streambufferSHARED_MEM_SIZE_BYTES * 2 ] __attribute__( ( aligned( streambufferSHARED_MEM_SIZE_BYTES ) ) ) = { "One two three four five six seven eight nine ten eleven" };
-static const char pc54ByteString[ streambufferSHARED_MEM_SIZE_BYTES * 2 ] __attribute__( ( aligned( streambufferSHARED_MEM_SIZE_BYTES ) ) ) = { "01234567891abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQ" };
+static char pc55ByteString[ 128 ] __attribute__( ( aligned( 128 ) ) ) = { '\0' };
+static char pc54ByteString[ 128 ] __attribute__( ( aligned( 128 ) ) ) = { '\0' };
 
 /* Used to log the status of the tests contained within this file for reporting
  * to a monitoring task ('check' task). */
 static BaseType_t xErrorStatus[ streambufferSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( streambufferSHARED_MEM_SIZE_BYTES ) ) ) = { pdPASS };
 
-/* Used to define strings , since pvPortMalloc cannot be used */
-static char pcReceivedString1[ streambufferSHARED_MEM_SIZE_BYTES ]  __attribute__( ( aligned( streambufferSHARED_MEM_SIZE_BYTES ) ) );
-static char pcReceivedString2[ streambufferSHARED_MEM_SIZE_BYTES ]  __attribute__( ( aligned( streambufferSHARED_MEM_SIZE_BYTES ) ) );
-static char pcStringToSend1[ streambufferSHARED_MEM_SIZE_BYTES ] __attribute__( ( aligned( streambufferSHARED_MEM_SIZE_BYTES ) ) );
-static char pcStringReceived1[ streambufferSHARED_MEM_SIZE_BYTES ]  __attribute__( ( aligned( streambufferSHARED_MEM_SIZE_BYTES ) ) );
-static char pcStringToSend2[ streambufferSHARED_MEM_SIZE_BYTES ] __attribute__( ( aligned( streambufferSHARED_MEM_SIZE_BYTES ) ) );
-static char pcStringReceived2[ streambufferSHARED_MEM_SIZE_BYTES ]  __attribute__( ( aligned( streambufferSHARED_MEM_SIZE_BYTES ) ) );
-static uint8_t pucFullBuffer[ streambufferSHARED_MEM_SIZE_BYTES * 2 ] __attribute__( ( aligned( streambufferSHARED_MEM_SIZE_BYTES * 2 ) ) );
+#define ECHO_STREAM_BUFFERS_1_IDX 0
+#define ECHO_STREAM_BUFFERS_2_IDX 1
+static EchoStreamBuffers_t xEchoStreamBuffersArray[ streambufferSHARED_MEM_SIZE_DOUBLE_WORDS ] __attribute__( ( aligned( streambufferSHARED_MEM_SIZE_BYTES ) ) ) = { NULL };
 
-static EchoStreamBuffers_t xStreamBuffers[ streambufferSHARED_MEM_SIZE_CHAR ] __attribute__( ( aligned( streambufferSHARED_MEM_SIZE_BYTES ) ) ) = { NULL };
-
-static TaskHandle_t xEchoClientTaskHandle[ streambufferSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( streambufferSHARED_MEM_SIZE_BYTES ) ) ) = { NULL };
-
-
+#define ECHO_CLIENT_TASK1_IDX 0
+#define ECHO_CLIENT_TASK2_IDX 1
+static TaskHandle_t xEchoClientTaskHandles[ streambufferSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( streambufferSHARED_MEM_SIZE_BYTES ) ) ) = { NULL };
 /*-----------------------------------------------------------*/
 
 void vStartStreamBufferTasks( void )
 {
     StreamBufferHandle_t xStreamBuffer;
-
-    /*Stack Definitions*/
     static StackType_t xEchoServerTask1Stack[ configMINIMAL_STACK_SIZE * 2 ] __attribute__( ( aligned( configMINIMAL_STACK_SIZE * 2 * sizeof( StackType_t ) ) ) );
     static StackType_t xEchoServerTask2Stack[ configMINIMAL_STACK_SIZE * 2 ] __attribute__( ( aligned( configMINIMAL_STACK_SIZE * 2 * sizeof( StackType_t ) ) ) );
     static StackType_t xNonBlockingReceiverTaskStack[ configMINIMAL_STACK_SIZE ] __attribute__( ( aligned( configMINIMAL_STACK_SIZE * sizeof( StackType_t ) ) ) );
@@ -219,136 +205,37 @@ void vStartStreamBufferTasks( void )
     static StackType_t xEchoClientTask1Stack[ configMINIMAL_STACK_SIZE * 2 ] __attribute__( ( aligned( configMINIMAL_STACK_SIZE * 2 * sizeof( StackType_t ) ) ) );
     static StackType_t xEchoClientTask2Stack[ configMINIMAL_STACK_SIZE * 2 ] __attribute__( ( aligned( configMINIMAL_STACK_SIZE * 2 * sizeof( StackType_t ) ) ) );
 
-    /* Create the stream buffer used to send data from the client to the server,
-     * and the stream buffer used to echo the data from the server back to the
-     * client. */
-    int idx;
-    for( idx = 0; idx < 2; idx++ )
-    {
-		xStreamBuffers[ idx ].xEchoClientBuffer = xStreamBufferCreate( sbSTREAM_BUFFER_LENGTH_BYTES, sbTRIGGER_LEVEL_1 );
-		xStreamBuffers[ idx ].xEchoServerBuffer = xStreamBufferCreate( sbSTREAM_BUFFER_LENGTH_BYTES, sbTRIGGER_LEVEL_1 );
-		configASSERT( xStreamBuffers[ idx ].xEchoClientBuffer );
-		configASSERT( xStreamBuffers[ idx ].xEchoServerBuffer );
-    }
-
-
-    /* When the stream buffers have been created the echo client task can be
-     * created.  If this server task has the higher priority then the client task
-     * is created at the lower priority - if this server task has the lower
-     * priority then the client task is created at the higher priority.
-     * Currently, keeping the parameters as NULL, will assign then in the server task*/
-
-    TaskParameters_t xEchoClientTask1Parameters =
-    {
-        .pvTaskCode      = 	prvEchoClient,
-        .pcName          = 	"EchoClient",
-        .usStackDepth    = 	sbSMALLER_STACK_SIZE,
-        .pvParameters    = 	(void *) &xStreamBuffers[ 0 ],
-        .uxPriority      =	sbLOWER_PRIORITY ,
-        .puxStackBuffer  = 	xEchoClientTask1Stack,
-        .xRegions        =    {
-								{ ( void * ) &( pcStringToSend1[ 0 ] ), streambufferSHARED_MEM_SIZE_BYTES,
-								   ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-									 ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-								},
-								{ ( void * ) &( pcStringReceived1[ 0 ] ), streambufferSHARED_MEM_SIZE_BYTES,
-								   ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-									 ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-								},
-								{ ( void * ) &( ulEchoLoopCounters[ 0 ] ), streambufferSHARED_MEM_SIZE_BYTES,
-								   ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-									 ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-								},
-								{ ( void * ) &( xStreamBuffers[ 0 ] ), streambufferSHARED_MEM_SIZE_BYTES,
-								   ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-									 ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-								},
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        }
-                            }
-    };
-
-    TaskParameters_t xEchoClientTask2Parameters =
-    {
-        .pvTaskCode      = 	prvEchoClient,
-        .pcName          = 	"EchoClient",
-        .usStackDepth    = 	sbSMALLER_STACK_SIZE,
-        .pvParameters    = 	(void *) &xStreamBuffers[ 1 ],
-        .uxPriority      =	sbLOWER_PRIORITY ,
-        .puxStackBuffer  = 	xEchoClientTask2Stack,
-        .xRegions        =    {
-								{ ( void * ) &( pcStringToSend2[ 0 ] ), streambufferSHARED_MEM_SIZE_BYTES,
-								   ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-									 ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-								},
-								{ ( void * ) &( pcStringReceived2[ 0 ] ), streambufferSHARED_MEM_SIZE_BYTES,
-								   ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-									 ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-								},
-								{ ( void * ) &( ulEchoLoopCounters[ 0 ] ), streambufferSHARED_MEM_SIZE_BYTES,
-								   ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-									 ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-								},
-								{ ( void * ) &( xStreamBuffers[ 0 ] ), streambufferSHARED_MEM_SIZE_BYTES,
-								   ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-									 ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-								},
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        }
-                            }
-    };
-
-    /*Creating client task */
-    xTaskCreateRestricted( &( xEchoClientTask1Parameters ), &( xEchoClientTaskHandle[ 0 ] ) );
-    xTaskCreateRestricted( &( xEchoClientTask2Parameters ), &( xEchoClientTaskHandle[ 1 ] ) );
-
-    /* The echo servers sets up the stream buffers before creating the echo
-     * client tasks.  One set of tasks has the server as the higher priority, and
-     * the other has the client as the higher priority. */
-
     TaskParameters_t xEchoServerTask1Parameters =
     {
-        .pvTaskCode      = prvEchoServer,
-        .pcName          = "1StrEchoServer",
-        .usStackDepth    = sbSMALLER_STACK_SIZE,
-        .pvParameters    = (void *) &xStreamBuffers[ 0 ],
-        .uxPriority      = ( sbHIGHEST_PRIORITY | portPRIVILEGE_BIT ),
-        .puxStackBuffer  = xEchoServerTask1Stack,
-        .xRegions        =    {
-								{ ( void * ) &( pucFullBuffer[ 0 ] ), streambufferSHARED_MEM_SIZE_BYTES * 2,
-								   ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-									 ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-								},
-								{ ( void * ) &( pc54ByteString[ 0 ] ), streambufferSHARED_MEM_SIZE_BYTES * 2,
-								   ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-									 ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-								},
-								{ ( void * ) &( pc55ByteString[ 0 ] ), streambufferSHARED_MEM_SIZE_BYTES * 2,
-								   ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-									 ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-								},
-								{ ( void * ) &( pcReceivedString2[ 0 ] ), streambufferSHARED_MEM_SIZE_BYTES,
-								   ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-									 ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-								},
-								{ ( void * ) &( xStreamBuffers[ 0 ] ), streambufferSHARED_MEM_SIZE_BYTES,
-								   ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-									 ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-								},
-								{ ( void * ) &( xEchoClientTaskHandle[ 0 ] ), streambufferSHARED_MEM_SIZE_BYTES,
-								   ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-									 ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-								},
+        .pvTaskCode     = prvEchoServer,
+        .pcName         = "1StrEchoServer",
+        .usStackDepth   = configMINIMAL_STACK_SIZE * 2,
+        .pvParameters   = NULL,
+        /* Needs to be privileged because it calls xStreamBufferSendFromISR. */
+        .uxPriority     = ( sbHIGHER_PRIORITY | portPRIVILEGE_BIT ),
+        .puxStackBuffer = xEchoServerTask1Stack,
+        .xRegions       = {
+                                { ( void * ) &( xEchoStreamBuffersArray[ 0 ] ), streambufferSHARED_MEM_SIZE_BYTES,
+                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                     ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                },
+                                { ( void * ) &( xEchoClientTaskHandles[ 0 ] ), streambufferSHARED_MEM_SIZE_BYTES,
+                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                     ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                },
+                                { ( void * ) &( xErrorStatus[ 0 ] ), streambufferSHARED_MEM_SIZE_BYTES,
+                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                     ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                },
+                                { ( void * ) &( pc55ByteString[ 0 ] ), 128,
+                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                     ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                },
+                                { ( void * ) &( pc54ByteString[ 0 ] ), 128,
+                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                     ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                },
+                                { 0,                0,                    0                                                        },
                                 { 0,                0,                    0                                                        },
                                 { 0,                0,                    0                                                        },
                                 { 0,                0,                    0                                                        },
@@ -361,28 +248,31 @@ void vStartStreamBufferTasks( void )
     {
         .pvTaskCode      = prvEchoServer,
         .pcName          = "2StrEchoServer",
-        .usStackDepth    = sbSMALLER_STACK_SIZE,
-        .pvParameters    = (void *) &xStreamBuffers[ 1 ],
-        .uxPriority      = sbHIGHER_PRIORITY,
+        .usStackDepth    = configMINIMAL_STACK_SIZE * 2,
+        .pvParameters    = NULL,
+        .uxPriority      = sbLOWER_PRIORITY,
         .puxStackBuffer  = xEchoServerTask2Stack,
-        .xRegions        =    {
-								{ ( void * ) &( pucFullBuffer[ 0 ] ), streambufferSHARED_MEM_SIZE_BYTES * 2,
-								   ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-									 ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-								},
-								{ ( void * ) &( pcReceivedString1[ 0 ] ), streambufferSHARED_MEM_SIZE_BYTES,
-									( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-									( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-								},
-								{ ( void * ) &( xStreamBuffers[ 0 ] ), streambufferSHARED_MEM_SIZE_BYTES,
-								   ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-									 ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-								},
-								{ ( void * ) &( xEchoClientTaskHandle[ 0 ] ), streambufferSHARED_MEM_SIZE_BYTES,
-								   ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-									 ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-								},
-                                { 0,                0,                    0                                                        },
+        .xRegions        = {
+                                { ( void * ) &( xEchoStreamBuffersArray[ 0 ] ), streambufferSHARED_MEM_SIZE_BYTES,
+                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                     ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                },
+                                { ( void * ) &( xEchoClientTaskHandles[ 0 ] ), streambufferSHARED_MEM_SIZE_BYTES,
+                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                     ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                },
+                                { ( void * ) &( xErrorStatus[ 0 ] ), streambufferSHARED_MEM_SIZE_BYTES,
+                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                     ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                },
+                                { ( void * ) &( pc55ByteString[ 0 ] ), 128,
+                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                     ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                },
+                                { ( void * ) &( pc54ByteString[ 0 ] ), 128,
+                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                     ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                },
                                 { 0,                0,                    0                                                        },
                                 { 0,                0,                    0                                                        },
                                 { 0,                0,                    0                                                        },
@@ -392,31 +282,23 @@ void vStartStreamBufferTasks( void )
                             }
     };
 
-    xTaskCreateRestricted( &( xEchoServerTask1Parameters ), NULL );
-    xTaskCreateRestricted( &( xEchoServerTask2Parameters ), NULL );
-
-    /* The non blocking tasks run continuously and will interleave with each
-     * other, so must be created at the lowest priority.  The stream buffer they
-     * use is created and passed in using the task's parameter. */
-    xStreamBuffer = xStreamBufferCreate( sbSTREAM_BUFFER_LENGTH_BYTES, sbTRIGGER_LEVEL_1 );
-
     TaskParameters_t xNonBlockingReceiverTaskParameters =
     {
         .pvTaskCode      = prvNonBlockingReceiverTask,
         .pcName          = "StrNonBlkRx",
         .usStackDepth    = configMINIMAL_STACK_SIZE,
-        .pvParameters    = ( void * ) xStreamBuffer,
-        .uxPriority      = (tskIDLE_PRIORITY + 1),
+        .pvParameters    = NULL,
+        .uxPriority      = tskIDLE_PRIORITY,
         .puxStackBuffer  = xNonBlockingReceiverTaskStack,
-        .xRegions        =    {
-								{ ( void * ) &( ulNonBlockingRxCounter[ 0 ] ), streambufferSHARED_MEM_SIZE_BYTES,
-								   ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-									 ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-								},
-								{ ( void * ) &( pc54ByteString[ 0 ] ), streambufferSHARED_MEM_SIZE_BYTES,
-								   ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-									 ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-								},
+        .xRegions        = {
+                                { ( void * ) &( ulNonBlockingRxCounter[ 0 ] ), streambufferSHARED_MEM_SIZE_BYTES,
+                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                     ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                },
+                                { ( void * ) &( pc54ByteString[ 0 ] ), 128,
+                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                     ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                },
                                 { 0,                0,                    0                                                        },
                                 { 0,                0,                    0                                                        },
                                 { 0,                0,                    0                                                        },
@@ -434,15 +316,18 @@ void vStartStreamBufferTasks( void )
         .pvTaskCode      = prvNonBlockingSenderTask,
         .pcName          = "StrNonBlkTx",
         .usStackDepth    = configMINIMAL_STACK_SIZE,
-        .pvParameters    = ( void * ) xStreamBuffer,
-        .uxPriority      = (tskIDLE_PRIORITY + 1),
+        .pvParameters    = NULL,
+        .uxPriority      = tskIDLE_PRIORITY,
         .puxStackBuffer  = xNonBlockingSenderTaskStack,
-        .xRegions        =    {
-								{ ( void * ) &( pc54ByteString[ 0 ] ), streambufferSHARED_MEM_SIZE_BYTES,
-								   ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-									 ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-								},
-                				{ 0,                0,                    0                                                        },
+        .xRegions        = {
+                                { ( void * ) &( xErrorStatus[ 0 ] ), streambufferSHARED_MEM_SIZE_BYTES,
+                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                     ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                },
+                                { ( void * ) &( pc54ByteString[ 0 ] ), 128,
+                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                     ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                },
                                 { 0,                0,                    0                                                        },
                                 { 0,                0,                    0                                                        },
                                 { 0,                0,                    0                                                        },
@@ -454,13 +339,6 @@ void vStartStreamBufferTasks( void )
                                 { 0,                0,                    0                                                        }
                             }
     };
-    xTaskCreateRestricted( &( xNonBlockingReceiverTaskParameters ), NULL );
-    xTaskCreateRestricted( &( xNonBlockingSenderTaskParameters ), NULL );
-
-    /* The task that receives bytes from an interrupt to test that it unblocks
-     * at a specific trigger level must run at a high priority to minimize the risk
-     * of it receiving more characters before it can execute again after being
-     * unblocked. */
 
     TaskParameters_t xInterruptTriggerLevelTestTaskParameters =
     {
@@ -468,21 +346,21 @@ void vStartStreamBufferTasks( void )
         .pcName          = "StrTrig",
         .usStackDepth    = configMINIMAL_STACK_SIZE,
         .pvParameters    = NULL,
-        .uxPriority      = (configMAX_PRIORITIES - 1),
+        .uxPriority      = configMAX_PRIORITIES - 1,
         .puxStackBuffer  = xInterruptTriggerLevelTestStack,
-        .xRegions        =    {
-								{ ( void * ) &( ulInterruptTriggerCounter[ 0 ] ), streambufferSHARED_MEM_SIZE_BYTES,
-								   ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-									 ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-								},
-								{ ( void * ) &( xInterruptStreamBuffer[ 0 ] ), streambufferSHARED_MEM_SIZE_BYTES,
-								   ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-									 ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-								},
-								{ ( void * ) &( pcDataSentFromInterrupt[ 0 ] ), streambufferSHARED_MEM_SIZE_BYTES,
-								   ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-									 ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-								},
+        .xRegions        = {
+                                { ( void * ) &( ulInterruptTriggerCounter[ 0 ] ), streambufferSHARED_MEM_SIZE_BYTES,
+                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                     ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                },
+                                { ( void * ) &( xInterruptStreamBuffer[ 0 ] ), streambufferSHARED_MEM_SIZE_BYTES,
+                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                     ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                },
+                                { ( void * ) &( pcDataSentFromInterrupt[ 0 ] ), streambufferSHARED_MEM_SIZE_BYTES,
+                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                     ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                },
                                 { 0,                0,                    0                                                        },
                                 { 0,                0,                    0                                                        },
                                 { 0,                0,                    0                                                        },
@@ -494,38 +372,221 @@ void vStartStreamBufferTasks( void )
                             }
     };
 
+    TaskParameters_t xEchoClientTask1Parameters =
+    {
+        .pvTaskCode      = prvEchoClient,
+        .pcName          = "EchoClient",
+        .usStackDepth    = configMINIMAL_STACK_SIZE * 2,
+        .pvParameters    = NULL,
+        .uxPriority      = sbLOWER_PRIORITY,
+        .puxStackBuffer  = xEchoClientTask1Stack,
+        .xRegions        = {
+                                { ( void * ) &( xEchoStreamBuffersArray[ 0 ] ), streambufferSHARED_MEM_SIZE_BYTES,
+                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                     ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                },
+                                { ( void * ) &( ulEchoLoopCounters[ 0 ] ), streambufferSHARED_MEM_SIZE_BYTES,
+                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                     ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                },
+                                { ( void * ) &( xErrorStatus[ 0 ] ), streambufferSHARED_MEM_SIZE_BYTES,
+                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                     ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        }
+                            }
+    };
+
+    TaskParameters_t xEchoClientTask2Parameters =
+    {
+        .pvTaskCode      = prvEchoClient,
+        .pcName          = "EchoClient",
+        .usStackDepth    = configMINIMAL_STACK_SIZE * 2,
+        .pvParameters    = NULL,
+        .uxPriority      = sbHIGHER_PRIORITY,
+        .puxStackBuffer  = xEchoClientTask2Stack,
+        .xRegions        = {
+                                { ( void * ) &( xEchoStreamBuffersArray[ 0 ] ), streambufferSHARED_MEM_SIZE_BYTES,
+                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                     ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                },
+                                { ( void * ) &( ulEchoLoopCounters[ 0 ] ), streambufferSHARED_MEM_SIZE_BYTES,
+                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                     ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                },
+                                { ( void * ) &( xErrorStatus[ 0 ] ), streambufferSHARED_MEM_SIZE_BYTES,
+                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                     ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        },
+                                { 0,                0,                    0                                                        }
+                            }
+    };
+
+    /* Setup strings used in the demo. */
+    sprintf( pcDataSentFromInterrupt, "0123456789" );
+    sprintf( pc55ByteString, "One two three four five six seven eight nine ten eleven" );
+    sprintf( pc54ByteString, "01234567891abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQ" );
+
+    /* Create the stream buffer used to send data from the client to the server,
+     * and the stream buffer used to echo the data from the server back to the
+     * client. */
+    xEchoStreamBuffersArray[ ECHO_STREAM_BUFFERS_1_IDX ].xEchoClientBuffer = xStreamBufferCreate( sbSTREAM_BUFFER_LENGTH_BYTES, sbTRIGGER_LEVEL_1 );
+    xEchoStreamBuffersArray[ ECHO_STREAM_BUFFERS_1_IDX ].xEchoServerBuffer = xStreamBufferCreate( sbSTREAM_BUFFER_LENGTH_BYTES, sbTRIGGER_LEVEL_1 );
+    configASSERT( xEchoStreamBuffersArray[ ECHO_STREAM_BUFFERS_1_IDX ].xEchoClientBuffer );
+    configASSERT( xEchoStreamBuffersArray[ ECHO_STREAM_BUFFERS_1_IDX ].xEchoServerBuffer );
+
+    xEchoStreamBuffersArray[ ECHO_STREAM_BUFFERS_2_IDX ].xEchoClientBuffer = xStreamBufferCreate( sbSTREAM_BUFFER_LENGTH_BYTES, sbTRIGGER_LEVEL_1 );
+    xEchoStreamBuffersArray[ ECHO_STREAM_BUFFERS_2_IDX ].xEchoServerBuffer = xStreamBufferCreate( sbSTREAM_BUFFER_LENGTH_BYTES, sbTRIGGER_LEVEL_1 );
+    configASSERT( xEchoStreamBuffersArray[ ECHO_STREAM_BUFFERS_2_IDX ].xEchoClientBuffer );
+    configASSERT( xEchoStreamBuffersArray[ ECHO_STREAM_BUFFERS_2_IDX ].xEchoServerBuffer );
+
+    /* The echo servers sets up the stream buffers before creating the echo
+     * client tasks.  One set of tasks has the server as the higher priority, and
+     * the other has the client as the higher priority. */
+    xEchoServerTask1Parameters.pvParameters = ( void * ) &( xEchoStreamBuffersArray[ ECHO_STREAM_BUFFERS_1_IDX ] );
+    xEchoServerTask2Parameters.pvParameters = ( void * ) &( xEchoStreamBuffersArray[ ECHO_STREAM_BUFFERS_2_IDX ] );
+    xTaskCreateRestricted( &( xEchoServerTask1Parameters ), NULL );
+    xTaskCreateRestricted( &( xEchoServerTask2Parameters ), NULL );
+
+    /* The non blocking tasks run continuously and will interleave with each
+     * other, so must be created at the lowest priority.  The stream buffer they
+     * use is created and passed in using the task's parameter. */
+    xStreamBuffer = xStreamBufferCreate( sbSTREAM_BUFFER_LENGTH_BYTES, sbTRIGGER_LEVEL_1 );
+    xNonBlockingReceiverTaskParameters.pvParameters = ( void * ) xStreamBuffer;
+    xNonBlockingSenderTaskParameters.pvParameters = ( void * ) xStreamBuffer;
+    xTaskCreateRestricted( &( xNonBlockingReceiverTaskParameters ), NULL );
+    xTaskCreateRestricted( &( xNonBlockingSenderTaskParameters ), NULL );
+
+    /* The task that receives bytes from an interrupt to test that it unblocks
+     * at a specific trigger level must run at a high priority to minimize the risk
+     * of it receiving more characters before it can execute again after being
+     * unblocked. */
     xTaskCreateRestricted( &( xInterruptTriggerLevelTestTaskParameters ), NULL );
+
+    /* Echo client tasks. */
+    xEchoClientTask1Parameters.pvParameters = ( void * ) &( xEchoStreamBuffersArray[ ECHO_STREAM_BUFFERS_1_IDX ] );
+    xEchoClientTask2Parameters.pvParameters = ( void * ) &( xEchoStreamBuffersArray[ ECHO_STREAM_BUFFERS_2_IDX ] );
+    xTaskCreateRestricted( &( xEchoClientTask1Parameters ), &( xEchoClientTaskHandles[ ECHO_CLIENT_TASK1_IDX ] ) );
+    xTaskCreateRestricted( &( xEchoClientTask2Parameters ), &( xEchoClientTaskHandles[ ECHO_CLIENT_TASK2_IDX ] ) );
+    vTaskSuspend( xEchoClientTaskHandles[ ECHO_CLIENT_TASK1_IDX ] );
+    vTaskSuspend( xEchoClientTaskHandles[ ECHO_CLIENT_TASK2_IDX ] );
 
     #if ( configSUPPORT_STATIC_ALLOCATION == 1 )
     {
-        /* The sender tasks set up the stream buffers before creating the
-         * receiver tasks.  Priorities must be 0 and 1 as the priority is used to
-         * index into the xStaticStreamBuffers and ucBufferStorage arrays. */
+        StreamBufferHandle_t xStreamBufferForStaticTests1, xStreamBufferForStaticTests2;
+        static StackType_t xSenderTask1Stack[ configMINIMAL_STACK_SIZE * 2 ] __attribute__( ( aligned( configMINIMAL_STACK_SIZE * 2 * sizeof( StackType_t ) ) ) );
+        static StackType_t xSenderTask2Stack[ configMINIMAL_STACK_SIZE * 2 ] __attribute__( ( aligned( configMINIMAL_STACK_SIZE * 2 * sizeof( StackType_t ) ) ) );
+        static StackType_t xReceivingTask1Stack[ configMINIMAL_STACK_SIZE * 2 ] __attribute__( ( aligned( configMINIMAL_STACK_SIZE * 2 * sizeof( StackType_t ) ) ) );
+        static StackType_t xReceivingTask2Stack[ configMINIMAL_STACK_SIZE * 2 ] __attribute__( ( aligned( configMINIMAL_STACK_SIZE * 2 * sizeof( StackType_t ) ) ) );
 
-        
-        int idx;
-        for (idx = 0; idx < 2; idx++)
+        TaskParameters_t xSenderTask1Parameters =
         {
-            xReceiverTaskStreamBuffers[idx] = xStreamBufferCreateStatic(sizeof(ucBufferStorage) / sbNUMBER_OF_SENDER_TASKS, /* The number of bytes in each buffer in the array. */
-                                                                    sbTRIGGER_LEVEL_1,                                    /* The number of bytes to be in the buffer before a task blocked to wait for data is unblocked. */
-                                                                    &(ucBufferStorage[idx][0]),                 /* The address of the buffer to use within the array. */
-                                                                    &(xStaticStreamBuffers[idx]));               /* The static stream buffer structure to use within the array. */
-        }
+            .pvTaskCode      = prvSenderTask,
+            .pcName          = "Str1Sender",
+            .usStackDepth    = configMINIMAL_STACK_SIZE * 2,
+            .pvParameters    = NULL,
+            .uxPriority      = sbHIGHER_PRIORITY,
+            .puxStackBuffer  = xSenderTask1Stack,
+            .xRegions        = {
+                                    { ( void * ) &( xReceiverTaskHandles[ 0 ] ), streambufferSHARED_MEM_SIZE_BYTES,
+                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                        ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                    },
+                                    { ( void * ) &( ulSenderLoopCounters[ 0 ] ), streambufferSHARED_MEM_SIZE_BYTES,
+                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                        ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                    },
+                                    { ( void * ) &( xErrorStatus[ 0 ] ), streambufferSHARED_MEM_SIZE_BYTES,
+                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                        ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                    },
+                                    { ( void * ) &( pc55ByteString[ 0 ] ), 128,
+                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                        ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                    },
+                                    { ( void * ) &( pc54ByteString[ 0 ] ), 128,
+                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                        ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                    },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        }
+                                }
+        };
 
-        static StackType_t xReceivingTask1Stack[configMINIMAL_STACK_SIZE * 2] __attribute__((aligned(configMINIMAL_STACK_SIZE * 2 * sizeof(StackType_t))));
-        static StackType_t xReceivingTask2Stack[configMINIMAL_STACK_SIZE * 2] __attribute__((aligned(configMINIMAL_STACK_SIZE * 2 * sizeof(StackType_t))));
+        TaskParameters_t xSenderTask2Parameters =
+        {
+            .pvTaskCode      = prvSenderTask,
+            .pcName          = "Str2Sender",
+            .usStackDepth    = sbSMALLER_STACK_SIZE,
+            .pvParameters    = NULL,
+            /* Needs to be privileged because it calls xStreamBufferSendFromISR. */
+            .uxPriority      = ( sbLOWER_PRIORITY | portPRIVILEGE_BIT ),
+            .puxStackBuffer  = xSenderTask2Stack,
+            .xRegions        = {
+                                    { ( void * ) &( xReceiverTaskHandles[ 0 ] ), streambufferSHARED_MEM_SIZE_BYTES,
+                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                        ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                    },
+                                    { ( void * ) &( ulSenderLoopCounters[ 0 ] ), streambufferSHARED_MEM_SIZE_BYTES,
+                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                         ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                    },
+                                    { ( void * ) &( xErrorStatus[ 0 ] ), streambufferSHARED_MEM_SIZE_BYTES,
+                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                        ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                    },
+                                    { ( void * ) &( pc55ByteString[ 0 ] ), 128,
+                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                        ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                    },
+                                    { ( void * ) &( pc54ByteString[ 0 ] ), 128,
+                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                        ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                    },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        },
+                                    { 0,                0,                    0                                                        }
+                                }
+        };
 
         TaskParameters_t xReceivingTask1Parameters =
         {
             .pvTaskCode = prvReceiverTask,
             .pcName = "StrReceiver",
-            .usStackDepth = sbSMALLER_STACK_SIZE,
-            .pvParameters = (void*)xReceiverTaskStreamBuffers[ 0 ],
+            .usStackDepth = configMINIMAL_STACK_SIZE * 2,
+            .pvParameters = NULL,
             .uxPriority = sbLOWER_PRIORITY,
             .puxStackBuffer = xReceivingTask1Stack,
             .xRegions = {
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
+                                    { ( void * ) &( xErrorStatus[ 0 ] ), streambufferSHARED_MEM_SIZE_BYTES,
+                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                        ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                    },
+                                    { ( void * ) &( pc55ByteString[ 0 ] ), 128,
+                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                        ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                    },
                                     { 0,                0,                    0                                                        },
                                     { 0,                0,                    0                                                        },
                                     { 0,                0,                    0                                                        },
@@ -542,13 +603,19 @@ void vStartStreamBufferTasks( void )
         {
             .pvTaskCode = prvReceiverTask,
             .pcName = "StrReceiver",
-            .usStackDepth = sbSMALLER_STACK_SIZE,
-            .pvParameters = (void*)xReceiverTaskStreamBuffers[ 1 ],
-            .uxPriority = sbLOWER_PRIORITY,
+            .usStackDepth = configMINIMAL_STACK_SIZE * 2,
+            .pvParameters = NULL,
+            .uxPriority = sbHIGHER_PRIORITY,
             .puxStackBuffer = xReceivingTask2Stack,
             .xRegions = {
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
+                                    { ( void * ) &( xErrorStatus[ 0 ] ), streambufferSHARED_MEM_SIZE_BYTES,
+                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                        ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                    },
+                                    { ( void * ) &( pc55ByteString[ 0 ] ), 128,
+                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
+                                        ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                    },
                                     { 0,                0,                    0                                                        },
                                     { 0,                0,                    0                                                        },
                                     { 0,                0,                    0                                                        },
@@ -561,88 +628,31 @@ void vStartStreamBufferTasks( void )
                                 }
         };
 
-        xTaskCreateRestricted( &( xReceivingTask1Parameters ), &( xReceiverTaskHandles[ 0 ] ) );
-        xTaskCreateRestricted( &( xReceivingTask2Parameters ), &( xReceiverTaskHandles[ 1 ] ) );
+        xStreamBufferForStaticTests1 = xStreamBufferCreateStatic( sizeof( ucBufferStorage ) / sbNUMBER_OF_SENDER_TASKS, /* The number of bytes in each buffer in the array. */
+                                                                  sbTRIGGER_LEVEL_1,                                    /* The number of bytes to be in the buffer before a task blocked to wait for data is unblocked. */
+                                                                  &( ucBufferStorage[ 1 ][ 0 ] ),                 /* The address of the buffer to use within the array. */
+                                                                  &( xStaticStreamBuffers[ 1 ] ) );               /* The static stream buffer structure to use within the array. */
 
-        static StackType_t xSenderTask1Stack[ configMINIMAL_STACK_SIZE * 2 ] __attribute__( ( aligned( configMINIMAL_STACK_SIZE * 2 * sizeof( StackType_t ) ) ) );
-        static StackType_t xSenderTask2Stack[ configMINIMAL_STACK_SIZE * 2 ] __attribute__( ( aligned( configMINIMAL_STACK_SIZE * 2 * sizeof( StackType_t ) ) ) );
+        xStreamBufferForStaticTests2 = xStreamBufferCreateStatic( sizeof( ucBufferStorage ) / sbNUMBER_OF_SENDER_TASKS, /* The number of bytes in each buffer in the array. */
+                                                                  sbTRIGGER_LEVEL_1,                                    /* The number of bytes to be in the buffer before a task blocked to wait for data is unblocked. */
+                                                                  &( ucBufferStorage[ 0 ][ 0 ] ),                 /* The address of the buffer to use within the array. */
+                                                                  &( xStaticStreamBuffers[ 0 ] ) );               /* The static stream buffer structure to use within the array. */
 
-        TaskParameters_t xSenderTask1Parameters =
-        {
-            .pvTaskCode      = prvSenderTask,
-            .pcName          = "Str1Sender",
-            .usStackDepth    = sbSMALLER_STACK_SIZE,
-            .pvParameters    = (void*)xReceiverTaskStreamBuffers[ 0 ],
-            .uxPriority      = sbHIGHEST_PRIORITY,
-            .puxStackBuffer  = xSenderTask1Stack,
-            .xRegions        =    {
-									{ ( void * ) &( pc55ByteString[ 0 ] ), streambufferSHARED_MEM_SIZE_BYTES,
-									   ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-										 ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-									},
-									{ ( void * ) &( ulSenderLoopCounters[ 0 ] ), streambufferSHARED_MEM_SIZE_BYTES,
-									   ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-										 ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-									},
-									{ ( void * ) &( pucFullBuffer[ 0 ] ), streambufferSHARED_MEM_SIZE_BYTES * 2,
-									   ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-										 ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-									},
-									{ ( void * ) &( ulSenderLoopCounters[ 0 ] ), streambufferSHARED_MEM_SIZE_BYTES,
-									   ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-										 ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-									},
-									{ ( void * ) &( xReceiverTaskHandles[ 0 ] ), streambufferSHARED_MEM_SIZE_BYTES,
-									   ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-										 ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-									},
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        }
-                                }
-        };
-
-        TaskParameters_t xSenderTask2Parameters =
-        {
-            .pvTaskCode      = prvSenderTask,
-            .pcName          = "Str2Sender",
-            .usStackDepth    = sbSMALLER_STACK_SIZE,
-            .pvParameters    = (void*)xReceiverTaskStreamBuffers[ 1 ],
-            .uxPriority      = (sbHIGHER_PRIORITY | portPRIVILEGE_BIT),
-            .puxStackBuffer  = xSenderTask2Stack,
-            .xRegions        =    {
-									{ ( void * ) &( pc55ByteString[ 0 ] ), streambufferSHARED_MEM_SIZE_BYTES,
-									   ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-										 ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-									},
-									{ ( void * ) &( ulSenderLoopCounters[ 0 ] ), streambufferSHARED_MEM_SIZE_BYTES,
-									   ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-										 ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-									},
-									{ ( void * ) &( pucFullBuffer[ 0 ] ), streambufferSHARED_MEM_SIZE_BYTES * 2,
-									   ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-										 ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-									},
-									{ ( void * ) &( xReceiverTaskHandles[ 0 ] ), streambufferSHARED_MEM_SIZE_BYTES,
-									   ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-										 ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-									},
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        }
-                                }
-        };
-
+        /* The sender tasks set up the stream buffers before creating the
+         * receiver tasks.  Priorities must be 0 and 1 as the priority is used to
+         * index into the xStaticStreamBuffers and ucBufferStorage arrays. */
+        xSenderTask1Parameters.pvParameters = ( void * ) xStreamBufferForStaticTests1;
+        xSenderTask2Parameters.pvParameters = ( void * ) xStreamBufferForStaticTests2;
         xTaskCreateRestricted( &( xSenderTask1Parameters ), NULL );
         xTaskCreateRestricted( &( xSenderTask2Parameters ), NULL );
 
+        xReceivingTask1Parameters.pvParameters = ( void * ) xStreamBufferForStaticTests1;
+        xReceivingTask2Parameters.pvParameters = ( void * ) xStreamBufferForStaticTests2;
+        xTaskCreateRestricted( &( xReceivingTask1Parameters ), &( xReceiverTaskHandles[ RECEIVER_TASK1_IDX ] ) );
+        xTaskCreateRestricted( &( xReceivingTask2Parameters ), &( xReceiverTaskHandles[ RECEIVER_TASK2_IDX ] ) );
+
+        vTaskSuspend( xReceiverTaskHandles[ RECEIVER_TASK1_IDX ] );
+        vTaskSuspend( xReceiverTaskHandles[ RECEIVER_TASK2_IDX ] );
     }
     #endif /* configSUPPORT_STATIC_ALLOCATION */
 }
@@ -665,7 +675,8 @@ static void prvSingleTaskTests( StreamBufferHandle_t xStreamBuffer )
     const size_t xMax6ByteMessages = sbSTREAM_BUFFER_LENGTH_BYTES / 6;
     const size_t xTrueSize = ( sizeof( ucBufferStorage ) / sbNUMBER_OF_SENDER_TASKS );
     const size_t x6ByteLength = 6, x17ByteLength = 17, xFullBufferSize = sbSTREAM_BUFFER_LENGTH_BYTES * ( size_t ) 2;
-    uint8_t * pucData, * pucReadData;
+    uint8_t ucFullBuffer[ sbSTREAM_BUFFER_LENGTH_BYTES * 2 ];
+    uint8_t * pucFullBuffer, * pucData, * pucReadData;
     TickType_t xTimeBeforeCall, xTimeAfterCall;
     const TickType_t xBlockTime = pdMS_TO_TICKS( 15 ), xAllowableMargin = pdMS_TO_TICKS( 3 ), xMinimalBlockTime = 2;
     UBaseType_t uxOriginalPriority;
@@ -673,10 +684,7 @@ static void prvSingleTaskTests( StreamBufferHandle_t xStreamBuffer )
     /* Remove warning in case configASSERT() is not defined. */
     ( void ) xAllowableMargin;
 
-    /* To minimize stack and heap usage a full size buffer is allocated from the
-     * heap, then buffers which hold smaller amounts of data are overlayed with the
-     * larger buffer - just make sure not to use both at once! */
-    configASSERT( pucFullBuffer );
+    pucFullBuffer = &( ucFullBuffer[ 0 ] );
 
     pucData = pucFullBuffer;
     pucReadData = pucData + x17ByteLength;
@@ -1000,7 +1008,6 @@ static void prvSingleTaskTests( StreamBufferHandle_t xStreamBuffer )
     /* Clean up with data in the buffer to ensure the tests that follow don't
      * see the data (the data should be discarded). */
     ( void ) xStreamBufferSend( xStreamBuffer, ( const void * ) pc55ByteString, sbSTREAM_BUFFER_LENGTH_BYTES / ( size_t ) 2, sbDONT_BLOCK );
-    memset( ( void * ) pucFullBuffer, ( ( int ) '0' ) , sizeof( pucFullBuffer ) );
     xStreamBufferReset( xStreamBuffer );
 }
 /*-----------------------------------------------------------*/
@@ -1123,7 +1130,7 @@ static void prvNonBlockingReceiverTask( void * pvParameters )
 
     static void prvSenderTask( void * pvParameters )
     {
-        StreamBufferHandle_t xStreamBuffer,xTempStreamBuffer;
+        StreamBufferHandle_t xStreamBuffer, xTempStreamBuffer;
         static uint8_t ucTempBuffer[ 10 ]; /* Just used to exercise stream buffer creating and deletion. */
         const TickType_t xTicksToWait = sbRX_TX_BLOCK_TIME, xShortDelay = pdMS_TO_TICKS( 50 );
         StaticStreamBuffer_t xStaticStreamBuffer;
@@ -1136,35 +1143,20 @@ static void prvNonBlockingReceiverTask( void * pvParameters )
 
         /* Make sure a change in priority does not inadvertently result in an
          * invalid array index. */
-        prvCheckExpectedState( uxIndex < sbNUMBER_OF_ECHO_CLIENTS + 1 );
+        prvCheckExpectedState( uxIndex < sbNUMBER_OF_ECHO_CLIENTS );
 
-        /* Avoid compiler warnings about unused parameters. */
+        xStreamBuffer = ( StreamBufferHandle_t ) pvParameters;
 
-        xStreamBuffer = ( StreamBufferHandle_t )pvParameters;
-
-        /*Suspend the receiver tasks*/
-        vTaskSuspend( xReceiverTaskHandles[ 0 ] );
-        vTaskSuspend( xReceiverTaskHandles[ 1 ] );
-
-        /* Now the stream buffer has been created the receiver task can be
-         * created.  If this sender task has the higher priority then the receiver
-         * task is created at the lower priority - if this sender task has the
-         * lower priority then the receiver task is created at the higher
-         * priority. */
-        if( uxTaskPriorityGet( NULL ) == sbHIGHER_PRIORITY )
+        if( uxTaskPriorityGet( NULL ) == sbLOWER_PRIORITY )
         {
             /* Here prvSingleTaskTests() performs various tests on a stream buffer
              * that was created statically. */
             prvSingleTaskTests( xStreamBuffer );
-        	vTaskPrioritySet( xReceiverTaskHandles[ 1 ], sbHIGHEST_PRIORITY );
-        	vTaskResume( xReceiverTaskHandles[ 1 ] );
-        	vTaskResume( xReceiverTaskHandles[ 0 ] );
-
+            vTaskResume( xReceiverTaskHandles[ RECEIVER_TASK2_IDX ] );
         }
         else
         {
-        	vTaskPrioritySet( xReceiverTaskHandles[ 0 ], sbHIGHER_PRIORITY );
-        	vTaskResume( xReceiverTaskHandles[ 0 ] );
+            vTaskResume( xReceiverTaskHandles[ RECEIVER_TASK1_IDX ] );
         }
 
         for( ; ; )
@@ -1192,7 +1184,7 @@ static void prvNonBlockingReceiverTask( void * pvParameters )
              * still running as expected. */
             ulSenderLoopCounters[ uxIndex ]++;
 
-            if( uxTaskPriorityGet( NULL ) == sbHIGHEST_PRIORITY )
+            if( uxTaskPriorityGet( NULL ) == sbHIGHER_PRIORITY )
             {
                 /* Allow other tasks to run. */
                 vTaskDelay( xShortDelay );
@@ -1220,7 +1212,7 @@ static void prvNonBlockingReceiverTask( void * pvParameters )
         StreamBufferHandle_t const pxStreamBuffer = ( StreamBufferHandle_t ) pvParameters;
         char cRxString[ 12 ]; /* Large enough to hold a 32-bit number in ASCII. */
         const TickType_t xTicksToWait = pdMS_TO_TICKS( 5UL );
-        const size_t xStringLength = strlen( pc55ByteString);
+        const size_t xStringLength = strlen( pc55ByteString );
         size_t xNextChar = 0, xReceivedLength, xBytesToReceive;
 
         for( ; ; )
@@ -1256,39 +1248,21 @@ static void prvNonBlockingReceiverTask( void * pvParameters )
 static void prvEchoClient( void * pvParameters )
 {
     size_t xSendLength = 0, ux;
-    char *pcStringToSend, *pcStringReceived, cNextChar = sbASCII_SPACE;
+    char pcStringToSend[ sbSTREAM_BUFFER_LENGTH_BYTES ];
+    char pcStringReceived[ sbSTREAM_BUFFER_LENGTH_BYTES ];
+    char cNextChar = sbASCII_SPACE;
     const TickType_t xTicksToWait = pdMS_TO_TICKS( 50 );
     StreamBufferHandle_t xTempStreamBuffer;
 
-/* The task's priority is used as an index into the loop counters used to
- * indicate this task is still running. */
+    /* The task's priority is used as an index into the loop counters used to
+     * indicate this task is still running. */
     UBaseType_t uxIndex = uxTaskPriorityGet( NULL );
 
-    if( uxIndex == sbHIGHER_PRIORITY )
-    {
-    	pcStringToSend = pcStringToSend1;
-    	pcStringReceived = pcStringReceived1;
-    }
-    else
-    {
-    	pcStringToSend = pcStringToSend2;
-    	pcStringReceived = pcStringReceived2;
-    }
-
-/* Pointers to the client and server stream buffers are passed into this task
- * using the task's parameter. */
+    /* Pointers to the client and server stream buffers are passed into this task
+     * using the task's parameter. */
     EchoStreamBuffers_t * pxStreamBuffers = ( EchoStreamBuffers_t * ) pvParameters;
 
-    /* Create the buffer into which strings to send to the server will be
-     * created, and the buffer into which strings echoed back from the server will
-     * be copied. */
-    //pcStringToSend = ( char * ) pvPortMalloc( sbSTREAM_BUFFER_LENGTH_BYTES );
-    //pcStringReceived = ( char * ) pvPortMalloc( sbSTREAM_BUFFER_LENGTH_BYTES );
-
-    configASSERT( pcStringToSend );
-    configASSERT( pcStringReceived );
-
-    for( ; ; )
+     for( ; ; )
     {
         /* Generate the length of the next string to send. */
         xSendLength++;
@@ -1391,34 +1365,14 @@ static void prvEchoClient( void * pvParameters )
 static void prvEchoServer( void * pvParameters )
 {
     size_t xReceivedLength;
+    char pcReceivedString[ sbSTREAM_BUFFER_LENGTH_BYTES ];
     TickType_t xTimeOnEntering;
-    char * pcReceivedString;
     const TickType_t xTicksToBlock = pdMS_TO_TICKS( 350UL );
-
-    /* Pointers to the client and server stream buffers are passed into this task
-     * using the task's parameter. */
-    EchoStreamBuffers_t * pxStreamBuffers = ( EchoStreamBuffers_t * ) pvParameters;
-
-    //check the priority of the task and then allocate local buffer based on that
-    UBaseType_t uxIndex = uxTaskPriorityGet( NULL );
-    if( uxIndex == sbHIGHER_PRIORITY)
-    {
-    	pcReceivedString = pcReceivedString1;
-    }
-    else
-    {
-    	pcReceivedString = pcReceivedString2;
-    }
-
-    configASSERT( pcReceivedString );
-
-    /* Suspend both the client tasks */
-    vTaskSuspend( xEchoClientTaskHandle[ 0 ] );
-    vTaskSuspend( xEchoClientTaskHandle[ 1 ] );
+    EchoStreamBuffers_t * pxEchoStreamBuffers = ( EchoStreamBuffers_t * ) pvParameters;
 
     /* Don't expect to receive anything yet! */
     xTimeOnEntering = xTaskGetTickCount();
-    xReceivedLength = xStreamBufferReceive( pxStreamBuffers->xEchoClientBuffer, ( void * ) pcReceivedString, sbSTREAM_BUFFER_LENGTH_BYTES, xTicksToBlock );
+    xReceivedLength = xStreamBufferReceive( pxEchoStreamBuffers->xEchoClientBuffer, ( void * ) pcReceivedString, sbSTREAM_BUFFER_LENGTH_BYTES, xTicksToBlock );
     prvCheckExpectedState( ( ( TickType_t ) ( xTaskGetTickCount() - xTimeOnEntering ) ) >= xTicksToBlock );
     prvCheckExpectedState( xReceivedLength == 0 );
 
@@ -1426,21 +1380,16 @@ static void prvEchoServer( void * pvParameters )
      * created.  If this server task has the higher priority then the client task
      * is created at the lower priority - if this server task has the lower
      * priority then the client task is created at the higher priority. */
-    if( uxTaskPriorityGet( NULL ) == sbHIGHER_PRIORITY )
+    if( uxTaskPriorityGet( NULL ) == sbLOWER_PRIORITY )
     {
-    	vTaskPrioritySet( xEchoClientTaskHandle[ 1 ], sbHIGHEST_PRIORITY );
-    	vTaskResume( xEchoClientTaskHandle[ 1 ] );
-    	vTaskResume( xEchoClientTaskHandle[ 0 ] );
+        vTaskResume( xEchoClientTaskHandles[ ECHO_CLIENT_TASK2_IDX ] );
     }
     else
     {
         /* Here prvSingleTaskTests() performs various tests on a stream buffer
          * that was created dynamically. */
-        prvSingleTaskTests( pxStreamBuffers->xEchoClientBuffer );
-
-    	vTaskPrioritySet( xEchoClientTaskHandle[ 0 ], sbHIGHER_PRIORITY );
-    	vTaskResume( xEchoClientTaskHandle[ 0 ] );
-
+        prvSingleTaskTests( pxEchoStreamBuffers->xEchoClientBuffer );
+        vTaskResume( xEchoClientTaskHandles[ ECHO_CLIENT_TASK1_IDX ] );
     }
 
     for( ; ; )
@@ -1448,13 +1397,13 @@ static void prvEchoServer( void * pvParameters )
         memset( pcReceivedString, 0x00, sbSTREAM_BUFFER_LENGTH_BYTES );
 
         /* Has any data been sent by the client? */
-        xReceivedLength = xStreamBufferReceive( pxStreamBuffers->xEchoClientBuffer, ( void * ) pcReceivedString, sbSTREAM_BUFFER_LENGTH_BYTES, portMAX_DELAY );
+        xReceivedLength = xStreamBufferReceive( pxEchoStreamBuffers->xEchoClientBuffer, ( void * ) pcReceivedString, sbSTREAM_BUFFER_LENGTH_BYTES, portMAX_DELAY );
 
         /* Should always receive data as max delay was used. */
         prvCheckExpectedState( xReceivedLength > 0 );
 
         /* Echo the received data back to the client. */
-        xStreamBufferSend( pxStreamBuffers->xEchoServerBuffer, ( void * ) pcReceivedString, xReceivedLength, portMAX_DELAY );
+        xStreamBufferSend( pxEchoStreamBuffers->xEchoServerBuffer, ( void * ) pcReceivedString, xReceivedLength, portMAX_DELAY );
     }
 }
 /*-----------------------------------------------------------*/
@@ -1650,15 +1599,13 @@ BaseType_t xAreStreamBufferTasksStillRunning( void )
 
     for( x = 0; x < sbNUMBER_OF_ECHO_CLIENTS; x++ )
     {
-    	//incrementing ulEchoLoopCounters index by 1, due to the changed priority of the client tasks
-
-        if( ulLastEchoLoopCounters[ x ] == ulEchoLoopCounters[ x + 1 ] )
+        if( ulLastEchoLoopCounters[ x ] == ulEchoLoopCounters[ x ] )
         {
             xErrorStatus[ 0 ] = pdFAIL;
         }
         else
         {
-            ulLastEchoLoopCounters[ x ] = ulEchoLoopCounters[ x + 1 ];
+            ulLastEchoLoopCounters[ x ] = ulEchoLoopCounters[ x ];
         }
     }
 
@@ -1686,13 +1633,13 @@ BaseType_t xAreStreamBufferTasksStillRunning( void )
 
         for( x = 0; x < sbNUMBER_OF_SENDER_TASKS; x++ )
         {
-            if( ulLastSenderLoopCounters[ x ] == ulSenderLoopCounters[ x + 1 ] )
+            if( ulLastSenderLoopCounters[ x ] == ulSenderLoopCounters[ x ] )
             {
                 xErrorStatus[ 0 ] = pdFAIL;
             }
             else
             {
-                ulLastSenderLoopCounters[ x ] = ulSenderLoopCounters[ x + 1 ];
+                ulLastSenderLoopCounters[ x ] = ulSenderLoopCounters[ x ];
             }
         }
     }
