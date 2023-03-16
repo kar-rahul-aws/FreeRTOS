@@ -151,7 +151,8 @@ See http://www.FreeRTOS.org/RTOS-Cortex-M3-M4.html. */
  * used. TEX=0, S=0, C=1, B=1. */
 #define configTEX_S_C_B_SRAM						( 0x03UL )
 
-#define configPROTECTED_KERNEL_OBJECT_HANDLE_POOL_SIZE				( 150 )
+#define configPROTECTED_KERNEL_OBJECT_HANDLE_POOL_SIZE        ( 150 )
+#define configPROTECTED_TIMER_OBJECT_POOL_SIZE                ( 20 )
 /* Defines for Testing Project https://github.com/FreeRTOS/FreeRTOS/tree/main/FreeRTOS/Demo/ThirdParty/Template*/
 
 #define configTASK_NOTIFICATION_ARRAY_ENTRIES 	3
@@ -180,7 +181,7 @@ See http://www.FreeRTOS.org/RTOS-Cortex-M3-M4.html. */
 #define configSTART_MESSAGE_BUFFER_TESTS          1
 #define configSTART_STREAM_BUFFER_TESTS           1
 #define configSTART_STREAM_BUFFER_INTERRUPT_TESTS 1
-#define configSTART_TIMER_TESTS                   0
+#define configSTART_TIMER_TESTS                   1
 #define configSTART_INTERRUPT_QUEUE_TESTS         0
 #define configSTART_REGISTER_TESTS                0
 #define configSTART_DELETE_SELF_TESTS             0
