@@ -182,9 +182,10 @@ void vStartInterruptSemaphoreTasks( void )
         {
             .pvTaskCode        = vInterruptMutexMasterTask,
             .pcName            = "IntMuM",
-            .usStackDepth    = configMINIMAL_STACK_SIZE,
-            .pvParameters    = NULL,
-            .uxPriority        = intsemMASTER_PRIORITY,
+            .usStackDepth    	= configMINIMAL_STACK_SIZE,
+            .pvParameters    	= NULL,
+			/* Needs to be privileged because it calls privileged only APIs. */
+            .uxPriority        = ( intsemMASTER_PRIORITY | portPRIVILEGE_BIT ),
             .puxStackBuffer    = xInterruptMutexMasterTaskStack,
             .xRegions        =    {
                                     { ( void * ) &( xSlaveHandle[ 0 ] ), intsSHARED_MEM_SIZE_BYTES,

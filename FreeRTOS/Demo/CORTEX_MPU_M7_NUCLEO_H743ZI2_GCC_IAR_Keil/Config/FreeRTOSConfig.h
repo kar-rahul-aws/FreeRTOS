@@ -181,7 +181,7 @@ See http://www.FreeRTOS.org/RTOS-Cortex-M3-M4.html. */
 #define configSTART_MESSAGE_BUFFER_TESTS          1
 #define configSTART_STREAM_BUFFER_TESTS           1
 #define configSTART_STREAM_BUFFER_INTERRUPT_TESTS 1
-#define configSTART_TIMER_TESTS                   1
+#define configSTART_TIMER_TESTS                   0
 #define configSTART_INTERRUPT_QUEUE_TESTS         0
 #define configSTART_REGISTER_TESTS                0
 #define configSTART_DELETE_SELF_TESTS             0

@@ -233,7 +233,8 @@ void vStartEventGroupTasks( void )
         .pcName          = "SetB",
         .usStackDepth    = ebEVENT_GROUP_SET_BITS_TEST_TASK_STACK_SIZE,
         .pvParameters    = NULL,
-        .uxPriority      = ebSET_BIT_TASK_PRIORITY,
+		/* Needs to be privileged because it calls privileged only APIs. */
+        .uxPriority      = ( ebSET_BIT_TASK_PRIORITY | portPRIVILEGE_BIT ),
         .puxStackBuffer  = xTestMasterTaskStack,
         .xRegions        =  {
                                 { ( void * ) &( xEventGroup[ 0 ] ), eventgrpSHARED_MEM_SIZE_BYTES,

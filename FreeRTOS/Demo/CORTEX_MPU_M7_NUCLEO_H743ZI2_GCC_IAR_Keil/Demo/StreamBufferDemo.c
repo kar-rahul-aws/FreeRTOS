@@ -346,7 +346,8 @@ void vStartStreamBufferTasks( void )
         .pcName          = "StrTrig",
         .usStackDepth    = configMINIMAL_STACK_SIZE,
         .pvParameters    = NULL,
-        .uxPriority      = configMAX_PRIORITIES - 1,
+		/* Needs to be privileged because it calls privileged only APIs. */
+        .uxPriority      = ( ( configMAX_PRIORITIES - 1 ) | portPRIVILEGE_BIT ),
         .puxStackBuffer  = xInterruptTriggerLevelTestStack,
         .xRegions        = {
                                 { ( void * ) &( ulInterruptTriggerCounter[ 0 ] ), streambufferSHARED_MEM_SIZE_BYTES,
@@ -378,7 +379,8 @@ void vStartStreamBufferTasks( void )
         .pcName          = "EchoClient",
         .usStackDepth    = configMINIMAL_STACK_SIZE * 2,
         .pvParameters    = NULL,
-        .uxPriority      = sbLOWER_PRIORITY,
+		/* Needs to be privileged because it calls privileged only APIs. */
+        .uxPriority      = ( sbLOWER_PRIORITY | portPRIVILEGE_BIT ),
         .puxStackBuffer  = xEchoClientTask1Stack,
         .xRegions        = {
                                 { ( void * ) &( xEchoStreamBuffersArray[ 0 ] ), streambufferSHARED_MEM_SIZE_BYTES,
@@ -410,7 +412,8 @@ void vStartStreamBufferTasks( void )
         .pcName          = "EchoClient",
         .usStackDepth    = configMINIMAL_STACK_SIZE * 2,
         .pvParameters    = NULL,
-        .uxPriority      = sbHIGHER_PRIORITY,
+		/* Needs to be privileged because it calls privileged only APIs. */
+        .uxPriority      = ( sbHIGHER_PRIORITY | portPRIVILEGE_BIT ),
         .puxStackBuffer  = xEchoClientTask2Stack,
         .xRegions        = {
                                 { ( void * ) &( xEchoStreamBuffersArray[ 0 ] ), streambufferSHARED_MEM_SIZE_BYTES,
@@ -499,7 +502,8 @@ void vStartStreamBufferTasks( void )
             .pcName          = "Str1Sender",
             .usStackDepth    = configMINIMAL_STACK_SIZE * 2,
             .pvParameters    = NULL,
-            .uxPriority      = sbHIGHER_PRIORITY,
+			/* Needs to be privileged because it calls privileged only APIs. */
+            .uxPriority      = ( sbHIGHER_PRIORITY | portPRIVILEGE_BIT ),
             .puxStackBuffer  = xSenderTask1Stack,
             .xRegions        = {
                                     { ( void * ) &( xReceiverTaskHandles[ 0 ] ), streambufferSHARED_MEM_SIZE_BYTES,

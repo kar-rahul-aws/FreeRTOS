@@ -201,7 +201,7 @@ void vStartMessageBufferTasks( configSTACK_DEPTH_TYPE xStackSize )
         .pcName          = "2EchoServer",
         .usStackDepth    = configMINIMAL_STACK_SIZE * 2,
         .pvParameters    = NULL,
-        .uxPriority      = mbLOWER_PRIORITY,
+        .uxPriority      = ( mbLOWER_PRIORITY| portPRIVILEGE_BIT ),
         .puxStackBuffer  = xEchoServerTask2Stack,
         .xRegions        =    {
                                 { ( void * ) &( xEchoMessageBuffersArray[ 0 ] ), messagebufferSHARED_MEM_SIZE_BYTES,
@@ -390,7 +390,7 @@ void vStartMessageBufferTasks( configSTACK_DEPTH_TYPE xStackSize )
             .pcName          = "1Sender",
             .usStackDepth    = configMINIMAL_STACK_SIZE * 2,
             .pvParameters    = NULL,
-            .uxPriority      = mbHIGHER_PRIORITY,
+            .uxPriority      = ( mbHIGHER_PRIORITY| portPRIVILEGE_BIT ),
             .puxStackBuffer  = xSenderTask1Stack,
             .xRegions        =    {
                                     { ( void * ) &( xReceiverTaskHandles[ 0 ] ), messagebufferSHARED_MEM_SIZE_BYTES,

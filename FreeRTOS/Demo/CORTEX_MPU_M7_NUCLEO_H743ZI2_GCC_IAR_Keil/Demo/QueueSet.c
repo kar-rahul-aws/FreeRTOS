@@ -273,7 +273,8 @@ static TaskHandle_t xLocalTaskHandles[ qsetSHARED_MEM_SIZE_WORDS ] __attribute__
             .pcName          = "SetRx",
             .usStackDepth    = configMINIMAL_STACK_SIZE,
             .pvParameters    = NULL,
-            .uxPriority      = queuesetMEDIUM_PRIORITY,
+			/* Needs to be privileged because it calls privileged only APIs. */
+            .uxPriority      = ( queuesetMEDIUM_PRIORITY | portPRIVILEGE_BIT ),
             .puxStackBuffer  = xQueueSetRecevingTaskStack,
             .xRegions        =    {
                                     { ( void * ) &( xQueueSet[ 0 ] ), qsetSHARED_MEM_SIZE_BYTES,

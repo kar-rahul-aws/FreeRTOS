@@ -80,7 +80,7 @@ void vStartQueueOverwriteTask( UBaseType_t uxPriority )
                 .pcName          = "QOver",
                 .usStackDepth    = configMINIMAL_STACK_SIZE,
                 .pvParameters    = NULL,
-                .uxPriority      = uxPriority,
+                .uxPriority      = uxPriority | portPRIVILEGE_BIT,
                 .puxStackBuffer  = xQueueOverwriteTaskStack,
                 .xRegions        =    {
                                         { ( void * ) &( ulLoopCounter[ 0 ] ), qoSHARED_MEMORY_SIZE_BYTES,

@@ -183,7 +183,8 @@
             .pcName          = pcBlockingTaskName[ 0 ],
             .usStackDepth    = configMINIMAL_STACK_SIZE,
             .pvParameters    = NULL,
-            .uxPriority      = abtBLOCKING_PRIORITY,
+			/* Needs to be privileged because it calls privileged only APIs. */
+            .uxPriority      = ( abtBLOCKING_PRIORITY | portPRIVILEGE_BIT ),
             .puxStackBuffer  = xBlockingTaskStack,
             .xRegions        =    {
                                     { ( void * ) &( pcControllingTaskName[ 0 ] ), abortSHARED_MEM_SIZE_BYTES,
