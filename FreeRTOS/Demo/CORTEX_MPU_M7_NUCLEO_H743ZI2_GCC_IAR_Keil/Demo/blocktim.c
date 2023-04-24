@@ -129,7 +129,8 @@ void vCreateBlockTimeTasks( void )
             .pcName         = "BTest1",
             .usStackDepth   = bktBLOCK_TIME_TASK_STACK_SIZE,
             .pvParameters   = ( void * ) xTestQueue[ 0 ],
-            .uxPriority     = bktPRIMARY_PRIORITY,
+			/* Needs to be privileged because it calls privileged only APIs --> Task Suspension */
+            .uxPriority     = ( bktPRIMARY_PRIORITY | portPRIVILEGE_BIT ),
             .puxStackBuffer = xPrimaryBlockTimeTestTaskStack,
             .xRegions       =
             {

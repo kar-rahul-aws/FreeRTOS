@@ -225,7 +225,8 @@ void vStartInterruptSemaphoreTasks( void )
             .pcName            = "IntCnt",
             .usStackDepth    = configMINIMAL_STACK_SIZE,
             .pvParameters    = NULL,
-            .uxPriority        = tskIDLE_PRIORITY,
+			/* Needs to be privileged because it calls privileged only APIs --> Set Priority */
+            .uxPriority        = ( tskIDLE_PRIORITY | portPRIVILEGE_BIT ),
             .puxStackBuffer    = xInterruptCountingSemaphoreTaskStack,
             .xRegions        =    {
                                     { ( void * ) &( xOkToGiveCountingSemaphore[ 0 ] ), intsSHARED_MEM_SIZE_BYTES,

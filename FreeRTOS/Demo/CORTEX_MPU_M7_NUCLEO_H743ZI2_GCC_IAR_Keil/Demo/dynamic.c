@@ -180,7 +180,8 @@ static StackType_t xQueueReceiveWhenSuspendedTaskStack[ priSUSPENDED_RX_TASK_STA
             .pcName          = "CNT_INC",
             .usStackDepth    = priSTACK_SIZE,
             .pvParameters    = ( void * ) &ulCounter[ 0 ],
-            .uxPriority      = tskIDLE_PRIORITY,
+			/* Needs to be privileged because it calls privileged only APIs --> Set Priority */
+            .uxPriority      = ( tskIDLE_PRIORITY | portPRIVILEGE_BIT ),
             .puxStackBuffer  = xContinuousIncrementTaskStack,
             .xRegions        =  {
                                     { ( void * ) &( ulCounter[ 0 ] ), dynamicSHARED_MEM_SIZE_BYTES,
@@ -230,7 +231,8 @@ static StackType_t xQueueReceiveWhenSuspendedTaskStack[ priSUSPENDED_RX_TASK_STA
             .pcName          = "C_CTRL",
             .usStackDepth    = priSUSPENDED_RX_TASK_STACK_SIZE,
             .pvParameters    = NULL,
-            .uxPriority      = tskIDLE_PRIORITY,
+			/* Needs to be privileged because it has to suspend another privileged task */
+            .uxPriority      = ( tskIDLE_PRIORITY | portPRIVILEGE_BIT ),
             .puxStackBuffer  = xCounterControlTaskStack,
             .xRegions        =  {
                                     { ( void * ) &( ulCounter[ 0 ] ), dynamicSHARED_MEM_SIZE_BYTES,
@@ -261,7 +263,8 @@ static StackType_t xQueueReceiveWhenSuspendedTaskStack[ priSUSPENDED_RX_TASK_STA
             .pcName          = "SUSP_TX",
             .usStackDepth    = priSTACK_SIZE,
             .pvParameters    = NULL,
-            .uxPriority      = tskIDLE_PRIORITY,
+			/* Needs to be privileged because it calls privileged only APIs --> TaskSuspendAll() */
+            .uxPriority      = ( tskIDLE_PRIORITY | portPRIVILEGE_BIT ),
             .puxStackBuffer  = xQueueSendWhenSuspendedTaskStack,
             .xRegions        =  {
                                     { ( void * ) &( xSuspendedTestQueue[ 0 ] ), dynamicSHARED_MEM_SIZE_BYTES,
@@ -292,7 +295,8 @@ static StackType_t xQueueReceiveWhenSuspendedTaskStack[ priSUSPENDED_RX_TASK_STA
             .pcName          = "SUSP_RX",
             .usStackDepth    = priSUSPENDED_RX_TASK_STACK_SIZE,
             .pvParameters    = NULL,
-            .uxPriority      = tskIDLE_PRIORITY,
+			/* Needs to be privileged because it calls privileged only APIs --> TaskSuspendAll() */
+            .uxPriority      = ( tskIDLE_PRIORITY | portPRIVILEGE_BIT ),
             .puxStackBuffer  = xQueueReceiveWhenSuspendedTaskStack,
             .xRegions        =    {
                                     { ( void * ) &( xSuspendedTestQueue[ 0 ] ), dynamicSHARED_MEM_SIZE_BYTES,

@@ -125,7 +125,8 @@ void vStartTaskNotifyTask( void )
         .pcName          = "Notified",
         .usStackDepth    = notifyNOTIFIED_TASK_STACK_SIZE,
         .pvParameters    = NULL,
-        .uxPriority      = notifyTASK_PRIORITY,
+		/* Needs to be privileged because it calls privileged only APIs --> Set Priority */
+        .uxPriority      = ( notifyTASK_PRIORITY | portPRIVILEGE_BIT ),
         .puxStackBuffer  = xNotifiedTaskStack,
         .xRegions        =  {
                                 { ( void * ) &( ulTimerNotificationsReceived[ 0 ] ), notifySHARED_MEM_SIZE_BYTES,

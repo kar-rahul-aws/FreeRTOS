@@ -140,7 +140,8 @@ void vStartTimerDemoTask( TickType_t xBasePeriodIn )
         .pcName         = "Tmr Tst",
         .usStackDepth   = tmrTIMER_TEST_TASK_STACK_SIZE,
         .pvParameters   = NULL,
-        .uxPriority     = configTIMER_TASK_PRIORITY - 1,
+		/* Needs to be privileged because it calls privileged only APIs --> Set Priority */
+        .uxPriority     = ( ( configTIMER_TASK_PRIORITY - 1 ) | portPRIVILEGE_BIT ),
         .puxStackBuffer = xTimerTestTaskStack,
         .xRegions       =
         {

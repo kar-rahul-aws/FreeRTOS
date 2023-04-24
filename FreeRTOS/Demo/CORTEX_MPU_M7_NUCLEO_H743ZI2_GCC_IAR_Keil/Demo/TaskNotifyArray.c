@@ -172,7 +172,8 @@ void vStartTaskNotifyArrayTask( void )
         .pcName          = "ArrayNotified",
         .usStackDepth    = notifyNOTIFY_ARRAY_TASK_STACK_SIZE,
         .pvParameters    = NULL,
-        .uxPriority      = notifyTASK_PRIORITY,
+		/* Needs to be privileged because it calls privileged only APIs --> Set Priority */
+        .uxPriority      = ( notifyTASK_PRIORITY | portPRIVILEGE_BIT ),
         .puxStackBuffer  = xNotifiedTaskStack,
         .xRegions        =  {
                                 { ( void * ) &( ulCourseCycleCounter[ 0 ] ), notifyArraySHARED_MEM_SIZE_BYTES,
