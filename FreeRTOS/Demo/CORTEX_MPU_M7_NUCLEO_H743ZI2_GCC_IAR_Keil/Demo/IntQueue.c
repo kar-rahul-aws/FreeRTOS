@@ -230,7 +230,8 @@ void vStartInterruptQueueTasks( void )
         .pcName          = "H1QRx",
         .usStackDepth    = configMINIMAL_STACK_SIZE,
         .pvParameters    = ( void * ) intqHIGH_PRIORITY_TASK1,
-        .uxPriority      = intqHIGHER_PRIORITY,
+		/* Needs to be privileged because it suspends another privileged task */
+        .uxPriority      = ( intqHIGHER_PRIORITY | portPRIVILEGE_BIT ),
         .puxStackBuffer  = x1stHigherPriorityNormallyEmptyTaskStack,
         .xRegions        =  {
                                 { ( void * ) &( xNormallyEmptyQueue[ 0 ] ), intqSHARED_MEM_SIZE_BYTES,
@@ -274,7 +275,8 @@ void vStartInterruptQueueTasks( void )
         .pcName          = "H2QRx",
         .usStackDepth    = configMINIMAL_STACK_SIZE,
         .pvParameters    = ( void * ) intqHIGH_PRIORITY_TASK2,
-        .uxPriority      = intqHIGHER_PRIORITY,
+		/* Needs to be privileged because it suspends another privileged task */
+        .uxPriority      = ( intqHIGHER_PRIORITY | portPRIVILEGE_BIT ),
         .puxStackBuffer  = x2ndHigherPriorityNormallyEmptyTaskStack,
         .xRegions        =  {
                                 { ( void * ) &( xNormallyEmptyQueue[ 0 ] ), intqSHARED_MEM_SIZE_BYTES,
@@ -317,7 +319,8 @@ void vStartInterruptQueueTasks( void )
         .pcName          = "L1QRx",
         .usStackDepth    = configMINIMAL_STACK_SIZE,
         .pvParameters    = NULL,
-        .uxPriority      = intqLOWER_PRIORITY,
+		/* Needs to be privileged because it calls privileged only APIs --> Set Priority */
+        .uxPriority      = ( intqLOWER_PRIORITY | portPRIVILEGE_BIT ),
         .puxStackBuffer  = xLowerPriorityNormallyEmptyTaskStack,
         .xRegions        =  {
                                 { ( void * ) &( xNormallyEmptyQueue[ 0 ] ), intqSHARED_MEM_SIZE_BYTES,
@@ -354,7 +357,8 @@ void vStartInterruptQueueTasks( void )
         .pcName          = "H1QTx",
         .usStackDepth    = configMINIMAL_STACK_SIZE,
         .pvParameters    = ( void * ) intqHIGH_PRIORITY_TASK1,
-        .uxPriority      = intqHIGHER_PRIORITY,
+		/* Needs to be privileged because it suspends another privileged task */
+        .uxPriority      = ( intqHIGHER_PRIORITY | portPRIVILEGE_BIT ),
         .puxStackBuffer  = x1stHigherPriorityNormallyFullTaskStack,
         .xRegions        =  {
                                 { ( void * ) &( uxValueForNormallyFullQueue[ 0 ] ), intqSHARED_MEM_SIZE_VALUES_TO_LOG,
@@ -435,7 +439,8 @@ void vStartInterruptQueueTasks( void )
         .pcName          = "L2QRx",
         .usStackDepth    = configMINIMAL_STACK_SIZE,
         .pvParameters    = NULL,
-        .uxPriority      = intqLOWER_PRIORITY,
+		/* Needs to be privileged because it calls privileged only APIs --> Set Priority */
+        .uxPriority      = ( intqLOWER_PRIORITY | portPRIVILEGE_BIT ),
         .puxStackBuffer  = xLowerPriorityNormallyFullTaskStack,
         .xRegions        =  {
                                 { ( void * ) &( xNormallyFullQueue[ 0 ] ), intqSHARED_MEM_SIZE_BYTES,
