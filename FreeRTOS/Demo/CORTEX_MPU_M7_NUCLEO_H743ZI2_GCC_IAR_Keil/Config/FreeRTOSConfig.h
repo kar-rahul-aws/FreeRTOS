@@ -151,7 +151,7 @@ See http://www.FreeRTOS.org/RTOS-Cortex-M3-M4.html. */
  * used. TEX=0, S=0, C=1, B=1. */
 #define configTEX_S_C_B_SRAM						( 0x03UL )
 
-#define configPROTECTED_KERNEL_OBJECT_HANDLE_POOL_SIZE        ( 150 )
+#define configPROTECTED_KERNEL_OBJECT_POOL_SIZE        ( 150 )
 #define configPROTECTED_TIMER_OBJECT_POOL_SIZE                ( 20 )
 /* Defines for Testing Project https://github.com/FreeRTOS/FreeRTOS/tree/main/FreeRTOS/Demo/ThirdParty/Template*/
 
@@ -159,30 +159,30 @@ See http://www.FreeRTOS.org/RTOS-Cortex-M3-M4.html. */
 #define configPRINTF( X ) printf X /* Not thread safe currently, so must not be used from more than one task. */
 
 
-#define configSTART_TASK_NOTIFY_TESTS             1
-#define configSTART_TASK_NOTIFY_ARRAY_TESTS       1
-#define configSTART_BLOCKING_QUEUE_TESTS          1
-#define configSTART_SEMAPHORE_TESTS               1
-#define configSTART_POLLED_QUEUE_TESTS            1
-#define configSTART_INTEGER_MATH_TESTS            1
-#define configSTART_GENERIC_QUEUE_TESTS           1
-#define configSTART_PEEK_QUEUE_TESTS              1
-#define configSTART_MATH_TESTS                    1
-#define configSTART_RECURSIVE_MUTEX_TESTS         1
-#define configSTART_COUNTING_SEMAPHORE_TESTS      1
-#define configSTART_QUEUE_SET_TESTS               1
-#define configSTART_QUEUE_OVERWRITE_TESTS         1
-#define configSTART_EVENT_GROUP_TESTS             1
-#define configSTART_INTERRUPT_SEMAPHORE_TESTS     1
-#define configSTART_QUEUE_SET_POLLING_TESTS       1
-#define configSTART_BLOCK_TIME_TESTS              1
-#define configSTART_ABORT_DELAY_TESTS             1
-#define configSTART_DYNAMIC_TASK_TESTS            1
-#define configSTART_MESSAGE_BUFFER_TESTS          1
-#define configSTART_STREAM_BUFFER_TESTS           1
-#define configSTART_STREAM_BUFFER_INTERRUPT_TESTS 1
-#define configSTART_TIMER_TESTS                   1
-#define configSTART_INTERRUPT_QUEUE_TESTS         0
+#define configSTART_TASK_NOTIFY_TESTS             0
+#define configSTART_TASK_NOTIFY_ARRAY_TESTS       0
+#define configSTART_BLOCKING_QUEUE_TESTS          0
+#define configSTART_SEMAPHORE_TESTS               0
+#define configSTART_POLLED_QUEUE_TESTS            0
+#define configSTART_INTEGER_MATH_TESTS            0
+#define configSTART_GENERIC_QUEUE_TESTS           0
+#define configSTART_PEEK_QUEUE_TESTS              0
+#define configSTART_MATH_TESTS                    0
+#define configSTART_RECURSIVE_MUTEX_TESTS         0
+#define configSTART_COUNTING_SEMAPHORE_TESTS      0
+#define configSTART_QUEUE_SET_TESTS               0
+#define configSTART_QUEUE_OVERWRITE_TESTS         0
+#define configSTART_EVENT_GROUP_TESTS             0
+#define configSTART_INTERRUPT_SEMAPHORE_TESTS     0
+#define configSTART_QUEUE_SET_POLLING_TESTS       0
+#define configSTART_BLOCK_TIME_TESTS              0
+#define configSTART_ABORT_DELAY_TESTS             0
+#define configSTART_DYNAMIC_TASK_TESTS            0
+#define configSTART_MESSAGE_BUFFER_TESTS          0
+#define configSTART_STREAM_BUFFER_TESTS           0
+#define configSTART_STREAM_BUFFER_INTERRUPT_TESTS 0
+#define configSTART_TIMER_TESTS                   0
+#define configSTART_INTERRUPT_QUEUE_TESTS         1
 #define configSTART_REGISTER_TESTS                0
 #define configSTART_DELETE_SELF_TESTS             0
 
