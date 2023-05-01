@@ -46,7 +46,7 @@
 extern uint32_t SystemCoreClock;
 
 /* Cortex M33 port configuration. */
-#define configENABLE_MPU								1
+#define configENABLE_MPU								0
 #define configENABLE_FPU								1
 #define configENABLE_TRUSTZONE							1
 
@@ -160,6 +160,10 @@ extern uint32_t SystemCoreClock;
 	#define configTICK_RATE_HZ							( ( TickType_t ) 100 )
 
 #endif /* __IASMARM__ */
+
+/*MPU demo includes*/
+//#define configPROTECTED_KERNEL_OBJECT_POOL_SIZE        				( 150 )
+//#define configPROTECTED_TIMER_OBJECT_POOL_SIZE                ( 20 )
 
 /* Enable static allocation. */
 #define configSUPPORT_STATIC_ALLOCATION					1

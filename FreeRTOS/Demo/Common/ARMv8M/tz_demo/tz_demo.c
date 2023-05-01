@@ -68,6 +68,8 @@ static void prvSecureCallingTask( void * pvParameters );
 void vStartTZDemo( void )
 {
     static StackType_t xSecureCallingTaskStack[ configMINIMAL_STACK_SIZE ] __attribute__( ( aligned( 32 ) ) );
+		static StaticTask_t xSecureCallingTaskTCBBuffer; 
+		
     TaskParameters_t xSecureCallingTaskParameters =
     {
         .pvTaskCode     = prvSecureCallingTask,
@@ -85,7 +87,11 @@ void vStartTZDemo( void )
     };
 
     /* Create an unprivileged task which calls secure functions. */
+#if ( configTOTAL_MPU_REGIONS == 16 )
     xTaskCreateRestricted( &( xSecureCallingTaskParameters ), NULL );
+#else
+		xTaskCreateStatic( prvSecureCallingTask, "SecCalling", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY, xSecureCallingTaskStack, &xSecureCallingTaskTCBBuffer );
+#endif
 }
 /*-----------------------------------------------------------*/
 

@@ -99,6 +99,15 @@ static StackType_t xRegTest4TaskStack[ configMINIMAL_STACK_SIZE ] __attribute__(
 static StackType_t xRegTestSecureTaskStack[ configMINIMAL_STACK_SIZE ] __attribute__( ( aligned( 32 ) ) );
 static StackType_t xRegTestNonSecureCallbackTaskStack[ configMINIMAL_STACK_SIZE ] __attribute__( ( aligned( 32 ) ) );
 static StackType_t xCheckTaskStack[ configMINIMAL_STACK_SIZE ] __attribute__( ( aligned( 32 ) ) );
+	
+static StaticTask_t xRegTest1TCBStack;
+static StaticTask_t xRegTest2TCBStack;
+static StaticTask_t xRegTest3TCBStack;
+static StaticTask_t xRegTest4TCBStack;
+static StaticTask_t xRegTestSecureTaskTCBStack;
+static StaticTask_t xRegTestNonSecureCallbackTaskTCBStack;
+static StaticTask_t xCheckTaskTCBStack;
+	
 
 TaskParameters_t xRegTest1TaskParameters =
 {
@@ -199,7 +208,7 @@ TaskParameters_t xCheckTaskParameters =
                             { 0, 0, 0 }
                         }
 };
-
+#if ( configTOTAL_MPU_REGIONS == 16 )
     xTaskCreateRestricted( &( xRegTest1TaskParameters ), NULL );
     xTaskCreateRestricted( &( xRegTest2TaskParameters ), NULL );
     xTaskCreateRestricted( &( xRegTest3TaskParameters ), NULL );
@@ -207,6 +216,16 @@ TaskParameters_t xCheckTaskParameters =
     xTaskCreateRestricted( &( xRegTestSecureTaskParameters ), NULL );
     xTaskCreateRestricted( &( xRegTestNonSecureCallbackTaskParameters ), NULL );
     xTaskCreateRestricted( &( xCheckTaskParameters ), NULL );
+#else
+		xTaskCreateStatic( prvRegTest1_Task,"RegTest1",configMINIMAL_STACK_SIZE,REG_TEST_1_TASK_PARAMETER,( tskIDLE_PRIORITY | portPRIVILEGE_BIT ),xRegTest1TaskStack,&xRegTest1TCBStack );
+		xTaskCreateStatic( prvRegTest2_Task,"RegTest2",configMINIMAL_STACK_SIZE,REG_TEST_2_TASK_PARAMETER,( tskIDLE_PRIORITY | portPRIVILEGE_BIT ),xRegTest2TaskStack,&xRegTest2TCBStack );
+		xTaskCreateStatic( prvRegTest3_Task,"RegTest3",configMINIMAL_STACK_SIZE,REG_TEST_3_TASK_PARAMETER,( tskIDLE_PRIORITY | portPRIVILEGE_BIT ),xRegTest3TaskStack,&xRegTest3TCBStack );
+		xTaskCreateStatic( prvRegTest4_Task,"RegTest4",configMINIMAL_STACK_SIZE,REG_TEST_4_TASK_PARAMETER,( tskIDLE_PRIORITY | portPRIVILEGE_BIT ),xRegTest4TaskStack,&xRegTest4TCBStack );
+		xTaskCreateStatic( prvRegTest_Secure_Task,"RegTestSecure",configMINIMAL_STACK_SIZE,REG_TEST_SECURE_TASK_PARAMETER,( tskIDLE_PRIORITY | portPRIVILEGE_BIT ),xRegTestSecureTaskStack,&xRegTestSecureTaskTCBStack );
+		xTaskCreateStatic( prvRegTest_NonSecureCallback_Task,"RegTestNonSecureCallback",configMINIMAL_STACK_SIZE,REG_TEST_NON_SECURE_CALLBACK_TASK_PARAMETER,( tskIDLE_PRIORITY | portPRIVILEGE_BIT ),xRegTestNonSecureCallbackTaskStack,&xRegTestNonSecureCallbackTaskTCBStack );		
+		xTaskCreateStatic( prvCheckTask,"Check",configMINIMAL_STACK_SIZE,NULL,( CHECK_TASK_PRIORITY | portPRIVILEGE_BIT ),xCheckTaskStack,&xCheckTaskTCBStack );
+		
+#endif
 }
 /*-----------------------------------------------------------*/
 

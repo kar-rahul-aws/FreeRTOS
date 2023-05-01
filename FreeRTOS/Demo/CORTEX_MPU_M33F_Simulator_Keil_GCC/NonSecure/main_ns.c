@@ -117,7 +117,9 @@ int main( void )
 static void prvCreateTasks( void )
 {
 	/* Create tasks for the MPU Demo. */
+#if ( configTOTAL_MPU_REGIONS == 16 )
 	vStartMPUDemo();
+#endif
 
 	/* Create tasks for the TZ Demo. */
 	vStartTZDemo();
