@@ -486,12 +486,17 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
+#if defined(__ICCARM__)
+int __write( int file, char *ptr, int len )
+#else
 int _write( int file, char *ptr, int len )
+#endif
 {
   ( void ) file;
   HAL_UART_Transmit( &( huart3 ), ( uint8_t * ) ptr, ( __uint16_t ) len, 1000 );
   return len;
 }
+
 /*-----------------------------------------------------------*/
 
 void vIncrementTim7Tick( void )
