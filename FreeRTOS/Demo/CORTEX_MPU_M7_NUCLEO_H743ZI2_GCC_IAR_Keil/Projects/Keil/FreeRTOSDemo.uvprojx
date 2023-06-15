@@ -10,13 +10,13 @@
       <TargetName>FreeRTOSDemo</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
-      <pCCUsed>6130001::V6.13.1::.\ARMCLANG</pCCUsed>
+      <pCCUsed>6190000::V6.19::ARMCLANG</pCCUsed>
       <uAC6>1</uAC6>
       <TargetOption>
         <TargetCommonOption>
           <Device>STM32H743ZITx</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32H7xx_DFP.2.4.0</PackID>
+          <PackID>Keil.STM32H7xx_DFP.3.1.0</PackID>
           <PackURL>https://www.keil.com/pack/</PackURL>
           <Cpu>IRAM(0x20000000-0x2001FFFF) IRAM2(0x24000000-0x2407FFFF) IROM(0x8000000-0x81FFFFF) CLOCK(12000000) FPU3(DFPU) CPUTYPE("Cortex-M7") ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
@@ -185,6 +185,8 @@
             <uocXRam>0</uocXRam>
             <RvdsVP>3</RvdsVP>
             <RvdsMve>0</RvdsMve>
+            <RvdsCdeCp>0</RvdsCdeCp>
+            <nBranchProt>0</nBranchProt>
             <hadIRAM2>1</hadIRAM2>
             <hadIROM2>0</hadIROM2>
             <StupSel>8</StupSel>
@@ -338,7 +340,7 @@
               <MiscControls></MiscControls>
               <Define>USE_HAL_DRIVER,STM32H743xx</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\Config;..\..\Demo;..\..\ST_Code\Core\Inc;..\..\ST_Code\Drivers\STM32H7xx_HAL_Driver\Inc;..\..\ST_Code\Drivers\STM32H7xx_HAL_Driver\Inc\Legacy;..\..\ST_Code\Drivers\CMSIS\Device\ST\STM32H7xx\Include;..\..\ST_Code\Drivers\CMSIS\Include;..\..\..\..\Source\include;..\..\..\..\Source\portable\GCC\ARM_CM4_MPU</IncludePath>
+              <IncludePath>..\..\Config;..\..\Demo;..\..\ST_Code\Core\Inc;..\..\ST_Code\Drivers\STM32H7xx_HAL_Driver\Inc;..\..\ST_Code\Drivers\STM32H7xx_HAL_Driver\Inc\Legacy;..\..\ST_Code\Drivers\CMSIS\Device\ST\STM32H7xx\Include;..\..\ST_Code\Drivers\CMSIS\Include;..\..\..\..\Source\include;..\..\..\..\Source\portable\GCC\ARM_CM4_MPU;..\..\..\..\Demo\Common\include</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -351,7 +353,7 @@
             <NoWarn>0</NoWarn>
             <uSurpInc>0</uSurpInc>
             <useXO>0</useXO>
-            <uClangAs>0</uClangAs>
+            <ClangAsOpt>4</ClangAsOpt>
             <VariousControls>
               <MiscControls></MiscControls>
               <Define></Define>
@@ -412,6 +414,171 @@
               <FileType>5</FileType>
               <FilePath>..\..\Demo\mpu_demo.h</FilePath>
             </File>
+            <File>
+              <FileName>AbortDelay.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\Demo\AbortDelay.c</FilePath>
+            </File>
+            <File>
+              <FileName>AbortDelay.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\Demo\AbortDelay.h</FilePath>
+            </File>
+            <File>
+              <FileName>BlockQ.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\Demo\BlockQ.c</FilePath>
+            </File>
+            <File>
+              <FileName>BlockQ.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\Demo\BlockQ.h</FilePath>
+            </File>
+            <File>
+              <FileName>blocktim.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\Demo\blocktim.c</FilePath>
+            </File>
+            <File>
+              <FileName>countsem.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\Demo\countsem.c</FilePath>
+            </File>
+            <File>
+              <FileName>dynamic.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\Demo\dynamic.c</FilePath>
+            </File>
+            <File>
+              <FileName>EventGroupsDemo.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\Demo\EventGroupsDemo.c</FilePath>
+            </File>
+            <File>
+              <FileName>EventGroupsDemo.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\Demo\EventGroupsDemo.h</FilePath>
+            </File>
+            <File>
+              <FileName>flop.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\Demo\flop.c</FilePath>
+            </File>
+            <File>
+              <FileName>GenQTest.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\Demo\GenQTest.c</FilePath>
+            </File>
+            <File>
+              <FileName>GenQTest.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\Demo\GenQTest.h</FilePath>
+            </File>
+            <File>
+              <FileName>integer.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\Demo\integer.c</FilePath>
+            </File>
+            <File>
+              <FileName>IntQueue.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\Demo\IntQueue.c</FilePath>
+            </File>
+            <File>
+              <FileName>IntQueue.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\Demo\IntQueue.h</FilePath>
+            </File>
+            <File>
+              <FileName>IntQueueTimer.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\Demo\IntQueueTimer.c</FilePath>
+            </File>
+            <File>
+              <FileName>IntQueueTimer.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\Demo\IntQueueTimer.h</FilePath>
+            </File>
+            <File>
+              <FileName>IntSemTest.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\Demo\IntSemTest.c</FilePath>
+            </File>
+            <File>
+              <FileName>MessageBufferDemo.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\Demo\MessageBufferDemo.c</FilePath>
+            </File>
+            <File>
+              <FileName>PollQ.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\Demo\PollQ.c</FilePath>
+            </File>
+            <File>
+              <FileName>QPeek.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\Demo\QPeek.c</FilePath>
+            </File>
+            <File>
+              <FileName>QueueOverwrite.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\Demo\QueueOverwrite.c</FilePath>
+            </File>
+            <File>
+              <FileName>QueueSet.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\Demo\QueueSet.c</FilePath>
+            </File>
+            <File>
+              <FileName>QueueSetPolling.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\Demo\QueueSetPolling.c</FilePath>
+            </File>
+            <File>
+              <FileName>recmutex.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\Demo\recmutex.c</FilePath>
+            </File>
+            <File>
+              <FileName>semtest.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\Demo\semtest.c</FilePath>
+            </File>
+            <File>
+              <FileName>StreamBufferDemo.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\Demo\StreamBufferDemo.c</FilePath>
+            </File>
+            <File>
+              <FileName>StreamBufferInterrupt.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\Demo\StreamBufferInterrupt.c</FilePath>
+            </File>
+            <File>
+              <FileName>TaskNotify.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\Demo\TaskNotify.c</FilePath>
+            </File>
+            <File>
+              <FileName>TaskNotifyArray.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\Demo\TaskNotifyArray.c</FilePath>
+            </File>
+            <File>
+              <FileName>TestRunner.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\Demo\TestRunner.c</FilePath>
+            </File>
+            <File>
+              <FileName>TestRunner.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\Demo\TestRunner.h</FilePath>
+            </File>
+            <File>
+              <FileName>TimerDemo.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\Demo\TimerDemo.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -458,14 +625,19 @@
               <FilePath>..\..\..\..\Source\portable\GCC\ARM_CM4_MPU\portmacro.h</FilePath>
             </File>
             <File>
-              <FileName>mpu_wrappers.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\Source\portable\Common\mpu_wrappers.c</FilePath>
-            </File>
-            <File>
               <FileName>heap_4.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\Source\portable\MemMang\heap_4.c</FilePath>
+            </File>
+            <File>
+              <FileName>mpu_wrappers_v2_asm.S</FileName>
+              <FileType>2</FileType>
+              <FilePath>..\..\..\..\Source\portable\RVDS\ARM_CM4_MPU\mpu_wrappers_v2_asm.S</FilePath>
+            </File>
+            <File>
+              <FileName>mpu_wrappers_v2.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\Source\portable\Common\mpu_wrappers_v2.c</FilePath>
             </File>
           </Files>
         </Group>
