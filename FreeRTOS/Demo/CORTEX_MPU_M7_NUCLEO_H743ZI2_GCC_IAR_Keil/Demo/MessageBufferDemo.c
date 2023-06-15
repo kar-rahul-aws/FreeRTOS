@@ -233,7 +233,7 @@ void vStartMessageBufferTasks( configSTACK_DEPTH_TYPE xStackSize )
         .pcName          = "NonBlkRx",
         .usStackDepth    = configMINIMAL_STACK_SIZE,
         .pvParameters    = NULL,
-        .uxPriority      = tskIDLE_PRIORITY,
+        .uxPriority      = ( tskIDLE_PRIORITY | portPRIVILEGE_BIT ),
         .puxStackBuffer  = xNonBlockingReceiverTaskStack,
         .xRegions        =    {
                                 { ( void * ) &( ulNonBlockingRxCounter[ 0 ] ), messagebufferSHARED_MEM_SIZE_BYTES,
@@ -259,7 +259,7 @@ void vStartMessageBufferTasks( configSTACK_DEPTH_TYPE xStackSize )
         .pcName          = "NonBlkTx",
         .usStackDepth    = configMINIMAL_STACK_SIZE,
         .pvParameters    = NULL,
-        .uxPriority      = tskIDLE_PRIORITY,
+        .uxPriority      = ( tskIDLE_PRIORITY | portPRIVILEGE_BIT ),
         .puxStackBuffer  = xNonBlockingSenderTaskStack,
         .xRegions        =    {
                                 { 0,                0,                    0                                                        },
@@ -390,7 +390,7 @@ void vStartMessageBufferTasks( configSTACK_DEPTH_TYPE xStackSize )
             .pcName          = "1Sender",
             .usStackDepth    = configMINIMAL_STACK_SIZE * 2,
             .pvParameters    = NULL,
-            .uxPriority      = ( mbHIGHER_PRIORITY| portPRIVILEGE_BIT ),
+            .uxPriority      = ( mbHIGHER_PRIORITY | portPRIVILEGE_BIT ),
             .puxStackBuffer  = xSenderTask1Stack,
             .xRegions        =    {
                                     { ( void * ) &( xReceiverTaskHandles[ 0 ] ), messagebufferSHARED_MEM_SIZE_BYTES,
@@ -453,7 +453,7 @@ void vStartMessageBufferTasks( configSTACK_DEPTH_TYPE xStackSize )
             .pcName          = "MsgReceiver",
             .usStackDepth    = configMINIMAL_STACK_SIZE * 2,
             .pvParameters    = NULL,
-            .uxPriority      = mbLOWER_PRIORITY,
+            .uxPriority      = ( mbLOWER_PRIORITY | portPRIVILEGE_BIT ),
             .puxStackBuffer  = xReceivingTask1Stack,
             .xRegions        =    {
                                     { 0,                0,                    0                                                        },
@@ -475,7 +475,7 @@ void vStartMessageBufferTasks( configSTACK_DEPTH_TYPE xStackSize )
             .pcName          = "MsgReceiver",
             .usStackDepth    = configMINIMAL_STACK_SIZE * 2,
             .pvParameters    = NULL,
-            .uxPriority      = mbHIGHER_PRIORITY,
+            .uxPriority      = ( mbHIGHER_PRIORITY | portPRIVILEGE_BIT ),
             .puxStackBuffer  = xReceivingTask2Stack,
             .xRegions        =    {
                                     { 0,                0,                    0                                                        },
