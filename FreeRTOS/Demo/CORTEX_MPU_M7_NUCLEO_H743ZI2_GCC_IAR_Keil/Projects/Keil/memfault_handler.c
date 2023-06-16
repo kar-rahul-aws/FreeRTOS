@@ -25,9 +25,12 @@
  */
 
 #include <stdint.h>
+#include <stdio.h>
+#include <main.h>
 
 extern uint32_t Image$$ER_IROM_FREERTOS_SYSTEM_CALLS$$Base;
 extern uint32_t Image$$ER_IROM_FREERTOS_SYSTEM_CALLS$$Limit;
+extern UART_HandleTypeDef huart3;
 
 /* Memory map needed for MPU setup. Must must match the one defined in
  * the scatter-loading file (FreeRTOSDemo.sct). */
@@ -53,17 +56,25 @@ void MemManage_Handler( void ) __attribute__ (( naked ));
 
 void MemManage_Handler( void )
 {
-	__asm volatile
-	(
-		" tst lr, #4										\n"
-		" ite eq											\n"
-		" mrseq r0, msp										\n"
-		" mrsne r0, psp										\n"
-		" ldr r1, handler_address_const						\n"
-		" bx r1												\n"
-		"													\n"
-		" .align 4											\n"
-		" handler_address_const: .word vHandleMemoryFault	\n"
-	);
+ __asm volatile
+ (
+  " tst lr, #4          \n"
+  " ite eq           \n"
+  " mrseq r0, msp          \n"
+  " mrsne r0, psp          \n"
+  " ldr r1, handler_address_const      \n"
+  " bx r1            \n"
+  "             \n"
+  " .align 4           \n"
+  " handler_address_const: .word vHandleMemoryFault \n"
+ );
+}
+
+/*-----------------------------------------------------------*/
+
+int fputc(int ch, FILE * stream)
+{
+   HAL_UART_Transmit( &( huart3 ), ( uint8_t * ) &ch, ( uint16_t ) 1, 1000 );
+   return 1;
 }
 /*-----------------------------------------------------------*/
