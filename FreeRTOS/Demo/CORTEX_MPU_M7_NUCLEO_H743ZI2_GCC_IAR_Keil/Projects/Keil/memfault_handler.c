@@ -33,13 +33,13 @@ extern uint32_t Image$$ER_IROM_FREERTOS_SYSTEM_CALLS$$Limit;
  * the scatter-loading file (FreeRTOSDemo.sct). */
 const uint32_t * __FLASH_segment_start__ = ( uint32_t * ) 0x08000000;
 const uint32_t * __FLASH_segment_end__ = ( uint32_t * ) 0x08200000;
-const uint32_t * __SRAM_segment_start__ = ( uint32_t * ) 0x20000000;
-const uint32_t * __SRAM_segment_end__ = ( uint32_t * ) 0x20020000;
+const uint32_t * __SRAM_segment_start__ = ( uint32_t * ) 0x24000000;
+const uint32_t * __SRAM_segment_end__ = ( uint32_t * ) 0x24080000;
 
 const uint32_t * __privileged_functions_start__ = ( uint32_t * ) 0x08000000;
 const uint32_t * __privileged_functions_end__ = ( uint32_t * ) 0x08008000;
-const uint32_t * __privileged_data_start__ = ( uint32_t * ) 0x20000000;
-const uint32_t * __privileged_data_end__ = ( uint32_t * ) 0x20008000;
+const uint32_t * __privileged_data_start__ = ( uint32_t * ) 0x24000000;
+const uint32_t * __privileged_data_end__ = ( uint32_t * ) 0x24040000;
 
 const uint32_t * __syscalls_flash_start__ = ( uint32_t * ) &( Image$$ER_IROM_FREERTOS_SYSTEM_CALLS$$Base );
 const uint32_t * __syscalls_flash_end__ = ( uint32_t * ) &( Image$$ER_IROM_FREERTOS_SYSTEM_CALLS$$Limit );

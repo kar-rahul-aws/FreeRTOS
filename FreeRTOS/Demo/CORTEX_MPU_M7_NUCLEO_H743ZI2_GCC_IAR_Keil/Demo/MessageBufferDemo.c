@@ -870,7 +870,7 @@ static void prvNonBlockingSenderTask( void * pvParameters )
      * string will increase and decrease as the value of the number increases
      * then overflows. */
     memset( cTxString, 0x00, sizeof( cTxString ) );
-#if defined(__ICCARM__)
+#if defined(__ICCARM__) || defined( __ARMCC_VERSION )
     sprintf( cTxString, "%d", iDataToSend );
 #else
     itoa( iDataToSend, cTxString, sizeof( cTxString ) );
@@ -894,7 +894,7 @@ static void prvNonBlockingSenderTask( void * pvParameters )
 
             /* Create the next string. */
             memset( cTxString, 0x00, sizeof( cTxString ) );
-#if defined(__ICCARM__)
+#if defined(__ICCARM__) || defined( __ARMCC_VERSION)
             sprintf( cTxString, "%d", iDataToSend );
 #else
             itoa( iDataToSend, cTxString, sizeof( cTxString ) );
@@ -925,7 +925,7 @@ static void prvNonBlockingReceiverTask( void * pvParameters )
      * the non blocking sender task. */
     memset( cExpectedString, 0x00, sizeof( cExpectedString ) );
     memset( cRxString, 0x00, sizeof( cRxString ) );
-#if defined(__ICCARM__)
+#if defined(__ICCARM__) || defined( __ARMCC_VERSION )
     sprintf( cExpectedString, "%d", iDataToSend );
 #else
     itoa( iDataToSend, cExpectedString, sizeof( cExpectedString ) );
@@ -965,7 +965,7 @@ static void prvNonBlockingReceiverTask( void * pvParameters )
 
             memset( cExpectedString, 0x00, sizeof( cExpectedString ) );
             memset( cRxString, 0x00, sizeof( cRxString ) );
-#if defined(__ICCARM__)
+#if defined(__ICCARM__) || defined( __ARMCC_VERSION )
             sprintf( cExpectedString, "%d", iDataToSend );
 #else
             itoa( iDataToSend, cExpectedString, sizeof( cExpectedString ) );
@@ -1027,7 +1027,7 @@ static void prvNonBlockingReceiverTask( void * pvParameters )
              * string will increase and decrease as the value of the number increases
              * then overflows. */
             memset( cTxString, 0x00, sizeof( cTxString ) );
-#if defined(__ICCARM__)
+#if defined(__ICCARM__) || defined( __ARMCC_VERSION )
             sprintf( cTxString, "%d", iDataToSend );
 #else
             itoa( iDataToSend, cTxString, sizeof( cTxString ) );
@@ -1081,7 +1081,7 @@ static void prvNonBlockingReceiverTask( void * pvParameters )
         {
             /* Generate the next expected string in the cExpectedString buffer. */
             memset( cExpectedString, 0x00, sizeof( cExpectedString ) );
-#if defined(__ICCARM__)
+#if defined(__ICCARM__) || defined( __ARMCC_VERSION )
             sprintf( cExpectedString, "%d", iExpectedData );
 #else
             itoa( iExpectedData, cExpectedString, sizeof( cExpectedString ) );

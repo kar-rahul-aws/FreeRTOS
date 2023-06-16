@@ -127,7 +127,7 @@
                                             }
                     };
 
-        if( ( xQueue != NULL ) && ( xQueueSet != NULL ) )
+        if( ( xQueue != NULL ) && ( xQueueSet[ 0 ] != NULL ) )
         {
             xQueueAddToSet( xQueue, xQueueSet[ 0 ] );
 

@@ -493,7 +493,7 @@ int _write( int file, char *ptr, int len )
 #endif
 {
   ( void ) file;
-  HAL_UART_Transmit( &( huart3 ), ( uint8_t * ) ptr, ( __uint16_t ) len, 1000 );
+  HAL_UART_Transmit( &( huart3 ), ( uint8_t * ) ptr, ( uint16_t ) len, 1000 );
   return len;
 }
 

@@ -267,8 +267,8 @@ BaseType_t xArePollingQueuesStillRunning( void )
      * been changed since out last trip round.  We do not need a critical section
      * around the check variables as this is called from a higher priority than
      * the other tasks that access the same variables. */
-    if( ( xPollingConsumerCount == pollqINITIAL_VALUE ) ||
-        ( xPollingProducerCount == pollqINITIAL_VALUE )
+    if( ( xPollingConsumerCount[ 0 ] == pollqINITIAL_VALUE ) ||
+        ( xPollingProducerCount[ 0 ]== pollqINITIAL_VALUE )
         )
     {
         xReturn = pdFALSE;
