@@ -21,6 +21,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "string.h"
+#include "stdio.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -495,6 +496,13 @@ int _write( int file, char *ptr, int len )
   ( void ) file;
   HAL_UART_Transmit( &( huart3 ), ( uint8_t * ) ptr, ( uint16_t ) len, 1000 );
   return len;
+}
+
+int fputc(int ch, FILE * stream)
+{
+  
+	HAL_UART_Transmit( &( huart3 ), ( uint8_t * ) &ch, ( uint16_t ) 1, 1000 );
+  return 1;
 }
 
 /*-----------------------------------------------------------*/
