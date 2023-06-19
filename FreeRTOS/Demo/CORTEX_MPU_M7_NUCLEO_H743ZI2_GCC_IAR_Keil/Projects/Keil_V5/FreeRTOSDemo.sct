@@ -33,12 +33,12 @@ LR_APP 0x08000000 0x00200000 ; load region size_region
         .ANY (+RO)
     }
 
-    RW_IRAM_PRIVILEGED 0x24000000
+    RW_IRAM_PRIVILEGED 0x24000000 0x40000
     {
         *(privileged_data)
     }
 
-    RW_IRAM_UNPRIVILEGED 0x24040000
+    RW_IRAM_UNPRIVILEGED 0x24040000 0x40000
     {
         .ANY (+RW +ZI)
     }
