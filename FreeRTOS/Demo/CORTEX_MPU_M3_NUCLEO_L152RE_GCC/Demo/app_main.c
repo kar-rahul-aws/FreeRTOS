@@ -35,8 +35,11 @@
 
 void app_main( void )
 {
+	/* Start tests. */
+	vStartTests();
+
 	/* Start the MPU demo. */
-	vStartMPUDemo();
+	//vStartMPUDemo();
 
 	/* Start the scheduler. */
 	vTaskStartScheduler();
