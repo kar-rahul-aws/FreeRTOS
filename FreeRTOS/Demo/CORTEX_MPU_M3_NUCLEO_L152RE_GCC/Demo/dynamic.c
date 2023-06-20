@@ -185,17 +185,8 @@ static StackType_t xQueueReceiveWhenSuspendedTaskStack[ priSUSPENDED_RX_TASK_STA
             .puxStackBuffer  = xContinuousIncrementTaskStack,
             .xRegions        =  {
                                     { ( void * ) &( ulCounter[ 0 ] ), dynamicSHARED_MEM_SIZE_BYTES,
-                                        ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-                                        ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                        ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
                                     },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
                                     { 0,                0,                    0                                                        },
                                     { 0,                0,                    0                                                        }
                                 }
@@ -210,17 +201,8 @@ static StackType_t xQueueReceiveWhenSuspendedTaskStack[ priSUSPENDED_RX_TASK_STA
             .puxStackBuffer  = xLimitedIncrementTaskStack,
             .xRegions        =  {
                                     { ( void * ) &( ulCounter[ 0 ] ), dynamicSHARED_MEM_SIZE_BYTES,
-                                        ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-                                        ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                        ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
                                     },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
                                     { 0,                0,                    0                                                        },
                                     { 0,                0,                    0                                                        }
                                 }
@@ -236,25 +218,14 @@ static StackType_t xQueueReceiveWhenSuspendedTaskStack[ priSUSPENDED_RX_TASK_STA
             .puxStackBuffer  = xCounterControlTaskStack,
             .xRegions        =  {
                                     { ( void * ) &( ulCounter[ 0 ] ), dynamicSHARED_MEM_SIZE_BYTES,
-                                        ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-                                        ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                        ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
                                     },
                                     { ( void * ) &( xLocalTaskHandles[ CONTINUOUS_INCREMENT_TASK_IDX ] ), dynamicSHARED_MEM_SIZE_BYTES,
-                                        ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-                                        ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                        ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
                                     },
                                     { ( void * ) &( usCheckVariable[ 0 ] ), dynamicSHARED_MEM_SIZE_BYTES,
-                                        ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-                                        ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-                                    },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        }
+                                        ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                    }
                                 }
         };
         TaskParameters_t xQueueSendWhenSuspendedTask =
@@ -268,25 +239,14 @@ static StackType_t xQueueReceiveWhenSuspendedTaskStack[ priSUSPENDED_RX_TASK_STA
             .puxStackBuffer  = xQueueSendWhenSuspendedTaskStack,
             .xRegions        =  {
                                     { ( void * ) &( xSuspendedTestQueue[ 0 ] ), dynamicSHARED_MEM_SIZE_BYTES,
-                                        ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-                                        ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                        ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
                                     },
                                     { ( void * ) &( xSuspendedQueueSendError[ 0 ] ), dynamicSHARED_MEM_SIZE_BYTES,
-                                        ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-                                        ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                        ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
                                     },
                                     { ( void * ) &( ulValueToSend[ 0 ] ), dynamicSHARED_MEM_SIZE_BYTES,
-                                        ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-                                        ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-                                    },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        }
+                                        ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                    }
                                 }
         };
         TaskParameters_t xQueueReceiveWhenSuspendedTask =
@@ -300,25 +260,14 @@ static StackType_t xQueueReceiveWhenSuspendedTaskStack[ priSUSPENDED_RX_TASK_STA
             .puxStackBuffer  = xQueueReceiveWhenSuspendedTaskStack,
             .xRegions        =    {
                                     { ( void * ) &( xSuspendedTestQueue[ 0 ] ), dynamicSHARED_MEM_SIZE_BYTES,
-                                        ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-                                        ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                        ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
                                     },
                                     { ( void * ) &( xSuspendedQueueReceiveError[ 0 ] ), dynamicSHARED_MEM_SIZE_BYTES,
-                                        ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-                                        ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                        ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
                                     },
                                     { ( void * ) &( ulExpectedValue[ 0 ] ), dynamicSHARED_MEM_SIZE_BYTES,
-                                            ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-                                        ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-                                    },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        }
+                                            ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                    }
                                 }
         };
 

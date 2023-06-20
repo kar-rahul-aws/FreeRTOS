@@ -32,6 +32,7 @@
 
 /* Demo includes. */
 #include "mpu_demo.h"
+#include "TestRunner.h"
 
 void app_main( void )
 {

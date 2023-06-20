@@ -162,22 +162,11 @@ void vStartBlockingQueueTasks( UBaseType_t uxPriority )
             .puxStackBuffer  = xBlockingQueueConsumerB1TaskStack,
             .xRegions        =    {
                                     { ( void * ) &( sBlockingConsumerCount[ 0 ] ), blckqSHARED_MEM_SIZE_BYTES,
-                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-                                        ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
                                     },
                                     { &( xQueueParameters1 ), blckqSHARED_MEM_SIZE_BYTES,
-                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-                                        ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-                                    },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        }
+                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                    }
                                 }
         };
     TaskParameters_t xBlockingQueueProducerB2Task =
@@ -190,22 +179,11 @@ void vStartBlockingQueueTasks( UBaseType_t uxPriority )
             .puxStackBuffer  = xBlockingQueueProducerB2TaskStack,
             .xRegions        =    {
                                     { ( void * ) &( sBlockingProducerCount[ 0 ] ), blckqSHARED_MEM_SIZE_BYTES,
-                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-                                        ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
                                     },
                                     { &( xQueueParameters2 ), blckqSHARED_MEM_SIZE_BYTES,
-                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-                                        ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-                                    },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        }
+                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                    }
                                 }
         };
 
@@ -236,22 +214,11 @@ void vStartBlockingQueueTasks( UBaseType_t uxPriority )
             .puxStackBuffer  = xBlockingQueueConsumerB3TaskStack,
             .xRegions        =    {
                                     { ( void * ) &( sBlockingConsumerCount[ 0 ] ), blckqSHARED_MEM_SIZE_BYTES,
-                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-                                             ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
                                     },
                                     { &( xQueueParameters3 ), blckqSHARED_MEM_SIZE_BYTES,
-                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-                                        ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-                                    },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        }
+                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                    }
                                 }
         };
     TaskParameters_t xBlockingQueueProducerB4Task =
@@ -264,22 +231,11 @@ void vStartBlockingQueueTasks( UBaseType_t uxPriority )
             .puxStackBuffer  = xBlockingQueueProducerB4TaskStack,
             .xRegions        =    {
                                     { ( void * ) &( sBlockingProducerCount[ 0 ] ), blckqSHARED_MEM_SIZE_BYTES,
-                                        ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-                                        ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                        ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
                                     },
                                     { &( xQueueParameters4 ), blckqSHARED_MEM_SIZE_BYTES,
-                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-                                        ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-                                    },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        }
+                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                    }
                                 }
         };
 
@@ -308,22 +264,11 @@ void vStartBlockingQueueTasks( UBaseType_t uxPriority )
             .puxStackBuffer  = xBlockingQueueProducerB5TaskStack,
             .xRegions        =    {
                                     { ( void * ) &( sBlockingProducerCount[ 0 ] ), blckqSHARED_MEM_SIZE_BYTES,
-                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-                                        ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
                                     },
                                     { &( xQueueParameters5 ), blckqSHARED_MEM_SIZE_BYTES,
-                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-                                        ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-                                    },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        }
+                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                    }
                                 }
         };
     TaskParameters_t xBlockingQueueConsumerB6Task =
@@ -336,22 +281,11 @@ void vStartBlockingQueueTasks( UBaseType_t uxPriority )
             .puxStackBuffer  = xBlockingQueueConsumerB6TaskStack,
             .xRegions        =    {
                                     { ( void * ) &( sBlockingConsumerCount[ 0 ] ), blckqSHARED_MEM_SIZE_BYTES,
-                                        ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-                                        ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                        ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
                                     },
                                     { &( xQueueParameters6 ), blckqSHARED_MEM_SIZE_BYTES,
-                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-                                        ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-                                    },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        }
+                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                    }
                                 }
         };
 

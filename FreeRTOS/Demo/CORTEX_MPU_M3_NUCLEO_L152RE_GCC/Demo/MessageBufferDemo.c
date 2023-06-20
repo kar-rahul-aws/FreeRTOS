@@ -173,25 +173,14 @@ void vStartMessageBufferTasks( configSTACK_DEPTH_TYPE xStackSize )
         .puxStackBuffer  = xEchoServerTask1Stack,
         .xRegions        =    {
                                 { ( void * ) &( xEchoMessageBuffersArray[ 0 ] ), messagebufferSHARED_MEM_SIZE_BYTES,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-                                     ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
                                 },
                                 { ( void * ) &( xEchoClientTaskHandles[ 0 ] ), messagebufferSHARED_MEM_SIZE_BYTES,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-                                     ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
                                 },
                                 { ( void * ) &( pc55ByteString[ 0 ] ), 128,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-                                },
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        }
+                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                }
                             }
     };
 
@@ -205,25 +194,14 @@ void vStartMessageBufferTasks( configSTACK_DEPTH_TYPE xStackSize )
         .puxStackBuffer  = xEchoServerTask2Stack,
         .xRegions        =    {
                                 { ( void * ) &( xEchoMessageBuffersArray[ 0 ] ), messagebufferSHARED_MEM_SIZE_BYTES,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-                                     ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
                                 },
                                 { ( void * ) &( xEchoClientTaskHandles[ 0 ] ), messagebufferSHARED_MEM_SIZE_BYTES,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-                                     ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
                                 },
                                 { ( void * ) &( pc55ByteString[ 0 ] ), 128,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-                                },
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        }
+                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                }
                             }
     };
 
@@ -237,17 +215,8 @@ void vStartMessageBufferTasks( configSTACK_DEPTH_TYPE xStackSize )
         .puxStackBuffer  = xNonBlockingReceiverTaskStack,
         .xRegions        =    {
                                 { ( void * ) &( ulNonBlockingRxCounter[ 0 ] ), messagebufferSHARED_MEM_SIZE_BYTES,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-                                     ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
                                 },
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        },
                                 { 0,                0,                    0                                                        },
                                 { 0,                0,                    0                                                        }
                             }
@@ -264,14 +233,6 @@ void vStartMessageBufferTasks( configSTACK_DEPTH_TYPE xStackSize )
         .xRegions        =    {
                                 { 0,                0,                    0                                                        },
                                 { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        },
                                 { 0,                0,                    0                                                        }
                             }
     };
@@ -286,21 +247,11 @@ void vStartMessageBufferTasks( configSTACK_DEPTH_TYPE xStackSize )
         .puxStackBuffer  = xEchoClientTask1Stack,
         .xRegions        =    {
                                 { ( void * ) &( xEchoMessageBuffersArray[ 0 ] ), messagebufferSHARED_MEM_SIZE_BYTES,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-                                     ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
                                 },
                                 { ( void * ) &( ulEchoLoopCounters[ 0 ] ), messagebufferSHARED_MEM_SIZE_BYTES,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-                                     ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
                                 },
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        },
                                 { 0,                0,                    0                                                        }
                             }
     };
@@ -315,21 +266,11 @@ void vStartMessageBufferTasks( configSTACK_DEPTH_TYPE xStackSize )
         .puxStackBuffer  = xEchoClientTask2Stack,
         .xRegions        =    {
                                 { ( void * ) &( xEchoMessageBuffersArray[ 0 ] ), messagebufferSHARED_MEM_SIZE_BYTES,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-                                     ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
                                 },
                                 { ( void * ) &( ulEchoLoopCounters[ 0 ] ), messagebufferSHARED_MEM_SIZE_BYTES,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-                                     ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
                                 },
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        },
                                 { 0,                0,                    0                                                        }
                             }
     };
@@ -394,25 +335,14 @@ void vStartMessageBufferTasks( configSTACK_DEPTH_TYPE xStackSize )
             .puxStackBuffer  = xSenderTask1Stack,
             .xRegions        =    {
                                     { ( void * ) &( xReceiverTaskHandles[ 0 ] ), messagebufferSHARED_MEM_SIZE_BYTES,
-                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-                                        ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
                                     },
                                     { ( void * ) &( ulSenderLoopCounters[ 0 ] ), messagebufferSHARED_MEM_SIZE_BYTES,
-                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-                                        ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
                                     },
                                     { ( void * ) &( pc55ByteString[ 0 ] ), 128,
-                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-                                        ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-                                    },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        }
+                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                    }
                                 }
         };
         TaskParameters_t xSenderTask2Parameters =
@@ -426,25 +356,14 @@ void vStartMessageBufferTasks( configSTACK_DEPTH_TYPE xStackSize )
             .puxStackBuffer  = xSenderTask2Stack,
             .xRegions        =    {
                                     { ( void * ) &( xReceiverTaskHandles[ 0 ] ), messagebufferSHARED_MEM_SIZE_BYTES,
-                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-                                        ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
                                     },
                                     { ( void * ) &( ulSenderLoopCounters[ 0 ] ), messagebufferSHARED_MEM_SIZE_BYTES,
-                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-                                        ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
                                     },
                                     { ( void * ) &( pc55ByteString[ 0 ] ), 128,
-                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-                                        ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-                                    },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        }
+                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                    }
                                 }
         };
         TaskParameters_t xReceivingTask1Parameters =
@@ -456,14 +375,6 @@ void vStartMessageBufferTasks( configSTACK_DEPTH_TYPE xStackSize )
             .uxPriority      = ( mbLOWER_PRIORITY | portPRIVILEGE_BIT ),
             .puxStackBuffer  = xReceivingTask1Stack,
             .xRegions        =    {
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
                                     { 0,                0,                    0                                                        },
                                     { 0,                0,                    0                                                        },
                                     { 0,                0,                    0                                                        }
@@ -478,14 +389,6 @@ void vStartMessageBufferTasks( configSTACK_DEPTH_TYPE xStackSize )
             .uxPriority      = ( mbHIGHER_PRIORITY | portPRIVILEGE_BIT ),
             .puxStackBuffer  = xReceivingTask2Stack,
             .xRegions        =    {
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
                                     { 0,                0,                    0                                                        },
                                     { 0,                0,                    0                                                        },
                                     { 0,                0,                    0                                                        }
@@ -534,14 +437,6 @@ void vStartMessageBufferTasks( configSTACK_DEPTH_TYPE xStackSize )
             .xRegions        =  {
                                     { 0,                0,                    0                                                        },
                                     { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
                                     { 0,                0,                    0                                                        }
                                 }
         };
@@ -555,17 +450,8 @@ void vStartMessageBufferTasks( configSTACK_DEPTH_TYPE xStackSize )
             .puxStackBuffer  = xCoherenceTesterTaskStack,
             .xRegions        =  {
                                     { ( void * ) &( ulSizeCoherencyTestCycles[ 0 ] ), messagebufferSHARED_MEM_SIZE_BYTES,
-                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-                                         ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
                                     },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
                                     { 0,                0,                    0                                                        },
                                     { 0,                0,                    0                                                        }
                                 }

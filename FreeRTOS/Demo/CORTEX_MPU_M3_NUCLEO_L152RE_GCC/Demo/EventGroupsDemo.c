@@ -209,21 +209,11 @@ void vStartEventGroupTasks( void )
         .puxStackBuffer  = xTestSlaveTaskStack,
         .xRegions        =  {
                                 { ( void * ) &( xEventGroup[ 0 ] ), eventgrpSHARED_MEM_SIZE_BYTES,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
                                 },
                                 { ( void * ) &( ulTestSlaveCycles[ 0 ] ), eventgrpSHARED_MEM_SIZE_BYTES,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
                                 },
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        },
                                 { 0,                0,                    0                                                        }
                             }
     };
@@ -238,25 +228,14 @@ void vStartEventGroupTasks( void )
         .puxStackBuffer  = xTestMasterTaskStack,
         .xRegions        =  {
                                 { ( void * ) &( xEventGroup[ 0 ] ), eventgrpSHARED_MEM_SIZE_BYTES,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
                                 },
                                 { ( void * ) &( xSyncTaskHandle[ SYNC_TASK_ONE_IDX ] ), eventgrpSHARED_MEM_SIZE_BYTES,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
                                 },
                                 { ( void * ) &( ulTestMasterCycles[ 0 ] ), eventgrpSHARED_MEM_SIZE_BYTES,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-                                },
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        }
+                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                }
                             }
     };
     TaskParameters_t xSyncTaskOneParams =
@@ -269,21 +248,11 @@ void vStartEventGroupTasks( void )
         .puxStackBuffer  = xSyncTaskOneStack,
         .xRegions        =  {
                                 { ( void * ) &( xEventGroup[ 0 ] ), eventgrpSHARED_MEM_SIZE_BYTES,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
                                 },
                                 { ( void * ) &( xSyncTaskHandle[ SYNC_TASK_ONE_IDX ] ), eventgrpSHARED_MEM_SIZE_BYTES,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
                                 },
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        },
                                 { 0,                0,                    0                                                        }
                             }
     };
@@ -297,21 +266,11 @@ void vStartEventGroupTasks( void )
         .puxStackBuffer  = xSyncTaskTwoStack,
         .xRegions        =  {
                                 { ( void * ) &( xEventGroup[ 0 ] ), eventgrpSHARED_MEM_SIZE_BYTES,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
                                 },
                                 { ( void * ) &( xSyncTaskHandle[ SYNC_TASK_ONE_IDX ] ), eventgrpSHARED_MEM_SIZE_BYTES,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
                                 },
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        },
                                 { 0,                0,                    0                                                        }
                             }
     };

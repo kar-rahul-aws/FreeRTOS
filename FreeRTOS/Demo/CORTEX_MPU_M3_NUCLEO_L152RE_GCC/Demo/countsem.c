@@ -137,21 +137,11 @@ void vStartCountingSemaphoreTasks( void )
         .puxStackBuffer  = xCountingSemaphoreTaskStack1,
         .xRegions        =  {
                                 { ( void * ) &( xErrorDetected[ 0 ] ), countSHARED_MEM_SIZE_BYTES,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
                                 },
                                 { &( xParameters1 ), countSHARED_MEM_SIZE_BYTES,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
                                 },
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        },
                                 { 0,                0,                    0                                                        }
                             }
     };
@@ -165,21 +155,11 @@ void vStartCountingSemaphoreTasks( void )
         .puxStackBuffer  = xCountingSemaphoreTaskStack2,
         .xRegions        =  {
                                 { ( void * ) &( xErrorDetected[ 0 ] ), countSHARED_MEM_SIZE_BYTES,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
                                 },
                                 { &( xParameters2 ), countSHARED_MEM_SIZE_BYTES,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
                                 },
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        },
                                 { 0,                0,                    0                                                        }
                             }
     };

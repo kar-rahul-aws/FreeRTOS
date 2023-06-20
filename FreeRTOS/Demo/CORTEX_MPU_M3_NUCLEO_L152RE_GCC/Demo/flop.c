@@ -91,17 +91,8 @@ static StackType_t xCompletingMathTask4Stack[ mathSTACK_SIZE ] __attribute__( ( 
             .puxStackBuffer  = xCompletingMathTask1Stack,
             .xRegions        =  {
                                     { ( void * ) &( usTaskCheck[ 0 ] ), mathSHARED_MEM_SIZE_BYTES,
-                                        ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-                                        ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                        ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
                                     },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
                                     { 0,                0,                    0                                                        },
                                     { 0,                0,                    0                                                        }
                                 }
@@ -116,17 +107,8 @@ static StackType_t xCompletingMathTask4Stack[ mathSTACK_SIZE ] __attribute__( ( 
             .puxStackBuffer  = xCompletingMathTask2Stack,
             .xRegions        =  {
                                     { ( void * ) &( usTaskCheck[ 0 ] ), mathSHARED_MEM_SIZE_BYTES,
-                                        ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-                                        ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                        ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
                                     },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
                                     { 0,                0,                    0                                                        },
                                     { 0,                0,                    0                                                        }
                                 }
@@ -141,21 +123,11 @@ static StackType_t xCompletingMathTask4Stack[ mathSTACK_SIZE ] __attribute__( ( 
             .puxStackBuffer  = xCompletingMathTask3Stack,
             .xRegions        =  {
                                     { ( void * ) &( usTaskCheck[ 0 ] ), mathSHARED_MEM_SIZE_BYTES,
-                                        ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-                                        ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                        ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
                                     },
                                     { ( void * ) &( xArray1[ 0 ] ), mathSHARED_MEM_ARRAY_SIZE,
-                                        ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-                                        ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                        ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
                                     },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
                                     { 0,                0,                    0                                                        }
                                 }
     };
@@ -169,21 +141,11 @@ static StackType_t xCompletingMathTask4Stack[ mathSTACK_SIZE ] __attribute__( ( 
             .puxStackBuffer  = xCompletingMathTask4Stack,
             .xRegions        =  {
                                     { ( void * ) &( usTaskCheck[ 0 ] ), mathSHARED_MEM_SIZE_BYTES,
-                                        ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-                                        ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                        ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
                                     },
                                     { ( void * ) &( xArray2[ 0 ] ), mathSHARED_MEM_ARRAY_SIZE,
-                                        ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-                                        ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                        ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
                                     },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
                                     { 0,                0,                    0                                                        }
                                 }
     };
