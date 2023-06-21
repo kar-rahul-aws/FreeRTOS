@@ -130,22 +130,37 @@ static UBaseType_t prvRand( void );
  * loop of all the tests to ensure each test is actually executing.  The check task
  * calls xAreTaskNotificationArrayTasksStillRunning() (implemented within this
  * file) to check both counters are changing. */
-static volatile uint32_t ulFineCycleCount[ notifyArraySHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( notifyArraySHARED_MEM_SIZE_BYTES ) ) ) = { 0 };
-static volatile uint32_t ulCourseCycleCounter[ notifyArraySHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( notifyArraySHARED_MEM_SIZE_BYTES ) ) ) = { 0 };
+/*static volatile uint32_t ulFineCycleCount[ notifyArraySHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( notifyArraySHARED_MEM_SIZE_BYTES ) ) ) = { 0 }; */
+/*static volatile uint32_t ulCourseCycleCounter[ notifyArraySHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( notifyArraySHARED_MEM_SIZE_BYTES ) ) ) = { 0 }; */
 
 /* The handle of the task that runs the tests and receives the notifications
  * from the software timers and interrupts. */
 static TaskHandle_t xTaskToNotify[ notifyArraySHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( notifyArraySHARED_MEM_SIZE_BYTES ) ) ) = { NULL };
 
 /* The software timers used to send notifications to the main test task. */
-static TimerHandle_t xIncrementingIndexTimer[ notifyArraySHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( notifyArraySHARED_MEM_SIZE_BYTES ) ) ) = { NULL };
-static TimerHandle_t xNotifyWhileSuspendedTimer[ notifyArraySHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( notifyArraySHARED_MEM_SIZE_BYTES ) ) ) = { NULL };
+/*static TimerHandle_t xIncrementingIndexTimer[ notifyArraySHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( notifyArraySHARED_MEM_SIZE_BYTES ) ) ) = { NULL }; */
+/*static TimerHandle_t xNotifyWhileSuspendedTimer[ notifyArraySHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( notifyArraySHARED_MEM_SIZE_BYTES ) ) ) = { NULL }; */
+
+/* helper variable to accommodate software timers in a single array */
+static TimerHandle_t xTimer[ notifyArraySHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( notifyArraySHARED_MEM_SIZE_BYTES ) ) ) = { NULL };
+
+#define INCREMENTING_INDEX_TIMER    0
+#define NOTIFY_SUSPENDED_TIMER      1
 
 /* Used by the pseudo random number generating function. */
-static size_t uxNextRand[ notifyArraySHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( notifyArraySHARED_MEM_SIZE_BYTES ) ) ) = { 0 };
+/*static size_t uxNextRand[ notifyArraySHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( notifyArraySHARED_MEM_SIZE_BYTES ) ) ) = { 0 }; */
 
 /* Used to communicate when to send a task notification to the tick hook tests. */
-static volatile BaseType_t xSendNotificationFromISR[ notifyArraySHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( notifyArraySHARED_MEM_SIZE_BYTES ) ) ) = { pdFALSE };
+/*static volatile BaseType_t xSendNotificationFromISR[ notifyArraySHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( notifyArraySHARED_MEM_SIZE_BYTES ) ) ) = { pdFALSE }; */
+
+/* helper variable to accommodate 3 user defined regions */
+static uint32_t xHelper[ notifyArraySHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( notifyArraySHARED_MEM_SIZE_BYTES ) ) ) = { 0 };
+
+#define FINE_CYCLE_COUNT         0
+#define COURSE_CYCLE_COUNT       1
+#define NEXT_RAND                2
+#define NOTIFICATION_FROM_ISR    3
+
 
 /*-----------------------------------------------------------*/
 
@@ -158,65 +173,37 @@ void vStartTaskNotifyArrayTask( void )
 
     /* Create the software timers used for these tests.  The timer callbacks send
      * notifications to this task. */
-    xNotifyWhileSuspendedTimer[ 0 ] = xTimerCreate( "SingleNotify", xSuspendTimerPeriod, pdFALSE, NULL, prvSuspendedTaskTimerTestCallback );
-    xIncrementingIndexTimer[ 0 ] = xTimerCreate( "Notifier", xIncrementingIndexTimerPeriod, pdFALSE, NULL, prvNotifyingTimerCallback );
-    configASSERT( xNotifyWhileSuspendedTimer[ 0 ] );
-    configASSERT( xIncrementingIndexTimer[ 0 ] );
+    xTimer[ NOTIFY_SUSPENDED_TIMER ] = xTimerCreate( "SingleNotify", xSuspendTimerPeriod, pdFALSE, NULL, prvSuspendedTaskTimerTestCallback );
+    xTimer[ INCREMENTING_INDEX_TIMER ] = xTimerCreate( "Notifier", xIncrementingIndexTimerPeriod, pdFALSE, NULL, prvNotifyingTimerCallback );
+    configASSERT( xTimer[ NOTIFY_SUSPENDED_TIMER ] );
+    configASSERT( xTimer[ INCREMENTING_INDEX_TIMER ] );
 
     /* Create the task that performs some tests by itself, then loops around
      * being notified by both a software timer and an interrupt. */
 
     TaskParameters_t xNotifiedTask =
     {
-        .pvTaskCode      = prvNotifiedTask,
-        .pcName          = "ArrayNotified",
-        .usStackDepth    = notifyNOTIFY_ARRAY_TASK_STACK_SIZE,
-        .pvParameters    = NULL,
-		/* Needs to be privileged because it calls privileged only APIs --> Set Priority */
-        .uxPriority      = ( notifyTASK_PRIORITY | portPRIVILEGE_BIT ),
-        .puxStackBuffer  = xNotifiedTaskStack,
-        .xRegions        =  {
-                                { ( void * ) &( ulCourseCycleCounter[ 0 ] ), notifyArraySHARED_MEM_SIZE_BYTES,
-                                    ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-                                },
-                                { ( void * ) &( xSendNotificationFromISR[ 0 ] ), notifyArraySHARED_MEM_SIZE_BYTES,
-                                    ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-                                },
-                                { ( void * ) &( uxNextRand[ 0 ] ), notifyArraySHARED_MEM_SIZE_BYTES,
-                                    ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-                                },
-                                { ( void * ) &( xNotifyWhileSuspendedTimer[ 0 ] ), notifyArraySHARED_MEM_SIZE_BYTES,
-                                    ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-                                },
-                                { ( void * ) &( xIncrementingIndexTimer[ 0 ] ), notifyArraySHARED_MEM_SIZE_BYTES,
-                                    ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-                                },
-                                { ( void * ) &( ulCourseCycleCounter[ 0 ] ), notifyArraySHARED_MEM_SIZE_BYTES,
-                                    ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-                                },
-                                { ( void * ) &( xTaskToNotify[ 0 ] ), notifyArraySHARED_MEM_SIZE_BYTES,
-                                    ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-                                },
-                                { ( void * ) &( ulFineCycleCount[ 0 ] ), notifyArraySHARED_MEM_SIZE_BYTES,
-                                    ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-                                },
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        }
-                            }
+        .pvTaskCode     = prvNotifiedTask,
+        .pcName         = "ArrayNotified",
+        .usStackDepth   = notifyNOTIFY_ARRAY_TASK_STACK_SIZE,
+        .pvParameters   = NULL,
+        /* Needs to be privileged because it calls privileged only APIs --> Set Priority */
+        .uxPriority     = ( notifyTASK_PRIORITY | portPRIVILEGE_BIT ),
+        .puxStackBuffer = xNotifiedTaskStack,
+        .xRegions       =
+        {
+            { ( void * ) &( xHelper[ 0 ] ),       notifyArraySHARED_MEM_SIZE_BYTES,
+              ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER ) },
+            { ( void * ) &( xTimer[ 0 ] ),        notifyArraySHARED_MEM_SIZE_BYTES,
+              ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER ) },
+            { ( void * ) &( xTaskToNotify[ 0 ] ), notifyArraySHARED_MEM_SIZE_BYTES,
+              ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER ) }
+        }
     };
 
     xTaskCreateRestricted( &( xNotifiedTask ), &xTaskToNotify[ 0 ] );
     /* Pseudo seed the random number generator. */
-    uxNextRand[ 0 ] = ( size_t ) prvRand;
+    xHelper[ NEXT_RAND ] = ( size_t ) prvRand;
 }
 /*-----------------------------------------------------------*/
 
@@ -234,7 +221,7 @@ static void prvNotifiedTask( void * pvParameters )
         prvBlockOnTheNotifiedIndexed();
         prvBlockOnANonNotifiedIndexed();
         prvBlockOnNotificationsComingFromInterrupts();
-        ulCourseCycleCounter[ 0 ]++;
+        xHelper[ COURSE_CYCLE_COUNT ]++;
     }
 }
 /*-----------------------------------------------------------*/
@@ -773,7 +760,7 @@ static void prvSingleTaskTests( void )
     }
 
     /* Incremented to show the task is still running. */
-    ulFineCycleCount[ 0 ]++;
+    xHelper[ FINE_CYCLE_COUNT ]++;
 
     /* Leave all bits cleared. */
     for( uxIndexToTest = 0; uxIndexToTest < configTASK_NOTIFICATION_ARRAY_ENTRIES; uxIndexToTest++ )
@@ -881,7 +868,7 @@ static void prvTestNotifyTaskWhileSuspended( void )
          * executes the timer will suspend the task, then resume the task, without
          * ever sending a notification to the task. */
         ulNotifiedValue = 0;
-        xTimerStart( xNotifyWhileSuspendedTimer[ 0 ], portMAX_DELAY );
+        xTimerStart( xTimer[ NOTIFY_SUSPENDED_TIMER ], portMAX_DELAY );
 
         /* Check a notification is not received on the task notification at
          * index uxIndexToTest within the array of task notifications. */
@@ -904,7 +891,7 @@ static void prvTestNotifyTaskWhileSuspended( void )
          * the array of task notifications.  The second time the callback executes
          * the timer will suspend the task, notify the task, then resume the task
          * (previously it was suspended and resumed without being notified). */
-        xTimerStart( xNotifyWhileSuspendedTimer[ 0 ], portMAX_DELAY );
+        xTimerStart( xTimer[ NOTIFY_SUSPENDED_TIMER ], portMAX_DELAY );
 
         /* Check a notification is only received in the index within the array
          * of task notifications under test. */
@@ -940,7 +927,7 @@ static void prvTestNotifyTaskWhileSuspended( void )
     vTaskPrioritySet( NULL, notifyTASK_PRIORITY );
 
     /* Incremented to show the task is still running. */
-    ulFineCycleCount[ 0 ]++;
+    xHelper[ FINE_CYCLE_COUNT ]++;
 
     /* Leave all bits cleared. */
     for( uxIndexToTest = 0; uxIndexToTest < configTASK_NOTIFICATION_ARRAY_ENTRIES; uxIndexToTest++ )
@@ -979,7 +966,7 @@ static void prvBlockOnTheNotifiedIndexed( void )
         /* Start the software timer then wait for it to notify this task.  Block
          * on the notification index we expect to receive the notification on.  The
          * margin is to ensure the task blocks longer than the timer period. */
-        xTimerStart( xIncrementingIndexTimer[ 0 ], portMAX_DELAY );
+        xTimerStart( xTimer[ INCREMENTING_INDEX_TIMER ], portMAX_DELAY );
         ulReceivedValue = ulTaskNotifyTakeIndexed( uxIndexToNotify, pdFALSE, xTimerPeriod + xMargin );
 
         /* The notification value was initially zero, and should have been
@@ -1010,7 +997,7 @@ static void prvBlockOnTheNotifiedIndexed( void )
         xTaskNotifyStateClearIndexed( xTaskToNotify[ 0 ], uxIndexToNotify );
 
         /* Incremented to show the task is still running. */
-        ulFineCycleCount[ 0 ]++;
+        xHelper[ FINE_CYCLE_COUNT ]++;
     }
 }
 /* ------------------------------------------------------------------------ */
@@ -1037,7 +1024,7 @@ static void prvBlockOnANonNotifiedIndexed( void )
         /* Start the software timer then wait for it to notify this task.  Block
          * on a notification index that we do not expect to receive the notification
          * on.  The margin is to ensure the task blocks longer than the timer period. */
-        xTimerStart( xIncrementingIndexTimer[ 0 ], portMAX_DELAY );
+        xTimerStart( xTimer[ INCREMENTING_INDEX_TIMER ], portMAX_DELAY );
         xTimeBeforeBlocking = xTaskGetTickCount();
 
         if( uxIndexToNotify == ( configTASK_NOTIFICATION_ARRAY_ENTRIES - 1 ) )
@@ -1093,7 +1080,7 @@ static void prvBlockOnANonNotifiedIndexed( void )
         }
 
         /* Incremented to show the task is still running. */
-        ulFineCycleCount[ 0 ]++;
+        xHelper[ FINE_CYCLE_COUNT ]++;
     }
 }
 /* ------------------------------------------------------------------------ */
@@ -1123,8 +1110,8 @@ static void prvBlockOnNotificationsComingFromInterrupts( void )
             /* Don't expect to find xSendNotificationFromISR set at this time as
              * the interrupt should have cleared it back to pdFALSE last time it
              * executed. */
-            configASSERT( xSendNotificationFromISR[ 0 ] == pdFALSE );
-            xSendNotificationFromISR[ 0 ] = pdTRUE;
+            configASSERT( xHelper[ NOTIFICATION_FROM_ISR ] == pdFALSE );
+            xHelper[ NOTIFICATION_FROM_ISR ] = pdTRUE;
         }
         taskEXIT_CRITICAL();
 
@@ -1134,7 +1121,7 @@ static void prvBlockOnNotificationsComingFromInterrupts( void )
 
         /* Interrupt should have reset xSendNotificationFromISR after it sent
          * the notification. */
-        configASSERT( xSendNotificationFromISR[ 0 ] == pdFALSE );
+        configASSERT( xHelper[ NOTIFICATION_FROM_ISR ] == pdFALSE );
 
         /* The notification value was initially zero, and should have been
          * incremented by the interrupt, so now one. */
@@ -1155,7 +1142,7 @@ static void prvBlockOnNotificationsComingFromInterrupts( void )
         }
 
         /* Incremented to show the task is still running. */
-        ulFineCycleCount[ 0 ]++;
+        xHelper[ FINE_CYCLE_COUNT ]++;
     }
 }
 /*-----------------------------------------------------------*/
@@ -1173,9 +1160,9 @@ void xNotifyArrayTaskFromISR( void )
     /* The task sets xSendNotificationFromISR to pdTRUE each time it wants this
      * interrupt (this function runs in the RTOS tick hook) to send the next
      * notification. */
-    if( xSendNotificationFromISR[ 0 ] == pdTRUE )
+    if( xHelper[ NOTIFICATION_FROM_ISR ] == pdTRUE )
     {
-        xSendNotificationFromISR[ 0 ] = pdFALSE;
+        xHelper[ NOTIFICATION_FROM_ISR ] = pdFALSE;
 
         /* Test using both vTaskNotifyGiveFromISR(), xTaskNotifyFromISR()
          * and xTaskNotifyAndQueryFromISR(). The notification is set to the task
@@ -1228,13 +1215,13 @@ BaseType_t xAreTaskNotificationArrayTasksStillRunning( void )
      * actually running.  The fine counter is incremented within individual test
      * functions.  The course counter is incremented one each time all the test
      * functions have been executed to ensure all the tests are running. */
-    if( ulLastFineCycleCount == ulFineCycleCount[ 0 ] )
+    if( ulLastFineCycleCount == xHelper[ FINE_CYCLE_COUNT ] )
     {
         xErrorStatus = pdFAIL;
     }
     else
     {
-        ulLastFineCycleCount = ulFineCycleCount[ 0 ];
+        ulLastFineCycleCount = xHelper[ FINE_CYCLE_COUNT ];
     }
 
     ulCallCount++;
@@ -1243,13 +1230,13 @@ BaseType_t xAreTaskNotificationArrayTasksStillRunning( void )
     {
         ulCallCount = 0;
 
-        if( ulLastCourseCycleCount == ulCourseCycleCounter[ 0 ] )
+        if( ulLastCourseCycleCount == xHelper[ COURSE_CYCLE_COUNT ] )
         {
             xErrorStatus = pdFAIL;
         }
         else
         {
-            ulLastCourseCycleCount = ulCourseCycleCounter[ 0 ];
+            ulLastCourseCycleCount = xHelper[ COURSE_CYCLE_COUNT ];
         }
     }
 
@@ -1262,7 +1249,7 @@ static UBaseType_t prvRand( void )
     const size_t uxMultiplier = ( size_t ) 0x015a4e35, uxIncrement = ( size_t ) 1;
 
     /* Utility function to generate a pseudo random number. */
-    uxNextRand[ 0 ] = ( uxMultiplier * uxNextRand[ 0 ] ) + uxIncrement;
-    return( ( uxNextRand[ 0 ] >> 16 ) & ( ( size_t ) 0x7fff ) );
+    xHelper[ NEXT_RAND ] = ( uxMultiplier * xHelper[ NEXT_RAND ] ) + uxIncrement;
+    return( ( xHelper[ NEXT_RAND ] >> 16 ) & ( ( size_t ) 0x7fff ) );
 }
 /*-----------------------------------------------------------*/

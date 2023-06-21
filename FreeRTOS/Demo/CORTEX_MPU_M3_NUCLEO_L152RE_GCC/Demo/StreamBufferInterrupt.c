@@ -50,8 +50,8 @@
 #define sbiSTREAM_BUFFER_LENGTH_BYTES        ( ( size_t ) 100 )
 #define sbiSTREAM_BUFFER_TRIGGER_LEVEL_10    ( ( BaseType_t ) 10 )
 
-#define streambufferSHARED_MEM_SIZE_WORDS     ( 8 )
-#define streambufferSHARED_MEM_SIZE_BYTES     ( 32 )
+#define streambufferSHARED_MEM_SIZE_WORDS    ( 8 )
+#define streambufferSHARED_MEM_SIZE_BYTES    ( 32 )
 
 /*-----------------------------------------------------------*/
 
@@ -69,7 +69,7 @@ static const char * pcStringToSend = "_____Hello FreeRTOS_____";
 
 /* The string to task is looking for, which must be a substring of
  * pcStringToSend. */
-static const char * pcStringToReceive[ streambufferSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( streambufferSHARED_MEM_SIZE_BYTES ) ) ) = { "Hello FreeRTOS" };
+/*static const char * pcStringToReceive[ streambufferSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( streambufferSHARED_MEM_SIZE_BYTES ) ) ) = { "Hello FreeRTOS" }; */
 
 /* Set to pdFAIL if anything unexpected happens. */
 static BaseType_t xDemoStatus[ streambufferSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( streambufferSHARED_MEM_SIZE_BYTES ) ) ) = { pdPASS };
@@ -77,7 +77,7 @@ static BaseType_t xDemoStatus[ streambufferSHARED_MEM_SIZE_WORDS ] __attribute__
 /* Incremented each time pcStringToReceive is correctly received, provided no
  * errors have occurred.  Used so the check task can check this task is still
  * running as expected. */
-static uint32_t ulCycleCount[ streambufferSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( streambufferSHARED_MEM_SIZE_BYTES ) ) ) = { 0 };;
+static uint32_t ulCycleCount[ streambufferSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( streambufferSHARED_MEM_SIZE_BYTES ) ) ) = { 0 };
 
 /*-----------------------------------------------------------*/
 
@@ -87,43 +87,27 @@ void vStartStreamBufferInterruptDemo( void )
 
     /* Create the stream buffer that sends data from the interrupt to the
      * task, and create the task. */
-    xStreamBuffer[ 0 ] = xStreamBufferCreate( sbiSTREAM_BUFFER_LENGTH_BYTES, /* The buffer length in bytes. */
+    xStreamBuffer[ 0 ] = xStreamBufferCreate( sbiSTREAM_BUFFER_LENGTH_BYTES,    /* The buffer length in bytes. */
                                               sbiSTREAM_BUFFER_TRIGGER_LEVEL_10 /* The stream buffer's trigger level. */
-                                            );
+                                              );
 
     TaskParameters_t xReceivingTaskParameters =
     {
-        .pvTaskCode      = prvReceivingTask,
-        .pcName          = "StrIntRx",
-        .usStackDepth    = configMINIMAL_STACK_SIZE,
-        .pvParameters    = NULL,
-        .uxPriority      = tskIDLE_PRIORITY + 2,
-        .puxStackBuffer  = xReceivingTaskStack,
-        .xRegions        =    {
-                                { ( void * ) &( xDemoStatus[ 0 ] ), streambufferSHARED_MEM_SIZE_BYTES,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-                                },
-                                { ( void * ) &( ulCycleCount[ 0 ] ), streambufferSHARED_MEM_SIZE_BYTES,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-                                },
-                                { ( void * ) &( pcStringToReceive[ 0 ] ), streambufferSHARED_MEM_SIZE_BYTES,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-                                },
-                                { ( void * ) &( xStreamBuffer[ 0 ] ), streambufferSHARED_MEM_SIZE_BYTES,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-                                },
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        }
-                            }
+        .pvTaskCode     = prvReceivingTask,
+        .pcName         = "StrIntRx",
+        .usStackDepth   = configMINIMAL_STACK_SIZE,
+        .pvParameters   = NULL,
+        .uxPriority     = tskIDLE_PRIORITY + 2,
+        .puxStackBuffer = xReceivingTaskStack,
+        .xRegions       =
+        {
+            { ( void * ) &( xDemoStatus[ 0 ] ),   streambufferSHARED_MEM_SIZE_BYTES,
+              ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER ) },
+            { ( void * ) &( ulCycleCount[ 0 ] ),  streambufferSHARED_MEM_SIZE_BYTES,
+              ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER ) },
+            { ( void * ) &( xStreamBuffer[ 0 ] ), streambufferSHARED_MEM_SIZE_BYTES,
+              ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER ) }
+        }
     };
 
     xTaskCreateRestricted( &( xReceivingTaskParameters ), NULL );
@@ -137,10 +121,11 @@ static void prvReceivingTask( void * pvParameters )
 
     /* Remove warning about unused parameters. */
     ( void ) pvParameters;
+    const char * pcStringToReceive = "Hello FreeRTOS";
 
     /* Make sure the string will fit in the Rx buffer, including the NULL
      * terminator. */
-    configASSERT( sizeof( cRxBuffer ) > strlen( pcStringToReceive[ 0 ] ) );
+    configASSERT( sizeof( cRxBuffer ) > strlen( pcStringToReceive ) );
 
     /* Make sure the stream buffer has been created. */
     configASSERT( xStreamBuffer[ 0 ] != NULL );
@@ -154,11 +139,11 @@ static void prvReceivingTask( void * pvParameters )
          * Note:  An infinite block time is used to simplify the example.  Infinite
          * block times are not recommended in production code as they do not allow
          * for error recovery. */
-        xStreamBufferReceive( xStreamBuffer[ 0 ], /* The stream buffer data is being received from. */
+        xStreamBufferReceive( xStreamBuffer[ 0 ],                     /* The stream buffer data is being received from. */
                               ( void * ) &( cRxBuffer[ xNextByte ] ), /* Where to place received data. */
-                              sizeof( char ), /* The number of bytes to receive. */
-                              portMAX_DELAY /* The time to wait for the next data if the buffer is empty. */
-                            );
+                              sizeof( char ),                         /* The number of bytes to receive. */
+                              portMAX_DELAY                           /* The time to wait for the next data if the buffer is empty. */
+                              );
 
         /* If xNextByte is 0 then this task is looking for the start of the
          * string, which is 'H'. */
@@ -178,7 +163,7 @@ static void prvReceivingTask( void * pvParameters )
             if( cRxBuffer[ xNextByte ] == 'S' )
             {
                 /* The string has now been received.  Check its validity. */
-                if( strcmp( cRxBuffer, pcStringToReceive[ 0 ] ) != 0 )
+                if( strcmp( cRxBuffer, pcStringToReceive ) != 0 )
                 {
                     xDemoStatus[ 0 ] = pdFAIL;
                 }
