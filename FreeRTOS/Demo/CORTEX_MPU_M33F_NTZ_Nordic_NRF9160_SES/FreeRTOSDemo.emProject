@@ -1,5 +1,11 @@
 <!DOCTYPE CrossStudio_Project_File>
 <solution Name="FreeRTOSDemo" target="8" version="2">
+  <configuration Name="Common" c_user_include_directories="" />
+  <configuration
+    Name="Debug"
+    c_preprocessor_definitions="DEBUG"
+    gcc_debugging_level="Level 3"
+    gcc_optimization_level="None" />
   <project Name="FreeRTOSDemo">
     <configuration
       LIBRARY_IO_TYPE="RTT"
@@ -24,7 +30,7 @@
       build_intermediate_directory="Output/$(Configuration)/Objects/"
       build_output_directory="Output/$(Configuration)/"
       c_preprocessor_definitions="ARM_MATH_ARMV8MML;NRF9160_XXAA;__NRF_FAMILY;__SUPPORT_RESET_HALT_AFTER_BTL=0;INITIALIZE_USER_SECTIONS;__ARMCC_VERSION"
-      c_user_include_directories="$(ProjectDir)/Nordic_Code/CMSIS_5/CMSIS/Core/Include;$(ProjectDir)/Nordic_Code/nRF/Device/Include;$(ProjectDir)/Config;../../Source/include;../../Source/portable/GCC/ARM_CM33_NTZ/non_secure;../Common/ARMv8M/mpu_demo"
+      c_user_include_directories="$(ProjectDir)/Nordic_Code/CMSIS_5/CMSIS/Core/Include;$(ProjectDir)/Nordic_Code/nRF/Device/Include;$(ProjectDir)/Config;../../Source/include;../../Source/portable/GCC/ARM_CM33_NTZ/non_secure;../Common/include;../Common/ARMv8M/mpu_demo;../Common/ARMv8M/soak_tests"
       debug_register_definition_file="$(ProjectDir)/Nordic_Code/nRF/XML/nrf9160_Registers.xml"
       debug_stack_pointer_start="__stack_end__"
       debug_start_from_entry_point_symbol="No"
@@ -39,32 +45,40 @@
       project_type="Executable"
       target_reset_script="Reset();"
       target_trace_initialize_script="EnableTrace(&quot;$(TraceInterfaceType)&quot;)" />
-    <folder Name="Nordic_Code">
-      <folder Name="CMSIS Files">
-        <file file_name="Nordic_Code/nRF/Device/Source/system_nrf9160.c">
-          <configuration
-            Name="Common"
-            default_code_section=".init"
-            default_const_section=".init_rodata" />
-        </file>
-        <file file_name="Nordic_Code/nRF/Device/Include/nrf.h" />
-      </folder>
-      <folder Name="Script Files">
-        <file file_name="Nordic_Code/nRF/Scripts/nRF_Target.js">
-          <configuration Name="Common" file_type="Reset Script" />
-        </file>
-      </folder>
-      <folder Name="System Files">
-        <file file_name="Nordic_Code/nRF/Source/nRF_Startup.s" />
-        <file file_name="Nordic_Code/nRF/Source/nrf9160_Vectors.s">
-          <configuration Name="Common" file_type="Assembly" />
-        </file>
-        <file file_name="Nordic_Code/nRF/Source/thumb_crt0.s" />
-      </folder>
+    <folder Name="Config">
+      <file file_name="Config/FreeRTOSConfig.h" />
     </folder>
-    <folder Name="User">
-      <configuration Name="Common" filter="c;cpp;cxx;cc;h;s;asm;inc" />
-      <file file_name="Source/main.c" />
+    <folder Name="Demos">
+      <configuration
+        Name="Common"
+        c_user_include_directories="../Common/ARMv8M/soak_tests" />
+      <file file_name="../Common/ARMv8M/soak_tests/AbortDelay.c" />
+      <file file_name="../Common/ARMv8M/soak_tests/BlockQ.c" />
+      <file file_name="../Common/ARMv8M/soak_tests/blocktim.c" />
+      <file file_name="../Common/ARMv8M/soak_tests/countsem.c" />
+      <file file_name="../Common/ARMv8M/soak_tests/dynamic.c" />
+      <file file_name="../Common/ARMv8M/soak_tests/EventGroupsDemo.c" />
+      <file file_name="../Common/ARMv8M/soak_tests/flop.c" />
+      <file file_name="../Common/ARMv8M/soak_tests/GenQTest.c" />
+      <file file_name="../Common/ARMv8M/soak_tests/integer.c" />
+      <file file_name="../Common/ARMv8M/soak_tests/IntQueue.c" />
+      <file file_name="../Common/ARMv8M/soak_tests/IntQueueTimer.c" />
+      <file file_name="../Common/ARMv8M/soak_tests/IntSemTest.c" />
+      <file file_name="../Common/ARMv8M/soak_tests/MessageBufferDemo.c" />
+      <file file_name="../Common/ARMv8M/mpu_demo/mpu_demo.c" />
+      <file file_name="../Common/ARMv8M/soak_tests/PollQ.c" />
+      <file file_name="../Common/ARMv8M/soak_tests/QPeek.c" />
+      <file file_name="../Common/ARMv8M/soak_tests/QueueOverwrite.c" />
+      <file file_name="../Common/ARMv8M/soak_tests/QueueSet.c" />
+      <file file_name="../Common/ARMv8M/soak_tests/QueueSetPolling.c" />
+      <file file_name="../Common/ARMv8M/soak_tests/recmutex.c" />
+      <file file_name="../Common/ARMv8M/soak_tests/semtest.c" />
+      <file file_name="../Common/ARMv8M/soak_tests/StreamBufferDemo.c" />
+      <file file_name="../Common/ARMv8M/soak_tests/StreamBufferInterrupt.c" />
+      <file file_name="../Common/ARMv8M/soak_tests/TaskNotify.c" />
+      <file file_name="../Common/ARMv8M/soak_tests/TaskNotifyArray.c" />
+      <file file_name="../Common/ARMv8M/soak_tests/TestRunner.c" />
+      <file file_name="../Common/ARMv8M/soak_tests/TimerDemo.c" />
     </folder>
     <folder Name="FreeRTOS">
       <folder Name="include">
@@ -92,9 +106,9 @@
         </folder>
         <folder Name="GCC">
           <folder Name="ARM_CM33_NTZ">
+            <file file_name="../../Source/portable/GCC/ARM_CM33_NTZ/non_secure/port.c" />
             <file file_name="../../Source/portable/GCC/ARM_CM33_NTZ/non_secure/portasm.c" />
             <file file_name="../../Source/portable/GCC/ARM_CM33_NTZ/non_secure/portasm.h" />
-            <file file_name="../../Source/portable/GCC/ARM_CM33_NTZ/non_secure/port.c" />
             <file file_name="../../Source/portable/GCC/ARM_CM33_NTZ/non_secure/portmacro.h" />
           </folder>
         </folder>
@@ -109,17 +123,32 @@
       <file file_name="../../Source/tasks.c" />
       <file file_name="../../Source/timers.c" />
     </folder>
-    <folder Name="Config">
-      <file file_name="Config/FreeRTOSConfig.h" />
+    <folder Name="Nordic_Code">
+      <folder Name="CMSIS Files">
+        <file file_name="Nordic_Code/nRF/Device/Include/nrf.h" />
+        <file file_name="Nordic_Code/nRF/Device/Source/system_nrf9160.c">
+          <configuration
+            Name="Common"
+            default_code_section=".init"
+            default_const_section=".init_rodata" />
+        </file>
+      </folder>
+      <folder Name="Script Files">
+        <file file_name="Nordic_Code/nRF/Scripts/nRF_Target.js">
+          <configuration Name="Common" file_type="Reset Script" />
+        </file>
+      </folder>
+      <folder Name="System Files">
+        <file file_name="Nordic_Code/nRF/Source/nrf9160_Vectors.s">
+          <configuration Name="Common" file_type="Assembly" />
+        </file>
+        <file file_name="Nordic_Code/nRF/Source/nRF_Startup.s" />
+        <file file_name="Nordic_Code/nRF/Source/thumb_crt0.s" />
+      </folder>
     </folder>
-    <folder Name="Demos">
-      <file file_name="../Common/ARMv8M/mpu_demo/mpu_demo.c" />
-      <file file_name="../Common/ARMv8M/mpu_demo/mpu_demo.h" />
+    <folder Name="User">
+      <configuration Name="Common" filter="c;cpp;cxx;cc;h;s;asm;inc" />
+      <file file_name="Source/main.c" />
     </folder>
   </project>
-  <configuration
-    Name="Debug"
-    c_preprocessor_definitions="DEBUG"
-    gcc_debugging_level="Level 3"
-    gcc_optimization_level="None" />
 </solution>
