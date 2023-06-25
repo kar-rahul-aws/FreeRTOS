@@ -54,8 +54,8 @@
 
 #define notifySUSPENDED_TEST_TIMER_PERIOD     pdMS_TO_TICKS( 50 )
 
-#define notifySHARED_MEM_SIZE_WORDS           ( 8 )
-#define notifySHARED_MEM_SIZE_BYTES           ( 32 )
+#define notifySHARED_MEM_SIZE_WORDS             ( 8 )
+#define notifySHARED_MEM_SIZE_BYTES             ( 32 )
 
 /*-----------------------------------------------------------*/
 
@@ -91,10 +91,10 @@ static void prvSuspendedTaskTimerTestCallback( TimerHandle_t xExpiredTimer );
 /*-----------------------------------------------------------*/
 
 /* Used to latch errors during the test's execution. */
-/*static BaseType_t xErrorStatus[ notifySHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( notifySHARED_MEM_SIZE_BYTES ) ) ) = { pdPASS }; */
+static BaseType_t xErrorStatus[ notifySHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( notifySHARED_MEM_SIZE_BYTES ) ) ) = { pdPASS };
 
 /* Used to ensure the task has not stalled. */
-/*static volatile uint32_t ulNotifyCycleCount[ notifySHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( notifySHARED_MEM_SIZE_BYTES ) ) ) = { 0 }; */
+static volatile uint32_t ulNotifyCycleCount[ notifySHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( notifySHARED_MEM_SIZE_BYTES ) ) ) = { 0 };
 
 /* The handle of the task that receives the notifications. */
 static TaskHandle_t xTaskToNotify[ notifySHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( notifySHARED_MEM_SIZE_BYTES ) ) ) = { NULL };
@@ -102,23 +102,14 @@ static TaskHandle_t xTaskToNotify[ notifySHARED_MEM_SIZE_WORDS ] __attribute__( 
 /* Used to count the notifications sent to the task from a software timer and
  * the number of notifications received by the task from the software timer.  The
  * two should stay synchronized. */
-/*static uint32_t ulTimerNotificationsReceived[ notifySHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( notifySHARED_MEM_SIZE_BYTES ) ) ) = { 0UL }; */
-/*static uint32_t ulTimerNotificationsSent[ notifySHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( notifySHARED_MEM_SIZE_BYTES ) ) ) = { 0UL }; */
+static uint32_t ulTimerNotificationsReceived[ notifySHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( notifySHARED_MEM_SIZE_BYTES ) ) ) = { 0UL };
+static uint32_t ulTimerNotificationsSent[ notifySHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( notifySHARED_MEM_SIZE_BYTES ) ) ) = { 0UL };
 
 /* The timer used to notify the task. */
 static TimerHandle_t xTimer[ notifySHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( notifySHARED_MEM_SIZE_BYTES ) ) ) = { NULL };
 
 /* Used by the pseudo random number generating function. */
-/*static size_t uxNextRand[ notifySHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( notifySHARED_MEM_SIZE_BYTES ) ) ) = { 0 }; */
-
-/* Helper variable to accommodate 3 user defined regions */
-static uint32_t xHelper[ notifySHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( notifySHARED_MEM_SIZE_BYTES ) ) ) = { 0 };
-
-#define ERROR_STATUS              0
-#define NOTIFY_CYCLE_COUNT        1
-#define NOTIFICATIONS_RECEIVED    2
-#define NOTIFICATIONS_SENT        3
-#define NEXT_RAND                 4
+static size_t uxNextRand[ notifySHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( notifySHARED_MEM_SIZE_BYTES ) ) ) = { 0 };
 
 /*-----------------------------------------------------------*/
 
@@ -128,34 +119,24 @@ void vStartTaskNotifyTask( void )
      * being notified by both a software timer and an interrupt. */
     const TickType_t xMaxPeriod = pdMS_TO_TICKS( 90 );
     static StackType_t xNotifiedTaskStack[ notifyNOTIFIED_TASK_STACK_SIZE ] __attribute__( ( aligned( notifyNOTIFIED_TASK_STACK_SIZE * sizeof( StackType_t ) ) ) );
-
     TaskParameters_t xNotifiedTask =
     {
-        .pvTaskCode     = prvNotifiedTask,
-        .pcName         = "Notified",
-        .usStackDepth   = notifyNOTIFIED_TASK_STACK_SIZE,
-        .pvParameters   = NULL,
-        /* Needs to be privileged because it calls privileged only APIs --> Set Priority */
-        .uxPriority     = ( notifyTASK_PRIORITY | portPRIVILEGE_BIT ),
-        .puxStackBuffer = xNotifiedTaskStack,
-        .xRegions       =
-        {
-            { ( void * ) &( xHelper[ 0 ] ),       notifySHARED_MEM_SIZE_BYTES,
-              ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER ) },
-            { ( void * ) &( xTimer[ 0 ] ),        notifySHARED_MEM_SIZE_BYTES,
-              ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER ) },
-
-            { ( void * ) &( xTaskToNotify[ 0 ] ), notifySHARED_MEM_SIZE_BYTES,
-              ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER ) }
-        }
+        .pvTaskCode      = prvNotifiedTask,
+        .pcName          = "Notified",
+        .usStackDepth    = notifyNOTIFIED_TASK_STACK_SIZE,
+        .pvParameters    = NULL,
+		/* Needs to be privileged because it calls privileged only APIs --> Set Priority */
+        .uxPriority      = ( notifyTASK_PRIORITY | portPRIVILEGE_BIT ),
+        .puxStackBuffer  = xNotifiedTaskStack,
+        .xRegions        =  {
+                                { 0, 0, 0 },
+                                { 0, 0, 0 },
+                                { 0, 0, 0 }
+                            }
     };
-
-    xTaskCreateRestricted( &( xNotifiedTask ), &xTaskToNotify[ 0 ] );
-
-    xHelper[ ERROR_STATUS ] = pdPASS;
+    xTaskCreateRestricted( & ( xNotifiedTask ) , &xTaskToNotify[ 0 ] );
     /* Pseudo seed the random number generator. */
-    xHelper[ NEXT_RAND ] = ( size_t ) prvRand;
-
+    uxNextRand[ 0 ] = ( size_t ) prvRand;
 
     xTimer[ 0 ] = xTimerCreate( "Notifier", xMaxPeriod, pdFALSE, NULL, prvNotifyingTimer );
     configASSERT( xTimer[ 0 ] );
@@ -183,7 +164,7 @@ static void prvSingleTaskTests( void )
     /* Should have blocked for the entire block time. */
     if( ( xTaskGetTickCount() - xTimeOnEntering ) < xTicksToWait )
     {
-        xHelper[ ERROR_STATUS ] = pdFAIL;
+        xErrorStatus[ 0 ] = pdFAIL;
     }
 
     configASSERT( xReturned == pdFAIL );
@@ -214,7 +195,7 @@ static void prvSingleTaskTests( void )
 
     if( ( xTaskGetTickCount() - xTimeOnEntering ) >= xTicksToWait )
     {
-        xHelper[ ERROR_STATUS ] = pdFAIL;
+        xErrorStatus[ 0 ] = pdFAIL;
     }
 
     /* The task should have been notified, and the notified value should
@@ -225,7 +206,7 @@ static void prvSingleTaskTests( void )
     ( void ) ulNotifiedValue;
 
     /* Incremented to show the task is still running. */
-    xHelper[ NOTIFY_CYCLE_COUNT ]++;
+    ulNotifyCycleCount[ 0 ]++;
 
 
 
@@ -462,7 +443,7 @@ static void prvSingleTaskTests( void )
 
 
     /* Incremented to show the task is still running. */
-    xHelper[ NOTIFY_CYCLE_COUNT ]++;
+    ulNotifyCycleCount[ 0 ]++;
 
     /* Ensure no notifications are pending. */
     xTaskNotifyWait( notifyUINT32_MAX, 0, NULL, 0 );
@@ -485,7 +466,7 @@ static void prvSingleTaskTests( void )
     ( void ) xReturned; /* In case configASSERT() is not defined. */
 
     /* Incremented to show the task is still running. */
-    xHelper[ NOTIFY_CYCLE_COUNT ]++;
+    ulNotifyCycleCount[ 0 ]++;
 
     /* Start the timer that will try notifying this task while it is
      * suspended, then wait for a notification.  The second time the callback
@@ -505,7 +486,7 @@ static void prvSingleTaskTests( void )
     xTimerDelete( xTimer[ 1 ], portMAX_DELAY );
 
     /* Incremented to show the task is still running. */
-    xHelper[ NOTIFY_CYCLE_COUNT ]++;
+    ulNotifyCycleCount[ 0 ]++;
 
     /* Leave all bits cleared. */
     xTaskNotifyWait( notifyUINT32_MAX, 0, NULL, 0 );
@@ -558,7 +539,7 @@ static void prvNotifyingTimer( TimerHandle_t xNotUsed )
     /* This value is also incremented from an interrupt. */
     taskENTER_CRITICAL();
     {
-        xHelper[ NOTIFICATIONS_SENT ]++;
+        ulTimerNotificationsSent[ 0 ]++;
     }
     taskEXIT_CRITICAL();
 }
@@ -610,34 +591,34 @@ static void prvNotifiedTask( void * pvParameters )
          * notifications as any other notifications will remain pending. */
         if( ulTaskNotifyTake( pdFALSE, xPeriod ) != 0 )
         {
-            xHelper[ NOTIFICATIONS_RECEIVED ]++;
+            ulTimerNotificationsReceived[ 0 ]++;
         }
 
         /* Take a notification without clearing again, but this time without a
          * block time specified. */
         if( ulTaskNotifyTake( pdFALSE, xDontBlock ) != 0 )
         {
-            xHelper[ NOTIFICATIONS_RECEIVED ]++;
+            ulTimerNotificationsReceived[ 0 ]++;
         }
 
         /* Wait for the next notification from the timer, clearing all
          * notifications if one is received, so this time adding the total number
          * of notifications that were pending as none will be left pending after
          * the function call. */
-        xHelper[ NOTIFICATIONS_RECEIVED ] += ulTaskNotifyTake( pdTRUE, xPeriod );
+        ulTimerNotificationsReceived[ 0 ] += ulTaskNotifyTake( pdTRUE, xPeriod );
 
         /* Occasionally raise the priority of the task being notified to test
          * the path where the task is notified from an ISR and becomes the highest
          * priority ready state task, but the pxHigherPriorityTaskWoken parameter
          * is NULL (which it is in the tick hook that sends notifications to this
          * task). */
-        if( ( xHelper[ NOTIFY_CYCLE_COUNT ] % ulCyclesToRaisePriority ) == 0 )
+        if( ( ulNotifyCycleCount[ 0 ] % ulCyclesToRaisePriority ) == 0 )
         {
             vTaskPrioritySet( xTaskToNotify[ 0 ], configMAX_PRIORITIES - 1 );
 
             /* Wait for the next notification again, clearing all notifications
              * if one is received, but this time blocking indefinitely. */
-            xHelper[ NOTIFICATIONS_RECEIVED ] += ulTaskNotifyTake( pdTRUE, portMAX_DELAY );
+            ulTimerNotificationsReceived[ 0 ] += ulTaskNotifyTake( pdTRUE, portMAX_DELAY );
 
             /* Reset the priority. */
             vTaskPrioritySet( xTaskToNotify[ 0 ], notifyTASK_PRIORITY );
@@ -646,11 +627,11 @@ static void prvNotifiedTask( void * pvParameters )
         {
             /* Wait for the next notification again, clearing all notifications
              * if one is received, but this time blocking indefinitely. */
-            xHelper[ NOTIFICATIONS_RECEIVED ] += ulTaskNotifyTake( pdTRUE, portMAX_DELAY );
+            ulTimerNotificationsReceived[ 0 ] += ulTaskNotifyTake( pdTRUE, portMAX_DELAY );
         }
 
         /* Incremented to show the task is still running. */
-        xHelper[ NOTIFY_CYCLE_COUNT ]++;
+        ulNotifyCycleCount[ 0 ]++;
     }
 }
 /*-----------------------------------------------------------*/
@@ -703,7 +684,7 @@ void xNotifyTaskFromISR( void )
                     break;
             }
 
-            xHelper[ NOTIFICATIONS_SENT ]++;
+            ulTimerNotificationsSent[ 0 ]++;
         }
     }
 }
@@ -718,26 +699,26 @@ BaseType_t xAreTaskNotificationTasksStillRunning( void )
 
     /* Check the cycle count is still incrementing to ensure the task is still
      * actually running. */
-    if( ulLastNotifyCycleCount == xHelper[ NOTIFY_CYCLE_COUNT ] )
+    if( ulLastNotifyCycleCount == ulNotifyCycleCount[ 0 ] )
     {
-        xHelper[ ERROR_STATUS ] = pdFAIL;
+        xErrorStatus[ 0 ] = pdFAIL;
     }
     else
     {
-        ulLastNotifyCycleCount = xHelper[ NOTIFY_CYCLE_COUNT ];
+        ulLastNotifyCycleCount = ulNotifyCycleCount[ 0 ];
     }
 
     /* Check the count of 'takes' from the software timer is keeping track with
      * the amount of 'gives'. */
-    if( xHelper[ NOTIFICATIONS_SENT ] > xHelper[ NOTIFICATIONS_RECEIVED ] )
+    if( ulTimerNotificationsSent[ 0 ] > ulTimerNotificationsReceived[ 0 ] )
     {
-        if( ( xHelper[ NOTIFICATIONS_SENT ] - xHelper[ NOTIFICATIONS_RECEIVED ] ) > ulMaxSendReceiveDeviation )
+        if( ( ulTimerNotificationsSent[ 0 ] - ulTimerNotificationsReceived[ 0 ] ) > ulMaxSendReceiveDeviation )
         {
-            xHelper[ ERROR_STATUS ] = pdFAIL;
+            xErrorStatus[ 0 ] = pdFAIL;
         }
     }
 
-    return xHelper[ ERROR_STATUS ];
+    return xErrorStatus[ 0 ];
 }
 /*-----------------------------------------------------------*/
 
@@ -746,7 +727,7 @@ static UBaseType_t prvRand( void )
     const size_t uxMultiplier = ( size_t ) 0x015a4e35, uxIncrement = ( size_t ) 1;
 
     /* Utility function to generate a pseudo random number. */
-    xHelper[ NEXT_RAND ] = ( uxMultiplier * xHelper[ NEXT_RAND ] ) + uxIncrement;
-    return( ( xHelper[ NEXT_RAND ] >> 16 ) & ( ( size_t ) 0x7fff ) );
+    uxNextRand[ 0 ] = ( uxMultiplier * uxNextRand[ 0 ] ) + uxIncrement;
+    return( ( uxNextRand[ 0 ] >> 16 ) & ( ( size_t ) 0x7fff ) );
 }
 /*-----------------------------------------------------------*/

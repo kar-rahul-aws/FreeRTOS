@@ -234,38 +234,9 @@ void vStartInterruptQueueTasks( void )
         .uxPriority      = ( intqHIGHER_PRIORITY | portPRIVILEGE_BIT ),
         .puxStackBuffer  = x1stHigherPriorityNormallyEmptyTaskStack,
         .xRegions        =  {
-                                { ( void * ) &( xNormallyEmptyQueue[ 0 ] ), intqSHARED_MEM_SIZE_BYTES,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-                                },
-                                { ( void * ) &( xErrorStatus[ 0 ] ), intqSHARED_MEM_SIZE_BYTES,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-                                },
-                                { ( void * ) &( xErrorLine[ 0 ] ), intqSHARED_MEM_SIZE_BYTES,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-                                },
-                                { ( void * ) &( ucNormallyEmptyReceivedValues[ 0 ] ), intqSHARED_MEM_SIZE_VALUES_TO_LOG,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-                                },
-                                { ( void * ) &( uxValueForNormallyEmptyQueue[ 0 ] ), intqSHARED_MEM_SIZE_VALUES_TO_LOG,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-                                },
-                                { ( void * ) &( xLocalTaskHandles[ 0 ] ), intqSHARED_MEM_SIZE_VALUES_TO_LOG,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-                                },
-                                { ( void * ) &( uxHighPriorityLoops1[ 0 ] ), intqSHARED_MEM_SIZE_VALUES_TO_LOG,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-                                },
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        }
+                                { 0, 0, 0 },
+                                { 0, 0, 0 },
+                                { 0, 0, 0 }
                             }
     };
 
@@ -279,38 +250,9 @@ void vStartInterruptQueueTasks( void )
         .uxPriority      = ( intqHIGHER_PRIORITY | portPRIVILEGE_BIT ),
         .puxStackBuffer  = x2ndHigherPriorityNormallyEmptyTaskStack,
         .xRegions        =  {
-                                { ( void * ) &( xNormallyEmptyQueue[ 0 ] ), intqSHARED_MEM_SIZE_BYTES,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-                                },
-                                { ( void * ) &( xErrorStatus[ 0 ] ), intqSHARED_MEM_SIZE_BYTES,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-                                },
-                                { ( void * ) &( xErrorLine[ 0 ] ), intqSHARED_MEM_SIZE_BYTES,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-                                },
-                                { ( void * ) &( ucNormallyEmptyReceivedValues[ 0 ] ), intqSHARED_MEM_SIZE_VALUES_TO_LOG,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-                                },
-                                { ( void * ) &( uxValueForNormallyEmptyQueue[ 0 ] ), intqSHARED_MEM_SIZE_VALUES_TO_LOG,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-                                },
-                                { ( void * ) &( xLocalTaskHandles[ 0 ] ), intqSHARED_MEM_SIZE_VALUES_TO_LOG,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-                                },
-                                { ( void * ) &( uxHighPriorityLoops1[ 0 ] ), intqSHARED_MEM_SIZE_VALUES_TO_LOG,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-                                },
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        }
+                                { 0, 0, 0 },
+                                { 0, 0, 0 },
+                                { 0, 0, 0 }
                             }
     };
     TaskParameters_t xLowerPriorityNormallyEmptyTaskParameters =
@@ -323,32 +265,9 @@ void vStartInterruptQueueTasks( void )
         .uxPriority      = ( intqLOWER_PRIORITY | portPRIVILEGE_BIT ),
         .puxStackBuffer  = xLowerPriorityNormallyEmptyTaskStack,
         .xRegions        =  {
-                                { ( void * ) &( xNormallyEmptyQueue[ 0 ] ), intqSHARED_MEM_SIZE_BYTES,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-                                },
-                                { ( void * ) &( xLocalTaskHandles[ 0 ] ), intqSHARED_MEM_SIZE_VALUES_TO_LOG,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-                                },
-                                { ( void * ) &( uxLowPriorityLoops1[ 0 ] ), intqSHARED_MEM_SIZE_VALUES_TO_LOG,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-                                },
-                                { ( void * ) &( uxValueForNormallyEmptyQueue[ 0 ] ), intqSHARED_MEM_SIZE_VALUES_TO_LOG,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-                                },
-                                { ( void * ) &( ucNormallyEmptyReceivedValues[ 0 ] ), intqSHARED_MEM_SIZE_VALUES_TO_LOG,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-                                },
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        }
+                                { 0, 0, 0 },
+                                { 0, 0, 0 },
+                                { 0, 0, 0 }
                             }
     };
     TaskParameters_t x1stHigherPriorityNormallyFullTaskParameters =
@@ -361,41 +280,9 @@ void vStartInterruptQueueTasks( void )
         .uxPriority      = ( intqHIGHER_PRIORITY | portPRIVILEGE_BIT ),
         .puxStackBuffer  = x1stHigherPriorityNormallyFullTaskStack,
         .xRegions        =  {
-                                { ( void * ) &( uxValueForNormallyFullQueue[ 0 ] ), intqSHARED_MEM_SIZE_VALUES_TO_LOG,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-                                },
-                                { ( void * ) &( xNormallyFullQueue[ 0 ] ), intqSHARED_MEM_SIZE_BYTES,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-                                },
-                                { ( void * ) &( xLocalTaskHandles[ 0 ] ), intqSHARED_MEM_SIZE_VALUES_TO_LOG,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-                                },
-                                { ( void * ) &( xWasSuspended[ 0 ] ), intqSHARED_MEM_SIZE_VALUES_TO_LOG,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-                                },
-                                { ( void * ) &( ucNormallyFullReceivedValues[ 0 ] ), intqSHARED_MEM_SIZE_VALUES_TO_LOG,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-                                },
-                                { ( void * ) &( uxHighPriorityLoops2[ 0 ] ), intqSHARED_MEM_SIZE_VALUES_TO_LOG,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-                                },
-                                { ( void * ) &( xErrorStatus[ 0 ] ), intqSHARED_MEM_SIZE_BYTES,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-                                },
-                                { ( void * ) &( xErrorLine[ 0 ] ), intqSHARED_MEM_SIZE_BYTES,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-                                },
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        }
+                                { 0, 0, 0 },
+                                { 0, 0, 0 },
+                                { 0, 0, 0 }
                             }
     };
     TaskParameters_t x2ndHigherPriorityNormallyFullTaskParameters =
@@ -408,28 +295,14 @@ void vStartInterruptQueueTasks( void )
         .puxStackBuffer  = x2ndHigherPriorityNormallyFullTaskStack,
         .xRegions        =  {
                                 { ( void * ) &( uxValueForNormallyFullQueue[ 0 ] ), intqSHARED_MEM_SIZE_VALUES_TO_LOG,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
                                 },
                                 { ( void * ) &( xNormallyFullQueue[ 0 ] ), intqSHARED_MEM_SIZE_BYTES,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
+                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
                                 },
                                 { ( void * ) &( xWasSuspended[ 0 ] ), intqSHARED_MEM_SIZE_VALUES_TO_LOG,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-                                },
-                                { ( void * ) &( uxValueForNormallyFullQueue[ 0 ] ), intqSHARED_MEM_SIZE_VALUES_TO_LOG,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-                                },
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        }
+                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                }
                             }
     };
 
@@ -443,35 +316,9 @@ void vStartInterruptQueueTasks( void )
         .uxPriority      = ( intqLOWER_PRIORITY | portPRIVILEGE_BIT ),
         .puxStackBuffer  = xLowerPriorityNormallyFullTaskStack,
         .xRegions        =  {
-                                { ( void * ) &( xNormallyFullQueue[ 0 ] ), intqSHARED_MEM_SIZE_BYTES,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-                                },
-                                { ( void * ) &( xLocalTaskHandles[ 0 ] ), intqSHARED_MEM_SIZE_VALUES_TO_LOG,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-                                },
-                                { ( void * ) &( uxLowPriorityLoops2[ 0 ] ), intqSHARED_MEM_SIZE_VALUES_TO_LOG,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-                                },
-                                { ( void * ) &( ucNormallyFullReceivedValues[ 0 ] ), intqSHARED_MEM_SIZE_VALUES_TO_LOG,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-                                },
-                                { ( void * ) &( xErrorStatus[ 0 ] ), intqSHARED_MEM_SIZE_BYTES,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-                                },
-                                { ( void * ) &( xErrorLine[ 0 ] ), intqSHARED_MEM_SIZE_BYTES,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER |
-                                    ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) )
-                                },
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        }
+                                { 0, 0, 0 },
+                                { 0, 0, 0 },
+                                { 0, 0, 0 }
                             }
     };
 

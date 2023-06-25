@@ -24,11 +24,10 @@
  *
  */
 
-#ifndef GEN_Q_TEST_H
-#define GEN_Q_TEST_H
+#ifndef REG_TEST_H
+#define REG_TEST_H
 
-void vStartGenericQueueTasks( UBaseType_t uxPriority );
-BaseType_t xAreGenericQueueTasksStillRunning( void );
-void vMutexISRInteractionTest( void );
+void vStartRegisterTasks( UBaseType_t uxPriority );
+BaseType_t xAreRegisterTasksStillRunning( void );
 
-#endif /* GEN_Q_TEST_H */
+#endif /* REG_TEST_H */

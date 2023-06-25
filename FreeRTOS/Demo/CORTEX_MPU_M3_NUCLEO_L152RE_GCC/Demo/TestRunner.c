@@ -62,7 +62,7 @@
 #include "MessageBufferDemo.h"
 #include "StreamBufferDemo.h"
 #include "StreamBufferInterrupt.h"
-//#include "RegTests.h"
+#include "RegTests.h"
 
 /**
  * Priorities at which the tasks are created.

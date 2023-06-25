@@ -88,28 +88,17 @@ static void prvBasicDelayTests( void );
 /* The queue on which the tasks block. */
 static QueueHandle_t xTestQueue[ blocktimerSHARED_MEM_SIZE_WORDS ]  __attribute__( ( aligned( blocktimerSHARED_MEM_SIZE_BYTES ) ) ) = { NULL };
 
-
 /* Handle to the secondary task is required by the primary task for calls
  * to vTaskSuspend/Resume(). */
 static TaskHandle_t xSecondary[ blocktimerSHARED_MEM_SIZE_WORDS ]  __attribute__( ( aligned( blocktimerSHARED_MEM_SIZE_BYTES ) ) ) = { NULL };
 
-/* Used to ensure that tasks are still executing without error. */
-/*static volatile BaseType_t xPrimaryCycles[ blocktimerSHARED_MEM_SIZE_WORDS ]  __attribute__( ( aligned( blocktimerSHARED_MEM_SIZE_BYTES ) ) ) = { 0 }; */
-/*static volatile BaseType_t xSecondaryCycles[ blocktimerSHARED_MEM_SIZE_WORDS ]  __attribute__( ( aligned( blocktimerSHARED_MEM_SIZE_BYTES ) ) ) = { 0 }; */
-/*static volatile BaseType_t xErrorOccurred[ blocktimerSHARED_MEM_SIZE_WORDS ]  __attribute__( ( aligned( blocktimerSHARED_MEM_SIZE_BYTES ) ) ) = { pdFALSE }; */
+/* Shared array to accommodate 3 user defined regions */
+static volatile BaseType_t xSharedArray[ blocktimerSHARED_MEM_SIZE_WORDS ]  __attribute__( ( aligned( blocktimerSHARED_MEM_SIZE_BYTES ) ) ) = { 0 };
 
-/* Provides a simple mechanism for the primary task to know when the
- * secondary task has executed. */
-/*static volatile UBaseType_t xRunIndicator[ blocktimerSHARED_MEM_SIZE_WORDS ]  __attribute__( ( aligned( blocktimerSHARED_MEM_SIZE_BYTES ) ) ) = { pdFALSE }; */
-
-
-/* Helper variable to accommodate 3 user defined regions */
-static volatile BaseType_t xHelper[ blocktimerSHARED_MEM_SIZE_WORDS ]  __attribute__( ( aligned( blocktimerSHARED_MEM_SIZE_BYTES ) ) ) = { 0 };
-
-#define ERROR_DETECTED      0
-#define PRIMARY_CYCLES      1
-#define SECONDARY_CYCLES    2
-#define RUN_INDICATOR       3
+#define ERROR_DETECTED_IDX      0
+#define PRIMARY_CYCLES_IDX      1
+#define SECONDARY_CYCLES_IDX    2
+#define RUN_INDICATOR_IDX       3
 
 /*-----------------------------------------------------------*/
 
@@ -143,12 +132,9 @@ void vCreateBlockTimeTasks( void )
             .puxStackBuffer = xPrimaryBlockTimeTestTaskStack,
             .xRegions       =
             {
-                { ( void * ) &( xTestQueue[ 0 ] ), blocktimerSHARED_MEM_SIZE_BYTES,
-                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER ) },
-                { ( void * ) &( xHelper[ 0 ] ),    blocktimerSHARED_MEM_SIZE_BYTES,
-                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER ) },
-                { ( void * ) &( xSecondary[ 0 ] ), blocktimerSHARED_MEM_SIZE_BYTES,
-                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER ) }
+                { 0, 0, 0 },
+                { 0, 0, 0 },
+                { 0, 0, 0 }
             }
         };
         TaskParameters_t xSecondaryBlockTimerTestTaskParameters =
@@ -163,7 +149,7 @@ void vCreateBlockTimeTasks( void )
             {
                 { ( void * ) &( xSecondary[ 0 ] ), blocktimerSHARED_MEM_SIZE_BYTES,
                   ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER ) },
-                { ( void * ) &( xHelper[ 0 ] ),    blocktimerSHARED_MEM_SIZE_BYTES,
+                { ( void * ) &( xSharedArray[ 0 ] ),    blocktimerSHARED_MEM_SIZE_BYTES,
                   ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER ) },
                 { ( void * ) &( xTestQueue[ 0 ] ), blocktimerSHARED_MEM_SIZE_BYTES,
                   ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER ) }
@@ -207,7 +193,7 @@ static void vPrimaryBlockTimeTestTask( void * pvParameters )
              * anything on the queue. */
             if( xQueueReceive( xTestQueue[ 0 ], &xData, xTimeToBlock ) != errQUEUE_EMPTY )
             {
-                xHelper[ ERROR_DETECTED ] = pdTRUE;
+                xSharedArray[ ERROR_DETECTED_IDX ] = pdTRUE;
             }
 
             /* How long were we blocked for? */
@@ -216,7 +202,7 @@ static void vPrimaryBlockTimeTestTask( void * pvParameters )
             if( xBlockedTime < xTimeToBlock )
             {
                 /* Should not have blocked for less than we requested. */
-                xHelper[ ERROR_DETECTED ] = pdTRUE;
+                xSharedArray[ ERROR_DETECTED_IDX ] = pdTRUE;
             }
 
             if( xBlockedTime > ( xTimeToBlock + bktALLOWABLE_MARGIN ) )
@@ -224,7 +210,7 @@ static void vPrimaryBlockTimeTestTask( void * pvParameters )
                 /* Should not have blocked for longer than we requested,
                  * although we would not necessarily run as soon as we were
                  * unblocked so a margin is allowed. */
-                xHelper[ ERROR_DETECTED ] = pdTRUE;
+                xSharedArray[ ERROR_DETECTED_IDX ] = pdTRUE;
             }
         }
 
@@ -238,7 +224,7 @@ static void vPrimaryBlockTimeTestTask( void * pvParameters )
         {
             if( xQueueSend( xTestQueue[ 0 ], &xItem, bktDONT_BLOCK ) != pdPASS )
             {
-                xHelper[ ERROR_DETECTED ] = pdTRUE;
+                xSharedArray[ ERROR_DETECTED_IDX ] = pdTRUE;
             }
 
             #if configUSE_PREEMPTION == 0
@@ -258,7 +244,7 @@ static void vPrimaryBlockTimeTestTask( void * pvParameters )
              * anything on the queue. */
             if( xQueueSend( xTestQueue[ 0 ], &xItem, xTimeToBlock ) != errQUEUE_FULL )
             {
-                xHelper[ ERROR_DETECTED ] = pdTRUE;
+                xSharedArray[ ERROR_DETECTED_IDX ] = pdTRUE;
             }
 
             /* How long were we blocked for? */
@@ -267,7 +253,7 @@ static void vPrimaryBlockTimeTestTask( void * pvParameters )
             if( xBlockedTime < xTimeToBlock )
             {
                 /* Should not have blocked for less than we requested. */
-                xHelper[ ERROR_DETECTED ] = pdTRUE;
+                xSharedArray[ ERROR_DETECTED_IDX ] = pdTRUE;
             }
 
             if( xBlockedTime > ( xTimeToBlock + bktALLOWABLE_MARGIN ) )
@@ -275,7 +261,7 @@ static void vPrimaryBlockTimeTestTask( void * pvParameters )
                 /* Should not have blocked for longer than we requested,
                  * although we would not necessarily run as soon as we were
                  * unblocked so a margin is allowed. */
-                xHelper[ ERROR_DETECTED ] = pdTRUE;
+                xSharedArray[ ERROR_DETECTED_IDX ] = pdTRUE;
             }
         }
 
@@ -291,11 +277,11 @@ static void vPrimaryBlockTimeTestTask( void * pvParameters )
          *
          * Wake the other task so it blocks attempting to post to the already
          * full queue. */
-        xHelper[ RUN_INDICATOR ] = 0;
+        xSharedArray[ RUN_INDICATOR_IDX ] = 0;
         vTaskResume( xSecondary[ 0 ] );
 
         /* We need to wait a little to ensure the other task executes. */
-        while( xHelper[ RUN_INDICATOR ] != bktRUN_INDICATOR )
+        while( xSharedArray[ RUN_INDICATOR_IDX ] != bktRUN_INDICATOR )
         {
             /* The other task has not yet executed. */
             vTaskDelay( bktSHORT_WAIT );
@@ -303,7 +289,7 @@ static void vPrimaryBlockTimeTestTask( void * pvParameters )
 
         /* Make sure the other task is blocked on the queue. */
         vTaskDelay( bktSHORT_WAIT );
-        xHelper[ RUN_INDICATOR ] = 0;
+        xSharedArray[ RUN_INDICATOR_IDX ] = 0;
 
         for( xItem = 0; xItem < bktQUEUE_LENGTH; xItem++ )
         {
@@ -311,7 +297,7 @@ static void vPrimaryBlockTimeTestTask( void * pvParameters )
              * but not execute as this task has higher priority. */
             if( xQueueReceive( xTestQueue[ 0 ], &xData, bktDONT_BLOCK ) != pdPASS )
             {
-                xHelper[ ERROR_DETECTED ] = pdTRUE;
+                xSharedArray[ ERROR_DETECTED_IDX ] = pdTRUE;
             }
 
             /* Now fill the queue again before the other task gets a chance to
@@ -319,13 +305,13 @@ static void vPrimaryBlockTimeTestTask( void * pvParameters )
              * full ourselves, and the other task have set xRunIndicator. */
             if( xQueueSend( xTestQueue[ 0 ], &xItem, bktDONT_BLOCK ) != pdPASS )
             {
-                xHelper[ ERROR_DETECTED ] = pdTRUE;
+                xSharedArray[ ERROR_DETECTED_IDX ] = pdTRUE;
             }
 
-            if( xHelper[ RUN_INDICATOR ] == bktRUN_INDICATOR )
+            if( xSharedArray[ RUN_INDICATOR_IDX ] == bktRUN_INDICATOR )
             {
                 /* The other task should not have executed. */
-                xHelper[ ERROR_DETECTED ] = pdTRUE;
+                xSharedArray[ ERROR_DETECTED_IDX ] = pdTRUE;
             }
 
             /* Raise the priority of the other task so it executes and blocks
@@ -334,11 +320,11 @@ static void vPrimaryBlockTimeTestTask( void * pvParameters )
 
             /* The other task should now have re-blocked without exiting the
              * queue function. */
-            if( xHelper[ RUN_INDICATOR ] == bktRUN_INDICATOR )
+            if( xSharedArray[ RUN_INDICATOR_IDX ] == bktRUN_INDICATOR )
             {
                 /* The other task should not have executed outside of the
                  * queue function. */
-                xHelper[ ERROR_DETECTED ] = pdTRUE;
+                xSharedArray[ ERROR_DETECTED_IDX ] = pdTRUE;
             }
 
             /* Set the priority back down. */
@@ -347,13 +333,13 @@ static void vPrimaryBlockTimeTestTask( void * pvParameters )
 
         /* Let the other task timeout.  When it unblockes it will check that it
          * unblocked at the correct time, then suspend itself. */
-        while( xHelper[ RUN_INDICATOR ] != bktRUN_INDICATOR )
+        while( xSharedArray[ RUN_INDICATOR_IDX ] != bktRUN_INDICATOR )
         {
             vTaskDelay( bktSHORT_WAIT );
         }
 
         vTaskDelay( bktSHORT_WAIT );
-        xHelper[ RUN_INDICATOR ] = 0;
+        xSharedArray[ RUN_INDICATOR_IDX ] = 0;
 
         /*********************************************************************
          * Test 4
@@ -366,7 +352,7 @@ static void vPrimaryBlockTimeTestTask( void * pvParameters )
         {
             if( xQueueReceive( xTestQueue[ 0 ], &xData, bktDONT_BLOCK ) != pdPASS )
             {
-                xHelper[ ERROR_DETECTED ] = pdTRUE;
+                xSharedArray[ ERROR_DETECTED_IDX ] = pdTRUE;
             }
         }
 
@@ -375,13 +361,13 @@ static void vPrimaryBlockTimeTestTask( void * pvParameters )
         vTaskResume( xSecondary[ 0 ] );
 
         /* We need to wait a little to ensure the other task executes. */
-        while( xHelper[ RUN_INDICATOR ] != bktRUN_INDICATOR )
+        while( xSharedArray[ RUN_INDICATOR_IDX ] != bktRUN_INDICATOR )
         {
             vTaskDelay( bktSHORT_WAIT );
         }
 
         vTaskDelay( bktSHORT_WAIT );
-        xHelper[ RUN_INDICATOR ] = 0;
+        xSharedArray[ RUN_INDICATOR_IDX ] = 0;
 
         for( xItem = 0; xItem < bktQUEUE_LENGTH; xItem++ )
         {
@@ -389,7 +375,7 @@ static void vPrimaryBlockTimeTestTask( void * pvParameters )
              * wake but not execute as this task has higher priority. */
             if( xQueueSend( xTestQueue[ 0 ], &xItem, bktDONT_BLOCK ) != pdPASS )
             {
-                xHelper[ ERROR_DETECTED ] = pdTRUE;
+                xSharedArray[ ERROR_DETECTED_IDX ] = pdTRUE;
             }
 
             /* Now empty the queue again before the other task gets a chance to
@@ -397,13 +383,13 @@ static void vPrimaryBlockTimeTestTask( void * pvParameters )
              * empty ourselves, and the other task would be suspended. */
             if( xQueueReceive( xTestQueue[ 0 ], &xData, bktDONT_BLOCK ) != pdPASS )
             {
-                xHelper[ ERROR_DETECTED ] = pdTRUE;
+                xSharedArray[ ERROR_DETECTED_IDX ] = pdTRUE;
             }
 
-            if( xHelper[ RUN_INDICATOR ] == bktRUN_INDICATOR )
+            if( xSharedArray[ RUN_INDICATOR_IDX ] == bktRUN_INDICATOR )
             {
                 /* The other task should not have executed. */
-                xHelper[ ERROR_DETECTED ] = pdTRUE;
+                xSharedArray[ ERROR_DETECTED_IDX ] = pdTRUE;
             }
 
             /* Raise the priority of the other task so it executes and blocks
@@ -412,11 +398,11 @@ static void vPrimaryBlockTimeTestTask( void * pvParameters )
 
             /* The other task should now have re-blocked without exiting the
              * queue function. */
-            if( xHelper[ RUN_INDICATOR ] == bktRUN_INDICATOR )
+            if( xSharedArray[ RUN_INDICATOR_IDX ] == bktRUN_INDICATOR )
             {
                 /* The other task should not have executed outside of the
                  * queue function. */
-                xHelper[ ERROR_DETECTED ] = pdTRUE;
+                xSharedArray[ ERROR_DETECTED_IDX ] = pdTRUE;
             }
 
             vTaskPrioritySet( xSecondary[ 0 ], bktSECONDARY_PRIORITY );
@@ -424,14 +410,14 @@ static void vPrimaryBlockTimeTestTask( void * pvParameters )
 
         /* Let the other task timeout.  When it unblockes it will check that it
          * unblocked at the correct time, then suspend itself. */
-        while( xHelper[ RUN_INDICATOR ] != bktRUN_INDICATOR )
+        while( xSharedArray[ RUN_INDICATOR_IDX ] != bktRUN_INDICATOR )
         {
             vTaskDelay( bktSHORT_WAIT );
         }
 
         vTaskDelay( bktSHORT_WAIT );
 
-        xHelper[ PRIMARY_CYCLES ]++;
+        xSharedArray[ PRIMARY_CYCLES_IDX ]++;
     }
 }
 /*-----------------------------------------------------------*/
@@ -462,11 +448,11 @@ static void vSecondaryBlockTimeTestTask( void * pvParameters )
         /* We should unblock after bktTIME_TO_BLOCK having not sent anything to
          * the queue. */
         xData = 0;
-        xHelper[ RUN_INDICATOR ] = bktRUN_INDICATOR;
+        xSharedArray[ RUN_INDICATOR_IDX ] = bktRUN_INDICATOR;
 
         if( xQueueSend( xTestQueue[ 0 ], &xData, bktTIME_TO_BLOCK ) != errQUEUE_FULL )
         {
-            xHelper[ ERROR_DETECTED ] = pdTRUE;
+            xSharedArray[ ERROR_DETECTED_IDX ] = pdTRUE;
         }
 
         /* How long were we inside the send function? */
@@ -475,7 +461,7 @@ static void vSecondaryBlockTimeTestTask( void * pvParameters )
         /* We should not have blocked for less time than bktTIME_TO_BLOCK. */
         if( xBlockedTime < bktTIME_TO_BLOCK )
         {
-            xHelper[ ERROR_DETECTED ] = pdTRUE;
+            xSharedArray[ ERROR_DETECTED_IDX ] = pdTRUE;
         }
 
         /* We should of not blocked for much longer than bktALLOWABLE_MARGIN
@@ -483,11 +469,11 @@ static void vSecondaryBlockTimeTestTask( void * pvParameters )
          * soon as we unblocked. */
         if( xBlockedTime > ( bktTIME_TO_BLOCK + bktALLOWABLE_MARGIN ) )
         {
-            xHelper[ ERROR_DETECTED ] = pdTRUE;
+            xSharedArray[ ERROR_DETECTED_IDX ] = pdTRUE;
         }
 
         /* Suspend ready for test 3. */
-        xHelper[ RUN_INDICATOR ] = bktRUN_INDICATOR;
+        xSharedArray[ RUN_INDICATOR_IDX ] = bktRUN_INDICATOR;
         vTaskSuspend( NULL );
 
         /*********************************************************************
@@ -498,11 +484,11 @@ static void vSecondaryBlockTimeTestTask( void * pvParameters )
 
         /* We should unblock after bktTIME_TO_BLOCK having not received
          * anything on the queue. */
-        xHelper[ RUN_INDICATOR ] = bktRUN_INDICATOR;
+        xSharedArray[ RUN_INDICATOR_IDX ] = bktRUN_INDICATOR;
 
         if( xQueueReceive( xTestQueue[ 0 ], &xData, bktTIME_TO_BLOCK ) != errQUEUE_EMPTY )
         {
-            xHelper[ ERROR_DETECTED ] = pdTRUE;
+            xSharedArray[ ERROR_DETECTED_IDX ] = pdTRUE;
         }
 
         xBlockedTime = xTaskGetTickCount() - xTimeWhenBlocking;
@@ -510,7 +496,7 @@ static void vSecondaryBlockTimeTestTask( void * pvParameters )
         /* We should not have blocked for less time than bktTIME_TO_BLOCK. */
         if( xBlockedTime < bktTIME_TO_BLOCK )
         {
-            xHelper[ ERROR_DETECTED ] = pdTRUE;
+            xSharedArray[ ERROR_DETECTED_IDX ] = pdTRUE;
         }
 
         /* We should of not blocked for much longer than bktALLOWABLE_MARGIN
@@ -518,12 +504,12 @@ static void vSecondaryBlockTimeTestTask( void * pvParameters )
          * as we unblocked. */
         if( xBlockedTime > ( bktTIME_TO_BLOCK + bktALLOWABLE_MARGIN ) )
         {
-            xHelper[ ERROR_DETECTED ] = pdTRUE;
+            xSharedArray[ ERROR_DETECTED_IDX ] = pdTRUE;
         }
 
-        xHelper[ RUN_INDICATOR ] = bktRUN_INDICATOR;
+        xSharedArray[ RUN_INDICATOR_IDX ] = bktRUN_INDICATOR;
 
-        xHelper[ SECONDARY_CYCLES ]++;
+        xSharedArray[ SECONDARY_CYCLES_IDX ]++;
     }
 }
 /*-----------------------------------------------------------*/
@@ -548,7 +534,7 @@ static void prvBasicDelayTests( void )
      * to the other tests in this file. */
     if( ( xPostTime - xPreTime ) > ( bktTIME_TO_BLOCK + xAllowableMargin ) )
     {
-        xHelper[ ERROR_DETECTED ] = pdTRUE;
+        xSharedArray[ ERROR_DETECTED_IDX ] = pdTRUE;
     }
 
     /* Now crude tests to check the vTaskDelayUntil() functionality. */
@@ -565,10 +551,10 @@ static void prvBasicDelayTests( void )
 
         if( ( xTaskGetTickCount() - xExpectedUnblockTime ) > ( bktTIME_TO_BLOCK + xAllowableMargin ) )
         {
-            xHelper[ ERROR_DETECTED ] = pdTRUE;
+            xSharedArray[ ERROR_DETECTED_IDX ] = pdTRUE;
         }
 
-        xHelper[ PRIMARY_CYCLES ]++;
+        xSharedArray[ PRIMARY_CYCLES_IDX ]++;
     }
 
     /* Crude tests for return value of xTaskDelayUntil().  First a standard block
@@ -577,7 +563,7 @@ static void prvBasicDelayTests( void )
 
     if( xDidBlock != pdTRUE )
     {
-        xHelper[ ERROR_DETECTED ] = pdTRUE;
+        xSharedArray[ ERROR_DETECTED_IDX ] = pdTRUE;
     }
 
     /* Now delay a few ticks so repeating the above block period will not block for
@@ -587,7 +573,7 @@ static void prvBasicDelayTests( void )
 
     if( xDidBlock != pdTRUE )
     {
-        xHelper[ ERROR_DETECTED ] = pdTRUE;
+        xSharedArray[ ERROR_DETECTED_IDX ] = pdTRUE;
     }
 
     /* This time block for longer than xPeriod before calling xTaskDelayUntil() so
@@ -597,7 +583,7 @@ static void prvBasicDelayTests( void )
 
     if( xDidBlock != pdFALSE )
     {
-        xHelper[ ERROR_DETECTED ] = pdTRUE;
+        xSharedArray[ ERROR_DETECTED_IDX ] = pdTRUE;
     }
 
     /* Catch up. */
@@ -605,7 +591,7 @@ static void prvBasicDelayTests( void )
 
     if( xDidBlock != pdTRUE )
     {
-        xHelper[ ERROR_DETECTED ] = pdTRUE;
+        xSharedArray[ ERROR_DETECTED_IDX ] = pdTRUE;
     }
 
     /* Again block for slightly longer than a period so ensure the time is in the
@@ -615,7 +601,7 @@ static void prvBasicDelayTests( void )
 
     if( xDidBlock != pdFALSE )
     {
-        xHelper[ ERROR_DETECTED ] = pdTRUE;
+        xSharedArray[ ERROR_DETECTED_IDX ] = pdTRUE;
     }
 
     /* Reset to the original task priority ready for the other tests. */
@@ -630,23 +616,23 @@ BaseType_t xAreBlockTimeTestTasksStillRunning( void )
 
     /* Have both tasks performed at least one cycle since this function was
      * last called? */
-    if( xHelper[ PRIMARY_CYCLES ] == xLastPrimaryCycleCount )
+    if( xSharedArray[ PRIMARY_CYCLES_IDX ] == xLastPrimaryCycleCount )
     {
         xReturn = pdFAIL;
     }
 
-    if( xHelper[ SECONDARY_CYCLES ] == xLastSecondaryCycleCount )
+    if( xSharedArray[ SECONDARY_CYCLES_IDX ] == xLastSecondaryCycleCount )
     {
         xReturn = pdFAIL;
     }
 
-    if( xHelper[ ERROR_DETECTED ] == pdTRUE )
+    if( xSharedArray[ ERROR_DETECTED_IDX ] == pdTRUE )
     {
         xReturn = pdFAIL;
     }
 
-    xLastSecondaryCycleCount = xHelper[ SECONDARY_CYCLES ];
-    xLastPrimaryCycleCount = xHelper[ PRIMARY_CYCLES ];
+    xLastSecondaryCycleCount = xSharedArray[ SECONDARY_CYCLES_IDX ];
+    xLastPrimaryCycleCount = xSharedArray[ PRIMARY_CYCLES_IDX ];
 
     return xReturn;
 }

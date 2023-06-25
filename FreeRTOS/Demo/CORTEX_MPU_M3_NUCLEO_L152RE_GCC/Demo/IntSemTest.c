@@ -130,33 +130,33 @@ static TaskHandle_t xSlaveHandle[ intsSHARED_MEM_SIZE_WORDS ] __attribute__( ( a
 /* Used to coordinate timing between tasks and the interrupt. */
 const TickType_t xInterruptGivePeriod = pdMS_TO_TICKS( intsemINTERRUPT_MUTEX_GIVE_PERIOD_MS );
 
-static volatile uint32_t xHelper[ intsSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( intsSHARED_MEM_SIZE_BYTES ) ) ) = { 0 };
-#define ERROR_DETECTED              0
-#define MASTER_LOOPS                1
-#define COUNTING_SEMAPHORE_LOOPS    2
-#define OK_GIVE_MUTEX               3
-#define OK_GIVE_SEMAPHORE           4
+#define ERROR_DETECTED_IDX              0
+#define MASTER_LOOPS_IDX                1
+#define COUNTING_SEMAPHORE_LOOPS_IDX    2
+#define OK_TO_GIVE_MUTEX_IDX            3
+#define OK_TO_GIVE_SEMAPHORE_IDX        4
+static volatile uint32_t xSharedArray[ intsSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( intsSHARED_MEM_SIZE_BYTES ) ) ) = { 0 };
 
-static SemaphoreHandle_t xMutex[ intsSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( intsSHARED_MEM_SIZE_BYTES ) ) ) = { NULL };
-#define ISR_MUTEX                   0
-#define ISR_COUNTING_SEMAPHORE      1
-#define MASTER_SLAVE_MUTEX          2
+#define ISR_MUTEX_IDX                   0
+#define ISR_COUNTING_SEMAPHORE_IDX      1
+#define MASTER_SLAVE_MUTEX_IDX          2
+static SemaphoreHandle_t xSharedMutexes[ intsSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( intsSHARED_MEM_SIZE_BYTES ) ) ) = { NULL };
 
 /*-----------------------------------------------------------*/
 
 void vStartInterruptSemaphoreTasks( void )
 {
     /* Create the semaphores that are given from an interrupt. */
-    xMutex[ ISR_MUTEX ] = xSemaphoreCreateMutex();
-    configASSERT( xMutex[ ISR_MUTEX ] );
-    xMutex[ ISR_COUNTING_SEMAPHORE ] = xSemaphoreCreateCounting( intsemMAX_COUNT, 0 );
-    configASSERT( xMutex[ ISR_COUNTING_SEMAPHORE ] );
+    xSharedMutexes[ ISR_MUTEX_IDX ] = xSemaphoreCreateMutex();
+    configASSERT( xSharedMutexes[ ISR_MUTEX_IDX ] );
+    xSharedMutexes[ ISR_COUNTING_SEMAPHORE_IDX ] = xSemaphoreCreateCounting( intsemMAX_COUNT, 0 );
+    configASSERT( xSharedMutexes[ ISR_COUNTING_SEMAPHORE_IDX ] );
 
     /* Create the mutex that is shared between the master and slave tasks (the
      * master receives a mutex from an interrupt and shares a mutex with the
      * slave. */
-    xMutex[ MASTER_SLAVE_MUTEX ] = xSemaphoreCreateMutex();
-    configASSERT( xMutex[ MASTER_SLAVE_MUTEX ] );
+    xSharedMutexes[ MASTER_SLAVE_MUTEX_IDX ] = xSemaphoreCreateMutex();
+    configASSERT( xSharedMutexes[ MASTER_SLAVE_MUTEX_IDX ] );
 
     static StackType_t xInterruptMutexSlaveTaskStack[ configMINIMAL_STACK_SIZE ] __attribute__( ( aligned( configMINIMAL_STACK_SIZE * sizeof( StackType_t ) ) ) );
     static StackType_t xInterruptMutexMasterTaskStack[ configMINIMAL_STACK_SIZE ] __attribute__( ( aligned( configMINIMAL_STACK_SIZE * sizeof( StackType_t ) ) ) );
@@ -172,9 +172,9 @@ void vStartInterruptSemaphoreTasks( void )
         .puxStackBuffer = xInterruptMutexSlaveTaskStack,
         .xRegions       =
         {
-            { ( void * ) &( xMutex[ 0 ] ),  intsSHARED_MEM_SIZE_BYTES,
+            { ( void * ) &( xSharedMutexes[ 0 ] ),  intsSHARED_MEM_SIZE_BYTES,
               ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER ) },
-            { ( void * ) &( xHelper[ 0 ] ), intsSHARED_MEM_SIZE_BYTES,
+            { ( void * ) &( xSharedArray[ 0 ] ), intsSHARED_MEM_SIZE_BYTES,
               ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER ) },
             { 0,                            0,                        0}
         }
@@ -192,9 +192,9 @@ void vStartInterruptSemaphoreTasks( void )
         {
             { ( void * ) &( xSlaveHandle[ 0 ] ), intsSHARED_MEM_SIZE_BYTES,
               ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER ) },
-            { ( void * ) &( xHelper[ 0 ] ),      intsSHARED_MEM_SIZE_BYTES,
+            { ( void * ) &( xSharedArray[ 0 ] ),      intsSHARED_MEM_SIZE_BYTES,
               ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER ) },
-            { ( void * ) &( xMutex[ 0 ] ),       intsSHARED_MEM_SIZE_BYTES,
+            { ( void * ) &( xSharedMutexes[ 0 ] ),       intsSHARED_MEM_SIZE_BYTES,
               ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER ) }
         }
     };
@@ -209,9 +209,9 @@ void vStartInterruptSemaphoreTasks( void )
         .puxStackBuffer = xInterruptCountingSemaphoreTaskStack,
         .xRegions       =
         {
-            { ( void * ) &( xHelper[ 0 ] ), intsSHARED_MEM_SIZE_BYTES,
+            { ( void * ) &( xSharedArray[ 0 ] ), intsSHARED_MEM_SIZE_BYTES,
               ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER ) },
-            { ( void * ) &( xMutex[ 0 ] ),  intsSHARED_MEM_SIZE_BYTES,
+            { ( void * ) &( xSharedMutexes[ 0 ] ),  intsSHARED_MEM_SIZE_BYTES,
               ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER ) },
             { 0,                            0,                        0}
         }
@@ -233,13 +233,13 @@ static void vInterruptMutexMasterTask( void * pvParameters )
         prvTakeAndGiveInTheSameOrder();
 
         /* Ensure not to starve out other tests. */
-        xHelper[ MASTER_LOOPS ]++;
+        xSharedArray[ MASTER_LOOPS_IDX ]++;
         vTaskDelay( intsemINTERRUPT_MUTEX_GIVE_PERIOD_MS );
 
         prvTakeAndGiveInTheOppositeOrder();
 
         /* Ensure not to starve out other tests. */
-        xHelper[ MASTER_LOOPS ]++;
+        xSharedArray[ MASTER_LOOPS_IDX ]++;
         vTaskDelay( intsemINTERRUPT_MUTEX_GIVE_PERIOD_MS );
     }
 }
@@ -250,20 +250,20 @@ static void prvTakeAndGiveInTheSameOrder( void )
     /* Ensure the slave is suspended, and that this task is running at the
      * lower priority as expected as the start conditions. */
     #if ( INCLUDE_eTaskGetState == 1 )
-        {
-            configASSERT( eTaskGetState( xSlaveHandle[ 0 ] ) == eSuspended );
-        }
+    {
+        configASSERT( eTaskGetState( xSlaveHandle[ 0 ] ) == eSuspended );
+    }
     #endif /* INCLUDE_eTaskGetState */
 
     if( uxTaskPriorityGet( NULL ) != intsemMASTER_PRIORITY )
     {
-        xHelper[ ERROR_DETECTED ] = pdTRUE;
+        xSharedArray[ ERROR_DETECTED_IDX ] = pdTRUE;
     }
 
     /* Take the semaphore that is shared with the slave. */
-    if( xSemaphoreTake( xMutex[ MASTER_SLAVE_MUTEX ], intsemNO_BLOCK ) != pdPASS )
+    if( xSemaphoreTake( xSharedMutexes[ MASTER_SLAVE_MUTEX_IDX ], intsemNO_BLOCK ) != pdPASS )
     {
-        xHelper[ ERROR_DETECTED ] = pdTRUE;
+        xSharedArray[ ERROR_DETECTED_IDX ] = pdTRUE;
     }
 
     /* This task now has the mutex.  Unsuspend the slave so it too
@@ -273,77 +273,77 @@ static void prvTakeAndGiveInTheSameOrder( void )
     /* The slave has the higher priority so should now have executed and
      * blocked on the semaphore. */
     #if ( INCLUDE_eTaskGetState == 1 )
-        {
-            configASSERT( eTaskGetState( xSlaveHandle[ 0 ] ) == eBlocked );
-        }
+    {
+        configASSERT( eTaskGetState( xSlaveHandle[ 0 ] ) == eBlocked );
+    }
     #endif /* INCLUDE_eTaskGetState */
 
     /* This task should now have inherited the priority of the slave
      * task. */
     if( uxTaskPriorityGet( NULL ) != intsemSLAVE_PRIORITY )
     {
-        xHelper[ ERROR_DETECTED ] = pdTRUE;
+        xSharedArray[ ERROR_DETECTED_IDX ] = pdTRUE;
     }
 
     /* Now wait a little longer than the time between ISR gives to also
      * obtain the ISR mutex. */
-    xHelper[ OK_GIVE_MUTEX ] = pdTRUE;
+    xSharedArray[ OK_TO_GIVE_MUTEX_IDX ] = pdTRUE;
 
-    if( xSemaphoreTake( xMutex[ ISR_MUTEX ], ( xInterruptGivePeriod * 2 ) ) != pdPASS )
+    if( xSemaphoreTake( xSharedMutexes[ ISR_MUTEX_IDX ], ( xInterruptGivePeriod * 2 ) ) != pdPASS )
     {
-        xHelper[ ERROR_DETECTED ] = pdTRUE;
+        xSharedArray[ ERROR_DETECTED_IDX ] = pdTRUE;
     }
 
-    xMutex[ OK_GIVE_MUTEX ] = pdFALSE;
+    xSharedMutexes[ OK_TO_GIVE_MUTEX_IDX ] = pdFALSE;
 
     /* Attempting to take again immediately should fail as the mutex is
      * already held. */
-    if( xSemaphoreTake( xMutex[ ISR_MUTEX ], intsemNO_BLOCK ) != pdFAIL )
+    if( xSemaphoreTake( xSharedMutexes[ ISR_MUTEX_IDX ], intsemNO_BLOCK ) != pdFAIL )
     {
-        xHelper[ ERROR_DETECTED ] = pdTRUE;
+        xSharedArray[ ERROR_DETECTED_IDX ] = pdTRUE;
     }
 
     /* Should still be at the priority of the slave task. */
     if( uxTaskPriorityGet( NULL ) != intsemSLAVE_PRIORITY )
     {
-        xHelper[ ERROR_DETECTED ] = pdTRUE;
+        xSharedArray[ ERROR_DETECTED_IDX ] = pdTRUE;
     }
 
     /* Give back the ISR semaphore to ensure the priority is not
      * disinherited as the shared mutex (which the higher priority task is
      * attempting to obtain) is still held. */
-    if( xSemaphoreGive( xMutex[ ISR_MUTEX ] ) != pdPASS )
+    if( xSemaphoreGive( xSharedMutexes[ ISR_MUTEX_IDX ] ) != pdPASS )
     {
-        xHelper[ ERROR_DETECTED ] = pdTRUE;
+        xSharedArray[ ERROR_DETECTED_IDX ] = pdTRUE;
     }
 
     if( uxTaskPriorityGet( NULL ) != intsemSLAVE_PRIORITY )
     {
-        xHelper[ ERROR_DETECTED ] = pdTRUE;
+        xSharedArray[ ERROR_DETECTED_IDX ] = pdTRUE;
     }
 
     /* Finally give back the shared mutex.  This time the higher priority
      * task should run before this task runs again - so this task should have
      * disinherited the priority and the higher priority task should be in the
      * suspended state again. */
-    if( xSemaphoreGive( xMutex[ MASTER_SLAVE_MUTEX ] ) != pdPASS )
+    if( xSemaphoreGive( xSharedMutexes[ MASTER_SLAVE_MUTEX_IDX ] ) != pdPASS )
     {
-        xHelper[ ERROR_DETECTED ] = pdTRUE;
+        xSharedArray[ ERROR_DETECTED_IDX ] = pdTRUE;
     }
 
     if( uxTaskPriorityGet( NULL ) != intsemMASTER_PRIORITY )
     {
-        xHelper[ ERROR_DETECTED ] = pdTRUE;
+        xSharedArray[ ERROR_DETECTED_IDX ] = pdTRUE;
     }
 
     #if ( INCLUDE_eTaskGetState == 1 )
-        {
-            configASSERT( eTaskGetState( xSlaveHandle[ 0 ] ) == eSuspended );
-        }
+    {
+        configASSERT( eTaskGetState( xSlaveHandle[ 0 ] ) == eSuspended );
+    }
     #endif /* INCLUDE_eTaskGetState */
 
     /* Reset the mutex ready for the next round. */
-    xQueueReset( xMutex[ ISR_MUTEX ] );
+    xQueueReset( xSharedMutexes[ ISR_MUTEX_IDX ] );
 }
 /*-----------------------------------------------------------*/
 
@@ -352,20 +352,20 @@ static void prvTakeAndGiveInTheOppositeOrder( void )
     /* Ensure the slave is suspended, and that this task is running at the
      * lower priority as expected as the start conditions. */
     #if ( INCLUDE_eTaskGetState == 1 )
-        {
-            configASSERT( eTaskGetState( xSlaveHandle[ 0 ] ) == eSuspended );
-        }
+    {
+        configASSERT( eTaskGetState( xSlaveHandle[ 0 ] ) == eSuspended );
+    }
     #endif /* INCLUDE_eTaskGetState */
 
     if( uxTaskPriorityGet( NULL ) != intsemMASTER_PRIORITY )
     {
-        xHelper[ ERROR_DETECTED ] = pdTRUE;
+        xSharedArray[ ERROR_DETECTED_IDX ] = pdTRUE;
     }
 
     /* Take the semaphore that is shared with the slave. */
-    if( xSemaphoreTake( xMutex[ MASTER_SLAVE_MUTEX ], intsemNO_BLOCK ) != pdPASS )
+    if( xSemaphoreTake( xSharedMutexes[ MASTER_SLAVE_MUTEX_IDX ], intsemNO_BLOCK ) != pdPASS )
     {
-        xHelper[ ERROR_DETECTED ] = pdTRUE;
+        xSharedArray[ ERROR_DETECTED_IDX ] = pdTRUE;
     }
 
     /* This task now has the mutex.  Unsuspend the slave so it too
@@ -375,48 +375,48 @@ static void prvTakeAndGiveInTheOppositeOrder( void )
     /* The slave has the higher priority so should now have executed and
      * blocked on the semaphore. */
     #if ( INCLUDE_eTaskGetState == 1 )
-        {
-            configASSERT( eTaskGetState( xSlaveHandle[ 0 ] ) == eBlocked );
-        }
+    {
+        configASSERT( eTaskGetState( xSlaveHandle[ 0 ] ) == eBlocked );
+    }
     #endif /* INCLUDE_eTaskGetState */
 
     /* This task should now have inherited the priority of the slave
      * task. */
     if( uxTaskPriorityGet( NULL ) != intsemSLAVE_PRIORITY )
     {
-        xHelper[ ERROR_DETECTED ] = pdTRUE;
+        xSharedArray[ ERROR_DETECTED_IDX ] = pdTRUE;
     }
 
     /* Now wait a little longer than the time between ISR gives to also
      * obtain the ISR mutex. */
-    xHelper[ OK_GIVE_MUTEX ] = pdTRUE;
+    xSharedArray[ OK_TO_GIVE_MUTEX_IDX ] = pdTRUE;
 
-    if( xSemaphoreTake( xMutex[ ISR_MUTEX ], ( xInterruptGivePeriod * 2 ) ) != pdPASS )
+    if( xSemaphoreTake( xSharedMutexes[ ISR_MUTEX_IDX ], ( xInterruptGivePeriod * 2 ) ) != pdPASS )
     {
-        xHelper[ ERROR_DETECTED ] = pdTRUE;
+        xSharedArray[ ERROR_DETECTED_IDX ] = pdTRUE;
     }
 
-    xHelper[ OK_GIVE_MUTEX ] = pdFALSE;
+    xSharedArray[ OK_TO_GIVE_MUTEX_IDX ] = pdFALSE;
 
     /* Attempting to take again immediately should fail as the mutex is
      * already held. */
-    if( xSemaphoreTake( xMutex[ ISR_MUTEX ], intsemNO_BLOCK ) != pdFAIL )
+    if( xSemaphoreTake( xSharedMutexes[ ISR_MUTEX_IDX ], intsemNO_BLOCK ) != pdFAIL )
     {
-        xHelper[ ERROR_DETECTED ] = pdTRUE;
+        xSharedArray[ ERROR_DETECTED_IDX ] = pdTRUE;
     }
 
     /* Should still be at the priority of the slave task. */
     if( uxTaskPriorityGet( NULL ) != intsemSLAVE_PRIORITY )
     {
-        xHelper[ ERROR_DETECTED ] = pdTRUE;
+        xSharedArray[ ERROR_DETECTED_IDX ] = pdTRUE;
     }
 
     /* Give back the shared semaphore to ensure the priority is not disinherited
      * as the ISR mutex is still held.  The higher priority slave task should run
      * before this task runs again. */
-    if( xSemaphoreGive( xMutex[ MASTER_SLAVE_MUTEX ] ) != pdPASS )
+    if( xSemaphoreGive( xSharedMutexes[ MASTER_SLAVE_MUTEX_IDX ] ) != pdPASS )
     {
-        xHelper[ ERROR_DETECTED ] = pdTRUE;
+        xSharedArray[ ERROR_DETECTED_IDX ] = pdTRUE;
     }
 
     /* Should still be at the priority of the slave task as this task still
@@ -424,23 +424,23 @@ static void prvTakeAndGiveInTheOppositeOrder( void )
      * mechanism. */
     if( uxTaskPriorityGet( NULL ) != intsemSLAVE_PRIORITY )
     {
-        xHelper[ ERROR_DETECTED ] = pdTRUE;
+        xSharedArray[ ERROR_DETECTED_IDX ] = pdTRUE;
     }
 
     /* Give back the ISR semaphore, which should result in the priority being
      * disinherited as it was the last mutex held. */
-    if( xSemaphoreGive( xMutex[ ISR_MUTEX ] ) != pdPASS )
+    if( xSemaphoreGive( xSharedMutexes[ ISR_MUTEX_IDX ] ) != pdPASS )
     {
-        xHelper[ ERROR_DETECTED ] = pdTRUE;
+        xSharedArray[ ERROR_DETECTED_IDX ] = pdTRUE;
     }
 
     if( uxTaskPriorityGet( NULL ) != intsemMASTER_PRIORITY )
     {
-        xHelper[ ERROR_DETECTED ] = pdTRUE;
+        xSharedArray[ ERROR_DETECTED_IDX ] = pdTRUE;
     }
 
     /* Reset the mutex ready for the next round. */
-    xQueueReset( xMutex[ ISR_MUTEX ] );
+    xQueueReset( xSharedMutexes[ ISR_MUTEX_IDX ] );
 }
 /*-----------------------------------------------------------*/
 
@@ -458,14 +458,14 @@ static void vInterruptMutexSlaveTask( void * pvParameters )
         /* This task will execute when the master task already holds the mutex.
          * Attempting to take the mutex will place this task in the Blocked
          * state. */
-        if( xSemaphoreTake( xMutex[ MASTER_SLAVE_MUTEX ], portMAX_DELAY ) != pdPASS )
+        if( xSemaphoreTake( xSharedMutexes[ MASTER_SLAVE_MUTEX_IDX ], portMAX_DELAY ) != pdPASS )
         {
-            xHelper[ ERROR_DETECTED ] = pdTRUE;
+            xSharedArray[ ERROR_DETECTED_IDX ] = pdTRUE;
         }
 
-        if( xSemaphoreGive( xMutex[ MASTER_SLAVE_MUTEX ] ) != pdPASS )
+        if( xSemaphoreGive( xSharedMutexes[ MASTER_SLAVE_MUTEX_IDX ] ) != pdPASS )
         {
-            xHelper[ ERROR_DETECTED ] = pdTRUE;
+            xSharedArray[ ERROR_DETECTED_IDX ] = pdTRUE;
         }
     }
 }
@@ -481,43 +481,43 @@ static void vInterruptCountingSemaphoreTask( void * pvParameters )
     for( ; ; )
     {
         /* Expect to start with the counting semaphore empty. */
-        if( uxQueueMessagesWaiting( ( QueueHandle_t ) xMutex[ ISR_COUNTING_SEMAPHORE ] ) != 0 )
+        if( uxQueueMessagesWaiting( ( QueueHandle_t ) xSharedMutexes[ ISR_COUNTING_SEMAPHORE_IDX ] ) != 0 )
         {
-            xHelper[ ERROR_DETECTED ] = pdTRUE;
+            xSharedArray[ ERROR_DETECTED_IDX ] = pdTRUE;
         }
 
         /* Wait until it is expected that the interrupt will have filled the
          * counting semaphore. */
-        xHelper[ OK_GIVE_SEMAPHORE ] = pdTRUE;
+        xSharedArray[ OK_TO_GIVE_SEMAPHORE_IDX ] = pdTRUE;
         vTaskDelay( xDelay );
-        xHelper[ OK_GIVE_SEMAPHORE ] = pdFALSE;
+        xSharedArray[ OK_TO_GIVE_SEMAPHORE_IDX ] = pdFALSE;
 
         /* Now it is expected that the counting semaphore is full. */
-        if( uxQueueMessagesWaiting( ( QueueHandle_t ) xMutex[ ISR_COUNTING_SEMAPHORE ] ) != intsemMAX_COUNT )
+        if( uxQueueMessagesWaiting( ( QueueHandle_t ) xSharedMutexes[ ISR_COUNTING_SEMAPHORE_IDX ] ) != intsemMAX_COUNT )
         {
-            xHelper[ ERROR_DETECTED ] = pdTRUE;
+            xSharedArray[ ERROR_DETECTED_IDX ] = pdTRUE;
         }
 
-        if( uxQueueSpacesAvailable( ( QueueHandle_t ) xMutex[ ISR_COUNTING_SEMAPHORE ] ) != 0 )
+        if( uxQueueSpacesAvailable( ( QueueHandle_t ) xSharedMutexes[ ISR_COUNTING_SEMAPHORE_IDX ] ) != 0 )
         {
-            xHelper[ ERROR_DETECTED ] = pdTRUE;
+            xSharedArray[ ERROR_DETECTED_IDX ] = pdTRUE;
         }
 
-        xHelper[ COUNTING_SEMAPHORE_LOOPS ]++;
+        xSharedArray[ COUNTING_SEMAPHORE_LOOPS_IDX ]++;
 
         /* Expect to be able to take the counting semaphore intsemMAX_COUNT
          * times.  A block time of 0 is used as the semaphore should already be
          * there. */
         xCount = 0;
 
-        while( xSemaphoreTake( xMutex[ ISR_COUNTING_SEMAPHORE ], 0 ) == pdPASS )
+        while( xSemaphoreTake( xSharedMutexes[ ISR_COUNTING_SEMAPHORE_IDX ], 0 ) == pdPASS )
         {
             xCount++;
         }
 
         if( xCount != intsemMAX_COUNT )
         {
-            xHelper[ ERROR_DETECTED ] = pdTRUE;
+            xSharedArray[ ERROR_DETECTED_IDX ] = pdTRUE;
         }
 
         /* Now raise the priority of this task so it runs immediately that the
@@ -525,15 +525,15 @@ static void vInterruptCountingSemaphoreTask( void * pvParameters )
         vTaskPrioritySet( NULL, configMAX_PRIORITIES - 1 );
 
         /* Block to wait for the semaphore to be given from the interrupt. */
-        xHelper[ OK_GIVE_SEMAPHORE ] = pdTRUE;
-        xSemaphoreTake( xMutex[ ISR_COUNTING_SEMAPHORE ], portMAX_DELAY );
-        xSemaphoreTake( xMutex[ ISR_COUNTING_SEMAPHORE ], portMAX_DELAY );
-        xHelper[ OK_GIVE_SEMAPHORE ] = pdFALSE;
+        xSharedArray[ OK_TO_GIVE_SEMAPHORE_IDX ] = pdTRUE;
+        xSemaphoreTake( xSharedMutexes[ ISR_COUNTING_SEMAPHORE_IDX ], portMAX_DELAY );
+        xSemaphoreTake( xSharedMutexes[ ISR_COUNTING_SEMAPHORE_IDX ], portMAX_DELAY );
+        xSharedArray[ OK_TO_GIVE_SEMAPHORE_IDX ] = pdFALSE;
 
         /* Reset the priority so as not to disturbe other tests too much. */
         vTaskPrioritySet( NULL, tskIDLE_PRIORITY );
 
-        xHelper[ COUNTING_SEMAPHORE_LOOPS ]++;
+        xSharedArray[ COUNTING_SEMAPHORE_LOOPS_IDX ]++;
     }
 }
 /*-----------------------------------------------------------*/
@@ -550,21 +550,21 @@ void vInterruptSemaphorePeriodicTest( void )
 
     if( ( ( TickType_t ) ( xTimeNow - xLastGiveTime ) ) >= pdMS_TO_TICKS( intsemINTERRUPT_MUTEX_GIVE_PERIOD_MS ) )
     {
-        configASSERT( xMutex[ ISR_MUTEX ] );
+        configASSERT( xSharedMutexes[ ISR_MUTEX_IDX ] );
 
-        if( xHelper[ OK_GIVE_MUTEX ] != pdFALSE )
+        if( xSharedArray[ OK_TO_GIVE_MUTEX_IDX ] != pdFALSE )
         {
             /* Null is used as the second parameter in this give, and non-NULL
              * in the other gives for code coverage reasons. */
-            xSemaphoreGiveFromISR( xMutex[ ISR_MUTEX ], NULL );
+            xSemaphoreGiveFromISR( xSharedMutexes[ ISR_MUTEX_IDX ], NULL );
 
             /* Second give attempt should fail. */
-            configASSERT( xSemaphoreGiveFromISR( xMutex[ ISR_MUTEX ], &xHigherPriorityTaskWoken ) == pdFAIL );
+            configASSERT( xSemaphoreGiveFromISR( xSharedMutexes[ ISR_MUTEX_IDX ], &xHigherPriorityTaskWoken ) == pdFAIL );
         }
 
-        if( xHelper[ OK_GIVE_SEMAPHORE ] != pdFALSE )
+        if( xSharedArray[ OK_TO_GIVE_SEMAPHORE_IDX ] != pdFALSE )
         {
-            xSemaphoreGiveFromISR( xMutex[ ISR_COUNTING_SEMAPHORE ], &xHigherPriorityTaskWoken );
+            xSemaphoreGiveFromISR( xSharedMutexes[ ISR_COUNTING_SEMAPHORE_IDX ], &xHigherPriorityTaskWoken );
         }
 
         xLastGiveTime = xTimeNow;
@@ -582,23 +582,23 @@ BaseType_t xAreInterruptSemaphoreTasksStillRunning( void )
 
     /* If the demo tasks are running then it is expected that the loop counters
      * will have changed since this function was last called. */
-    if( ulLastMasterLoopCounter == xHelper[ MASTER_LOOPS ] )
+    if( ulLastMasterLoopCounter == xSharedArray[ MASTER_LOOPS_IDX ] )
     {
-        xHelper[ ERROR_DETECTED ] = pdTRUE;
+        xSharedArray[ ERROR_DETECTED_IDX ] = pdTRUE;
     }
 
-    ulLastMasterLoopCounter = xHelper[ MASTER_LOOPS ];
+    ulLastMasterLoopCounter = xSharedArray[ MASTER_LOOPS_IDX ];
 
-    if( ulLastCountingSemaphoreLoops == xHelper[ COUNTING_SEMAPHORE_LOOPS ] )
+    if( ulLastCountingSemaphoreLoops == xSharedArray[ COUNTING_SEMAPHORE_LOOPS_IDX ] )
     {
-        xHelper[ ERROR_DETECTED ] = pdTRUE;
+        xSharedArray[ ERROR_DETECTED_IDX ] = pdTRUE;
     }
 
-    ulLastCountingSemaphoreLoops = xHelper[ COUNTING_SEMAPHORE_LOOPS ]++;
+    ulLastCountingSemaphoreLoops = xSharedArray[ COUNTING_SEMAPHORE_LOOPS_IDX ]++;
 
     /* Errors detected in the task itself will have latched xErrorDetected
      * to true. */
 
-    return ( BaseType_t ) !xHelper[ ERROR_DETECTED ];
+    return ( BaseType_t ) !xSharedArray[ ERROR_DETECTED_IDX ];
 }
 /*-----------------------------------------------------------*/

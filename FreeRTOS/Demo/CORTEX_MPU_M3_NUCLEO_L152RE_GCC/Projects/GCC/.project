@@ -42,6 +42,11 @@
 			<locationURI>PARENT-2-PROJECT_LOC/Demo</locationURI>
 		</link>
 		<link>
+			<name>DemoInclude</name>
+			<type>2</type>
+			<locationURI>ROOT/Demo/Common/include</locationURI>
+		</link>
+		<link>
 			<name>FreeRTOS</name>
 			<type>2</type>
 			<locationURI>PARENT-4-PROJECT_LOC/Source</locationURI>
@@ -108,4 +113,10 @@
 			</matcher>
 		</filter>
 	</filteredResources>
+	<variableList>
+		<variable>
+			<name>ROOT</name>
+			<value>$%7BPARENT-4-PROJECT_LOC%7D</value>
+		</variable>
+	</variableList>
 </projectDescription>

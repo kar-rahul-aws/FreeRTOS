@@ -166,7 +166,8 @@ void vStartBlockingQueueTasks( UBaseType_t uxPriority )
                                     },
                                     { &( xQueueParameters1 ), blckqSHARED_MEM_SIZE_BYTES,
                                       ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
-                                    }
+                                    },
+                                    { 0, 0, 0 }
                                 }
         };
     TaskParameters_t xBlockingQueueProducerB2Task =
@@ -183,7 +184,8 @@ void vStartBlockingQueueTasks( UBaseType_t uxPriority )
                                     },
                                     { &( xQueueParameters2 ), blckqSHARED_MEM_SIZE_BYTES,
                                       ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
-                                    }
+                                    },
+                                    { 0, 0, 0 }
                                 }
         };
 
@@ -218,7 +220,8 @@ void vStartBlockingQueueTasks( UBaseType_t uxPriority )
                                     },
                                     { &( xQueueParameters3 ), blckqSHARED_MEM_SIZE_BYTES,
                                       ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
-                                    }
+                                    },
+                                    { 0, 0, 0 }
                                 }
         };
     TaskParameters_t xBlockingQueueProducerB4Task =
@@ -235,7 +238,8 @@ void vStartBlockingQueueTasks( UBaseType_t uxPriority )
                                     },
                                     { &( xQueueParameters4 ), blckqSHARED_MEM_SIZE_BYTES,
                                       ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
-                                    }
+                                    },
+                                    { 0, 0, 0 }
                                 }
         };
 
@@ -268,7 +272,8 @@ void vStartBlockingQueueTasks( UBaseType_t uxPriority )
                                     },
                                     { &( xQueueParameters5 ), blckqSHARED_MEM_SIZE_BYTES,
                                       ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
-                                    }
+                                    },
+                                    { 0, 0, 0 }
                                 }
         };
     TaskParameters_t xBlockingQueueConsumerB6Task =
@@ -285,7 +290,8 @@ void vStartBlockingQueueTasks( UBaseType_t uxPriority )
                                     },
                                     { &( xQueueParameters6 ), blckqSHARED_MEM_SIZE_BYTES,
                                       ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
-                                    }
+                                    },
+                                    { 0, 0, 0 }
                                 }
         };
 

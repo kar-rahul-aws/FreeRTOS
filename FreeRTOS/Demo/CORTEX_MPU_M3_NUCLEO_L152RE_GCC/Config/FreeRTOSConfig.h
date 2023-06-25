@@ -53,11 +53,11 @@ build, this configuration file has all options turned on. */
 #define configUSE_PORT_OPTIMISED_TASK_SELECTION	1
 #define configUSE_QUEUE_SETS					1
 #define configUSE_IDLE_HOOK						0
-#define configUSE_TICK_HOOK						0
+#define configUSE_TICK_HOOK						1
 #define configCPU_CLOCK_HZ						48000000
 #define configMAX_PRIORITIES					( 5 )
 #define configMINIMAL_STACK_SIZE				( ( unsigned short ) 256 )
-#define configTOTAL_HEAP_SIZE					( ( size_t ) ( 16 * 1024 ) )
+#define configTOTAL_HEAP_SIZE					( ( size_t ) ( 12 * 1024 ) )
 #define configMAX_TASK_NAME_LEN					( 10 )
 #define configUSE_TRACE_FACILITY				1
 #define configUSE_16_BIT_TICKS					0
@@ -107,7 +107,7 @@ to exclude the API function. */
 #define INCLUDE_vTaskDelayUntil					1
 #define INCLUDE_vTaskDelay						1
 #define INCLUDE_eTaskGetState					1
-#define INCLUDE_xTimerPendFunctionCall			0
+#define INCLUDE_xTimerPendFunctionCall			1
 #define INCLUDE_xSemaphoreGetMutexHolder		1
 #define INCLUDE_xTaskGetHandle					1
 #define INCLUDE_xTaskGetCurrentTaskHandle		1
@@ -174,7 +174,7 @@ header file. */
 
 #define configSTART_TASK_NOTIFY_TESTS               0
 #define configSTART_TASK_NOTIFY_ARRAY_TESTS         0
-#define configSTART_BLOCKING_QUEUE_TESTS            1
+#define configSTART_BLOCKING_QUEUE_TESTS            0
 #define configSTART_SEMAPHORE_TESTS                 0
 #define configSTART_POLLED_QUEUE_TESTS              0
 #define configSTART_INTEGER_MATH_TESTS              0
@@ -189,24 +189,18 @@ header file. */
 #define configSTART_INTERRUPT_SEMAPHORE_TESTS       0
 #define configSTART_QUEUE_SET_POLLING_TESTS         0
 #define configSTART_BLOCK_TIME_TESTS                0
-#define configSTART_ABORT_DELAY_TESTS               1
+#define configSTART_ABORT_DELAY_TESTS               0
 #define configSTART_DYNAMIC_TASK_TESTS              0
 #define configSTART_MESSAGE_BUFFER_TESTS            0
 #define configSTART_STREAM_BUFFER_TESTS             0
 #define configSTART_STREAM_BUFFER_INTERRUPT_TESTS   0
 #define configSTART_TIMER_TESTS                     0
 #define configSTART_INTERRUPT_QUEUE_TESTS           0
-#define configSTART_REGISTER_TESTS                  0
+#define configSTART_REGISTER_TESTS                  1
 #define configSTART_DELETE_SELF_TESTS               0
 
 #define configALLOW_UNPRIVILEGED_CRITICAL_SECTIONS  1 /* PolledQ tests need it. */
 #define configUSE_QUEUE_SETS                        1
-
-/* The default TEX,S,C,B setting marks the SRAM as shareable and as a result,
- * disables cache. Do not mark the SRAM as shareable because caching is being
- * used. TEX=0, S=0, C=1, B=1. */
-#define configTEX_S_C_B_SRAM						( 0x03UL )
-
 
 #ifdef __cplusplus
 }
