@@ -58,14 +58,154 @@
 			<locationURI>virtual:/virtual</locationURI>
 		</link>
 		<link>
+			<name>reg_tests</name>
+			<type>2</type>
+			<locationURI>DEMO_ROOT/Common/ARMv8M/reg_tests</locationURI>
+		</link>
+		<link>
+			<name>Demos/AbortDelay.c</name>
+			<type>1</type>
+			<locationURI>PARENT-4-PROJECT_LOC/CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/AbortDelay.c</locationURI>
+		</link>
+		<link>
+			<name>Demos/BlockQ.c</name>
+			<type>1</type>
+			<locationURI>PARENT-4-PROJECT_LOC/CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/BlockQ.c</locationURI>
+		</link>
+		<link>
+			<name>Demos/EventGroupsDemo.c</name>
+			<type>1</type>
+			<locationURI>PARENT-4-PROJECT_LOC/CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/EventGroupsDemo.c</locationURI>
+		</link>
+		<link>
+			<name>Demos/GenQTest.c</name>
+			<type>1</type>
+			<locationURI>PARENT-4-PROJECT_LOC/CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/GenQTest.c</locationURI>
+		</link>
+		<link>
+			<name>Demos/IntQueue.c</name>
+			<type>1</type>
+			<locationURI>PARENT-4-PROJECT_LOC/CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/IntQueue.c</locationURI>
+		</link>
+		<link>
+			<name>Demos/IntQueueTimer.c</name>
+			<type>1</type>
+			<locationURI>PARENT-4-PROJECT_LOC/CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/IntQueueTimer.c</locationURI>
+		</link>
+		<link>
+			<name>Demos/IntSemTest.c</name>
+			<type>1</type>
+			<locationURI>PARENT-4-PROJECT_LOC/CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/IntSemTest.c</locationURI>
+		</link>
+		<link>
+			<name>Demos/MessageBufferDemo.c</name>
+			<type>1</type>
+			<locationURI>PARENT-4-PROJECT_LOC/CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/MessageBufferDemo.c</locationURI>
+		</link>
+		<link>
+			<name>Demos/PollQ.c</name>
+			<type>1</type>
+			<locationURI>PARENT-4-PROJECT_LOC/CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/PollQ.c</locationURI>
+		</link>
+		<link>
+			<name>Demos/QPeek.c</name>
+			<type>1</type>
+			<locationURI>PARENT-4-PROJECT_LOC/CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/QPeek.c</locationURI>
+		</link>
+		<link>
+			<name>Demos/QueueOverwrite.c</name>
+			<type>1</type>
+			<locationURI>PARENT-4-PROJECT_LOC/CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/QueueOverwrite.c</locationURI>
+		</link>
+		<link>
+			<name>Demos/QueueSet.c</name>
+			<type>1</type>
+			<locationURI>PARENT-4-PROJECT_LOC/CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/QueueSet.c</locationURI>
+		</link>
+		<link>
+			<name>Demos/QueueSetPolling.c</name>
+			<type>1</type>
+			<locationURI>PARENT-4-PROJECT_LOC/CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/QueueSetPolling.c</locationURI>
+		</link>
+		<link>
+			<name>Demos/StreamBufferDemo.c</name>
+			<type>1</type>
+			<locationURI>PARENT-4-PROJECT_LOC/CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/StreamBufferDemo.c</locationURI>
+		</link>
+		<link>
+			<name>Demos/StreamBufferInterrupt.c</name>
+			<type>1</type>
+			<locationURI>PARENT-4-PROJECT_LOC/CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/StreamBufferInterrupt.c</locationURI>
+		</link>
+		<link>
+			<name>Demos/TaskNotify.c</name>
+			<type>1</type>
+			<locationURI>PARENT-4-PROJECT_LOC/CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c</locationURI>
+		</link>
+		<link>
+			<name>Demos/TaskNotifyArray.c</name>
+			<type>1</type>
+			<locationURI>PARENT-4-PROJECT_LOC/CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotifyArray.c</locationURI>
+		</link>
+		<link>
+			<name>Demos/TestRunner.c</name>
+			<type>1</type>
+			<locationURI>PARENT-4-PROJECT_LOC/CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TestRunner.c</locationURI>
+		</link>
+		<link>
+			<name>Demos/TimerDemo.c</name>
+			<type>1</type>
+			<locationURI>PARENT-4-PROJECT_LOC/CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TimerDemo.c</locationURI>
+		</link>
+		<link>
+			<name>Demos/blocktim.c</name>
+			<type>1</type>
+			<locationURI>PARENT-4-PROJECT_LOC/CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/blocktim.c</locationURI>
+		</link>
+		<link>
+			<name>Demos/countsem.c</name>
+			<type>1</type>
+			<locationURI>PARENT-4-PROJECT_LOC/CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/countsem.c</locationURI>
+		</link>
+		<link>
+			<name>Demos/dynamic.c</name>
+			<type>1</type>
+			<locationURI>PARENT-4-PROJECT_LOC/CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/dynamic.c</locationURI>
+		</link>
+		<link>
+			<name>Demos/flop.c</name>
+			<type>1</type>
+			<locationURI>PARENT-4-PROJECT_LOC/CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/flop.c</locationURI>
+		</link>
+		<link>
+			<name>Demos/integer.c</name>
+			<type>1</type>
+			<locationURI>PARENT-4-PROJECT_LOC/CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/integer.c</locationURI>
+		</link>
+		<link>
 			<name>Demos/mpu_demo.c</name>
 			<type>1</type>
 			<locationURI>PARENT-4-PROJECT_LOC/Common/ARMv8M/mpu_demo/mpu_demo.c</locationURI>
 		</link>
 		<link>
-			<name>Demos/mpu_demo.h</name>
+			<name>Demos/recmutex.c</name>
 			<type>1</type>
-			<locationURI>PARENT-4-PROJECT_LOC/Common/ARMv8M/mpu_demo/mpu_demo.h</locationURI>
+			<locationURI>PARENT-4-PROJECT_LOC/CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/recmutex.c</locationURI>
+		</link>
+		<link>
+			<name>Demos/reg_tests.c</name>
+			<type>1</type>
+			<locationURI>PARENT-3-PROJECT_LOC/RegTests/reg_tests.c</locationURI>
+		</link>
+		<link>
+			<name>Demos/reg_tests.h</name>
+			<type>1</type>
+			<locationURI>PARENT-3-PROJECT_LOC/RegTests/reg_tests.h</locationURI>
+		</link>
+		<link>
+			<name>Demos/semtest.c</name>
+			<type>1</type>
+			<locationURI>PARENT-4-PROJECT_LOC/CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/semtest.c</locationURI>
 		</link>
 		<link>
 			<name>Demos/tz_demo.c</name>
@@ -73,19 +213,19 @@
 			<locationURI>PARENT-4-PROJECT_LOC/Common/ARMv8M/tz_demo/tz_demo.c</locationURI>
 		</link>
 		<link>
-			<name>Demos/tz_demo.h</name>
+			<name>User/fault_handler.c</name>
 			<type>1</type>
-			<locationURI>PARENT-4-PROJECT_LOC/Common/ARMv8M/tz_demo/tz_demo.h</locationURI>
+			<locationURI>PROJECT_LOC/fault_handler.c</locationURI>
 		</link>
 		<link>
 			<name>User/main_ns.c</name>
 			<type>1</type>
-			<locationURI>PROJECT_LOC/main_ns.c</locationURI>
+			<locationURI>DEMO_ROOT/CORTEX_MPU_M33F_NXP_LPC55S69_MCUXpresso/User/NonSecure/main_ns.c</locationURI>
 		</link>
 	</linkedResources>
 	<filteredResources>
 		<filter>
-			<id>1557021723682</id>
+			<id>1687885718725</id>
 			<name></name>
 			<type>6</type>
 			<matcher>
@@ -94,12 +234,30 @@
 			</matcher>
 		</filter>
 		<filter>
-			<id>1557021723695</id>
+			<id>1687885718743</id>
 			<name></name>
 			<type>6</type>
 			<matcher>
 				<id>org.eclipse.ui.ide.multiFilter</id>
 				<arguments>1.0-name-matches-false-false-*.h</arguments>
+			</matcher>
+		</filter>
+		<filter>
+			<id>1682451751797</id>
+			<name>NXP_Code</name>
+			<type>10</type>
+			<matcher>
+				<id>org.eclipse.ui.ide.multiFilter</id>
+				<arguments>1.0-name-matches-false-false-trustzone</arguments>
+			</matcher>
+		</filter>
+		<filter>
+			<id>1681721788469</id>
+			<name>reg_tests</name>
+			<type>9</type>
+			<matcher>
+				<id>org.eclipse.ui.ide.multiFilter</id>
+				<arguments>1.0-name-matches-false-false-GCC</arguments>
 			</matcher>
 		</filter>
 		<filter>
@@ -139,6 +297,33 @@
 			</matcher>
 		</filter>
 		<filter>
+			<id>1682451733052</id>
+			<name>NXP_Code/startup</name>
+			<type>6</type>
+			<matcher>
+				<id>org.eclipse.ui.ide.multiFilter</id>
+				<arguments>1.0-name-matches-false-false-startup_LPC55S69_cm33_core0.s</arguments>
+			</matcher>
+		</filter>
+		<filter>
+			<id>1681721804811</id>
+			<name>reg_tests/GCC</name>
+			<type>9</type>
+			<matcher>
+				<id>org.eclipse.ui.ide.multiFilter</id>
+				<arguments>1.0-name-matches-false-false-ARM_CM33</arguments>
+			</matcher>
+		</filter>
+		<filter>
+			<id>1687885375073</id>
+			<name>FreeRTOS/portable/Common</name>
+			<type>5</type>
+			<matcher>
+				<id>org.eclipse.ui.ide.multiFilter</id>
+				<arguments>1.0-name-matches-false-false-mpu_wrappers.c</arguments>
+			</matcher>
+		</filter>
+		<filter>
 			<id>1553579192808</id>
 			<name>FreeRTOS/portable/GCC</name>
 			<type>9</type>
@@ -157,6 +342,15 @@
 			</matcher>
 		</filter>
 		<filter>
+			<id>1681721822064</id>
+			<name>reg_tests/GCC/ARM_CM33</name>
+			<type>9</type>
+			<matcher>
+				<id>org.eclipse.ui.ide.multiFilter</id>
+				<arguments>1.0-name-matches-false-false-non_secure</arguments>
+			</matcher>
+		</filter>
+		<filter>
 			<id>1553579213167</id>
 			<name>FreeRTOS/portable/GCC/ARM_CM33</name>
 			<type>9</type>
@@ -166,4 +360,10 @@
 			</matcher>
 		</filter>
 	</filteredResources>
+	<variableList>
+		<variable>
+			<name>DEMO_ROOT</name>
+			<value>$%7BPARENT-4-PROJECT_LOC%7D</value>
+		</variable>
+	</variableList>
 </projectDescription>
