@@ -130,28 +130,28 @@ static UBaseType_t prvRand( void );
  * loop of all the tests to ensure each test is actually executing.  The check task
  * calls xAreTaskNotificationArrayTasksStillRunning() (implemented within this
  * file) to check both counters are changing. */
-static volatile uint32_t ulFineCycleCount[ notifyArraySHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( notifyArraySHARED_MEM_SIZE_BYTES ) ) ) = { 0 };
-static volatile uint32_t ulCourseCycleCounter[ notifyArraySHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( notifyArraySHARED_MEM_SIZE_BYTES ) ) ) = { 0 };
+static volatile uint32_t ulFineCycleCount[ notifyArraySHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( 32 ) ) ) = { 0 };
+static volatile uint32_t ulCourseCycleCounter[ notifyArraySHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( 32 ) ) ) = { 0 };
 
 /* The handle of the task that runs the tests and receives the notifications
  * from the software timers and interrupts. */
-static TaskHandle_t xTaskToNotify[ notifyArraySHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( notifyArraySHARED_MEM_SIZE_BYTES ) ) ) = { NULL };
+static TaskHandle_t xTaskToNotify[ notifyArraySHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( 32 ) ) ) = { NULL };
 
 /* The software timers used to send notifications to the main test task. */
-static TimerHandle_t xIncrementingIndexTimer[ notifyArraySHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( notifyArraySHARED_MEM_SIZE_BYTES ) ) ) = { NULL };
-static TimerHandle_t xNotifyWhileSuspendedTimer[ notifyArraySHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( notifyArraySHARED_MEM_SIZE_BYTES ) ) ) = { NULL };
+static TimerHandle_t xIncrementingIndexTimer[ notifyArraySHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( 32 ) ) ) = { NULL };
+static TimerHandle_t xNotifyWhileSuspendedTimer[ notifyArraySHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( 32 ) ) ) = { NULL };
 
 /* Used by the pseudo random number generating function. */
-static size_t uxNextRand[ notifyArraySHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( notifyArraySHARED_MEM_SIZE_BYTES ) ) ) = { 0 };
+static size_t uxNextRand[ notifyArraySHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( 32 ) ) ) = { 0 };
 
 /* Used to communicate when to send a task notification to the tick hook tests. */
-static volatile BaseType_t xSendNotificationFromISR[ notifyArraySHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( notifyArraySHARED_MEM_SIZE_BYTES ) ) ) = { pdFALSE };
+static volatile BaseType_t xSendNotificationFromISR[ notifyArraySHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( 32 ) ) ) = { pdFALSE };
 
 /*-----------------------------------------------------------*/
 
 void vStartTaskNotifyArrayTask( void )
 {
-    static StackType_t xNotifiedTaskStack[ notifyNOTIFY_ARRAY_TASK_STACK_SIZE ] __attribute__( ( aligned( notifyNOTIFY_ARRAY_TASK_STACK_SIZE * sizeof( StackType_t ) ) ) );
+    static StackType_t xNotifiedTaskStack[ notifyNOTIFY_ARRAY_TASK_STACK_SIZE ] __attribute__( ( aligned( 32 ) ) );
 
     const TickType_t xIncrementingIndexTimerPeriod = pdMS_TO_TICKS( 100 );
     const TickType_t xSuspendTimerPeriod = pdMS_TO_TICKS( 50 );
@@ -177,29 +177,27 @@ void vStartTaskNotifyArrayTask( void )
         .puxStackBuffer  = xNotifiedTaskStack,
         .xRegions        =  {
                                 { ( void * ) &( ulCourseCycleCounter[ 0 ] ), notifyArraySHARED_MEM_SIZE_BYTES,
-                                    ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                    ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                 },
                                 { ( void * ) &( xSendNotificationFromISR[ 0 ] ), notifyArraySHARED_MEM_SIZE_BYTES,
-                                    ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                    ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                 },
                                 { ( void * ) &( uxNextRand[ 0 ] ), notifyArraySHARED_MEM_SIZE_BYTES,
-                                    ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                    ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                 },
                                 { ( void * ) &( xNotifyWhileSuspendedTimer[ 0 ] ), notifyArraySHARED_MEM_SIZE_BYTES,
-                                    ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                    ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                 },
                                 { ( void * ) &( xIncrementingIndexTimer[ 0 ] ), notifyArraySHARED_MEM_SIZE_BYTES,
-                                    ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
-                                },
-                                { ( void * ) &( ulCourseCycleCounter[ 0 ] ), notifyArraySHARED_MEM_SIZE_BYTES,
-                                    ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                    ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                 },
                                 { ( void * ) &( xTaskToNotify[ 0 ] ), notifyArraySHARED_MEM_SIZE_BYTES,
-                                    ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                    ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                 },
                                 { ( void * ) &( ulFineCycleCount[ 0 ] ), notifyArraySHARED_MEM_SIZE_BYTES,
-                                    ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                    ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                 },
+                                { 0,                0,                    0                                                        },
                                 { 0,                0,                    0                                                        },
                                 { 0,                0,                    0                                                        },
                                 { 0,                0,                    0                                                        }

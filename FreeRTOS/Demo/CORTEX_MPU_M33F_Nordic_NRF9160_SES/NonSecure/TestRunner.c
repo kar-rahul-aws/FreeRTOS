@@ -62,7 +62,7 @@
 #include "MessageBufferDemo.h"
 #include "StreamBufferDemo.h"
 #include "StreamBufferInterrupt.h"
-//#include "RegTests.h"
+#include "reg_tests.h"
 
 /**
  * Priorities at which the tasks are created.
@@ -101,7 +101,7 @@ static void prvCheckTask( void *pvParameters );
 void vStartTests( void )
 {
 	BaseType_t xResult;
-	static StackType_t xCheckTaskStack[ configMINIMAL_STACK_SIZE ] __attribute__( ( aligned( configMINIMAL_STACK_SIZE * sizeof( StackType_t ) ) ) );
+	static StackType_t xCheckTaskStack[ configMINIMAL_STACK_SIZE ] __attribute__( ( aligned( 32 ) ) );
 	TaskParameters_t xCheckTaskParameters =
 	{
 		.pvTaskCode		= prvCheckTask,
@@ -276,7 +276,7 @@ void vStartTests( void )
 
 		#if( configSTART_REGISTER_TESTS == 1 )
 		{
-			vStartRegisterTasks( testrunnerREGISTER_TEST_PRIORITY );
+			vStartRegisterTasks();
 		}
 		#endif /* configSTART_REGISTER_TESTS */
 

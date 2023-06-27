@@ -91,25 +91,25 @@ static void prvSuspendedTaskTimerTestCallback( TimerHandle_t xExpiredTimer );
 /*-----------------------------------------------------------*/
 
 /* Used to latch errors during the test's execution. */
-static BaseType_t xErrorStatus[ notifySHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( notifySHARED_MEM_SIZE_BYTES ) ) ) = { pdPASS };
+static BaseType_t xErrorStatus[ notifySHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( 32 ) ) ) = { pdPASS };
 
 /* Used to ensure the task has not stalled. */
-static volatile uint32_t ulNotifyCycleCount[ notifySHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( notifySHARED_MEM_SIZE_BYTES ) ) ) = { 0 };
+static volatile uint32_t ulNotifyCycleCount[ notifySHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( 32 ) ) ) = { 0 };
 
 /* The handle of the task that receives the notifications. */
-static TaskHandle_t xTaskToNotify[ notifySHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( notifySHARED_MEM_SIZE_BYTES ) ) ) = { NULL };
+static TaskHandle_t xTaskToNotify[ notifySHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( 32 ) ) ) = { NULL };
 
 /* Used to count the notifications sent to the task from a software timer and
  * the number of notifications received by the task from the software timer.  The
  * two should stay synchronized. */
-static uint32_t ulTimerNotificationsReceived[ notifySHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( notifySHARED_MEM_SIZE_BYTES ) ) ) = { 0UL };
-static uint32_t ulTimerNotificationsSent[ notifySHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( notifySHARED_MEM_SIZE_BYTES ) ) ) = { 0UL };
+static uint32_t ulTimerNotificationsReceived[ notifySHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( 32 ) ) ) = { 0UL };
+static uint32_t ulTimerNotificationsSent[ notifySHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( 32 ) ) ) = { 0UL };
 
 /* The timer used to notify the task. */
-static TimerHandle_t xTimer[ notifySHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( notifySHARED_MEM_SIZE_BYTES ) ) ) = { NULL };
+static TimerHandle_t xTimer[ notifySHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( 32 ) ) ) = { NULL };
 
 /* Used by the pseudo random number generating function. */
-static size_t uxNextRand[ notifySHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( notifySHARED_MEM_SIZE_BYTES ) ) ) = { 0 };
+static size_t uxNextRand[ notifySHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( 32 ) ) ) = { 0 };
 
 /*-----------------------------------------------------------*/
 
@@ -118,7 +118,7 @@ void vStartTaskNotifyTask( void )
     /* Create the task that performs some tests by itself, then loops around
      * being notified by both a software timer and an interrupt. */
     const TickType_t xMaxPeriod = pdMS_TO_TICKS( 90 );
-    static StackType_t xNotifiedTaskStack[ notifyNOTIFIED_TASK_STACK_SIZE ] __attribute__( ( aligned( notifyNOTIFIED_TASK_STACK_SIZE * sizeof( StackType_t ) ) ) );
+    static StackType_t xNotifiedTaskStack[ notifyNOTIFIED_TASK_STACK_SIZE ] __attribute__( ( aligned( 32 ) ) );
     TaskParameters_t xNotifiedTask =
     {
         .pvTaskCode      = prvNotifiedTask,
@@ -129,31 +129,17 @@ void vStartTaskNotifyTask( void )
         .uxPriority      = ( notifyTASK_PRIORITY | portPRIVILEGE_BIT ),
         .puxStackBuffer  = xNotifiedTaskStack,
         .xRegions        =  {
-                                { ( void * ) &( ulTimerNotificationsReceived[ 0 ] ), notifySHARED_MEM_SIZE_BYTES,
-                                    ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
-                                },
-                                { ( void * ) &( ulTimerNotificationsSent[ 0 ] ), notifySHARED_MEM_SIZE_BYTES,
-                                    ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
-                                },
-                                { ( void * ) &( xTimer[ 0 ] ), notifySHARED_MEM_SIZE_BYTES,
-                                    ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
-                                },
-                                { ( void * ) &( uxNextRand[ 0 ] ), notifySHARED_MEM_SIZE_BYTES,
-                                    ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
-                                },
-                                { ( void * ) &( ulNotifyCycleCount[ 0 ] ), notifySHARED_MEM_SIZE_BYTES,
-                                    ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
-                                },
-                                { ( void * ) &( xErrorStatus[ 0 ] ), notifySHARED_MEM_SIZE_BYTES,
-                                    ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
-                                },
-                                { ( void * ) &( xTaskToNotify[ 0 ] ), notifySHARED_MEM_SIZE_BYTES,
-                                    ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
-                                },
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        }
+                                { 0, 0, 0 },
+                                { 0, 0, 0 },
+                                { 0, 0, 0 },
+                                { 0, 0, 0 },
+                                { 0, 0, 0 },
+                                { 0, 0, 0 },
+                                { 0, 0, 0 },
+                                { 0, 0, 0 },
+                                { 0, 0, 0 },
+                                { 0, 0, 0 },
+                                { 0, 0, 0 }
                             }
     };
     xTaskCreateRestricted( & ( xNotifiedTask ) , &xTaskToNotify[ 0 ] );

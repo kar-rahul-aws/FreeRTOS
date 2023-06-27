@@ -133,6 +133,13 @@ void vApplicationStackOverflowHook( TaskHandle_t xTask,
 }
 /*-----------------------------------------------------------*/
 
+void vApplicationMallocFailedHook( void )
+{
+    taskDISABLE_INTERRUPTS();
+    for( ;; );
+}
+/*-----------------------------------------------------------*/
+
 /* configUSE_STATIC_ALLOCATION is set to 1, so the application must provide an
  * implementation of vApplicationGetIdleTaskMemory() to provide the memory that
  * is used by the Idle task. */

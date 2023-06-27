@@ -87,16 +87,16 @@ static void prvResetStartConditionsForNextIteration( void );
 
 /* Flag that will be latched to pdFAIL should any unexpected behaviour be
  * detected in any of the demo tests. */
-static volatile BaseType_t xTestStatus[ tmrSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( tmrSHARED_MEM_SIZE_BYTES ) ) ) = { pdPASS };
+static volatile BaseType_t xTestStatus[ tmrSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( 32 ) ) ) = { pdPASS };
 
 /* Flag indicating whether the testing includes the backlog demo.  The backlog
  * demo can be disruptive to other demos because the timer backlog is created by
  * calling xTaskCatchUpTicks(). */
-static uint8_t ucIsBacklogDemoEnabled[ tmrSHARED_MEM_SIZE_BYTES ]  __attribute__( ( aligned( tmrSHARED_MEM_SIZE_BYTES ) ) ) = { ( uint8_t ) pdFALSE };
+static uint8_t ucIsBacklogDemoEnabled[ tmrSHARED_MEM_SIZE_BYTES ]  __attribute__( ( aligned( 32 ) ) ) = { ( uint8_t ) pdFALSE };
 
 /* Counter that is incremented on each cycle of a test.  This is used to
  * detect a stalled task - a test that is no longer running. */
-static volatile uint32_t ulLoopCounter[ tmrSHARED_MEM_SIZE_WORDS ]  __attribute__( ( aligned( tmrSHARED_MEM_SIZE_BYTES ) ) ) = { 0 };
+static volatile uint32_t ulLoopCounter[ tmrSHARED_MEM_SIZE_WORDS ]  __attribute__( ( aligned( 32 ) ) ) = { 0 };
 
 /* A set of auto-reload timers - each of which use the same callback function.
  * The callback function uses the timer ID to index into, and then increment, a
@@ -104,14 +104,14 @@ static volatile uint32_t ulLoopCounter[ tmrSHARED_MEM_SIZE_WORDS ]  __attribute_
  * xAutoReloadTimers[0] during its callback if ucIsStopNeededInTimerZeroCallback is
  * pdTRUE.  The auto-reload timers referenced from xAutoReloadTimers[] are used by
  * the prvTimerTestTask task. */
-static TimerHandle_t xAutoReloadTimers[ 16 ] __attribute__( ( aligned( 64 ) ) ) = { 0 };
-static uint8_t ucAutoReloadTimerCounters[ tmrSHARED_MEM_SIZE_BYTES ] __attribute__( ( aligned( tmrSHARED_MEM_SIZE_BYTES ) ) ) = { 0 };
+static TimerHandle_t xAutoReloadTimers[ 16 ] __attribute__( ( aligned( 32 ) ) ) = { 0 };
+static uint8_t ucAutoReloadTimerCounters[ tmrSHARED_MEM_SIZE_BYTES ] __attribute__( ( aligned( 32 ) ) ) = { 0 };
 static uint8_t ucIsStopNeededInTimerZeroCallback = ( uint8_t ) pdFALSE;
 
 /* The one-shot timer is configured to use a callback function that increments
  * ucOneShotTimerCounter[ 0 ] each time it gets called. */
-static TimerHandle_t xOneShotTimer[ tmrSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( tmrSHARED_MEM_SIZE_BYTES ) ) ) = { NULL };
-static uint8_t ucOneShotTimerCounter[ tmrSHARED_MEM_SIZE_BYTES ] __attribute__( ( aligned( tmrSHARED_MEM_SIZE_BYTES ) ) ) = { ( uint8_t ) 0 };
+static TimerHandle_t xOneShotTimer[ tmrSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( 32 ) ) ) = { NULL };
+static uint8_t ucOneShotTimerCounter[ tmrSHARED_MEM_SIZE_BYTES ] __attribute__( ( aligned( 32 ) ) ) = { ( uint8_t ) 0 };
 
 /* The ISR reload timer is controlled from the tick hook to exercise the timer
  * API functions that can be used from an ISR.  It is configured to increment
@@ -127,13 +127,13 @@ static uint8_t ucISROneShotTimerCounter = ( uint8_t ) 0;
 
 /* The period of all the timers are a multiple of the base period.  The base
  * period is configured by the parameter to vStartTimerDemoTask(). */
-static TickType_t xBasePeriod[ tmrSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( tmrSHARED_MEM_SIZE_BYTES ) ) ) = { 0 };
+static TickType_t xBasePeriod[ tmrSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( 32 ) ) ) = { 0 };
 
 /*-----------------------------------------------------------*/
 
 void vStartTimerDemoTask( TickType_t xBasePeriodIn )
 {
-    static StackType_t xTimerTestTaskStack[ tmrTIMER_TEST_TASK_STACK_SIZE ] __attribute__( ( aligned( tmrTIMER_TEST_TASK_STACK_SIZE * sizeof( StackType_t ) ) ) );
+    static StackType_t xTimerTestTaskStack[ tmrTIMER_TEST_TASK_STACK_SIZE ] __attribute__( ( aligned( 32 ) ) );
     TaskParameters_t xTimerTestTaskParameters =
     {
         .pvTaskCode     = prvTimerTestTask,
@@ -146,28 +146,28 @@ void vStartTimerDemoTask( TickType_t xBasePeriodIn )
         .xRegions       =
         {
             { ( void * ) &( xTestStatus[ 0 ] ), tmrSHARED_MEM_SIZE_BYTES,
-              ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+              ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
             },
             { ( void * ) &( ucIsBacklogDemoEnabled[ 0 ] ), tmrSHARED_MEM_SIZE_BYTES,
-              ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+              ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
             },
             { ( void * ) &( ulLoopCounter[ 0 ] ), tmrSHARED_MEM_SIZE_BYTES,
-              ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+              ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
             },
             { ( void * ) &( xAutoReloadTimers[ 0 ] ), 64,
-              ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+              ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
             },
             { ( void * ) &( ucAutoReloadTimerCounters[ 0 ] ), tmrSHARED_MEM_SIZE_BYTES,
-              ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+              ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
             },
             { ( void * ) &( xOneShotTimer[ 0 ] ), tmrSHARED_MEM_SIZE_BYTES,
-              ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+              ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
             },
             { ( void * ) &( ucOneShotTimerCounter[ 0 ] ), tmrSHARED_MEM_SIZE_BYTES,
-              ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+              ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
             },
             { ( void * ) &( xBasePeriod[ 0 ] ), tmrSHARED_MEM_SIZE_BYTES,
-              ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+              ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
             },
             { 0,                                              0,                               0  },
             { 0,                                              0,                               0  },

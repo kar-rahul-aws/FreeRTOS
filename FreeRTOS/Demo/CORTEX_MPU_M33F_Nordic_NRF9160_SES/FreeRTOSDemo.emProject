@@ -29,7 +29,7 @@
       build_intermediate_directory="Output/$(ProjectName)/$(Configuration)/Objects/"
       build_output_directory="Output/$(ProjectName)/$(Configuration)"
       c_preprocessor_definitions="ARM_MATH_ARMV8MML;NRF9160_XXAA;__NRF_FAMILY;NRF_TRUSTZONE_NONSECURE;__SUPPORT_RESET_HALT_AFTER_BTL=0;INITIALIZE_USER_SECTIONS;__ARMCC_VERSION"
-      c_user_include_directories="$(ProjectDir)/Nordic_Code/CMSIS_5/CMSIS/Core/Include;$(ProjectDir)/Nordic_Code/nRF/Device/Include;$(ProjectDir)/Config;../../Source/include;../../Source/portable/GCC/ARM_CM33/secure;../../Source/portable/GCC/ARM_CM33/non_secure;../Common/include;../Common/ARMv8M/tz_demo;../Common/ARMv8M/mpu_demo;../Common/ARMv8M/soak_tests"
+      c_user_include_directories="$(ProjectDir)/Nordic_Code/CMSIS_5/CMSIS/Core/Include;$(ProjectDir)/Nordic_Code/nRF/Device/Include;$(ProjectDir)/Config;../../Source/include;../../Source/portable/GCC/ARM_CM33/secure;../../Source/portable/GCC/ARM_CM33/non_secure;../Common/include;../Common/ARMv8M/tz_demo;../Common/ARMv8M/mpu_demo;../Common/ARMv8M/soak_tests;../Common/ARMv8M/reg_tests/GCC/ARM_CM33/non_secure;../Common/ARMv8M/reg_tests/GCC/ARM_CM33/secure"
       debug_register_definition_file="$(ProjectDir)/Nordic_Code/nRF/XML/nrf9160_Registers.xml"
       debug_stack_pointer_start="__stack_end__"
       debug_start_from_entry_point_symbol="No"
@@ -51,43 +51,48 @@
     <folder Name="Demos">
       <file file_name="../Common/ARMv8M/soak_tests/AbortDelay.c" />
       <file file_name="../Common/ARMv8M/soak_tests/BlockQ.c" />
-      <file file_name="../Common/ARMv8M/soak_tests/blocktim.c" />
-      <file file_name="../Common/ARMv8M/soak_tests/countsem.c" />
-      <file file_name="../Common/ARMv8M/soak_tests/dynamic.c" />
       <file file_name="../Common/ARMv8M/soak_tests/EventGroupsDemo.c" />
-      <file file_name="../Common/ARMv8M/soak_tests/flop.c" />
       <file file_name="../Common/ARMv8M/soak_tests/GenQTest.c" />
-      <file file_name="../Common/ARMv8M/soak_tests/integer.c" />
       <file file_name="../Common/ARMv8M/soak_tests/IntQueue.c" />
       <file file_name="../Common/ARMv8M/soak_tests/IntQueueTimer.c" />
       <file file_name="../Common/ARMv8M/soak_tests/IntSemTest.c" />
       <file file_name="../Common/ARMv8M/soak_tests/MessageBufferDemo.c" />
+      <file file_name="../Common/ARMv8M/soak_tests/PollQ.c" />
+      <file file_name="../Common/ARMv8M/soak_tests/QPeek.c" />
+      <file file_name="../Common/ARMv8M/soak_tests/QueueOverwrite.c" />
+      <file file_name="../Common/ARMv8M/soak_tests/QueueSet.c" />
+      <file file_name="../Common/ARMv8M/soak_tests/QueueSetPolling.c" />
+      <file file_name="../Common/ARMv8M/soak_tests/StreamBufferDemo.c" />
+      <file file_name="../Common/ARMv8M/soak_tests/StreamBufferInterrupt.c" />
+      <file file_name="../Common/ARMv8M/soak_tests/TaskNotify.c" />
+      <file file_name="../Common/ARMv8M/soak_tests/TaskNotifyArray.c" />
+      <file file_name="NonSecure/TestRunner.c" />
+      <file file_name="NonSecure/TestRunner.h" />
+      <file file_name="../Common/ARMv8M/soak_tests/TimerDemo.c" />
+      <file file_name="../Common/ARMv8M/soak_tests/blocktim.c" />
+      <file file_name="../Common/ARMv8M/soak_tests/countsem.c" />
+      <file file_name="../Common/ARMv8M/soak_tests/dynamic.c" />
+      <file file_name="../Common/ARMv8M/soak_tests/flop.c" />
+      <file file_name="../Common/ARMv8M/soak_tests/integer.c" />
       <file file_name="../Common/ARMv8M/mpu_demo/mpu_demo.c">
         <configuration Name="Debug" build_exclude_from_build="No" />
       </file>
       <file file_name="../Common/ARMv8M/mpu_demo/mpu_demo.h">
         <configuration Name="Debug" build_exclude_from_build="No" />
       </file>
-      <file file_name="../Common/ARMv8M/soak_tests/PollQ.c" />
-      <file file_name="../Common/ARMv8M/soak_tests/QPeek.c" />
-      <file file_name="../Common/ARMv8M/soak_tests/QueueOverwrite.c" />
-      <file file_name="../Common/ARMv8M/soak_tests/QueueSet.c" />
-      <file file_name="../Common/ARMv8M/soak_tests/QueueSetPolling.c" />
       <file file_name="../Common/ARMv8M/soak_tests/recmutex.c" />
+      <file file_name="../Common/ARMv8M/reg_tests/GCC/ARM_CM33/non_secure/reg_test_asm.c" />
+      <file file_name="../Common/ARMv8M/reg_tests/GCC/ARM_CM33/non_secure/reg_test_asm.h" />
+      <file file_name="NonSecure/reg_tests.c" />
+      <file file_name="NonSecure/reg_tests.h" />
       <file file_name="../Common/ARMv8M/soak_tests/semtest.c" />
-      <file file_name="../Common/ARMv8M/soak_tests/StreamBufferDemo.c" />
-      <file file_name="../Common/ARMv8M/soak_tests/StreamBufferInterrupt.c" />
-      <file file_name="../Common/ARMv8M/soak_tests/TaskNotify.c" />
-      <file file_name="../Common/ARMv8M/soak_tests/TaskNotifyArray.c" />
-      <file file_name="../Common/ARMv8M/soak_tests/TestRunner.c" />
-      <file file_name="../Common/ARMv8M/soak_tests/TimerDemo.c" />
     </folder>
     <folder Name="FreeRTOS">
       <folder Name="include">
+        <file file_name="../../Source/include/FreeRTOS.h" />
         <file file_name="../../Source/include/atomic.h" />
         <file file_name="../../Source/include/deprecated_definitions.h" />
         <file file_name="../../Source/include/event_groups.h" />
-        <file file_name="../../Source/include/FreeRTOS.h" />
         <file file_name="../../Source/include/list.h" />
         <file file_name="../../Source/include/message_buffer.h" />
         <file file_name="../../Source/include/mpu_prototypes.h" />
@@ -103,10 +108,11 @@
       </folder>
       <folder Name="portable">
         <folder Name="Common">
-          <file file_name="../../Source/portable/Common/mpu_wrappers.c" />
+          <file file_name="../../Source/portable/Common/mpu_wrappers_v2.c" />
         </folder>
         <folder Name="GCC">
           <folder Name="ARM_CM33">
+            <file file_name="../../Source/portable/GCC/ARM_CM33/non_secure/mpu_wrappers_v2_asm.S" />
             <file file_name="../../Source/portable/GCC/ARM_CM33/non_secure/port.c" />
             <file file_name="../../Source/portable/GCC/ARM_CM33/non_secure/portasm.c" />
             <file file_name="../../Source/portable/GCC/ARM_CM33/non_secure/portasm.h" />
@@ -140,10 +146,10 @@
         </file>
       </folder>
       <folder Name="System Files">
+        <file file_name="Nordic_Code/nRF/Source/nRF_Startup.s" />
         <file file_name="Nordic_Code/nRF/Source/nrf9160_Vectors.s">
           <configuration Name="Common" file_type="Assembly" />
         </file>
-        <file file_name="Nordic_Code/nRF/Source/nRF_Startup.s" />
         <file file_name="Nordic_Code/nRF/Source/thumb_crt0.s" />
       </folder>
     </folder>
@@ -195,6 +201,10 @@
     <folder Name="Config">
       <file file_name="Config/FreeRTOSConfig.h" />
     </folder>
+    <folder Name="Demos">
+      <file file_name="../Common/ARMv8M/reg_tests/GCC/ARM_CM33/secure/secure_reg_test_asm.c" />
+      <file file_name="../Common/ARMv8M/reg_tests/GCC/ARM_CM33/secure/secure_reg_test_asm.h" />
+    </folder>
     <folder Name="FreeRTOS">
       <folder Name="SecureContext">
         <file file_name="../../Source/portable/GCC/ARM_CM33/secure/secure_context.c" />
@@ -210,6 +220,10 @@
         <file file_name="../../Source/portable/GCC/ARM_CM33/secure/secure_init.c" />
         <file file_name="../../Source/portable/GCC/ARM_CM33/secure/secure_init.h" />
       </folder>
+    </folder>
+    <folder Name="NSCFunctions">
+      <file file_name="../Common/ARMv8M/tz_demo/nsc_functions.c" />
+      <file file_name="../Common/ARMv8M/tz_demo/nsc_functions.h" />
     </folder>
     <folder Name="Nordic_Code">
       <folder Name="CMSIS Files">
@@ -227,16 +241,12 @@
         </file>
       </folder>
       <folder Name="System Files">
+        <file file_name="Nordic_Code/nRF/Source/nRF_Startup.s" />
         <file file_name="Nordic_Code/nRF/Source/nrf9160_Vectors.s">
           <configuration Name="Common" file_type="Assembly" />
         </file>
-        <file file_name="Nordic_Code/nRF/Source/nRF_Startup.s" />
         <file file_name="Nordic_Code/nRF/Source/thumb_crt0.s" />
       </folder>
-    </folder>
-    <folder Name="NSCFunctions">
-      <file file_name="../Common/ARMv8M/tz_demo/nsc_functions.c" />
-      <file file_name="../Common/ARMv8M/tz_demo/nsc_functions.h" />
     </folder>
     <folder Name="User">
       <configuration Name="Common" filter="c;cpp;cxx;cc;h;s;asm;inc" />

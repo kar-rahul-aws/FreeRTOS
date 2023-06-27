@@ -100,11 +100,11 @@ static void prvNonBlockingSenderTask( void * pvParameters );
 
     static StaticMessageBuffer_t xStaticMessageBuffers[ mbNUMBER_OF_ECHO_CLIENTS ];
     static uint8_t ucBufferStorage[ mbNUMBER_OF_SENDER_TASKS ][ mbMESSAGE_BUFFER_LENGTH_BYTES + 1 ];
-    static uint32_t ulSenderLoopCounters[ messagebufferSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( messagebufferSHARED_MEM_SIZE_BYTES ) ) ) = { 0 };
+    static uint32_t ulSenderLoopCounters[ messagebufferSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( 32 ) ) ) = { 0 };
 
     #define RECEIVER_TASK1_IDX 0
     #define RECEIVER_TASK2_IDX 1
-    static TaskHandle_t xReceiverTaskHandles[ messagebufferSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( messagebufferSHARED_MEM_SIZE_BYTES ) ) ) = { NULL };
+    static TaskHandle_t xReceiverTaskHandles[ messagebufferSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( 32 ) ) ) = { NULL };
 
 #endif /* configSUPPORT_STATIC_ALLOCATION */
 
@@ -118,7 +118,7 @@ static void prvNonBlockingSenderTask( void * pvParameters );
     static void prvSpaceAvailableCoherenceActor( void * pvParameters );
     static void prvSpaceAvailableCoherenceTester( void * pvParameters );
 
-    static uint32_t ulSizeCoherencyTestCycles[ messagebufferSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( messagebufferSHARED_MEM_SIZE_BYTES ) ) ) = { 0UL };
+    static uint32_t ulSizeCoherencyTestCycles[ messagebufferSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( 32 ) ) ) = { 0UL };
 #endif /* if ( configRUN_ADDITIONAL_TESTS == 1 ) */
 
 /*-----------------------------------------------------------*/
@@ -130,37 +130,37 @@ typedef struct ECHO_MESSAGE_BUFFERS
     MessageBufferHandle_t xEchoClientBuffer;
     MessageBufferHandle_t xEchoServerBuffer;
 } EchoMessageBuffers_t;
-static uint32_t ulEchoLoopCounters[ messagebufferSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( messagebufferSHARED_MEM_SIZE_BYTES ) ) ) = { 0 };
+static uint32_t ulEchoLoopCounters[ messagebufferSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( 32 ) ) ) = { 0 };
 
 /* The non-blocking tasks monitor their operation, and if no errors have been
  * found, increment ulNonBlockingRxCounter.  xAreMessageBufferTasksStillRunning()
  * then checks ulNonBlockingRxCounter and only returns pdPASS if
  * ulNonBlockingRxCounter is still incrementing. */
-static uint32_t ulNonBlockingRxCounter[ messagebufferSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( messagebufferSHARED_MEM_SIZE_BYTES ) ) ) = { 0 };
+static uint32_t ulNonBlockingRxCounter[ messagebufferSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( 32 ) ) ) = { 0 };
 
 /* A message that is longer than the buffer, parts of which are written to the
  * message buffer to test writing different lengths at different offsets. */
-static char pc55ByteString[ 128 ] __attribute__( ( aligned( 128 ) ) ) = { '\0' };
+static char pc55ByteString[ 128 ] __attribute__( ( aligned( 32 ) ) ) = { '\0' };
 
 #define ECHO_MESSAGE_BUFFERS_1_IDX 0
 #define ECHO_MESSAGE_BUFFERS_2_IDX 1
-static EchoMessageBuffers_t xEchoMessageBuffersArray[ messagebufferSHARED_MEM_SIZE_DOUBLE_WORDS ] __attribute__( ( aligned( messagebufferSHARED_MEM_SIZE_BYTES ) ) ) = { NULL };
+static EchoMessageBuffers_t xEchoMessageBuffersArray[ messagebufferSHARED_MEM_SIZE_DOUBLE_WORDS ] __attribute__( ( aligned( 32 ) ) ) = { NULL };
 
 #define ECHO_CLIENT_TASK1_IDX 0
 #define ECHO_CLIENT_TASK2_IDX 1
-static TaskHandle_t xEchoClientTaskHandles[ messagebufferSHARED_MEM_SIZE_DOUBLE_WORDS ] __attribute__( ( aligned( messagebufferSHARED_MEM_SIZE_BYTES ) ) ) = { NULL };
+static TaskHandle_t xEchoClientTaskHandles[ messagebufferSHARED_MEM_SIZE_DOUBLE_WORDS ] __attribute__( ( aligned( 32 ) ) ) = { NULL };
 
 /*-----------------------------------------------------------*/
 
 void vStartMessageBufferTasks( configSTACK_DEPTH_TYPE xStackSize )
 {
     MessageBufferHandle_t xMessageBuffer;
-    static StackType_t xEchoServerTask1Stack[ configMINIMAL_STACK_SIZE * 2 ] __attribute__( ( aligned( configMINIMAL_STACK_SIZE * 2 * sizeof( StackType_t ) ) ) );
-    static StackType_t xEchoServerTask2Stack[ configMINIMAL_STACK_SIZE * 2 ] __attribute__( ( aligned( configMINIMAL_STACK_SIZE * 2 * sizeof( StackType_t ) ) ) );
-    static StackType_t xNonBlockingReceiverTaskStack[ configMINIMAL_STACK_SIZE ] __attribute__( ( aligned( configMINIMAL_STACK_SIZE * sizeof( StackType_t ) ) ) );
-    static StackType_t xNonBlockingSenderTaskStack[ configMINIMAL_STACK_SIZE ] __attribute__( ( aligned( configMINIMAL_STACK_SIZE * sizeof( StackType_t ) ) ) );
-    static StackType_t xEchoClientTask1Stack[ configMINIMAL_STACK_SIZE ] __attribute__( ( aligned( configMINIMAL_STACK_SIZE * sizeof( StackType_t ) ) ) );
-    static StackType_t xEchoClientTask2Stack[ configMINIMAL_STACK_SIZE ] __attribute__( ( aligned( configMINIMAL_STACK_SIZE * sizeof( StackType_t ) ) ) );
+    static StackType_t xEchoServerTask1Stack[ configMINIMAL_STACK_SIZE * 2 ] __attribute__( ( aligned( 32 ) ) );
+    static StackType_t xEchoServerTask2Stack[ configMINIMAL_STACK_SIZE * 2 ] __attribute__( ( aligned( 32 ) ) );
+    static StackType_t xNonBlockingReceiverTaskStack[ configMINIMAL_STACK_SIZE ] __attribute__( ( aligned( 32 ) ) );
+    static StackType_t xNonBlockingSenderTaskStack[ configMINIMAL_STACK_SIZE ] __attribute__( ( aligned( 32 ) ) );
+    static StackType_t xEchoClientTask1Stack[ configMINIMAL_STACK_SIZE ] __attribute__( ( aligned( 32 ) ) );
+    static StackType_t xEchoClientTask2Stack[ configMINIMAL_STACK_SIZE ] __attribute__( ( aligned( 32 ) ) );
 
     TaskParameters_t xEchoServerTask1Parameters =
     {
@@ -173,13 +173,13 @@ void vStartMessageBufferTasks( configSTACK_DEPTH_TYPE xStackSize )
         .puxStackBuffer  = xEchoServerTask1Stack,
         .xRegions        =    {
                                 { ( void * ) &( xEchoMessageBuffersArray[ 0 ] ), messagebufferSHARED_MEM_SIZE_BYTES,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                  ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                 },
                                 { ( void * ) &( xEchoClientTaskHandles[ 0 ] ), messagebufferSHARED_MEM_SIZE_BYTES,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                  ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                 },
                                 { ( void * ) &( pc55ByteString[ 0 ] ), 128,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                  ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                 },
                                 { 0,                0,                    0                                                        },
                                 { 0,                0,                    0                                                        },
@@ -202,13 +202,13 @@ void vStartMessageBufferTasks( configSTACK_DEPTH_TYPE xStackSize )
         .puxStackBuffer  = xEchoServerTask2Stack,
         .xRegions        =    {
                                 { ( void * ) &( xEchoMessageBuffersArray[ 0 ] ), messagebufferSHARED_MEM_SIZE_BYTES,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                  ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                 },
                                 { ( void * ) &( xEchoClientTaskHandles[ 0 ] ), messagebufferSHARED_MEM_SIZE_BYTES,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                  ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                 },
                                 { ( void * ) &( pc55ByteString[ 0 ] ), 128,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                  ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                 },
                                 { 0,                0,                    0                                                        },
                                 { 0,                0,                    0                                                        },
@@ -231,7 +231,7 @@ void vStartMessageBufferTasks( configSTACK_DEPTH_TYPE xStackSize )
         .puxStackBuffer  = xNonBlockingReceiverTaskStack,
         .xRegions        =    {
                                 { ( void * ) &( ulNonBlockingRxCounter[ 0 ] ), messagebufferSHARED_MEM_SIZE_BYTES,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                  ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                 },
                                 { 0,                0,                    0                                                        },
                                 { 0,                0,                    0                                                        },
@@ -279,10 +279,10 @@ void vStartMessageBufferTasks( configSTACK_DEPTH_TYPE xStackSize )
         .puxStackBuffer  = xEchoClientTask1Stack,
         .xRegions        =    {
                                 { ( void * ) &( xEchoMessageBuffersArray[ 0 ] ), messagebufferSHARED_MEM_SIZE_BYTES,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                  ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                 },
                                 { ( void * ) &( ulEchoLoopCounters[ 0 ] ), messagebufferSHARED_MEM_SIZE_BYTES,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                  ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                 },
                                 { 0,                0,                    0                                                        },
                                 { 0,                0,                    0                                                        },
@@ -306,10 +306,10 @@ void vStartMessageBufferTasks( configSTACK_DEPTH_TYPE xStackSize )
         .puxStackBuffer  = xEchoClientTask2Stack,
         .xRegions        =    {
                                 { ( void * ) &( xEchoMessageBuffersArray[ 0 ] ), messagebufferSHARED_MEM_SIZE_BYTES,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                  ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                 },
                                 { ( void * ) &( ulEchoLoopCounters[ 0 ] ), messagebufferSHARED_MEM_SIZE_BYTES,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                  ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                 },
                                 { 0,                0,                    0                                                        },
                                 { 0,                0,                    0                                                        },
@@ -369,10 +369,10 @@ void vStartMessageBufferTasks( configSTACK_DEPTH_TYPE xStackSize )
     #if ( configSUPPORT_STATIC_ALLOCATION == 1 )
     {
         MessageBufferHandle_t xMessageBufferForStaticTests1, xMessageBufferForStaticTests2;
-        static StackType_t xSenderTask1Stack[ configMINIMAL_STACK_SIZE * 2 ] __attribute__( ( aligned( configMINIMAL_STACK_SIZE * 2 * sizeof( StackType_t ) ) ) );
-        static StackType_t xSenderTask2Stack[ configMINIMAL_STACK_SIZE * 2 ] __attribute__( ( aligned( configMINIMAL_STACK_SIZE * 2 * sizeof( StackType_t ) ) ) );
-        static StackType_t xReceivingTask1Stack[ configMINIMAL_STACK_SIZE * 2 ] __attribute__( ( aligned( configMINIMAL_STACK_SIZE * 2 * sizeof( StackType_t ) ) ) );
-        static StackType_t xReceivingTask2Stack[ configMINIMAL_STACK_SIZE * 2 ] __attribute__( ( aligned( configMINIMAL_STACK_SIZE * 2 * sizeof( StackType_t ) ) ) );
+        static StackType_t xSenderTask1Stack[ configMINIMAL_STACK_SIZE * 2 ] __attribute__( ( aligned( 32 ) ) );
+        static StackType_t xSenderTask2Stack[ configMINIMAL_STACK_SIZE * 2 ] __attribute__( ( aligned( 32 ) ) );
+        static StackType_t xReceivingTask1Stack[ configMINIMAL_STACK_SIZE * 2 ] __attribute__( ( aligned( 32 ) ) );
+        static StackType_t xReceivingTask2Stack[ configMINIMAL_STACK_SIZE * 2 ] __attribute__( ( aligned( 32 ) ) );
         TaskParameters_t xSenderTask1Parameters =
         {
             .pvTaskCode      = prvSenderTask,
@@ -383,13 +383,13 @@ void vStartMessageBufferTasks( configSTACK_DEPTH_TYPE xStackSize )
             .puxStackBuffer  = xSenderTask1Stack,
             .xRegions        =    {
                                     { ( void * ) &( xReceiverTaskHandles[ 0 ] ), messagebufferSHARED_MEM_SIZE_BYTES,
-                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                      ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                     },
                                     { ( void * ) &( ulSenderLoopCounters[ 0 ] ), messagebufferSHARED_MEM_SIZE_BYTES,
-                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                      ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                     },
                                     { ( void * ) &( pc55ByteString[ 0 ] ), 128,
-                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                      ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                     },
                                     { 0,                0,                    0                                                        },
                                     { 0,                0,                    0                                                        },
@@ -412,13 +412,13 @@ void vStartMessageBufferTasks( configSTACK_DEPTH_TYPE xStackSize )
             .puxStackBuffer  = xSenderTask2Stack,
             .xRegions        =    {
                                     { ( void * ) &( xReceiverTaskHandles[ 0 ] ), messagebufferSHARED_MEM_SIZE_BYTES,
-                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                      ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                     },
                                     { ( void * ) &( ulSenderLoopCounters[ 0 ] ), messagebufferSHARED_MEM_SIZE_BYTES,
-                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                      ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                     },
                                     { ( void * ) &( pc55ByteString[ 0 ] ), 128,
-                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                      ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                     },
                                     { 0,                0,                    0                                                        },
                                     { 0,                0,                    0                                                        },
@@ -504,8 +504,8 @@ void vStartMessageBufferTasks( configSTACK_DEPTH_TYPE xStackSize )
 
     #if ( configRUN_ADDITIONAL_TESTS == 1 )
     {
-        static StackType_t xCoherenceActorTaskStack[ configMINIMAL_STACK_SIZE ] __attribute__( ( aligned( configMINIMAL_STACK_SIZE * sizeof( StackType_t ) ) ) );
-        static StackType_t xCoherenceTesterTaskStack[ configMINIMAL_STACK_SIZE ] __attribute__( ( aligned( configMINIMAL_STACK_SIZE * sizeof( StackType_t ) ) ) );
+        static StackType_t xCoherenceActorTaskStack[ configMINIMAL_STACK_SIZE ] __attribute__( ( aligned( 32 ) ) );
+        static StackType_t xCoherenceTesterTaskStack[ configMINIMAL_STACK_SIZE ] __attribute__( ( aligned( 32 ) ) );
         TaskParameters_t xCoherenceActorTaskParameters =
         {
             .pvTaskCode      = prvSpaceAvailableCoherenceActor,
@@ -538,7 +538,7 @@ void vStartMessageBufferTasks( configSTACK_DEPTH_TYPE xStackSize )
             .puxStackBuffer  = xCoherenceTesterTaskStack,
             .xRegions        =  {
                                     { ( void * ) &( ulSizeCoherencyTestCycles[ 0 ] ), messagebufferSHARED_MEM_SIZE_BYTES,
-                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                      ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                     },
                                     { 0,                0,                    0                                                        },
                                     { 0,                0,                    0                                                        },

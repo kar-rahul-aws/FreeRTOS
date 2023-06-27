@@ -83,14 +83,14 @@ static portTASK_FUNCTION_PROTO( vPolledQueueConsumer, pvParameters );
 
 /* Variables that are used to check that the tasks are still running with no
  * errors. */
-static volatile BaseType_t xPollingConsumerCount[ pollqSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( pollqSHARED_MEM_SIZE_BYTES ) ) ) = { pollqINITIAL_VALUE };
-static volatile BaseType_t xPollingProducerCount[ pollqSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( pollqSHARED_MEM_SIZE_BYTES ) ) )= { pollqINITIAL_VALUE };
+static volatile BaseType_t xPollingConsumerCount[ pollqSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( 32 ) ) ) = { pollqINITIAL_VALUE };
+static volatile BaseType_t xPollingProducerCount[ pollqSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( 32 ) ) )= { pollqINITIAL_VALUE };
 
 /*-----------------------------------------------------------*/
 
 void vStartPolledQueueTasks( UBaseType_t uxPriority )
 {
-    static QueueHandle_t xPolledQueue[ pollqSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( pollqSHARED_MEM_SIZE_BYTES ) ) );
+    static QueueHandle_t xPolledQueue[ pollqSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( 32 ) ) );
 
     /* Create the queue used by the producer and consumer. */
     xPolledQueue[ 0 ] = xQueueCreate( pollqQUEUE_SIZE, ( UBaseType_t ) sizeof( uint16_t ) );
@@ -107,32 +107,28 @@ void vStartPolledQueueTasks( UBaseType_t uxPriority )
 
         /* Spawn the producer and consumer. */
 
-        static StackType_t xPolledQueueConsumerStack[ pollqSTACK_SIZE ] __attribute__( ( aligned( pollqSTACK_SIZE * sizeof( StackType_t ) ) ) );
-        static StackType_t xPolledQueueProducerStack[ pollqSTACK_SIZE ] __attribute__( ( aligned( pollqSTACK_SIZE * sizeof( StackType_t ) ) ) );
+        static StackType_t xPolledQueueConsumerStack[ pollqSTACK_SIZE ] __attribute__( ( aligned( 32 ) ) );
+        static StackType_t xPolledQueueProducerStack[ pollqSTACK_SIZE ] __attribute__( ( aligned( 32 ) ) );
         TaskParameters_t xvPolledQueueConsumer =
         {
             .pvTaskCode      = vPolledQueueConsumer,
             .pcName          = "QConsNB",
             .usStackDepth    = pollqSTACK_SIZE,
             .pvParameters    = ( void * ) &( xPolledQueue[ 0 ] ),
-            .uxPriority      = uxPriority,
+            .uxPriority      = ( uxPriority | portPRIVILEGE_BIT ),
             .puxStackBuffer  = xPolledQueueConsumerStack,
             .xRegions        =    {
-                                    { ( void * ) &( xPollingConsumerCount[ 0 ] ), pollqSHARED_MEM_SIZE_BYTES,
-                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
-                                    },
-                                    { ( void * ) &( xPolledQueue[ 0 ] ), pollqSHARED_MEM_SIZE_BYTES,
-                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
-                                    },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        }
+                                    { 0, 0, 0 },
+                                    { 0, 0, 0 },
+                                    { 0, 0, 0 },
+                                    { 0, 0, 0 },
+                                    { 0, 0, 0 },
+                                    { 0, 0, 0 },
+                                    { 0, 0, 0 },
+                                    { 0, 0, 0 },
+                                    { 0, 0, 0 },
+                                    { 0, 0, 0 },
+                                    { 0, 0, 0 }
                                 }
         };
 
@@ -142,24 +138,20 @@ void vStartPolledQueueTasks( UBaseType_t uxPriority )
             .pcName          = "QProdNB",
             .usStackDepth    = pollqSTACK_SIZE,
             .pvParameters    = ( void * ) &( xPolledQueue[ 0 ] ),
-            .uxPriority      = uxPriority,
+            .uxPriority      = ( uxPriority | portPRIVILEGE_BIT ),
             .puxStackBuffer  = xPolledQueueProducerStack,
             .xRegions        =    {
-                                    { ( void * ) &( xPollingProducerCount[ 0 ] ), pollqSHARED_MEM_SIZE_BYTES,
-                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
-                                    },
-                                    { ( void * ) &( xPolledQueue[ 0 ] ), pollqSHARED_MEM_SIZE_BYTES,
-                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
-                                    },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        },
-                                    { 0,                0,                    0                                                        }
+                                    { 0, 0, 0 },
+                                    { 0, 0, 0 },
+                                    { 0, 0, 0 },
+                                    { 0, 0, 0 },
+                                    { 0, 0, 0 },
+                                    { 0, 0, 0 },
+                                    { 0, 0, 0 },
+                                    { 0, 0, 0 },
+                                    { 0, 0, 0 },
+                                    { 0, 0, 0 },
+                                    { 0, 0, 0 }
                                 }
         };
 

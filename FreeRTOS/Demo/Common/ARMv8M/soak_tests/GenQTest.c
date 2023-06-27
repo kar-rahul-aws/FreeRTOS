@@ -120,28 +120,28 @@ static void prvTakeTwoMutexesReturnInDifferentOrder( SemaphoreHandle_t xMutex,
 
 /* Flag that will be latched to pdTRUE should any unexpected behaviour be
  * detected in any of the tasks. */
-static volatile BaseType_t xErrorDetected[ genqSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( genqSHARED_MEM_SIZE_BYTES ) ) ) = { pdFALSE };
+static volatile BaseType_t xErrorDetected[ genqSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( 32 ) ) ) = { pdFALSE };
 
 /* Counters that are incremented on each cycle of a test.  This is used to
  * detect a stalled task - a test that is no longer running. */
-static volatile uint32_t ulLoopCounter[ genqSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( genqSHARED_MEM_SIZE_BYTES ) ) ) = { 0 };
-static volatile uint32_t ulLoopCounter2[ genqSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( genqSHARED_MEM_SIZE_BYTES ) ) ) = { 0 };
-static UBaseType_t uxLoopCount[ genqSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( genqSHARED_MEM_SIZE_BYTES ) ) ) = { 0 };
+static volatile uint32_t ulLoopCounter[ genqSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( 32 ) ) ) = { 0 };
+static volatile uint32_t ulLoopCounter2[ genqSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( 32 ) ) ) = { 0 };
+static UBaseType_t uxLoopCount[ genqSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( 32 ) ) ) = { 0 };
 
 /* The variable that is guarded by the mutex in the mutex demo tasks. */
-static volatile uint32_t ulGuardedVariable[ genqSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( genqSHARED_MEM_SIZE_BYTES ) ) ) = { 0 };
+static volatile uint32_t ulGuardedVariable[ genqSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( 32 ) ) ) = { 0 };
 
 /* Handles used in the mutex test to suspend and resume the high and medium
  * priority mutex test tasks. */
 #define HIGH_PRIO_MUTEX_TASK_IDX    0
 #define MED_PRIO_MUTEX_TASK_IDX     1
 #define MED_PRIO_MUTEX_2_TASK_IDX   2
-static TaskHandle_t xLocalTaskHandles[ genqSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( genqSHARED_MEM_SIZE_BYTES ) ) ) = { NULL };
+static TaskHandle_t xLocalTaskHandles[ genqSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( 32 ) ) ) = { NULL };
 
 /* Lets the high priority semaphore task know that its wait for the semaphore
  * was aborted, in which case not being able to obtain the semaphore is not to be
  * considered an error. */
-static volatile BaseType_t xBlockWasAborted[ genqSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( genqSHARED_MEM_SIZE_BYTES ) ) ) = { pdFALSE };
+static volatile BaseType_t xBlockWasAborted[ genqSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( 32 ) ) ) = { pdFALSE };
 
 /*-----------------------------------------------------------*/
 
@@ -150,11 +150,11 @@ void vStartGenericQueueTasks( UBaseType_t uxPriority )
     QueueHandle_t xQueue;
     SemaphoreHandle_t xMutex;
 
-    static StackType_t xLowPriorityMutexTaskStack[ genqMUTEX_TEST_TASK_STACK_SIZE ] __attribute__( ( aligned( genqMUTEX_TEST_TASK_STACK_SIZE * sizeof( StackType_t ) ) ) );
-    static StackType_t xMediumPriorityMutexTaskStack[ configMINIMAL_STACK_SIZE ] __attribute__( ( aligned( configMINIMAL_STACK_SIZE * sizeof( StackType_t ) ) ) );
-    static StackType_t xHighPriorityMutexTaskStack[ genqMUTEX_TEST_TASK_STACK_SIZE ] __attribute__( ( aligned( genqMUTEX_TEST_TASK_STACK_SIZE * sizeof( StackType_t ) ) ) );
-    static StackType_t xHighPriorityMutexTask2Stack[ configMINIMAL_STACK_SIZE ] __attribute__( ( aligned( configMINIMAL_STACK_SIZE * sizeof( StackType_t ) ) ) );
-    static StackType_t xSendFrontAndBackTestStack[ genqGENERIC_QUEUE_TEST_TASK_STACK_SIZE ]__attribute__( ( aligned( genqGENERIC_QUEUE_TEST_TASK_STACK_SIZE * sizeof( StackType_t ) ) ) );
+    static StackType_t xLowPriorityMutexTaskStack[ genqMUTEX_TEST_TASK_STACK_SIZE ] __attribute__( ( aligned( 32 ) ) );
+    static StackType_t xMediumPriorityMutexTaskStack[ configMINIMAL_STACK_SIZE ] __attribute__( ( aligned( 32 ) ) );
+    static StackType_t xHighPriorityMutexTaskStack[ genqMUTEX_TEST_TASK_STACK_SIZE ] __attribute__( ( aligned( 32 ) ) );
+    static StackType_t xHighPriorityMutexTask2Stack[ configMINIMAL_STACK_SIZE ] __attribute__( ( aligned( 32 ) ) );
+    static StackType_t xSendFrontAndBackTestStack[ genqGENERIC_QUEUE_TEST_TASK_STACK_SIZE ]__attribute__( ( aligned( 32 ) ) );
 
     /* Create the queue that we are going to use for the
      * prvSendFrontAndBackTest demo. */
@@ -180,10 +180,10 @@ void vStartGenericQueueTasks( UBaseType_t uxPriority )
                 .puxStackBuffer  = xSendFrontAndBackTestStack,
                 .xRegions        =    {
                                         { ( void * ) &( ulLoopCounter[ 0 ] ), genqSHARED_MEM_SIZE_BYTES,
-                                           ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                           ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                         },
                                         { ( void * ) &( xErrorDetected[ 0 ] ), genqSHARED_MEM_SIZE_BYTES,
-                                           ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                           ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                         },
                                         { 0,                0,                    0                                                        },
                                         { 0,                0,                    0                                                        },
@@ -227,22 +227,22 @@ void vStartGenericQueueTasks( UBaseType_t uxPriority )
             .puxStackBuffer  = xLowPriorityMutexTaskStack,
             .xRegions        =    {
                                     { ( void * ) &( ulLoopCounter2[ 0 ] ),   genqSHARED_MEM_SIZE_BYTES,
-                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                      ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                     },
                                     { ( void * ) &( ulGuardedVariable[ 0 ]), genqSHARED_MEM_SIZE_BYTES,
-                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                      ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                     },
                                     { ( void * ) &( xLocalTaskHandles[ 0 ]), genqSHARED_MEM_SIZE_BYTES,
-                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                      ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                     },
                                     { ( void * ) &( uxLoopCount[ 0 ]), genqSHARED_MEM_SIZE_BYTES,
-                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                      ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                     },
                                     { ( void * ) &( xBlockWasAborted[ 0 ]), genqSHARED_MEM_SIZE_BYTES,
-                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                      ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                     },
                                     { ( void * ) &( xErrorDetected[ 0 ] ), genqSHARED_MEM_SIZE_BYTES,
-                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                      ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                     },
                                     { 0,                0,                    0                                                        },
                                     { 0,                0,                    0                                                        },
@@ -261,7 +261,7 @@ void vStartGenericQueueTasks( UBaseType_t uxPriority )
             .puxStackBuffer  = xMediumPriorityMutexTaskStack,
             .xRegions        =    {
                                     { ( void * ) &( ulGuardedVariable[ 0 ] ), genqSHARED_MEM_SIZE_BYTES,
-                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                      ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                     },
                                     { 0,                0,                    0                                                        },
                                     { 0,                0,                    0                                                        },
@@ -285,10 +285,10 @@ void vStartGenericQueueTasks( UBaseType_t uxPriority )
             .puxStackBuffer  = xHighPriorityMutexTaskStack,
             .xRegions        =    {
                                     { ( void * ) &( xBlockWasAborted[ 0 ] ), genqSHARED_MEM_SIZE_BYTES,
-                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                      ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                     },
                                     { ( void * ) &( xErrorDetected[ 0 ] ), genqSHARED_MEM_SIZE_BYTES,
-                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                      ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                     },
                                     { 0,                0,                    0                                                        },
                                     { 0,                0,                    0                                                        },
@@ -311,10 +311,10 @@ void vStartGenericQueueTasks( UBaseType_t uxPriority )
             .puxStackBuffer  = xHighPriorityMutexTask2Stack,
             .xRegions        =  {
                                     { ( void * ) &( xBlockWasAborted[ 0 ] ), genqSHARED_MEM_SIZE_BYTES,
-                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                      ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                     },
                                     { ( void * ) &( xErrorDetected[ 0 ] ), genqSHARED_MEM_SIZE_BYTES,
-                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                      ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                     },
                                     { 0,                0,                    0                                                        },
                                     { 0,                0,                    0                                                        },

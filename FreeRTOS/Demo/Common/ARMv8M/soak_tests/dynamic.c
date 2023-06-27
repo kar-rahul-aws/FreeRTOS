@@ -125,28 +125,28 @@ static portTASK_FUNCTION_PROTO( vQueueSendWhenSuspendedTask, pvParameters );
  * to the controller task to prevent them having to be file scope. */
 #define CONTINUOUS_INCREMENT_TASK_IDX           ( 0 )
 #define LIMITED_INCREMENT_TASK_IDX              ( 1 )
-static TaskHandle_t xLocalTaskHandles[ dynamicSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( dynamicSHARED_MEM_SIZE_BYTES ) ) ) = { NULL };
+static TaskHandle_t xLocalTaskHandles[ dynamicSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( 32 ) ) ) = { NULL };
 
 /* The shared counter variable.  This is passed in as a parameter to the two
  * counter variables for demonstration purposes. */
-static uint32_t ulCounter[ dynamicSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( dynamicSHARED_MEM_SIZE_BYTES ) ) ) = { 0 };
+static uint32_t ulCounter[ dynamicSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( 32 ) ) ) = { 0 };
 
 /* Variables used to check that the tasks are still operating without error.
  * Each complete iteration of the controller task increments this variable
  * provided no errors have been found.  The variable maintaining the same value
  * is therefore indication of an error. */
-static volatile uint16_t usCheckVariable[ dynamicSHARED_MEM_SIZE_HALF_WORDS ] __attribute__( ( aligned( dynamicSHARED_MEM_SIZE_BYTES ) ) ) = { (uint16_t) 0 };
-static volatile BaseType_t xSuspendedQueueSendError[ dynamicSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( dynamicSHARED_MEM_SIZE_BYTES ) ) ) = { pdFALSE };
-static volatile BaseType_t xSuspendedQueueReceiveError[ dynamicSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( dynamicSHARED_MEM_SIZE_BYTES ) ) ) = { pdFALSE };
+static volatile uint16_t usCheckVariable[ dynamicSHARED_MEM_SIZE_HALF_WORDS ] __attribute__( ( aligned( 32 ) ) ) = { (uint16_t) 0 };
+static volatile BaseType_t xSuspendedQueueSendError[ dynamicSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( 32 ) ) ) = { pdFALSE };
+static volatile BaseType_t xSuspendedQueueReceiveError[ dynamicSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( 32 ) ) ) = { pdFALSE };
 
 /* Queue used by the second test. */
-QueueHandle_t xSuspendedTestQueue[ dynamicSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( dynamicSHARED_MEM_SIZE_BYTES ) ) );
+QueueHandle_t xSuspendedTestQueue[ dynamicSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( 32 ) ) );
 
 /* The value the queue receive task expects to receive next.  This is file
  * scope so xAreDynamicPriorityTasksStillRunning() can ensure it is still
  * incrementing. */
-static uint32_t ulExpectedValue[ dynamicSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( dynamicSHARED_MEM_SIZE_BYTES ) ) ) = { 0 };
-static uint32_t ulValueToSend[ dynamicSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( dynamicSHARED_MEM_SIZE_BYTES ) ) ) = { ( uint32_t ) 0 };
+static uint32_t ulExpectedValue[ dynamicSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( 32 ) ) ) = { 0 };
+static uint32_t ulValueToSend[ dynamicSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( 32 ) ) ) = { ( uint32_t ) 0 };
 
 /*-----------------------------------------------------------*/
 
@@ -156,11 +156,11 @@ static uint32_t ulValueToSend[ dynamicSHARED_MEM_SIZE_WORDS ] __attribute__( ( a
  */
 void vStartDynamicPriorityTasks( void )
 {
-static StackType_t xContinuousIncrementTaskStack[ priSTACK_SIZE ] __attribute__( ( aligned( priSTACK_SIZE * sizeof( StackType_t ) ) ) );
-static StackType_t xLimitedIncrementTaskStack[ priSTACK_SIZE ] __attribute__( ( aligned( priSTACK_SIZE * sizeof( StackType_t ) ) ) );
-static StackType_t xCounterControlTaskStack[ priSUSPENDED_RX_TASK_STACK_SIZE ] __attribute__( ( aligned( priSUSPENDED_RX_TASK_STACK_SIZE * sizeof( StackType_t ) ) ) );
-static StackType_t xQueueSendWhenSuspendedTaskStack[ priSTACK_SIZE ] __attribute__( ( aligned( priSTACK_SIZE * sizeof( StackType_t ) ) ) );
-static StackType_t xQueueReceiveWhenSuspendedTaskStack[ priSUSPENDED_RX_TASK_STACK_SIZE ] __attribute__( ( aligned( priSUSPENDED_RX_TASK_STACK_SIZE * sizeof( StackType_t ) ) ) );
+static StackType_t xContinuousIncrementTaskStack[ priSTACK_SIZE ] __attribute__( ( aligned( 32 ) ) );
+static StackType_t xLimitedIncrementTaskStack[ priSTACK_SIZE ] __attribute__( ( aligned( 32 ) ) );
+static StackType_t xCounterControlTaskStack[ priSUSPENDED_RX_TASK_STACK_SIZE ] __attribute__( ( aligned( 32 ) ) );
+static StackType_t xQueueSendWhenSuspendedTaskStack[ priSTACK_SIZE ] __attribute__( ( aligned( 32 ) ) );
+static StackType_t xQueueReceiveWhenSuspendedTaskStack[ priSUSPENDED_RX_TASK_STACK_SIZE ] __attribute__( ( aligned( 32 ) ) );
 
     xSuspendedTestQueue[ 0 ] = xQueueCreate( priSUSPENDED_QUEUE_LENGTH, sizeof( uint32_t ) );
 
@@ -185,7 +185,7 @@ static StackType_t xQueueReceiveWhenSuspendedTaskStack[ priSUSPENDED_RX_TASK_STA
             .puxStackBuffer  = xContinuousIncrementTaskStack,
             .xRegions        =  {
                                     { ( void * ) &( ulCounter[ 0 ] ), dynamicSHARED_MEM_SIZE_BYTES,
-                                        ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                        ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                     },
                                     { 0,                0,                    0                                                        },
                                     { 0,                0,                    0                                                        },
@@ -209,7 +209,7 @@ static StackType_t xQueueReceiveWhenSuspendedTaskStack[ priSUSPENDED_RX_TASK_STA
             .puxStackBuffer  = xLimitedIncrementTaskStack,
             .xRegions        =  {
                                     { ( void * ) &( ulCounter[ 0 ] ), dynamicSHARED_MEM_SIZE_BYTES,
-                                        ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                        ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                     },
                                     { 0,                0,                    0                                                        },
                                     { 0,                0,                    0                                                        },
@@ -234,13 +234,13 @@ static StackType_t xQueueReceiveWhenSuspendedTaskStack[ priSUSPENDED_RX_TASK_STA
             .puxStackBuffer  = xCounterControlTaskStack,
             .xRegions        =  {
                                     { ( void * ) &( ulCounter[ 0 ] ), dynamicSHARED_MEM_SIZE_BYTES,
-                                        ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                        ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                     },
                                     { ( void * ) &( xLocalTaskHandles[ CONTINUOUS_INCREMENT_TASK_IDX ] ), dynamicSHARED_MEM_SIZE_BYTES,
-                                        ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                        ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                     },
                                     { ( void * ) &( usCheckVariable[ 0 ] ), dynamicSHARED_MEM_SIZE_BYTES,
-                                        ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                        ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                     },
                                     { 0,                0,                    0                                                        },
                                     { 0,                0,                    0                                                        },
@@ -263,13 +263,13 @@ static StackType_t xQueueReceiveWhenSuspendedTaskStack[ priSUSPENDED_RX_TASK_STA
             .puxStackBuffer  = xQueueSendWhenSuspendedTaskStack,
             .xRegions        =  {
                                     { ( void * ) &( xSuspendedTestQueue[ 0 ] ), dynamicSHARED_MEM_SIZE_BYTES,
-                                        ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                        ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                     },
                                     { ( void * ) &( xSuspendedQueueSendError[ 0 ] ), dynamicSHARED_MEM_SIZE_BYTES,
-                                        ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                        ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                     },
                                     { ( void * ) &( ulValueToSend[ 0 ] ), dynamicSHARED_MEM_SIZE_BYTES,
-                                        ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                        ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                     },
                                     { 0,                0,                    0                                                        },
                                     { 0,                0,                    0                                                        },
@@ -292,13 +292,13 @@ static StackType_t xQueueReceiveWhenSuspendedTaskStack[ priSUSPENDED_RX_TASK_STA
             .puxStackBuffer  = xQueueReceiveWhenSuspendedTaskStack,
             .xRegions        =    {
                                     { ( void * ) &( xSuspendedTestQueue[ 0 ] ), dynamicSHARED_MEM_SIZE_BYTES,
-                                        ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                        ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                     },
                                     { ( void * ) &( xSuspendedQueueReceiveError[ 0 ] ), dynamicSHARED_MEM_SIZE_BYTES,
-                                        ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                        ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                     },
                                     { ( void * ) &( ulExpectedValue[ 0 ] ), dynamicSHARED_MEM_SIZE_BYTES,
-                                            ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                            ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                     },
                                     { 0,                0,                    0                                                        },
                                     { 0,                0,                    0                                                        },

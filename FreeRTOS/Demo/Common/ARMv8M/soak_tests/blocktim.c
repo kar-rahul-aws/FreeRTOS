@@ -86,21 +86,21 @@ static void prvBasicDelayTests( void );
 /*-----------------------------------------------------------*/
 
 /* The queue on which the tasks block. */
-static QueueHandle_t xTestQueue[ blocktimerSHARED_MEM_SIZE_WORDS ]  __attribute__( ( aligned( blocktimerSHARED_MEM_SIZE_BYTES ) ) ) = { NULL };
+static QueueHandle_t xTestQueue[ blocktimerSHARED_MEM_SIZE_WORDS ]  __attribute__( ( aligned( 32 ) ) ) = { NULL };
 
 
 /* Handle to the secondary task is required by the primary task for calls
  * to vTaskSuspend/Resume(). */
-static TaskHandle_t xSecondary[ blocktimerSHARED_MEM_SIZE_WORDS ]  __attribute__( ( aligned( blocktimerSHARED_MEM_SIZE_BYTES ) ) ) = { NULL };
+static TaskHandle_t xSecondary[ blocktimerSHARED_MEM_SIZE_WORDS ]  __attribute__( ( aligned( 32 ) ) ) = { NULL };
 
 /* Used to ensure that tasks are still executing without error. */
-static volatile BaseType_t xPrimaryCycles[ blocktimerSHARED_MEM_SIZE_WORDS ]  __attribute__( ( aligned( blocktimerSHARED_MEM_SIZE_BYTES ) ) ) = { 0 };
-static volatile BaseType_t xSecondaryCycles[ blocktimerSHARED_MEM_SIZE_WORDS ]  __attribute__( ( aligned( blocktimerSHARED_MEM_SIZE_BYTES ) ) ) = { 0 };
-static volatile BaseType_t xErrorOccurred[ blocktimerSHARED_MEM_SIZE_WORDS ]  __attribute__( ( aligned( blocktimerSHARED_MEM_SIZE_BYTES ) ) ) = { pdFALSE };
+static volatile BaseType_t xPrimaryCycles[ blocktimerSHARED_MEM_SIZE_WORDS ]  __attribute__( ( aligned( 32 ) ) ) = { 0 };
+static volatile BaseType_t xSecondaryCycles[ blocktimerSHARED_MEM_SIZE_WORDS ]  __attribute__( ( aligned( 32 ) ) ) = { 0 };
+static volatile BaseType_t xErrorOccurred[ blocktimerSHARED_MEM_SIZE_WORDS ]  __attribute__( ( aligned( 32 ) ) ) = { pdFALSE };
 
 /* Provides a simple mechanism for the primary task to know when the
  * secondary task has executed. */
-static volatile UBaseType_t xRunIndicator[ blocktimerSHARED_MEM_SIZE_WORDS ]  __attribute__( ( aligned( blocktimerSHARED_MEM_SIZE_BYTES ) ) ) = { pdFALSE };
+static volatile UBaseType_t xRunIndicator[ blocktimerSHARED_MEM_SIZE_WORDS ]  __attribute__( ( aligned( 32 ) ) ) = { pdFALSE };
 
 /*-----------------------------------------------------------*/
 
@@ -109,8 +109,8 @@ void vCreateBlockTimeTasks( void )
     /* Create the queue on which the two tasks block. */
     xTestQueue[ 0 ] = xQueueCreate( bktQUEUE_LENGTH, sizeof( BaseType_t ) );
 
-    static StackType_t xPrimaryBlockTimeTestTaskStack[ bktBLOCK_TIME_TASK_STACK_SIZE ] __attribute__( ( aligned( bktBLOCK_TIME_TASK_STACK_SIZE * sizeof( StackType_t ) ) ) );
-    static StackType_t xSecondaryBlockTimeTestTaskStack[ bktBLOCK_TIME_TASK_STACK_SIZE ] __attribute__( ( aligned( bktBLOCK_TIME_TASK_STACK_SIZE * sizeof( StackType_t ) ) ) );
+    static StackType_t xPrimaryBlockTimeTestTaskStack[ bktBLOCK_TIME_TASK_STACK_SIZE ] __attribute__( ( aligned( 32 ) ) );
+    static StackType_t xSecondaryBlockTimeTestTaskStack[ bktBLOCK_TIME_TASK_STACK_SIZE ] __attribute__( ( aligned( 32 ) ) );
 
     if( xTestQueue[ 0 ] != NULL )
     {
@@ -135,15 +135,15 @@ void vCreateBlockTimeTasks( void )
             .xRegions       =
             {
                 { ( void * ) &( xTestQueue[ 0 ] ),     blocktimerSHARED_MEM_SIZE_BYTES,
-                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER ) },
+                  ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER ) },
                 { ( void * ) &( xErrorOccurred[ 0 ] ), blocktimerSHARED_MEM_SIZE_BYTES,
-                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER  ) },
+                  ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER  ) },
                 { ( void * ) &( xRunIndicator[ 0 ] ),  blocktimerSHARED_MEM_SIZE_BYTES,
-                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER  ) },
+                  ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER  ) },
                 { ( void * ) &( xSecondary[ 0 ] ),     blocktimerSHARED_MEM_SIZE_BYTES,
-                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER  ) },
+                  ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER  ) },
                 { ( void * ) &( xPrimaryCycles[ 0 ] ), blocktimerSHARED_MEM_SIZE_BYTES,
-                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER  ) },
+                  ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER  ) },
                 { 0,                                   0,                              0  },
                 { 0,                                   0,                              0  },
                 { 0,                                   0,                              0  },
@@ -163,13 +163,13 @@ void vCreateBlockTimeTasks( void )
             .xRegions       =
             {
                 { ( void * ) &( xSecondary[ 0 ] ),       blocktimerSHARED_MEM_SIZE_BYTES,
-                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER ) },
+                  ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER ) },
                 { ( void * ) &( xSecondaryCycles[ 0 ] ), blocktimerSHARED_MEM_SIZE_BYTES,
-                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER ) },
+                  ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER ) },
                 { ( void * ) &( xRunIndicator[ 0 ] ),    blocktimerSHARED_MEM_SIZE_BYTES,
-                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER ) },
+                  ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER ) },
                 { ( void * ) &( xTestQueue[ 0 ] ),       blocktimerSHARED_MEM_SIZE_BYTES,
-                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER ) },
+                  ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER ) },
                 { 0,                                     0,                              0  },
                 { 0,                                     0,                              0  },
                 { 0,                                     0,                              0  },

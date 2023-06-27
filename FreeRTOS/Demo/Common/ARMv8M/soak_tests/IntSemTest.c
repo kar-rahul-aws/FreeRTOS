@@ -146,9 +146,9 @@ void vStartInterruptSemaphoreTasks( void )
     xMasterSlaveMutex[ 0 ] = xSemaphoreCreateMutex();
     configASSERT( xMasterSlaveMutex[ 0 ] );
 
-    static StackType_t xInterruptMutexSlaveTaskStack[ configMINIMAL_STACK_SIZE ] __attribute__( ( aligned( configMINIMAL_STACK_SIZE * sizeof( StackType_t ) ) ) );
-    static StackType_t xInterruptMutexMasterTaskStack[ configMINIMAL_STACK_SIZE ] __attribute__( ( aligned( configMINIMAL_STACK_SIZE * sizeof( StackType_t ) ) ) );
-    static StackType_t xInterruptCountingSemaphoreTaskStack[ configMINIMAL_STACK_SIZE ] __attribute__( ( aligned( configMINIMAL_STACK_SIZE * sizeof( StackType_t ) ) ) );
+    static StackType_t xInterruptMutexSlaveTaskStack[ configMINIMAL_STACK_SIZE ] __attribute__( ( aligned( 32 ) ) );
+    static StackType_t xInterruptMutexMasterTaskStack[ configMINIMAL_STACK_SIZE ] __attribute__( ( aligned( 32 ) ) );
+    static StackType_t xInterruptCountingSemaphoreTaskStack[ configMINIMAL_STACK_SIZE ] __attribute__( ( aligned( 32 ) ) );
 
     TaskParameters_t xInterruptMutexSlaveTaskParameters =
     {
@@ -160,10 +160,10 @@ void vStartInterruptSemaphoreTasks( void )
         .puxStackBuffer  = xInterruptMutexSlaveTaskStack,
         .xRegions        =  {
                                 { ( void * ) &( xMasterSlaveMutex[ 0 ] ), intsSHARED_MEM_SIZE_BYTES,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                  ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                 },
                                 { ( void * ) &( xErrorDetected[ 0 ] ), intsSHARED_MEM_SIZE_BYTES,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                  ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                 },
                                 { 0,                0,                    0                                                        },
                                 { 0,                0,                    0                                                        },
@@ -187,22 +187,22 @@ void vStartInterruptSemaphoreTasks( void )
             .puxStackBuffer    = xInterruptMutexMasterTaskStack,
             .xRegions        =    {
                                     { ( void * ) &( xSlaveHandle[ 0 ] ), intsSHARED_MEM_SIZE_BYTES,
-                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                      ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                     },
                                     { ( void * ) &( ulMasterLoops[ 0 ] ), intsSHARED_MEM_SIZE_BYTES,
-                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                      ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                     },
                                     { ( void * ) &( xOkToGiveMutex[ 0 ] ), intsSHARED_MEM_SIZE_BYTES,
-                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                      ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                     },
                                     { ( void * ) &( xISRMutex[ 0 ] ), intsSHARED_MEM_SIZE_BYTES,
-                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                      ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                     },
                                     { ( void * ) &( xMasterSlaveMutex[ 0 ] ), intsSHARED_MEM_SIZE_BYTES,
-                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                      ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                     },
                                     { ( void * ) &( xErrorDetected[ 0 ] ), intsSHARED_MEM_SIZE_BYTES,
-                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                      ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                     },
                                     { 0,                0,                    0                                                        },
                                     { 0,                0,                    0                                                        },
@@ -222,16 +222,16 @@ void vStartInterruptSemaphoreTasks( void )
             .puxStackBuffer    = xInterruptCountingSemaphoreTaskStack,
             .xRegions        =    {
                                     { ( void * ) &( xOkToGiveCountingSemaphore[ 0 ] ), intsSHARED_MEM_SIZE_BYTES,
-                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                      ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                     },
                                     { ( void * ) &( xErrorDetected[ 0 ] ), intsSHARED_MEM_SIZE_BYTES,
-                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                      ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                     },
                                     { ( void * ) &( xISRCountingSemaphore[ 0 ] ), intsSHARED_MEM_SIZE_BYTES,
-                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                      ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                     },
                                     { ( void * ) &( ulCountingSemaphoreLoops[ 0 ] ), intsSHARED_MEM_SIZE_BYTES,
-                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                      ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                     },
                                     { 0,                0,                    0                                                        },
                                     { 0,                0,                    0                                                        },

@@ -93,7 +93,7 @@
         xQueue = xQueueCreate( setpollQUEUE_LENGTH, sizeof( uint32_t ) );
         xQueueSet[ 0 ] = xQueueCreateSet( setpollQUEUE_LENGTH );
 
-        static StackType_t xQueueSetReceivingTaskStack[ configMINIMAL_STACK_SIZE ]__attribute__( ( aligned( configMINIMAL_STACK_SIZE * sizeof( StackType_t ) ) ) );
+        static StackType_t xQueueSetReceivingTaskStack[ configMINIMAL_STACK_SIZE ]__attribute__( ( aligned( 32 ) ) );
 
         TaskParameters_t xQueueSetReceivingTaskParameters =
                     {
@@ -105,13 +105,13 @@
                         .puxStackBuffer  = xQueueSetReceivingTaskStack,
                         .xRegions        =    {
                                                 { ( void * ) &( xQueueSet[ 0 ] ), qsetPollSHARED_MEM_SIZE_BYTES,
-                                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                                  ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                                 },
                                                 { ( void * ) &( xQueueSetPollStatus[ 0 ] ), qsetPollSHARED_MEM_SIZE_BYTES,
-                                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                                  ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                                 },
                                                 { ( void * ) &( ulCycleCounter[ 0 ] ), qsetPollSHARED_MEM_SIZE_BYTES,
-                                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                                  ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                                 },
                                                 { 0,                0,                    0                                                        },
                                                 { 0,                0,                    0                                                        },

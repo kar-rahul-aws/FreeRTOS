@@ -214,15 +214,15 @@
 /* The task handles are stored so their priorities can be changed. */
 #define SEND_TASK_IDX           ( 0 )
 #define RECEIVE_TASK_IDX        ( 1 )
-static TaskHandle_t xLocalTaskHandles[ qsetSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( qsetSHARED_MEM_SIZE_BYTES ) ) ) = { NULL };
+static TaskHandle_t xLocalTaskHandles[ qsetSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( 32 ) ) ) = { NULL };
 
 /*-----------------------------------------------------------*/
 
     void vStartQueueSetTasks( void )
     {
         /* Create the tasks. */
-        static StackType_t xQueueSetSendingTaskStack[ configMINIMAL_STACK_SIZE ]__attribute__( ( aligned( configMINIMAL_STACK_SIZE * sizeof( StackType_t ) ) ) );
-        static StackType_t xQueueSetRecevingTaskStack[ configMINIMAL_STACK_SIZE ]__attribute__( ( aligned( configMINIMAL_STACK_SIZE * sizeof( StackType_t ) ) ) );
+        static StackType_t xQueueSetSendingTaskStack[ configMINIMAL_STACK_SIZE ]__attribute__( ( aligned( 32 ) ) );
+        static StackType_t xQueueSetRecevingTaskStack[ configMINIMAL_STACK_SIZE ]__attribute__( ( aligned( 32 ) ) );
 
         TaskParameters_t xQueueSetSendingTaskParameters =
         {
@@ -235,25 +235,25 @@ static TaskHandle_t xLocalTaskHandles[ qsetSHARED_MEM_SIZE_WORDS ] __attribute__
             .puxStackBuffer  = xQueueSetSendingTaskStack,
             .xRegions        =    {
                                     { ( void * ) &( uxNextRand[ 0 ] ), qsetSHARED_MEM_SIZE_BYTES,
-                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                      ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                     },
                                     { ( void * ) &( xQueues[ 0 ] ), qsetSHARED_MEM_SIZE_BYTES,
-                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                      ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                     },
                                     { ( void * ) &( ulQueueUsedCounter[ 0 ] ), qsetSHARED_MEM_SIZE_BYTES,
-                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                      ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                     },
                                     { ( void * ) &( xQueueSetTasksStatus[ 0 ] ), qsetSHARED_MEM_SIZE_BYTES,
-                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                      ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                     },
                                     { ( void * ) &( ulLoops[ 0 ] ), qsetSHARED_MEM_SIZE_BYTES,
-                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                      ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                     },
                                     { ( void * ) &( ePriorities[ 0 ] ), qsetSHARED_MEM_SIZE_BYTES,
-                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                      ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                     },
                                     { ( void * ) &( xLocalTaskHandles[ 0 ] ), qsetSHARED_MEM_SIZE_BYTES,
-                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                      ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                     },
                                     { 0,                0,                    0                                                        },
                                     { 0,                0,                    0                                                        },
@@ -272,28 +272,28 @@ static TaskHandle_t xLocalTaskHandles[ qsetSHARED_MEM_SIZE_WORDS ] __attribute__
             .puxStackBuffer  = xQueueSetRecevingTaskStack,
             .xRegions        =    {
                                     { ( void * ) &( xQueueSet[ 0 ] ), qsetSHARED_MEM_SIZE_BYTES,
-                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                      ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                     },
                                     { ( void * ) &( xQueues[ 0 ] ), qsetSHARED_MEM_SIZE_BYTES,
-                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                      ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                     },
                                     { ( void * ) &( xQueueSetTasksStatus[ 0 ] ), qsetSHARED_MEM_SIZE_BYTES,
-                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                      ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                     },
                                     { ( void * ) &( xSetupComplete[ 0 ] ), qsetSHARED_MEM_SIZE_BYTES,
-                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                      ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                     },
                                     { ( void * ) &( xLocalTaskHandles[ 0 ] ), qsetSHARED_MEM_SIZE_BYTES,
-                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                      ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                     },
                                     { ( void * ) &( ulExpectedReceivedFromTask[ 0 ] ), qsetSHARED_MEM_SIZE_BYTES,
-                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                      ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                     },
                                     { ( void * ) &( ulExpectedReceivedFromISR[ 0 ] ), qsetSHARED_MEM_SIZE_BYTES,
-                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                      ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                     },
                                     { ( void * ) &( ulCycleCounter[ 0 ] ), qsetSHARED_MEM_SIZE_BYTES,
-                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                      ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                     },
                                     { 0,                0,                    0                                                        },
                                     { 0,                0,                    0                                                        },

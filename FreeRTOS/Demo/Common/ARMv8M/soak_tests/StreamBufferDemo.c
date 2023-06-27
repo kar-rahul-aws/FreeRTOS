@@ -128,10 +128,10 @@ static void prvInterruptTriggerLevelTest( void * pvParameters );
     static void prvSenderTask( void * pvParameters );
 
     static StaticStreamBuffer_t xStaticStreamBuffers[ sbNUMBER_OF_ECHO_CLIENTS ];
-    static uint32_t ulSenderLoopCounters[ streambufferSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( streambufferSHARED_MEM_SIZE_BYTES ) ) ) = { 0 };
+    static uint32_t ulSenderLoopCounters[ streambufferSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( 32 ) ) ) = { 0 };
     #define RECEIVER_TASK1_IDX 0
     #define RECEIVER_TASK2_IDX 1
-    static TaskHandle_t xReceiverTaskHandles[ streambufferSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( streambufferSHARED_MEM_SIZE_BYTES ) ) ) = { NULL };
+    static TaskHandle_t xReceiverTaskHandles[ streambufferSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( 32 ) ) ) = { NULL };
 #endif /* configSUPPORT_STATIC_ALLOCATION */
 
 /* The +1 is to make the test logic easier as the function that calculates the
@@ -150,60 +150,60 @@ typedef struct ECHO_STREAM_BUFFERS
     StreamBufferHandle_t xEchoClientBuffer;
     StreamBufferHandle_t xEchoServerBuffer;
 } EchoStreamBuffers_t;
-static volatile uint32_t ulEchoLoopCounters[ streambufferSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( streambufferSHARED_MEM_SIZE_BYTES ) ) ) = { 0 };
+static volatile uint32_t ulEchoLoopCounters[ streambufferSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( 32 ) ) ) = { 0 };
 
 /* The non-blocking tasks monitor their operation, and if no errors have been
  * found, increment ulNonBlockingRxCounter.  xAreStreamBufferTasksStillRunning()
  * then checks ulNonBlockingRxCounter and only returns pdPASS if
  * ulNonBlockingRxCounter is still incrementing. */
-static volatile uint32_t ulNonBlockingRxCounter[ streambufferSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( streambufferSHARED_MEM_SIZE_BYTES ) ) ) = { 0 };
+static volatile uint32_t ulNonBlockingRxCounter[ streambufferSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( 32 ) ) ) = { 0 };
 
 /* The task that receives characters from the tick interrupt in order to test
  * different trigger levels monitors its own behaviour.  If it has not detected any
  * error then it increments ulInterruptTriggerCounter to indicate to the check task
  * that it is still operating correctly. */
-static volatile uint32_t ulInterruptTriggerCounter[ streambufferSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( streambufferSHARED_MEM_SIZE_BYTES ) ) ) = { 0UL };
+static volatile uint32_t ulInterruptTriggerCounter[ streambufferSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( 32 ) ) ) = { 0UL };
 
 /* The stream buffer used from the tick interrupt.  This sends one byte at a time
  * to a test task to test the trigger level operation.  The variable is set to NULL
  * in between test runs. */
-static volatile StreamBufferHandle_t xInterruptStreamBuffer[ streambufferSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( streambufferSHARED_MEM_SIZE_BYTES ) ) ) = { NULL };
+static volatile StreamBufferHandle_t xInterruptStreamBuffer[ streambufferSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( 32 ) ) ) = { NULL };
 
 /* The data sent from the tick interrupt to the task that tests the trigger
  * level functionality. */
-static char pcDataSentFromInterrupt[ streambufferSHARED_MEM_SIZE_BYTES ] __attribute__( ( aligned( streambufferSHARED_MEM_SIZE_BYTES ) ) ) = { '\0' };
+static char pcDataSentFromInterrupt[ streambufferSHARED_MEM_SIZE_BYTES ] __attribute__( ( aligned( 32 ) ) ) = { '\0' };
 
 /* Data that is longer than the buffer that is sent to the buffers as a stream
  * of bytes.  Parts of which are written to the stream buffer to test writing
  * different lengths at different offsets, to many bytes, part streams, streams
  * that wrap, etc..  Two messages are defined to ensure left over data is not
  * accidentally read out of the buffer. */
-static char pc55ByteString[ 128 ] __attribute__( ( aligned( 128 ) ) ) = { '\0' };
-static char pc54ByteString[ 128 ] __attribute__( ( aligned( 128 ) ) ) = { '\0' };
+static char pc55ByteString[ 128 ] __attribute__( ( aligned( 32 ) ) ) = { '\0' };
+static char pc54ByteString[ 128 ] __attribute__( ( aligned( 32 ) ) ) = { '\0' };
 
 /* Used to log the status of the tests contained within this file for reporting
  * to a monitoring task ('check' task). */
-static BaseType_t xErrorStatus[ streambufferSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( streambufferSHARED_MEM_SIZE_BYTES ) ) ) = { pdPASS };
+static BaseType_t xErrorStatus[ streambufferSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( 32 ) ) ) = { pdPASS };
 
 #define ECHO_STREAM_BUFFERS_1_IDX 0
 #define ECHO_STREAM_BUFFERS_2_IDX 1
-static EchoStreamBuffers_t xEchoStreamBuffersArray[ streambufferSHARED_MEM_SIZE_DOUBLE_WORDS ] __attribute__( ( aligned( streambufferSHARED_MEM_SIZE_BYTES ) ) ) = { NULL };
+static EchoStreamBuffers_t xEchoStreamBuffersArray[ streambufferSHARED_MEM_SIZE_DOUBLE_WORDS ] __attribute__( ( aligned( 32 ) ) ) = { NULL };
 
 #define ECHO_CLIENT_TASK1_IDX 0
 #define ECHO_CLIENT_TASK2_IDX 1
-static TaskHandle_t xEchoClientTaskHandles[ streambufferSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( streambufferSHARED_MEM_SIZE_BYTES ) ) ) = { NULL };
+static TaskHandle_t xEchoClientTaskHandles[ streambufferSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( 32 ) ) ) = { NULL };
 /*-----------------------------------------------------------*/
 
 void vStartStreamBufferTasks( void )
 {
     StreamBufferHandle_t xStreamBuffer;
-    static StackType_t xEchoServerTask1Stack[ configMINIMAL_STACK_SIZE * 2 ] __attribute__( ( aligned( configMINIMAL_STACK_SIZE * 2 * sizeof( StackType_t ) ) ) );
-    static StackType_t xEchoServerTask2Stack[ configMINIMAL_STACK_SIZE * 2 ] __attribute__( ( aligned( configMINIMAL_STACK_SIZE * 2 * sizeof( StackType_t ) ) ) );
-    static StackType_t xNonBlockingReceiverTaskStack[ configMINIMAL_STACK_SIZE ] __attribute__( ( aligned( configMINIMAL_STACK_SIZE * sizeof( StackType_t ) ) ) );
-    static StackType_t xNonBlockingSenderTaskStack[ configMINIMAL_STACK_SIZE ] __attribute__( ( aligned( configMINIMAL_STACK_SIZE * sizeof( StackType_t ) ) ) );
-    static StackType_t xInterruptTriggerLevelTestStack[ configMINIMAL_STACK_SIZE ] __attribute__( ( aligned( configMINIMAL_STACK_SIZE * sizeof( StackType_t ) ) ) );
-    static StackType_t xEchoClientTask1Stack[ configMINIMAL_STACK_SIZE * 2 ] __attribute__( ( aligned( configMINIMAL_STACK_SIZE * 2 * sizeof( StackType_t ) ) ) );
-    static StackType_t xEchoClientTask2Stack[ configMINIMAL_STACK_SIZE * 2 ] __attribute__( ( aligned( configMINIMAL_STACK_SIZE * 2 * sizeof( StackType_t ) ) ) );
+    static StackType_t xEchoServerTask1Stack[ configMINIMAL_STACK_SIZE * 2 ] __attribute__( ( aligned( 32 ) ) );
+    static StackType_t xEchoServerTask2Stack[ configMINIMAL_STACK_SIZE * 2 ] __attribute__( ( aligned( 32 ) ) );
+    static StackType_t xNonBlockingReceiverTaskStack[ configMINIMAL_STACK_SIZE ] __attribute__( ( aligned( 32 ) ) );
+    static StackType_t xNonBlockingSenderTaskStack[ configMINIMAL_STACK_SIZE ] __attribute__( ( aligned( 32 ) ) );
+    static StackType_t xInterruptTriggerLevelTestStack[ configMINIMAL_STACK_SIZE ] __attribute__( ( aligned( 32 ) ) );
+    static StackType_t xEchoClientTask1Stack[ configMINIMAL_STACK_SIZE * 2 ] __attribute__( ( aligned( 32 ) ) );
+    static StackType_t xEchoClientTask2Stack[ configMINIMAL_STACK_SIZE * 2 ] __attribute__( ( aligned( 32 ) ) );
 
     TaskParameters_t xEchoServerTask1Parameters =
     {
@@ -216,19 +216,19 @@ void vStartStreamBufferTasks( void )
         .puxStackBuffer = xEchoServerTask1Stack,
         .xRegions       = {
                                 { ( void * ) &( xEchoStreamBuffersArray[ 0 ] ), streambufferSHARED_MEM_SIZE_BYTES,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                  ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                 },
                                 { ( void * ) &( xEchoClientTaskHandles[ 0 ] ), streambufferSHARED_MEM_SIZE_BYTES,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                  ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                 },
                                 { ( void * ) &( xErrorStatus[ 0 ] ), streambufferSHARED_MEM_SIZE_BYTES,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                  ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                 },
                                 { ( void * ) &( pc55ByteString[ 0 ] ), 128,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                  ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                 },
                                 { ( void * ) &( pc54ByteString[ 0 ] ), 128,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                  ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                 },
                                 { 0,                0,                    0                                                        },
                                 { 0,                0,                    0                                                        },
@@ -249,19 +249,19 @@ void vStartStreamBufferTasks( void )
         .puxStackBuffer  = xEchoServerTask2Stack,
         .xRegions        = {
                                 { ( void * ) &( xEchoStreamBuffersArray[ 0 ] ), streambufferSHARED_MEM_SIZE_BYTES,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                  ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                 },
                                 { ( void * ) &( xEchoClientTaskHandles[ 0 ] ), streambufferSHARED_MEM_SIZE_BYTES,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                  ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                 },
                                 { ( void * ) &( xErrorStatus[ 0 ] ), streambufferSHARED_MEM_SIZE_BYTES,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                  ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                 },
                                 { ( void * ) &( pc55ByteString[ 0 ] ), 128,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                  ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                 },
                                 { ( void * ) &( pc54ByteString[ 0 ] ), 128,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                  ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                 },
                                 { 0,                0,                    0                                                        },
                                 { 0,                0,                    0                                                        },
@@ -282,10 +282,10 @@ void vStartStreamBufferTasks( void )
         .puxStackBuffer  = xNonBlockingReceiverTaskStack,
         .xRegions        = {
                                 { ( void * ) &( ulNonBlockingRxCounter[ 0 ] ), streambufferSHARED_MEM_SIZE_BYTES,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                  ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                 },
                                 { ( void * ) &( pc54ByteString[ 0 ] ), 128,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                  ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                 },
                                 { 0,                0,                    0                                                        },
                                 { 0,                0,                    0                                                        },
@@ -309,10 +309,10 @@ void vStartStreamBufferTasks( void )
         .puxStackBuffer  = xNonBlockingSenderTaskStack,
         .xRegions        = {
                                 { ( void * ) &( xErrorStatus[ 0 ] ), streambufferSHARED_MEM_SIZE_BYTES,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                  ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                 },
                                 { ( void * ) &( pc54ByteString[ 0 ] ), 128,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                  ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                 },
                                 { 0,                0,                    0                                                        },
                                 { 0,                0,                    0                                                        },
@@ -337,13 +337,13 @@ void vStartStreamBufferTasks( void )
         .puxStackBuffer  = xInterruptTriggerLevelTestStack,
         .xRegions        = {
                                 { ( void * ) &( ulInterruptTriggerCounter[ 0 ] ), streambufferSHARED_MEM_SIZE_BYTES,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                  ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                 },
                                 { ( void * ) &( xInterruptStreamBuffer[ 0 ] ), streambufferSHARED_MEM_SIZE_BYTES,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                  ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                 },
                                 { ( void * ) &( pcDataSentFromInterrupt[ 0 ] ), streambufferSHARED_MEM_SIZE_BYTES,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                  ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                 },
                                 { 0,                0,                    0                                                        },
                                 { 0,                0,                    0                                                        },
@@ -367,13 +367,13 @@ void vStartStreamBufferTasks( void )
         .puxStackBuffer  = xEchoClientTask1Stack,
         .xRegions        = {
                                 { ( void * ) &( xEchoStreamBuffersArray[ 0 ] ), streambufferSHARED_MEM_SIZE_BYTES,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                  ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                 },
                                 { ( void * ) &( ulEchoLoopCounters[ 0 ] ), streambufferSHARED_MEM_SIZE_BYTES,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                  ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                 },
                                 { ( void * ) &( xErrorStatus[ 0 ] ), streambufferSHARED_MEM_SIZE_BYTES,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                  ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                 },
                                 { 0,                0,                    0                                                        },
                                 { 0,                0,                    0                                                        },
@@ -397,13 +397,13 @@ void vStartStreamBufferTasks( void )
         .puxStackBuffer  = xEchoClientTask2Stack,
         .xRegions        = {
                                 { ( void * ) &( xEchoStreamBuffersArray[ 0 ] ), streambufferSHARED_MEM_SIZE_BYTES,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                  ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                 },
                                 { ( void * ) &( ulEchoLoopCounters[ 0 ] ), streambufferSHARED_MEM_SIZE_BYTES,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                  ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                 },
                                 { ( void * ) &( xErrorStatus[ 0 ] ), streambufferSHARED_MEM_SIZE_BYTES,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                  ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                 },
                                 { 0,                0,                    0                                                        },
                                 { 0,                0,                    0                                                        },
@@ -468,10 +468,10 @@ void vStartStreamBufferTasks( void )
     #if ( configSUPPORT_STATIC_ALLOCATION == 1 )
     {
         StreamBufferHandle_t xStreamBufferForStaticTests1, xStreamBufferForStaticTests2;
-        static StackType_t xSenderTask1Stack[ configMINIMAL_STACK_SIZE * 2 ] __attribute__( ( aligned( configMINIMAL_STACK_SIZE * 2 * sizeof( StackType_t ) ) ) );
-        static StackType_t xSenderTask2Stack[ configMINIMAL_STACK_SIZE * 2 ] __attribute__( ( aligned( configMINIMAL_STACK_SIZE * 2 * sizeof( StackType_t ) ) ) );
-        static StackType_t xReceivingTask1Stack[ configMINIMAL_STACK_SIZE * 2 ] __attribute__( ( aligned( configMINIMAL_STACK_SIZE * 2 * sizeof( StackType_t ) ) ) );
-        static StackType_t xReceivingTask2Stack[ configMINIMAL_STACK_SIZE * 2 ] __attribute__( ( aligned( configMINIMAL_STACK_SIZE * 2 * sizeof( StackType_t ) ) ) );
+        static StackType_t xSenderTask1Stack[ configMINIMAL_STACK_SIZE * 2 ] __attribute__( ( aligned( 32 ) ) );
+        static StackType_t xSenderTask2Stack[ configMINIMAL_STACK_SIZE * 2 ] __attribute__( ( aligned( 32 ) ) );
+        static StackType_t xReceivingTask1Stack[ configMINIMAL_STACK_SIZE * 2 ] __attribute__( ( aligned( 32 ) ) );
+        static StackType_t xReceivingTask2Stack[ configMINIMAL_STACK_SIZE * 2 ] __attribute__( ( aligned( 32 ) ) );
 
         TaskParameters_t xSenderTask1Parameters =
         {
@@ -484,19 +484,19 @@ void vStartStreamBufferTasks( void )
             .puxStackBuffer  = xSenderTask1Stack,
             .xRegions        = {
                                     { ( void * ) &( xReceiverTaskHandles[ 0 ] ), streambufferSHARED_MEM_SIZE_BYTES,
-                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                      ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                     },
                                     { ( void * ) &( ulSenderLoopCounters[ 0 ] ), streambufferSHARED_MEM_SIZE_BYTES,
-                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                      ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                     },
                                     { ( void * ) &( xErrorStatus[ 0 ] ), streambufferSHARED_MEM_SIZE_BYTES,
-                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                      ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                     },
                                     { ( void * ) &( pc55ByteString[ 0 ] ), 128,
-                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                      ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                     },
                                     { ( void * ) &( pc54ByteString[ 0 ] ), 128,
-                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                      ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                     },
                                     { 0,                0,                    0                                                        },
                                     { 0,                0,                    0                                                        },
@@ -518,19 +518,19 @@ void vStartStreamBufferTasks( void )
             .puxStackBuffer  = xSenderTask2Stack,
             .xRegions        = {
                                     { ( void * ) &( xReceiverTaskHandles[ 0 ] ), streambufferSHARED_MEM_SIZE_BYTES,
-                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                      ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                     },
                                     { ( void * ) &( ulSenderLoopCounters[ 0 ] ), streambufferSHARED_MEM_SIZE_BYTES,
-                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                      ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                     },
                                     { ( void * ) &( xErrorStatus[ 0 ] ), streambufferSHARED_MEM_SIZE_BYTES,
-                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                      ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                     },
                                     { ( void * ) &( pc55ByteString[ 0 ] ), 128,
-                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                      ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                     },
                                     { ( void * ) &( pc54ByteString[ 0 ] ), 128,
-                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                      ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                     },
                                     { 0,                0,                    0                                                        },
                                     { 0,                0,                    0                                                        },
@@ -551,10 +551,10 @@ void vStartStreamBufferTasks( void )
             .puxStackBuffer = xReceivingTask1Stack,
             .xRegions = {
                                     { ( void * ) &( xErrorStatus[ 0 ] ), streambufferSHARED_MEM_SIZE_BYTES,
-                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                      ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                     },
                                     { ( void * ) &( pc55ByteString[ 0 ] ), 128,
-                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                      ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                     },
                                     { 0,                0,                    0                                                        },
                                     { 0,                0,                    0                                                        },
@@ -578,10 +578,10 @@ void vStartStreamBufferTasks( void )
             .puxStackBuffer = xReceivingTask2Stack,
             .xRegions = {
                                     { ( void * ) &( xErrorStatus[ 0 ] ), streambufferSHARED_MEM_SIZE_BYTES,
-                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                      ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                     },
                                     { ( void * ) &( pc55ByteString[ 0 ] ), 128,
-                                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                      ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                     },
                                     { 0,                0,                    0                                                        },
                                     { 0,                0,                    0                                                        },

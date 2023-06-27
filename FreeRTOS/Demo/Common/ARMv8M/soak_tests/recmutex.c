@@ -97,21 +97,21 @@ static void prvRecursiveMutexBlockingTask( void * pvParameters );
 static void prvRecursiveMutexPollingTask( void * pvParameters );
 
 /* The mutex used by the demo. */
-static SemaphoreHandle_t xMutex[ recmuSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( recmuSHARED_MEM_SIZE_BYTES ) ) ) = { 0 };
+static SemaphoreHandle_t xMutex[ recmuSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( 32 ) ) ) = { 0 };
 
 /* Variables used to detect and latch errors. */
-static volatile BaseType_t xErrorOccurred[ recmuSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( recmuSHARED_MEM_SIZE_BYTES ) ) ) = { pdFALSE };
-static volatile BaseType_t xControllingIsSuspended[ recmuSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( recmuSHARED_MEM_SIZE_BYTES ) ) ) = { pdFALSE };
-static volatile BaseType_t xBlockingIsSuspended[ recmuSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( recmuSHARED_MEM_SIZE_BYTES ) ) ) = { pdFALSE };
-static volatile UBaseType_t uxControllingCycles[ recmuSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( recmuSHARED_MEM_SIZE_BYTES ) ) ) = { 0 };
-static volatile UBaseType_t uxBlockingCycles[ recmuSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( recmuSHARED_MEM_SIZE_BYTES ) ) ) = { 0 };
-static volatile UBaseType_t uxPollingCycles[ recmuSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( recmuSHARED_MEM_SIZE_BYTES ) ) ) = { 0 };
+static volatile BaseType_t xErrorOccurred[ recmuSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( 32 ) ) ) = { pdFALSE };
+static volatile BaseType_t xControllingIsSuspended[ recmuSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( 32 ) ) ) = { pdFALSE };
+static volatile BaseType_t xBlockingIsSuspended[ recmuSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( 32 ) ) ) = { pdFALSE };
+static volatile UBaseType_t uxControllingCycles[ recmuSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( 32 ) ) ) = { 0 };
+static volatile UBaseType_t uxBlockingCycles[ recmuSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( 32 ) ) ) = { 0 };
+static volatile UBaseType_t uxPollingCycles[ recmuSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( 32 ) ) ) = { 0 };
 
 /* Handles of the two higher priority tasks, required so they can be resumed
  * (unsuspended). */
 #define CONTROLLING_TASK_IDX        0
 #define BLOCKING_TASK_IDX           1
-static TaskHandle_t xLocalTaskHandles[ recmuSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( recmuSHARED_MEM_SIZE_BYTES ) ) ) = { NULL };
+static TaskHandle_t xLocalTaskHandles[ recmuSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( 32 ) ) ) = { NULL };
 /*-----------------------------------------------------------*/
 
 void vStartRecursiveMutexTasks( void )
@@ -120,9 +120,9 @@ void vStartRecursiveMutexTasks( void )
 
     xMutex[ 0 ] = xSemaphoreCreateRecursiveMutex();
 
-    static StackType_t xRecursiveMutexControllingTaskStack[ recmuRECURSIVE_MUTEX_TEST_TASK_STACK_SIZE ] __attribute__( ( aligned( recmuRECURSIVE_MUTEX_TEST_TASK_STACK_SIZE * sizeof( StackType_t ) ) ) );
-    static StackType_t xRecursiveMutexBlockingStack[ recmuRECURSIVE_MUTEX_TEST_TASK_STACK_SIZE ] __attribute__( ( aligned( recmuRECURSIVE_MUTEX_TEST_TASK_STACK_SIZE * sizeof( StackType_t ) ) ) );
-    static StackType_t xRecursiveMutexPollingTask[ recmuRECURSIVE_MUTEX_TEST_TASK_STACK_SIZE ] __attribute__( ( aligned( recmuRECURSIVE_MUTEX_TEST_TASK_STACK_SIZE * sizeof( StackType_t ) ) ) );
+    static StackType_t xRecursiveMutexControllingTaskStack[ recmuRECURSIVE_MUTEX_TEST_TASK_STACK_SIZE ] __attribute__( ( aligned( 32 ) ) );
+    static StackType_t xRecursiveMutexBlockingStack[ recmuRECURSIVE_MUTEX_TEST_TASK_STACK_SIZE ] __attribute__( ( aligned( 32 ) ) );
+    static StackType_t xRecursiveMutexPollingTask[ recmuRECURSIVE_MUTEX_TEST_TASK_STACK_SIZE ] __attribute__( ( aligned( 32 ) ) );
 
     TaskParameters_t xRecursiveMutexControllingTaskParameters =
     {
@@ -134,16 +134,16 @@ void vStartRecursiveMutexTasks( void )
         .puxStackBuffer  = xRecursiveMutexControllingTaskStack,
         .xRegions        =  {
                                 { ( void * ) &( uxControllingCycles[ 0 ] ), recmuSHARED_MEM_SIZE_BYTES,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                  ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                 },
                                 { ( void *) &( xMutex[ 0 ] ), recmuSHARED_MEM_SIZE_BYTES,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                  ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                 },
                                 { ( void * ) &( xErrorOccurred[ 0 ] ), recmuSHARED_MEM_SIZE_BYTES,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                  ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                 },
                                 { ( void * ) &( xControllingIsSuspended[ 0 ] ), recmuSHARED_MEM_SIZE_BYTES,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                  ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                 },
                                 {    0,                                        0,                                0 },
                                 {    0,                                        0,                                0 },
@@ -164,22 +164,22 @@ void vStartRecursiveMutexTasks( void )
         .puxStackBuffer  = xRecursiveMutexBlockingStack,
         .xRegions        =  {
                                 { ( void * ) &( uxBlockingCycles[ 0 ] ), recmuSHARED_MEM_SIZE_BYTES,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                  ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                 },
                                 { ( void * ) &( uxControllingCycles[ 0 ] ), recmuSHARED_MEM_SIZE_BYTES,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                  ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                 },
                                 { ( void * ) &( xMutex[ 0 ] ), recmuSHARED_MEM_SIZE_BYTES,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                  ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                 },
                                 { ( void * ) &( xErrorOccurred[ 0 ] ), recmuSHARED_MEM_SIZE_BYTES,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                  ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                 },
                                 { ( void * ) &( xBlockingIsSuspended[ 0 ] ), recmuSHARED_MEM_SIZE_BYTES,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                  ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                 },
                                 { ( void * ) &( xControllingIsSuspended[ 0 ] ), recmuSHARED_MEM_SIZE_BYTES,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                  ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                 },
                                 {    0,                                        0,                                0 },
                                 {    0,                                        0,                                0 },
@@ -198,22 +198,22 @@ void vStartRecursiveMutexTasks( void )
         .puxStackBuffer  = xRecursiveMutexPollingTask,
         .xRegions        =  {
                                 { ( void * ) &( xBlockingIsSuspended[ 0 ] ), recmuSHARED_MEM_SIZE_BYTES,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                  ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                 },
                                 { ( void * ) &( xControllingIsSuspended[ 0 ] ), recmuSHARED_MEM_SIZE_BYTES,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                  ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                 },
                                 { ( void * ) &( xMutex[ 0 ] ), recmuSHARED_MEM_SIZE_BYTES,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                  ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                 },
                                 { ( void * ) &( xErrorOccurred[ 0 ] ), recmuSHARED_MEM_SIZE_BYTES,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                  ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                 },
                                 { ( void * ) &( uxPollingCycles[ 0 ] ), recmuSHARED_MEM_SIZE_BYTES,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                  ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                 },
                                 { ( void * ) &( xLocalTaskHandles[ 0 ] ), recmuSHARED_MEM_SIZE_BYTES,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                  ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                 },
                                 {    0,                                        0,                                0 },
                                 {    0,                                        0,                                0 },

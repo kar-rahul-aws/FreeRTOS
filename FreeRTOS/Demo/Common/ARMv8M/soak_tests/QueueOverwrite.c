@@ -51,7 +51,7 @@ static void prvQueueOverwriteTask( void * pvParameters );
 
 /* Variable that is incremented on each loop of prvQueueOverwriteTask() provided
  * prvQueueOverwriteTask() has not found any errors. */
-static uint32_t ulLoopCounter[ qoSHARED_MEMORY_SIZE_WORDS ] __attribute__( ( aligned( qoSHARED_MEMORY_SIZE_BYTES ) ) ) = {0};
+static uint32_t ulLoopCounter[ qoSHARED_MEMORY_SIZE_WORDS ] __attribute__( ( aligned( 32 ) ) ) = {0};
 
 /* Set to pdFALSE if an error is discovered by the
  * vQueueOverwritePeriodicISRDemo() function. */
@@ -73,7 +73,7 @@ void vStartQueueOverwriteTask( UBaseType_t uxPriority )
 
     /* Create the test task.  The queue used by the test task is created inside
      * the task itself. */
-    static StackType_t xQueueOverwriteTaskStack[ configMINIMAL_STACK_SIZE ] __attribute__( ( aligned( configMINIMAL_STACK_SIZE * sizeof( StackType_t ) ) ) );
+    static StackType_t xQueueOverwriteTaskStack[ configMINIMAL_STACK_SIZE ] __attribute__( ( aligned( 32 ) ) );
     TaskParameters_t xQueueOverwriteTask =
             {
                 .pvTaskCode      = prvQueueOverwriteTask,
@@ -84,7 +84,7 @@ void vStartQueueOverwriteTask( UBaseType_t uxPriority )
                 .puxStackBuffer  = xQueueOverwriteTaskStack,
                 .xRegions        =    {
                                         { ( void * ) &( ulLoopCounter[ 0 ] ), qoSHARED_MEMORY_SIZE_BYTES,
-                                           ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                           ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                         },
                                         { 0,                0,                    0                                                        },
                                         { 0,                0,                    0                                                        },

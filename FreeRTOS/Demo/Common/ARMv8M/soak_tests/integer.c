@@ -61,35 +61,33 @@ static portTASK_FUNCTION_PROTO( vCompeteingIntMathTask, pvParameters );
  * that the task is still executing.  The check task sets the variable back to
  * false, flagging an error if the variable is still false the next time it
  * is called. */
-static BaseType_t xTaskCheck[ intgSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( intgSHARED_MEM_SIZE_BYTES ) ) ) = { ( BaseType_t ) pdFALSE };
+static BaseType_t xTaskCheck[ intgSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( 32 ) ) ) = { ( BaseType_t ) pdFALSE };
 
 /*-----------------------------------------------------------*/
 
 void vStartIntegerMathTasks( UBaseType_t uxPriority )
 {
-    static StackType_t xCompletingIntMathTaskStack[ intgSTACK_SIZE ] __attribute__( ( aligned( intgSTACK_SIZE * sizeof( StackType_t ) ) ) );
+    static StackType_t xCompletingIntMathTaskStack[ intgSTACK_SIZE ] __attribute__( ( aligned( 32 ) ) );
     TaskParameters_t xCompletingIntMathTaskParameters =
     {
         .pvTaskCode      = vCompeteingIntMathTask,
         .pcName          = "IntMath",
         .usStackDepth    = intgSTACK_SIZE,
         .pvParameters    = ( void * ) &( xTaskCheck[ 0 ] ),
-        .uxPriority      = uxPriority,
+        .uxPriority      = ( uxPriority | portPRIVILEGE_BIT ),
         .puxStackBuffer  = xCompletingIntMathTaskStack,
         .xRegions        =    {
-                                { ( void * ) &( xTaskCheck[ 0 ] ), intgSHARED_MEM_SIZE_BYTES,
-                                    ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
-                                },
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        },
-                                { 0,                0,                    0                                                        }
+                                    { 0, 0, 0 },
+                                    { 0, 0, 0 },
+                                    { 0, 0, 0 },
+                                    { 0, 0, 0 },
+                                    { 0, 0, 0 },
+                                    { 0, 0, 0 },
+                                    { 0, 0, 0 },
+                                    { 0, 0, 0 },
+                                    { 0, 0, 0 },
+                                    { 0, 0, 0 },
+                                    { 0, 0, 0 }
                             }
     };
     xTaskCreateRestricted( &( xCompletingIntMathTaskParameters ), NULL );

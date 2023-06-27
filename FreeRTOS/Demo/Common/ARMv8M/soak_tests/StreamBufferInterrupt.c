@@ -61,7 +61,7 @@ static void prvReceivingTask( void * pvParameters );
 /*-----------------------------------------------------------*/
 
 /* The stream buffer that is used to send data from an interrupt to the task. */
-static StreamBufferHandle_t xStreamBuffer[ streambufferSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( streambufferSHARED_MEM_SIZE_BYTES ) ) ) = { NULL };
+static StreamBufferHandle_t xStreamBuffer[ streambufferSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( 32 ) ) ) = { NULL };
 
 /* The string that is sent from the interrupt to the task four bytes at a
  * time.  Must be multiple of 4 bytes long as the ISR sends 4 bytes at a time*/
@@ -69,21 +69,21 @@ static const char * pcStringToSend = "_____Hello FreeRTOS_____";
 
 /* The string to task is looking for, which must be a substring of
  * pcStringToSend. */
-static const char * pcStringToReceive[ streambufferSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( streambufferSHARED_MEM_SIZE_BYTES ) ) ) = { "Hello FreeRTOS" };
+static const char * pcStringToReceive[ streambufferSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( 32 ) ) ) = { "Hello FreeRTOS" };
 
 /* Set to pdFAIL if anything unexpected happens. */
-static BaseType_t xDemoStatus[ streambufferSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( streambufferSHARED_MEM_SIZE_BYTES ) ) ) = { pdPASS };
+static BaseType_t xDemoStatus[ streambufferSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( 32 ) ) ) = { pdPASS };
 
 /* Incremented each time pcStringToReceive is correctly received, provided no
  * errors have occurred.  Used so the check task can check this task is still
  * running as expected. */
-static uint32_t ulCycleCount[ streambufferSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( streambufferSHARED_MEM_SIZE_BYTES ) ) ) = { 0 };;
+static uint32_t ulCycleCount[ streambufferSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( 32 ) ) ) = { 0 };;
 
 /*-----------------------------------------------------------*/
 
 void vStartStreamBufferInterruptDemo( void )
 {
-    static StackType_t xReceivingTaskStack[ configMINIMAL_STACK_SIZE ] __attribute__( ( aligned( configMINIMAL_STACK_SIZE * sizeof( StackType_t ) ) ) );
+    static StackType_t xReceivingTaskStack[ configMINIMAL_STACK_SIZE ] __attribute__( ( aligned( 32 ) ) );
 
     /* Create the stream buffer that sends data from the interrupt to the
      * task, and create the task. */
@@ -101,16 +101,16 @@ void vStartStreamBufferInterruptDemo( void )
         .puxStackBuffer  = xReceivingTaskStack,
         .xRegions        =    {
                                 { ( void * ) &( xDemoStatus[ 0 ] ), streambufferSHARED_MEM_SIZE_BYTES,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                  ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                 },
                                 { ( void * ) &( ulCycleCount[ 0 ] ), streambufferSHARED_MEM_SIZE_BYTES,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                  ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                 },
                                 { ( void * ) &( pcStringToReceive[ 0 ] ), streambufferSHARED_MEM_SIZE_BYTES,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                  ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                 },
                                 { ( void * ) &( xStreamBuffer[ 0 ] ), streambufferSHARED_MEM_SIZE_BYTES,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                  ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                 },
                                 { 0,                0,                    0                                                        },
                                 { 0,                0,                    0                                                        },

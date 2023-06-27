@@ -162,12 +162,12 @@ static void prvSelectiveBitsTestSlaveFunction( void );
 
 /* Variables that are incremented by the tasks on each cycle provided no errors
  * have been found.  Used to detect an error or stall in the test cycling. */
-static volatile uint32_t ulTestMasterCycles[ eventgrpSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( eventgrpSHARED_MEM_SIZE_BYTES ) ) ) = { 0 };
-static volatile uint32_t ulTestSlaveCycles[ eventgrpSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( eventgrpSHARED_MEM_SIZE_BYTES ) ) ) = { 0 };
+static volatile uint32_t ulTestMasterCycles[ eventgrpSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( 32 ) ) ) = { 0 };
+static volatile uint32_t ulTestSlaveCycles[ eventgrpSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( 32 ) ) ) = { 0 };
 static volatile uint32_t ulISRCycles = 0 ;
 
 /* The event group used by all the task based tests. */
-static EventGroupHandle_t xEventGroup[ eventgrpSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( eventgrpSHARED_MEM_SIZE_BYTES ) ) ) = { NULL };
+static EventGroupHandle_t xEventGroup[ eventgrpSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( 32 ) ) ) = { NULL };
 
 /* The event group used by the interrupt based tests. */
 static EventGroupHandle_t xISREventGroup = NULL;
@@ -175,7 +175,7 @@ static EventGroupHandle_t xISREventGroup = NULL;
 /* Handles to the tasks that only take part in the synchronization calls. */
 #define SYNC_TASK_ONE_IDX        ( 0 )
 #define SYNC_TASK_TWO_IDX        ( 1 )
-static TaskHandle_t xSyncTaskHandle[ eventgrpSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( eventgrpSHARED_MEM_SIZE_BYTES ) ) ) = { NULL };
+static TaskHandle_t xSyncTaskHandle[ eventgrpSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( 32 ) ) ) = { NULL };
 
 /*-----------------------------------------------------------*/
 
@@ -193,10 +193,10 @@ void vStartEventGroupTasks( void )
      *
      * Create the test tasks as described at the top of this file.
      */
-    static StackType_t xTestSlaveTaskStack[ ebRENDESVOUS_TEST_TASK_STACK_SIZE ] __attribute__( ( aligned( ebRENDESVOUS_TEST_TASK_STACK_SIZE * sizeof( StackType_t ) ) ) );
-    static StackType_t xTestMasterTaskStack[ ebEVENT_GROUP_SET_BITS_TEST_TASK_STACK_SIZE ] __attribute__( ( aligned( ebEVENT_GROUP_SET_BITS_TEST_TASK_STACK_SIZE * sizeof( StackType_t ) ) ) );
-    static StackType_t xSyncTaskOneStack[ ebRENDESVOUS_TEST_TASK_STACK_SIZE ] __attribute__( ( aligned( ebRENDESVOUS_TEST_TASK_STACK_SIZE * sizeof( StackType_t ) ) ) );
-    static StackType_t xSyncTaskTwoStack[ ebRENDESVOUS_TEST_TASK_STACK_SIZE ] __attribute__( ( aligned( ebRENDESVOUS_TEST_TASK_STACK_SIZE * sizeof( StackType_t ) ) ) );
+    static StackType_t xTestSlaveTaskStack[ ebRENDESVOUS_TEST_TASK_STACK_SIZE ] __attribute__( ( aligned( 32 ) ) );
+    static StackType_t xTestMasterTaskStack[ ebEVENT_GROUP_SET_BITS_TEST_TASK_STACK_SIZE ] __attribute__( ( aligned( 32 ) ) );
+    static StackType_t xSyncTaskOneStack[ ebRENDESVOUS_TEST_TASK_STACK_SIZE ] __attribute__( ( aligned( 32 ) ) );
+    static StackType_t xSyncTaskTwoStack[ ebRENDESVOUS_TEST_TASK_STACK_SIZE ] __attribute__( ( aligned( 32 ) ) );
     TaskHandle_t xTestSlaveTaskHandle;
 
     TaskParameters_t xTestSlaveTaskParams =
@@ -209,10 +209,10 @@ void vStartEventGroupTasks( void )
         .puxStackBuffer  = xTestSlaveTaskStack,
         .xRegions        =  {
                                 { ( void * ) &( xEventGroup[ 0 ] ), eventgrpSHARED_MEM_SIZE_BYTES,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                  ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                 },
                                 { ( void * ) &( ulTestSlaveCycles[ 0 ] ), eventgrpSHARED_MEM_SIZE_BYTES,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                  ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                 },
                                 { 0,                0,                    0                                                        },
                                 { 0,                0,                    0                                                        },
@@ -236,13 +236,13 @@ void vStartEventGroupTasks( void )
         .puxStackBuffer  = xTestMasterTaskStack,
         .xRegions        =  {
                                 { ( void * ) &( xEventGroup[ 0 ] ), eventgrpSHARED_MEM_SIZE_BYTES,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                  ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                 },
                                 { ( void * ) &( xSyncTaskHandle[ SYNC_TASK_ONE_IDX ] ), eventgrpSHARED_MEM_SIZE_BYTES,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                  ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                 },
                                 { ( void * ) &( ulTestMasterCycles[ 0 ] ), eventgrpSHARED_MEM_SIZE_BYTES,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                  ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                 },
                                 { 0,                0,                    0                                                        },
                                 { 0,                0,                    0                                                        },
@@ -264,10 +264,10 @@ void vStartEventGroupTasks( void )
         .puxStackBuffer  = xSyncTaskOneStack,
         .xRegions        =  {
                                 { ( void * ) &( xEventGroup[ 0 ] ), eventgrpSHARED_MEM_SIZE_BYTES,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                  ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                 },
                                 { ( void * ) &( xSyncTaskHandle[ SYNC_TASK_ONE_IDX ] ), eventgrpSHARED_MEM_SIZE_BYTES,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                  ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                 },
                                 { 0,                0,                    0                                                        },
                                 { 0,                0,                    0                                                        },
@@ -290,10 +290,10 @@ void vStartEventGroupTasks( void )
         .puxStackBuffer  = xSyncTaskTwoStack,
         .xRegions        =  {
                                 { ( void * ) &( xEventGroup[ 0 ] ), eventgrpSHARED_MEM_SIZE_BYTES,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                  ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                 },
                                 { ( void * ) &( xSyncTaskHandle[ SYNC_TASK_ONE_IDX ] ), eventgrpSHARED_MEM_SIZE_BYTES,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                  ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                 },
                                 { 0,                0,                    0                                                        },
                                 { 0,                0,                    0                                                        },

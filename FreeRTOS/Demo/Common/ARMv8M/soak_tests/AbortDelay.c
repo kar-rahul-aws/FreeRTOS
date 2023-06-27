@@ -119,14 +119,14 @@
 /*-----------------------------------------------------------*/
 
 /* Used to ensure that tasks are still executing without error. */
-    static volatile BaseType_t xControllingCycles[ abortSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( abortSHARED_MEM_SIZE_BYTES ) ) ) = { 0 };
-    static volatile BaseType_t xBlockingCycles[ abortSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( abortSHARED_MEM_SIZE_BYTES ) ) ) = { 0 };
-    static volatile BaseType_t xErrorOccurred[ abortSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( abortSHARED_MEM_SIZE_BYTES ) ) ) = { pdFALSE };
+    static volatile BaseType_t xControllingCycles[ abortSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( 32 ) ) ) = { 0 };
+    static volatile BaseType_t xBlockingCycles[ abortSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( 32 ) ) ) = { 0 };
+    static volatile BaseType_t xErrorOccurred[ abortSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( 32 ) ) ) = { pdFALSE };
 
 /* Each task needs to know the other tasks handle so they can send signals to
  * each other.  The handle is obtained from the task's name. */
-    static const char * pcControllingTaskName[ abortSHARED_MEM_SIZE_BYTES ] __attribute__( ( aligned( abortSHARED_MEM_SIZE_BYTES ) ) ) = { "AbtCtrl" };
-    static const char * pcBlockingTaskName[ abortSHARED_MEM_SIZE_BYTES ] __attribute__( ( aligned( abortSHARED_MEM_SIZE_BYTES ) ) ) = { "AbtBlk" };
+    static const char * pcControllingTaskName[ abortSHARED_MEM_SIZE_BYTES ] __attribute__( ( aligned( 32 ) ) ) = { "AbtCtrl" };
+    static const char * pcBlockingTaskName[ abortSHARED_MEM_SIZE_BYTES ] __attribute__( ( aligned( 32 ) ) ) = { "AbtBlk" };
 
 /* The maximum amount of time a task will block for. */
     const TickType_t xMaxBlockTime = pdMS_TO_TICKS( 100 );
@@ -143,8 +143,8 @@
     {
         /* Create the two test tasks described above. */
 
-        static StackType_t xControllingTaskStack[ configMINIMAL_STACK_SIZE ] __attribute__( ( aligned( configMINIMAL_STACK_SIZE * sizeof( StackType_t ) ) ) );
-        static StackType_t xBlockingTaskStack[ configMINIMAL_STACK_SIZE ] __attribute__( ( aligned( configMINIMAL_STACK_SIZE * sizeof( StackType_t ) ) ) );
+        static StackType_t xControllingTaskStack[ configMINIMAL_STACK_SIZE ] __attribute__( ( aligned( 32 ) ) );
+        static StackType_t xBlockingTaskStack[ configMINIMAL_STACK_SIZE ] __attribute__( ( aligned( 32 ) ) );
 
         TaskParameters_t xControllingTaskParameters =
         {
@@ -157,13 +157,13 @@
             .puxStackBuffer  = xControllingTaskStack,
             .xRegions        =    {
                                     { ( void * ) &( pcBlockingTaskName[ 0 ] ), abortSHARED_MEM_SIZE_BYTES,
-                                        ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                        ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                     },
                                     { ( void * ) &( xErrorOccurred[ 0 ] ), abortSHARED_MEM_SIZE_BYTES,
-                                        ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                        ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                     },
                                     { ( void * ) &( xControllingCycles[ 0 ] ), abortSHARED_MEM_SIZE_BYTES,
-                                        ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                        ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                     },
                                     { 0,                0,                    0                                                        },
                                     { 0,                0,                    0                                                        },
@@ -186,13 +186,13 @@
             .puxStackBuffer  = xBlockingTaskStack,
             .xRegions        =    {
                                     { ( void * ) &( pcControllingTaskName[ 0 ] ), abortSHARED_MEM_SIZE_BYTES,
-                                        ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                        ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                     },
                                     { ( void * ) &( xBlockingCycles[ 0 ] ), abortSHARED_MEM_SIZE_BYTES,
-                                        ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                        ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                     },
                                     { ( void * ) &( xErrorOccurred[ 0 ] ), abortSHARED_MEM_SIZE_BYTES,
-                                        ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                        ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                     },
                                     { 0,                0,                    0                                                        },
                                     { 0,                0,                    0                                                        },

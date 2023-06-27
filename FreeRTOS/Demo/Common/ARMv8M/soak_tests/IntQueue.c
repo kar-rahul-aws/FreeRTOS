@@ -186,14 +186,14 @@ static volatile UBaseType_t uxValueForNormallyFullQueue[ intqSHARED_MEM_SIZE_WOR
 #define FIRST_HIGH_PRIO_FULL_TASK_IDX           ( 4 )
 #define SECOND_HIGH_PRIO_FULL_TASK_IDX          ( 5 )
 
-static TaskHandle_t xLocalTaskHandles[ intqSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( intqSHARED_MEM_SIZE_BYTES ) ) ) = { NULL };
+static TaskHandle_t xLocalTaskHandles[ intqSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( 32 ) ) ) = { NULL };
 
 /* When a value is received in a queue the value is ticked off in the array
  * the array position of the value is set to a the identifier of the task or
  * interrupt that accessed the queue.  This way missing or duplicate values can be
  * detected. */
-static uint8_t ucNormallyEmptyReceivedValues[ intqSHARED_MEM_SIZE_VALUES_TO_LOG ] __attribute__( ( aligned( intqSHARED_MEM_SIZE_VALUES_TO_LOG ) ) ) = { 0 };
-static uint8_t ucNormallyFullReceivedValues[ intqSHARED_MEM_SIZE_VALUES_TO_LOG ] __attribute__( ( aligned( intqSHARED_MEM_SIZE_VALUES_TO_LOG ) ) ) = { 0 };
+static uint8_t ucNormallyEmptyReceivedValues[ intqSHARED_MEM_SIZE_VALUES_TO_LOG ] __attribute__( ( aligned( 32 ) ) ) = { 0 };
+static uint8_t ucNormallyFullReceivedValues[ intqSHARED_MEM_SIZE_VALUES_TO_LOG ] __attribute__( ( aligned( 32 ) ) ) = { 0 };
 
 /* The test tasks themselves. */
 static void prvLowerPriorityNormallyEmptyTask( void * pvParameters );
@@ -217,12 +217,12 @@ void vStartInterruptQueueTasks( void )
 {
     /* Start the test tasks. */
 
-    static StackType_t x1stHigherPriorityNormallyEmptyTaskStack[ configMINIMAL_STACK_SIZE ]__attribute__( ( aligned( configMINIMAL_STACK_SIZE * sizeof( StackType_t ) ) ) );
-    static StackType_t x2ndHigherPriorityNormallyEmptyTaskStack[ configMINIMAL_STACK_SIZE ]__attribute__( ( aligned( configMINIMAL_STACK_SIZE * sizeof( StackType_t ) ) ) );
-    static StackType_t xLowerPriorityNormallyEmptyTaskStack[ configMINIMAL_STACK_SIZE ]__attribute__( ( aligned( configMINIMAL_STACK_SIZE * sizeof( StackType_t ) ) ) );
-    static StackType_t x1stHigherPriorityNormallyFullTaskStack[ configMINIMAL_STACK_SIZE ]__attribute__( ( aligned( configMINIMAL_STACK_SIZE * sizeof( StackType_t ) ) ) );
-    static StackType_t x2ndHigherPriorityNormallyFullTaskStack[ configMINIMAL_STACK_SIZE ]__attribute__( ( aligned( configMINIMAL_STACK_SIZE * sizeof( StackType_t ) ) ) );
-    static StackType_t xLowerPriorityNormallyFullTaskStack[ configMINIMAL_STACK_SIZE ]__attribute__( ( aligned( configMINIMAL_STACK_SIZE * sizeof( StackType_t ) ) ) );
+    static StackType_t x1stHigherPriorityNormallyEmptyTaskStack[ configMINIMAL_STACK_SIZE ]__attribute__( ( aligned( 32 ) ) );
+    static StackType_t x2ndHigherPriorityNormallyEmptyTaskStack[ configMINIMAL_STACK_SIZE ]__attribute__( ( aligned( 32 ) ) );
+    static StackType_t xLowerPriorityNormallyEmptyTaskStack[ configMINIMAL_STACK_SIZE ]__attribute__( ( aligned( 32 ) ) );
+    static StackType_t x1stHigherPriorityNormallyFullTaskStack[ configMINIMAL_STACK_SIZE ]__attribute__( ( aligned( 32 ) ) );
+    static StackType_t x2ndHigherPriorityNormallyFullTaskStack[ configMINIMAL_STACK_SIZE ]__attribute__( ( aligned( 32 ) ) );
+    static StackType_t xLowerPriorityNormallyFullTaskStack[ configMINIMAL_STACK_SIZE ]__attribute__( ( aligned( 32 ) ) );
 
     TaskParameters_t x1stHigherPriorityNormallyEmptyTaskParameters =
     {
@@ -235,25 +235,25 @@ void vStartInterruptQueueTasks( void )
         .puxStackBuffer  = x1stHigherPriorityNormallyEmptyTaskStack,
         .xRegions        =  {
                                 { ( void * ) &( xNormallyEmptyQueue[ 0 ] ), intqSHARED_MEM_SIZE_BYTES,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                  ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                 },
                                 { ( void * ) &( xErrorStatus[ 0 ] ), intqSHARED_MEM_SIZE_BYTES,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                  ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                 },
                                 { ( void * ) &( xErrorLine[ 0 ] ), intqSHARED_MEM_SIZE_BYTES,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                  ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                 },
                                 { ( void * ) &( ucNormallyEmptyReceivedValues[ 0 ] ), intqSHARED_MEM_SIZE_VALUES_TO_LOG,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                  ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                 },
                                 { ( void * ) &( uxValueForNormallyEmptyQueue[ 0 ] ), intqSHARED_MEM_SIZE_VALUES_TO_LOG,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                  ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                 },
                                 { ( void * ) &( xLocalTaskHandles[ 0 ] ), intqSHARED_MEM_SIZE_VALUES_TO_LOG,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                  ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                 },
                                 { ( void * ) &( uxHighPriorityLoops1[ 0 ] ), intqSHARED_MEM_SIZE_VALUES_TO_LOG,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                  ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                 },
                                 { 0,                0,                    0                                                        },
                                 { 0,                0,                    0                                                        },
@@ -273,25 +273,25 @@ void vStartInterruptQueueTasks( void )
         .puxStackBuffer  = x2ndHigherPriorityNormallyEmptyTaskStack,
         .xRegions        =  {
                                 { ( void * ) &( xNormallyEmptyQueue[ 0 ] ), intqSHARED_MEM_SIZE_BYTES,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                  ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                 },
                                 { ( void * ) &( xErrorStatus[ 0 ] ), intqSHARED_MEM_SIZE_BYTES,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                  ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                 },
                                 { ( void * ) &( xErrorLine[ 0 ] ), intqSHARED_MEM_SIZE_BYTES,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                  ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                 },
                                 { ( void * ) &( ucNormallyEmptyReceivedValues[ 0 ] ), intqSHARED_MEM_SIZE_VALUES_TO_LOG,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                  ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                 },
                                 { ( void * ) &( uxValueForNormallyEmptyQueue[ 0 ] ), intqSHARED_MEM_SIZE_VALUES_TO_LOG,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                  ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                 },
                                 { ( void * ) &( xLocalTaskHandles[ 0 ] ), intqSHARED_MEM_SIZE_VALUES_TO_LOG,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                  ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                 },
                                 { ( void * ) &( uxHighPriorityLoops1[ 0 ] ), intqSHARED_MEM_SIZE_VALUES_TO_LOG,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                  ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                 },
                                 { 0,                0,                    0                                                        },
                                 { 0,                0,                    0                                                        },
@@ -310,19 +310,19 @@ void vStartInterruptQueueTasks( void )
         .puxStackBuffer  = xLowerPriorityNormallyEmptyTaskStack,
         .xRegions        =  {
                                 { ( void * ) &( xNormallyEmptyQueue[ 0 ] ), intqSHARED_MEM_SIZE_BYTES,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                  ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                 },
                                 { ( void * ) &( xLocalTaskHandles[ 0 ] ), intqSHARED_MEM_SIZE_VALUES_TO_LOG,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                  ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                 },
                                 { ( void * ) &( uxLowPriorityLoops1[ 0 ] ), intqSHARED_MEM_SIZE_VALUES_TO_LOG,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                  ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                 },
                                 { ( void * ) &( uxValueForNormallyEmptyQueue[ 0 ] ), intqSHARED_MEM_SIZE_VALUES_TO_LOG,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                  ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                 },
                                 { ( void * ) &( ucNormallyEmptyReceivedValues[ 0 ] ), intqSHARED_MEM_SIZE_VALUES_TO_LOG,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                  ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                 },
                                 { 0,                0,                    0                                                        },
                                 { 0,                0,                    0                                                        },
@@ -343,28 +343,28 @@ void vStartInterruptQueueTasks( void )
         .puxStackBuffer  = x1stHigherPriorityNormallyFullTaskStack,
         .xRegions        =  {
                                 { ( void * ) &( uxValueForNormallyFullQueue[ 0 ] ), intqSHARED_MEM_SIZE_VALUES_TO_LOG,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                  ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                 },
                                 { ( void * ) &( xNormallyFullQueue[ 0 ] ), intqSHARED_MEM_SIZE_BYTES,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                  ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                 },
                                 { ( void * ) &( xLocalTaskHandles[ 0 ] ), intqSHARED_MEM_SIZE_VALUES_TO_LOG,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                  ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                 },
                                 { ( void * ) &( xWasSuspended[ 0 ] ), intqSHARED_MEM_SIZE_VALUES_TO_LOG,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                  ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                 },
                                 { ( void * ) &( ucNormallyFullReceivedValues[ 0 ] ), intqSHARED_MEM_SIZE_VALUES_TO_LOG,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                  ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                 },
                                 { ( void * ) &( uxHighPriorityLoops2[ 0 ] ), intqSHARED_MEM_SIZE_VALUES_TO_LOG,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                  ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                 },
                                 { ( void * ) &( xErrorStatus[ 0 ] ), intqSHARED_MEM_SIZE_BYTES,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                  ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                 },
                                 { ( void * ) &( xErrorLine[ 0 ] ), intqSHARED_MEM_SIZE_BYTES,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                  ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                 },
                                 { 0,                0,                    0                                                        },
                                 { 0,                0,                    0                                                        },
@@ -381,16 +381,16 @@ void vStartInterruptQueueTasks( void )
         .puxStackBuffer  = x2ndHigherPriorityNormallyFullTaskStack,
         .xRegions        =  {
                                 { ( void * ) &( uxValueForNormallyFullQueue[ 0 ] ), intqSHARED_MEM_SIZE_VALUES_TO_LOG,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                  ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                 },
                                 { ( void * ) &( xNormallyFullQueue[ 0 ] ), intqSHARED_MEM_SIZE_BYTES,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                  ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                 },
                                 { ( void * ) &( xWasSuspended[ 0 ] ), intqSHARED_MEM_SIZE_VALUES_TO_LOG,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                  ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                 },
                                 { ( void * ) &( uxValueForNormallyFullQueue[ 0 ] ), intqSHARED_MEM_SIZE_VALUES_TO_LOG,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                  ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                 },
                                 { 0,                0,                    0                                                        },
                                 { 0,                0,                    0                                                        },
@@ -413,22 +413,22 @@ void vStartInterruptQueueTasks( void )
         .puxStackBuffer  = xLowerPriorityNormallyFullTaskStack,
         .xRegions        =  {
                                 { ( void * ) &( xNormallyFullQueue[ 0 ] ), intqSHARED_MEM_SIZE_BYTES,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                  ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                 },
                                 { ( void * ) &( xLocalTaskHandles[ 0 ] ), intqSHARED_MEM_SIZE_VALUES_TO_LOG,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                  ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                 },
                                 { ( void * ) &( uxLowPriorityLoops2[ 0 ] ), intqSHARED_MEM_SIZE_VALUES_TO_LOG,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                  ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                 },
                                 { ( void * ) &( ucNormallyFullReceivedValues[ 0 ] ), intqSHARED_MEM_SIZE_VALUES_TO_LOG,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                  ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                 },
                                 { ( void * ) &( xErrorStatus[ 0 ] ), intqSHARED_MEM_SIZE_BYTES,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                  ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                 },
                                 { ( void * ) &( xErrorLine[ 0 ] ), intqSHARED_MEM_SIZE_BYTES,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                  ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                 },
                                 { 0,                0,                    0                                                        },
                                 { 0,                0,                    0                                                        },

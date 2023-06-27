@@ -68,18 +68,18 @@ static portTASK_FUNCTION_PROTO( vCompetingMathTask4, pvParameters );
 
 /* These variables are used to check that all the tasks are still running.  If a
  * task gets a calculation wrong it will stop setting its check variable. */
-static uint16_t usTaskCheck[ mathSHARED_MEM_SIZE_HALF_WORDS ] __attribute__( ( aligned( mathSHARED_MEM_SIZE_BYTES ) ) ) = { ( uint16_t ) 0 };
+static uint16_t usTaskCheck[ mathSHARED_MEM_SIZE_HALF_WORDS ] __attribute__( ( aligned( 32 ) ) ) = { ( uint16_t ) 0 };
 
-static volatile portDOUBLE xArray1[ mathSHARED_MEM_SIZE_HALF_WORDS ] __attribute__( ( aligned( mathSHARED_MEM_ARRAY_SIZE ) ) ) = { ( portDOUBLE ) 0 };
-static volatile portDOUBLE xArray2[ mathSHARED_MEM_SIZE_HALF_WORDS ] __attribute__( ( aligned( mathSHARED_MEM_ARRAY_SIZE ) ) ) = { ( portDOUBLE ) 0 };
+static volatile portDOUBLE xArray1[ mathSHARED_MEM_SIZE_HALF_WORDS ] __attribute__( ( aligned( 32 ) ) ) = { ( portDOUBLE ) 0 };
+static volatile portDOUBLE xArray2[ mathSHARED_MEM_SIZE_HALF_WORDS ] __attribute__( ( aligned( 32 ) ) ) = { ( portDOUBLE ) 0 };
 /*-----------------------------------------------------------*/
 
 void vStartMathTasks( UBaseType_t uxPriority )
 {
-static StackType_t xCompletingMathTask1Stack[ mathSTACK_SIZE ] __attribute__( ( aligned( mathSTACK_SIZE * sizeof( StackType_t ) ) ) );
-static StackType_t xCompletingMathTask2Stack[ mathSTACK_SIZE ] __attribute__( ( aligned( mathSTACK_SIZE * sizeof( StackType_t ) ) ) );
-static StackType_t xCompletingMathTask3Stack[ mathSTACK_SIZE ] __attribute__( ( aligned( mathSTACK_SIZE * sizeof( StackType_t ) ) ) );
-static StackType_t xCompletingMathTask4Stack[ mathSTACK_SIZE ] __attribute__( ( aligned( mathSTACK_SIZE * sizeof( StackType_t ) ) ) );
+static StackType_t xCompletingMathTask1Stack[ mathSTACK_SIZE ] __attribute__( ( aligned( 32 ) ) );
+static StackType_t xCompletingMathTask2Stack[ mathSTACK_SIZE ] __attribute__( ( aligned( 32 ) ) );
+static StackType_t xCompletingMathTask3Stack[ mathSTACK_SIZE ] __attribute__( ( aligned( 32 ) ) );
+static StackType_t xCompletingMathTask4Stack[ mathSTACK_SIZE ] __attribute__( ( aligned( 32 ) ) );
 
     TaskParameters_t xCompletingMathTask1Parameters =
     {
@@ -91,7 +91,7 @@ static StackType_t xCompletingMathTask4Stack[ mathSTACK_SIZE ] __attribute__( ( 
             .puxStackBuffer  = xCompletingMathTask1Stack,
             .xRegions        =  {
                                     { ( void * ) &( usTaskCheck[ 0 ] ), mathSHARED_MEM_SIZE_BYTES,
-                                        ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                        ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                     },
                                     { 0,                0,                    0                                                        },
                                     { 0,                0,                    0                                                        },
@@ -115,7 +115,7 @@ static StackType_t xCompletingMathTask4Stack[ mathSTACK_SIZE ] __attribute__( ( 
             .puxStackBuffer  = xCompletingMathTask2Stack,
             .xRegions        =  {
                                     { ( void * ) &( usTaskCheck[ 0 ] ), mathSHARED_MEM_SIZE_BYTES,
-                                        ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                        ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                     },
                                     { 0,                0,                    0                                                        },
                                     { 0,                0,                    0                                                        },
@@ -139,10 +139,10 @@ static StackType_t xCompletingMathTask4Stack[ mathSTACK_SIZE ] __attribute__( ( 
             .puxStackBuffer  = xCompletingMathTask3Stack,
             .xRegions        =  {
                                     { ( void * ) &( usTaskCheck[ 0 ] ), mathSHARED_MEM_SIZE_BYTES,
-                                        ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                        ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                     },
                                     { ( void * ) &( xArray1[ 0 ] ), mathSHARED_MEM_ARRAY_SIZE,
-                                        ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                        ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                     },
                                     { 0,                0,                    0                                                        },
                                     { 0,                0,                    0                                                        },
@@ -165,10 +165,10 @@ static StackType_t xCompletingMathTask4Stack[ mathSTACK_SIZE ] __attribute__( ( 
             .puxStackBuffer  = xCompletingMathTask4Stack,
             .xRegions        =  {
                                     { ( void * ) &( usTaskCheck[ 0 ] ), mathSHARED_MEM_SIZE_BYTES,
-                                        ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                        ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                     },
                                     { ( void * ) &( xArray2[ 0 ] ), mathSHARED_MEM_ARRAY_SIZE,
-                                        ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                        ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                     },
                                     { 0,                0,                    0                                                        },
                                     { 0,                0,                    0                                                        },

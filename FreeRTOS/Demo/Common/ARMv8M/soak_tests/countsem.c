@@ -59,7 +59,7 @@
 
 /* Flag that will be latched to pdTRUE should any unexpected behavior be
  * detected in any of the tasks. */
-static volatile BaseType_t xErrorDetected[ countSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( countSHARED_MEM_SIZE_BYTES ) ) ) = { pdFALSE };
+static volatile BaseType_t xErrorDetected[ countSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( 32 ) ) ) = { pdFALSE };
 
 /*-----------------------------------------------------------*/
 
@@ -106,8 +106,8 @@ typedef struct COUNT_SEM_STRUCT
 } xCountSemStruct;
 
 /* Two structures are defined, one is passed to each test task. */
-static xCountSemStruct xParameters1 __attribute__( ( aligned( countSHARED_MEM_SIZE_BYTES ) ) );
-static xCountSemStruct xParameters2 __attribute__( ( aligned( countSHARED_MEM_SIZE_BYTES ) ) );
+static xCountSemStruct xParameters1 __attribute__( ( aligned( 32 ) ) );
+static xCountSemStruct xParameters2 __attribute__( ( aligned( 32 ) ) );
 
 /*-----------------------------------------------------------*/
 
@@ -124,8 +124,8 @@ void vStartCountingSemaphoreTasks( void )
     xParameters2.uxExpectedStartCount = 0;
     xParameters2.uxLoopCounter = 0;
 
-    static StackType_t xCountingSemaphoreTaskStack1[ configMINIMAL_STACK_SIZE ] __attribute__( ( aligned( configMINIMAL_STACK_SIZE * sizeof( StackType_t ) ) ) );
-    static StackType_t xCountingSemaphoreTaskStack2[ configMINIMAL_STACK_SIZE ]__attribute__( ( aligned( configMINIMAL_STACK_SIZE * sizeof( StackType_t ) ) ) );
+    static StackType_t xCountingSemaphoreTaskStack1[ configMINIMAL_STACK_SIZE ] __attribute__( ( aligned( 32 ) ) );
+    static StackType_t xCountingSemaphoreTaskStack2[ configMINIMAL_STACK_SIZE ]__attribute__( ( aligned( 32 ) ) );
 
     TaskParameters_t xCountingSemaphoreTask1 =
     {
@@ -137,10 +137,10 @@ void vStartCountingSemaphoreTasks( void )
         .puxStackBuffer  = xCountingSemaphoreTaskStack1,
         .xRegions        =  {
                                 { ( void * ) &( xErrorDetected[ 0 ] ), countSHARED_MEM_SIZE_BYTES,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                  ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                 },
                                 { &( xParameters1 ), countSHARED_MEM_SIZE_BYTES,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                  ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                 },
                                 { 0,                0,                    0                                                        },
                                 { 0,                0,                    0                                                        },
@@ -163,10 +163,10 @@ void vStartCountingSemaphoreTasks( void )
         .puxStackBuffer  = xCountingSemaphoreTaskStack2,
         .xRegions        =  {
                                 { ( void * ) &( xErrorDetected[ 0 ] ), countSHARED_MEM_SIZE_BYTES,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                  ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                 },
                                 { &( xParameters2 ), countSHARED_MEM_SIZE_BYTES,
-                                  ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                                  ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                                 },
                                 { 0,                0,                    0                                                        },
                                 { 0,                0,                    0                                                        },

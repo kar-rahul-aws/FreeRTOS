@@ -73,13 +73,13 @@ static volatile BaseType_t xErrorDetected = pdFALSE;
 
 /* Counter that is incremented on each cycle of a test.  This is used to
  * detect a stalled task - a test that is no longer running. */
-static volatile uint32_t ulLoopCounter[ qpeekSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( qpeekSHARED_MEM_SIZE_BYTES ) ) ) = { 0 };
+static volatile uint32_t ulLoopCounter[ qpeekSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( 32 ) ) ) = { 0 };
 
 /* Handles to the test tasks. */
 #define qpeekMED_PRIO_TASK_IDX      0
 #define qpeekHIGH_PRIO_TASK_IDX     1
 #define qpeekHIGHEST_PRIO_TASK_IDX  2
-static TaskHandle_t xQPeekLocalTaskHandles[ qpeekSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( qpeekSHARED_MEM_SIZE_BYTES ) ) );
+static TaskHandle_t xQPeekLocalTaskHandles[ qpeekSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( 32 ) ) );
 /*-----------------------------------------------------------*/
 
 void vStartQueuePeekTasks( void )
@@ -103,10 +103,10 @@ void vStartQueuePeekTasks( void )
          * passing the queue handle by value so it does not matter that it is declared
          * on the stack here. */
 
-        static StackType_t xLowPriorityPeekTaskStack[ configMINIMAL_STACK_SIZE ] __attribute__( ( aligned( configMINIMAL_STACK_SIZE * sizeof( StackType_t ) ) ) );
-        static StackType_t xMediumPriorityPeekTaskStack[ configMINIMAL_STACK_SIZE ] __attribute__( ( aligned( configMINIMAL_STACK_SIZE * sizeof( StackType_t ) ) ) );
-        static StackType_t xHighPriorityPeekTaskStack[ configMINIMAL_STACK_SIZE ] __attribute__( ( aligned( configMINIMAL_STACK_SIZE * sizeof( StackType_t ) ) ) );
-        static StackType_t xHighestPriorityPeekTaskStack[ configMINIMAL_STACK_SIZE ] __attribute__( ( aligned( configMINIMAL_STACK_SIZE * sizeof( StackType_t ) ) ) );
+        static StackType_t xLowPriorityPeekTaskStack[ configMINIMAL_STACK_SIZE ] __attribute__( ( aligned( 32 ) ) );
+        static StackType_t xMediumPriorityPeekTaskStack[ configMINIMAL_STACK_SIZE ] __attribute__( ( aligned( 32 ) ) );
+        static StackType_t xHighPriorityPeekTaskStack[ configMINIMAL_STACK_SIZE ] __attribute__( ( aligned( 32 ) ) );
+        static StackType_t xHighestPriorityPeekTaskStack[ configMINIMAL_STACK_SIZE ] __attribute__( ( aligned( 32 ) ) );
 
 
         TaskParameters_t xMediumPriorityPeekTaskParameters =
@@ -119,7 +119,7 @@ void vStartQueuePeekTasks( void )
             .puxStackBuffer  = xMediumPriorityPeekTaskStack,
             .xRegions        =    {
                     { ( void * ) &( ulLoopCounter[ 0 ] ), qpeekSHARED_MEM_SIZE_BYTES,
-                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                      ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                     },
                     { 0,                0,                    0                                                        },
                     { 0,                0,                    0                                                        },
@@ -190,7 +190,7 @@ void vStartQueuePeekTasks( void )
             .puxStackBuffer  = xLowPriorityPeekTaskStack,
             .xRegions        =    {
                     { ( void * ) &( xQPeekLocalTaskHandles[ 0 ] ), qpeekSHARED_MEM_SIZE_BYTES,
-                      ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
+                      ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER )
                     },
                     { 0,                0,                    0                                                        },
                     { 0,                0,                    0                                                        },

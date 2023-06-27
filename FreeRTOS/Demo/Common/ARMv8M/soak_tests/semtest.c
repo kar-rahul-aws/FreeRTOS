@@ -85,12 +85,12 @@ typedef struct SEMAPHORE_PARAMETERS
 } xSemaphoreParameters;
 
 /* Variables used to check that all the tasks are still running without errors. */
-static volatile short sCheckVariables[ semqSHARED_MEM_SIZE_HALF_WORDS ] __attribute__( ( aligned( semqSHARED_MEM_SIZE_BYTES ) ) ) = { 0 };
-static volatile short sNextCheckVariable[ semqSHARED_MEM_SIZE_HALF_WORDS ] __attribute__( ( aligned( semqSHARED_MEM_SIZE_BYTES ) ) ) = { 0 };
-static volatile uint32_t sSharedVariable[ semqSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( semqSHARED_MEM_SIZE_BYTES ) ) ) = { 0 };
+static volatile short sCheckVariables[ semqSHARED_MEM_SIZE_HALF_WORDS ] __attribute__( ( aligned( 32 ) ) ) = { 0 };
+static volatile short sNextCheckVariable[ semqSHARED_MEM_SIZE_HALF_WORDS ] __attribute__( ( aligned( 32 ) ) ) = { 0 };
+static volatile uint32_t sSharedVariable[ semqSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( 32 ) ) ) = { 0 };
 
-static xSemaphoreParameters xSemaphoreParameters1 __attribute__( ( aligned( semqSHARED_MEM_SIZE_BYTES ) ) );
-static xSemaphoreParameters xSemaphoreParameters2 __attribute__( ( aligned( semqSHARED_MEM_SIZE_BYTES ) ) );
+static xSemaphoreParameters xSemaphoreParameters1 __attribute__( ( aligned( 32 ) ) );
+static xSemaphoreParameters xSemaphoreParameters2 __attribute__( ( aligned( 32 ) ) );
 
 /*-----------------------------------------------------------*/
 
@@ -102,10 +102,10 @@ void vStartSemaphoreTasks( UBaseType_t uxPriority )
     /* Create the structure used to pass parameters to the first two tasks. */
     pxFirstSemaphoreParameters = &( xSemaphoreParameters1 );
 
-    static StackType_t xSemesterTest1Stack[ semtstSTACK_SIZE ] __attribute__( ( aligned( semtstSTACK_SIZE * sizeof( StackType_t ) ) ) );
-    static StackType_t xSemesterTest2Stack[ semtstSTACK_SIZE ] __attribute__( ( aligned( semtstSTACK_SIZE * sizeof( StackType_t ) ) ) );
-    static StackType_t xSemesterTest3Stack[ semtstSTACK_SIZE ] __attribute__( ( aligned( semtstSTACK_SIZE * sizeof( StackType_t ) ) ) );
-    static StackType_t xSemesterTest4Stack[ semtstSTACK_SIZE ] __attribute__( ( aligned( semtstSTACK_SIZE * sizeof( StackType_t ) ) ) );
+    static StackType_t xSemesterTest1Stack[ semtstSTACK_SIZE ] __attribute__( ( aligned( 32 ) ) );
+    static StackType_t xSemesterTest2Stack[ semtstSTACK_SIZE ] __attribute__( ( aligned( 32 ) ) );
+    static StackType_t xSemesterTest3Stack[ semtstSTACK_SIZE ] __attribute__( ( aligned( 32 ) ) );
+    static StackType_t xSemesterTest4Stack[ semtstSTACK_SIZE ] __attribute__( ( aligned( 32 ) ) );
 
     if( pxFirstSemaphoreParameters != NULL )
     {
@@ -132,28 +132,20 @@ void vStartSemaphoreTasks( UBaseType_t uxPriority )
                 .pcName          = "PolSEM1",
                 .usStackDepth    = semtstSTACK_SIZE,
                 .pvParameters    = ( void * ) pxFirstSemaphoreParameters,
-                .uxPriority      = tskIDLE_PRIORITY,
+                .uxPriority      = ( tskIDLE_PRIORITY | portPRIVILEGE_BIT ),
                 .puxStackBuffer  = xSemesterTest1Stack,
                 .xRegions        =  {
-                                        { ( void * ) &( sCheckVariables[ 0 ] ), semqSHARED_MEM_SIZE_BYTES,
-                                          ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
-                                        },
-                                        { ( void * ) &( sNextCheckVariable[ 0 ] ), semqSHARED_MEM_SIZE_BYTES,
-                                          ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
-                                        },
-                                        { &( xSemaphoreParameters1 ), semqSHARED_MEM_SIZE_BYTES,
-                                          ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
-                                        },
-                                        { ( void * ) &( sSharedVariable[ 0 ] ), semqSHARED_MEM_SIZE_BYTES,
-                                          ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
-                                        },
-                                        { 0,                0,                    0                                                        },
-                                        { 0,                0,                    0                                                        },
-                                        { 0,                0,                    0                                                        },
-                                        { 0,                0,                    0                                                        },
-                                        { 0,                0,                    0                                                        },
-                                        { 0,                0,                    0                                                        },
-                                        { 0,                0,                    0                                                        }
+                                        { 0, 0, 0 },
+                                        { 0, 0, 0 },
+                                        { 0, 0, 0 },
+                                        { 0, 0, 0 },
+                                        { 0, 0, 0 },
+                                        { 0, 0, 0 },
+                                        { 0, 0, 0 },
+                                        { 0, 0, 0 },
+                                        { 0, 0, 0 },
+                                        { 0, 0, 0 },
+                                        { 0, 0, 0 }
                                     }
             };
             TaskParameters_t xSemaphoreTest2Parameters =
@@ -162,28 +154,20 @@ void vStartSemaphoreTasks( UBaseType_t uxPriority )
                 .pcName          = "PolSEM2",
                 .usStackDepth    = semtstSTACK_SIZE,
                 .pvParameters    = ( void * ) pxFirstSemaphoreParameters,
-                .uxPriority      = tskIDLE_PRIORITY,
+                .uxPriority      = ( tskIDLE_PRIORITY | portPRIVILEGE_BIT ),
                 .puxStackBuffer  = xSemesterTest2Stack,
                 .xRegions        =  {
-                                        { ( void * ) &( sCheckVariables[ 0 ] ), semqSHARED_MEM_SIZE_BYTES,
-                                          ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
-                                        },
-                                        { ( void * ) &( sNextCheckVariable[ 0 ] ), semqSHARED_MEM_SIZE_BYTES,
-                                          ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
-                                        },
-                                        { &( xSemaphoreParameters1 ), semqSHARED_MEM_SIZE_BYTES,
-                                          ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
-                                        },
-                                        { ( void * ) &( sSharedVariable[ 0 ] ), semqSHARED_MEM_SIZE_BYTES,
-                                          ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
-                                        },
-                                        { 0,                0,                    0                                                        },
-                                        { 0,                0,                    0                                                        },
-                                        { 0,                0,                    0                                                        },
-                                        { 0,                0,                    0                                                        },
-                                        { 0,                0,                    0                                                        },
-                                        { 0,                0,                    0                                                        },
-                                        { 0,                0,                    0                                                        }
+                                        { 0, 0, 0 },
+                                        { 0, 0, 0 },
+                                        { 0, 0, 0 },
+                                        { 0, 0, 0 },
+                                        { 0, 0, 0 },
+                                        { 0, 0, 0 },
+                                        { 0, 0, 0 },
+                                        { 0, 0, 0 },
+                                        { 0, 0, 0 },
+                                        { 0, 0, 0 },
+                                        { 0, 0, 0 }
                                     }
             };
 
@@ -222,29 +206,21 @@ void vStartSemaphoreTasks( UBaseType_t uxPriority )
                 .pcName          = "BlkSEM1",
                 .usStackDepth    = semtstSTACK_SIZE,
                 .pvParameters    = ( void * ) pxSecondSemaphoreParameters,
-                .uxPriority      = tskIDLE_PRIORITY,
+                .uxPriority      = ( tskIDLE_PRIORITY | portPRIVILEGE_BIT ),
                 .puxStackBuffer  = xSemesterTest3Stack,
                 .xRegions        =  {
-                                            { ( void * ) &( sCheckVariables[ 0 ] ), semqSHARED_MEM_SIZE_BYTES,
-                                              ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
-                                            },
-                                            { ( void * ) &( sNextCheckVariable[ 0 ] ), semqSHARED_MEM_SIZE_BYTES,
-                                              ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
-                                            },
-                                            { &( xSemaphoreParameters2 ), semqSHARED_MEM_SIZE_BYTES,
-                                              ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
-                                            },
-                                            { ( void * ) &( sSharedVariable[ 0 ] ), semqSHARED_MEM_SIZE_BYTES,
-                                              ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
-                                            },
-                                            { 0,                0,                    0                                                        },
-                                            { 0,                0,                    0                                                        },
-                                            { 0,                0,                    0                                                        },
-                                            { 0,                0,                    0                                                        },
-                                            { 0,                0,                    0                                                        },
-                                            { 0,                0,                    0                                                        },
-                                            { 0,                0,                    0                                                        }
-                                        }
+                                        { 0, 0, 0 },
+                                        { 0, 0, 0 },
+                                        { 0, 0, 0 },
+                                        { 0, 0, 0 },
+                                        { 0, 0, 0 },
+                                        { 0, 0, 0 },
+                                        { 0, 0, 0 },
+                                        { 0, 0, 0 },
+                                        { 0, 0, 0 },
+                                        { 0, 0, 0 },
+                                        { 0, 0, 0 }
+                                    }
             };
             TaskParameters_t xSemaphoreTest4Parameters =
             {
@@ -252,28 +228,20 @@ void vStartSemaphoreTasks( UBaseType_t uxPriority )
                 .pcName          = "BlkSEM2",
                 .usStackDepth    = semtstSTACK_SIZE,
                 .pvParameters    = ( void * ) pxSecondSemaphoreParameters,
-                .uxPriority      = tskIDLE_PRIORITY,
+                .uxPriority      = ( tskIDLE_PRIORITY | portPRIVILEGE_BIT ),
                 .puxStackBuffer  = xSemesterTest4Stack,
                 .xRegions        =  {
-                                        { ( void * ) &( sCheckVariables[ 0 ] ), semqSHARED_MEM_SIZE_BYTES,
-                                          ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
-                                        },
-                                        { ( void * ) &( sNextCheckVariable[ 0 ] ), semqSHARED_MEM_SIZE_BYTES,
-                                          ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
-                                        },
-                                        { &( xSemaphoreParameters2 ), semqSHARED_MEM_SIZE_BYTES,
-                                          ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
-                                        },
-                                        { ( void * ) &( sSharedVariable[ 0 ] ), semqSHARED_MEM_SIZE_BYTES,
-                                          ( portMPU_REGION_READ_WRITE | portMPU_REGION_EXECUTE_NEVER )
-                                        },
-                                        { 0,                0,                    0                                                        },
-                                        { 0,                0,                    0                                                        },
-                                        { 0,                0,                    0                                                        },
-                                        { 0,                0,                    0                                                        },
-                                        { 0,                0,                    0                                                        },
-                                        { 0,                0,                    0                                                        },
-                                        { 0,                0,                    0                                                        }
+                                        { 0, 0, 0 },
+                                        { 0, 0, 0 },
+                                        { 0, 0, 0 },
+                                        { 0, 0, 0 },
+                                        { 0, 0, 0 },
+                                        { 0, 0, 0 },
+                                        { 0, 0, 0 },
+                                        { 0, 0, 0 },
+                                        { 0, 0, 0 },
+                                        { 0, 0, 0 },
+                                        { 0, 0, 0 }
                                     }
             };
 
