@@ -1,0 +1,4379 @@
+	.text
+	.syntax unified
+	.eabi_attribute	67, "2.09"	@ Tag_conformance
+	.eabi_attribute	6, 16	@ Tag_CPU_arch
+	.eabi_attribute	7, 77	@ Tag_CPU_arch_profile
+	.eabi_attribute	8, 0	@ Tag_ARM_ISA_use
+	.eabi_attribute	9, 3	@ Tag_THUMB_ISA_use
+	.eabi_attribute	34, 0	@ Tag_CPU_unaligned_access
+	.eabi_attribute	17, 1	@ Tag_ABI_PCS_GOT_use
+	.eabi_attribute	20, 2	@ Tag_ABI_FP_denormal
+	.eabi_attribute	21, 0	@ Tag_ABI_FP_exceptions
+	.eabi_attribute	23, 1	@ Tag_ABI_FP_number_model
+	.eabi_attribute	24, 1	@ Tag_ABI_align_needed
+	.eabi_attribute	25, 1	@ Tag_ABI_align_preserved
+	.eabi_attribute	38, 1	@ Tag_ABI_FP_16bit_format
+	.eabi_attribute	18, 4	@ Tag_ABI_PCS_wchar_t
+	.eabi_attribute	26, 2	@ Tag_ABI_enum_size
+	.eabi_attribute	14, 0	@ Tag_ABI_PCS_R9_use
+	.file	"TaskNotify.c"
+	.file	1 "C:\\Keil_v5\\ARM\\ARMCLANG\\Bin\\..\\include" "stdint.h"
+	.file	2 "C:\\Users\\karahulx\\Downloads\\Kernel\\FreeRTOS\\FreeRTOS\\Demo\\CORTEX_MPU_M23_Nuvoton_NuMaker_PFM_M2351_IAR_GCC\\Projects_NTZ\\Keil" "../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/portmacrocommon.h"
+	.file	3 "C:\\Users\\karahulx\\Downloads\\Kernel\\FreeRTOS\\FreeRTOS\\Demo\\CORTEX_MPU_M23_Nuvoton_NuMaker_PFM_M2351_IAR_GCC\\Projects_NTZ\\Keil" "../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c"
+	.file	4 "C:\\Users\\karahulx\\Downloads\\Kernel\\FreeRTOS\\FreeRTOS\\Demo\\CORTEX_MPU_M23_Nuvoton_NuMaker_PFM_M2351_IAR_GCC\\Projects_NTZ\\Keil" "../../../../Source/include/task.h"
+	.file	5 "C:\\Keil_v5\\ARM\\ARMCLANG\\Bin\\..\\include" "stddef.h"
+	.file	6 "C:\\Users\\karahulx\\Downloads\\Kernel\\FreeRTOS\\FreeRTOS\\Demo\\CORTEX_MPU_M23_Nuvoton_NuMaker_PFM_M2351_IAR_GCC\\Projects_NTZ\\Keil" "../../../../Source/include\\timers.h"
+	.section	.text.vStartTaskNotifyTask,"ax",%progbits
+	.hidden	vStartTaskNotifyTask            @ -- Begin function vStartTaskNotifyTask
+	.globl	vStartTaskNotifyTask
+	.p2align	1
+	.type	vStartTaskNotifyTask,%function
+	.code	16                              @ @vStartTaskNotifyTask
+	.thumb_func
+vStartTaskNotifyTask:
+.Lfunc_begin0:
+	.loc	3 117 0                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:117:0
+	.fnstart
+	.cfi_sections .debug_frame
+	.cfi_startproc
+@ %bb.0:
+	.save	{r4, r5, r6, lr}
+	push	{r4, r5, r6, lr}
+	.cfi_def_cfa_offset 16
+	.cfi_offset lr, -4
+	.cfi_offset r6, -8
+	.cfi_offset r5, -12
+	.cfi_offset r4, -16
+	.pad	#80
+	sub	sp, #80
+	.cfi_def_cfa_offset 96
+	movs	r0, #9
+.Ltmp0:
+	.loc	3 120 22 prologue_end           @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:120:22
+	str	r0, [sp, #8]                    @ 4-byte Spill
+	str	r0, [sp, #76]
+	.loc	3 122 22                        @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:122:22
+	movw	r2, :lower16:.L__const.vStartTaskNotifyTask.xNotifiedTask
+	movt	r2, :upper16:.L__const.vStartTaskNotifyTask.xNotifiedTask
+	add	r0, sp, #12
+	mov	r1, r0
+	ldm	r2!, {r3, r4, r5, r6}
+	stm	r1!, {r3, r4, r5, r6}
+	ldm	r2!, {r3, r4, r5, r6}
+	stm	r1!, {r3, r4, r5, r6}
+	ldm	r2!, {r3, r4, r5, r6}
+	stm	r1!, {r3, r4, r5, r6}
+	ldm	r2!, {r3, r4, r5, r6}
+	stm	r1!, {r3, r4, r5, r6}
+	.loc	3 137 5                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:137:5
+	movw	r1, :lower16:xTaskToNotify
+	movt	r1, :upper16:xTaskToNotify
+	bl	xTaskCreateRestricted
+	ldr	r1, [sp, #8]                    @ 4-byte Reload
+	.loc	3 139 21                        @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:139:21
+	movw	r2, :lower16:uxNextRand
+	movt	r2, :upper16:uxNextRand
+	movw	r0, :lower16:prvRand
+	movt	r0, :upper16:prvRand
+	str	r0, [r2]
+	.loc	3 141 19                        @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:141:19
+	movw	r0, :lower16:prvNotifyingTimer
+	movt	r0, :upper16:prvNotifyingTimer
+	str	r0, [sp]
+	movw	r0, :lower16:.L.str.1
+	movt	r0, :upper16:.L.str.1
+	movs	r3, #0
+	mov	r2, r3
+	bl	xTimerCreate
+	mov	r1, r0
+	.loc	3 141 17 is_stmt 0              @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:141:17
+	movw	r0, :lower16:xTimer
+	movt	r0, :upper16:xTimer
+	str	r1, [r0]
+.Ltmp1:
+	.loc	3 142 5 is_stmt 1               @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:142:5
+	ldr	r0, [r0]
+.Ltmp2:
+	.loc	3 142 5 is_stmt 0               @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:142:5
+	cbnz	r0, .LBB0_3
+	b	.LBB0_1
+.LBB0_1:
+.Ltmp3:
+	.loc	3 142 5                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:142:5
+	@APP
+	cpsid i
+	@NO_APP
+	b	.LBB0_2
+.LBB0_2:                                @ =>This Inner Loop Header: Depth=1
+.Ltmp4:
+	.loc	3 142 5                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:142:5
+	b	.LBB0_2
+.Ltmp5:
+.LBB0_3:
+	.loc	3 143 19 is_stmt 1              @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:143:19
+	movw	r0, :lower16:prvSuspendedTaskTimerTestCallback
+	movt	r0, :upper16:prvSuspendedTaskTimerTestCallback
+	str	r0, [sp]
+	movw	r0, :lower16:.L.str.2
+	movt	r0, :upper16:.L.str.2
+	movs	r1, #5
+	movs	r3, #0
+	mov	r2, r3
+	bl	xTimerCreate
+	mov	r1, r0
+	.loc	3 143 17 is_stmt 0              @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:143:17
+	movw	r0, :lower16:xTimer
+	movt	r0, :upper16:xTimer
+	str	r1, [r0, #4]
+.Ltmp6:
+	.loc	3 144 5 is_stmt 1               @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:144:5
+	ldr	r0, [r0, #4]
+.Ltmp7:
+	.loc	3 144 5 is_stmt 0               @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:144:5
+	cbnz	r0, .LBB0_6
+	b	.LBB0_4
+.LBB0_4:
+.Ltmp8:
+	.loc	3 144 5                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:144:5
+	@APP
+	cpsid i
+	@NO_APP
+	b	.LBB0_5
+.LBB0_5:                                @ =>This Inner Loop Header: Depth=1
+.Ltmp9:
+	.loc	3 144 5                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:144:5
+	b	.LBB0_5
+.Ltmp10:
+.LBB0_6:
+	.loc	3 145 1 is_stmt 1               @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:145:1
+	add	sp, #80
+	pop	{r4, r5, r6, pc}
+.Ltmp11:
+.Lfunc_end0:
+	.size	vStartTaskNotifyTask, .Lfunc_end0-vStartTaskNotifyTask
+	.cfi_endproc
+	.cantunwind
+	.fnend
+                                        @ -- End function
+	.section	.text.prvNotifiedTask,"ax",%progbits
+	.p2align	1                               @ -- Begin function prvNotifiedTask
+	.type	prvNotifiedTask,%function
+	.code	16                              @ @prvNotifiedTask
+	.thumb_func
+prvNotifiedTask:
+.Lfunc_begin1:
+	.loc	3 549 0                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:549:0
+	.fnstart
+	.cfi_startproc
+@ %bb.0:
+	.save	{r4, lr}
+	push	{r4, lr}
+	.cfi_def_cfa_offset 8
+	.cfi_offset lr, -4
+	.cfi_offset r4, -8
+	.pad	#48
+	sub	sp, #48
+	.cfi_def_cfa_offset 56
+	str	r0, [sp, #44]
+	movs	r0, #9
+.Ltmp12:
+	.loc	3 550 22 prologue_end           @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:550:22
+	str	r0, [sp, #40]
+	movs	r0, #1
+	.loc	3 550 56 is_stmt 0              @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:550:56
+	str	r0, [sp, #36]
+	movs	r0, #0
+	.loc	3 550 90                        @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:550:90
+	str	r0, [sp, #20]                   @ 4-byte Spill
+	str	r0, [sp, #32]
+	movs	r0, #50
+	.loc	3 552 20 is_stmt 1              @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:552:20
+	str	r0, [sp, #24]
+	.loc	3 559 5                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:559:5
+	bl	prvSingleTaskTests
+	ldr	r0, [sp, #20]                   @ 4-byte Reload
+	.loc	3 562 17                        @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:562:17
+	movw	r1, :lower16:xTimer
+	movt	r1, :upper16:xTimer
+	mvns	r0, r0
+	str	r0, [r1, #8]
+	.loc	3 564 5                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:564:5
+	b	.LBB1_1
+.LBB1_1:                                @ =>This Inner Loop Header: Depth=1
+.Ltmp13:
+	.loc	3 569 19                        @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:569:19
+	bl	prvRand
+	movs	r1, #9
+	.loc	3 569 29 is_stmt 0              @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:569:29
+	udiv	r2, r0, r1
+	muls	r1, r2, r1
+	subs	r0, r0, r1
+	.loc	3 569 17                        @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:569:17
+	str	r0, [sp, #28]
+.Ltmp14:
+	.loc	3 571 13 is_stmt 1              @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:571:13
+	ldr	r0, [sp, #28]
+.Ltmp15:
+	.loc	3 571 13 is_stmt 0              @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:571:13
+	cbnz	r0, .LBB1_3
+	b	.LBB1_2
+.LBB1_2:                                @   in Loop: Header=BB1_1 Depth=1
+	.loc	3 0 13                          @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:0:13
+	movs	r0, #1
+.Ltmp16:
+	.loc	3 573 21 is_stmt 1              @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:573:21
+	str	r0, [sp, #28]
+	.loc	3 574 9                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:574:9
+	b	.LBB1_3
+.Ltmp17:
+.LBB1_3:                                @   in Loop: Header=BB1_1 Depth=1
+	.loc	3 577 9                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:577:9
+	movw	r0, :lower16:xTimer
+	movt	r0, :upper16:xTimer
+	ldr	r0, [r0]
+	ldr	r2, [sp, #28]
+	movs	r3, #0
+	mvns	r1, r3
+	str	r1, [sp]
+	movs	r1, #4
+	bl	MPU_xTimerGenericCommand
+	.loc	3 582 19                        @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:582:19
+	bl	prvRand
+	movs	r1, #9
+	.loc	3 582 29 is_stmt 0              @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:582:29
+	udiv	r2, r0, r1
+	muls	r1, r2, r1
+	subs	r0, r0, r1
+	.loc	3 582 17                        @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:582:17
+	str	r0, [sp, #28]
+.Ltmp18:
+	.loc	3 584 13 is_stmt 1              @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:584:13
+	ldr	r0, [sp, #28]
+.Ltmp19:
+	.loc	3 584 13 is_stmt 0              @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:584:13
+	cbnz	r0, .LBB1_5
+	b	.LBB1_4
+.LBB1_4:                                @   in Loop: Header=BB1_1 Depth=1
+	.loc	3 0 13                          @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:0:13
+	movs	r0, #1
+.Ltmp20:
+	.loc	3 586 21 is_stmt 1              @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:586:21
+	str	r0, [sp, #28]
+	.loc	3 587 9                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:587:9
+	b	.LBB1_5
+.Ltmp21:
+.LBB1_5:                                @   in Loop: Header=BB1_1 Depth=1
+	.loc	3 592 13                        @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:592:13
+	ldr	r2, [sp, #28]
+	movs	r1, #0
+	mov	r0, r1
+	bl	MPU_ulTaskGenericNotifyTake
+.Ltmp22:
+	.loc	3 592 13 is_stmt 0              @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:592:13
+	cbz	r0, .LBB1_7
+	b	.LBB1_6
+.LBB1_6:                                @   in Loop: Header=BB1_1 Depth=1
+.Ltmp23:
+	.loc	3 594 46 is_stmt 1              @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:594:46
+	movw	r1, :lower16:ulTimerNotificationsReceived
+	movt	r1, :upper16:ulTimerNotificationsReceived
+	ldr	r0, [r1]
+	adds	r0, r0, #1
+	str	r0, [r1]
+	.loc	3 595 9                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:595:9
+	b	.LBB1_7
+.Ltmp24:
+.LBB1_7:                                @   in Loop: Header=BB1_1 Depth=1
+	.loc	3 0 9 is_stmt 0                 @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:0:9
+	movs	r2, #0
+.Ltmp25:
+	.loc	3 599 13 is_stmt 1              @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:599:13
+	mov	r0, r2
+	mov	r1, r2
+	bl	MPU_ulTaskGenericNotifyTake
+.Ltmp26:
+	.loc	3 599 13 is_stmt 0              @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:599:13
+	cbz	r0, .LBB1_9
+	b	.LBB1_8
+.LBB1_8:                                @   in Loop: Header=BB1_1 Depth=1
+.Ltmp27:
+	.loc	3 601 46 is_stmt 1              @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:601:46
+	movw	r1, :lower16:ulTimerNotificationsReceived
+	movt	r1, :upper16:ulTimerNotificationsReceived
+	ldr	r0, [r1]
+	adds	r0, r0, #1
+	str	r0, [r1]
+	.loc	3 602 9                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:602:9
+	b	.LBB1_9
+.Ltmp28:
+.LBB1_9:                                @   in Loop: Header=BB1_1 Depth=1
+	.loc	3 608 46                        @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:608:46
+	ldr	r2, [sp, #28]
+	movs	r0, #0
+	movs	r1, #1
+	str	r1, [sp, #16]                   @ 4-byte Spill
+	bl	MPU_ulTaskGenericNotifyTake
+	ldr	r1, [sp, #16]                   @ 4-byte Reload
+	mov	r3, r0
+	.loc	3 608 43 is_stmt 0              @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:608:43
+	movw	r2, :lower16:ulTimerNotificationsReceived
+	movt	r2, :upper16:ulTimerNotificationsReceived
+	ldr	r0, [r2]
+	adds	r0, r0, r3
+	str	r0, [r2]
+.Ltmp29:
+	.loc	3 615 15 is_stmt 1              @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:615:15
+	movw	r0, :lower16:ulNotifyCycleCount
+	movt	r0, :upper16:ulNotifyCycleCount
+	ldr	r2, [r0]
+	movw	r0, #23593
+	movt	r0, #49807
+.Ltmp30:
+	.loc	3 615 13 is_stmt 0              @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:615:13
+	muls	r0, r2, r0
+	rors	r0, r1
+	movw	r1, #47185
+	movt	r1, #1310
+	cmp	r0, r1
+	bhi	.LBB1_11
+	b	.LBB1_10
+.LBB1_10:                               @   in Loop: Header=BB1_1 Depth=1
+.Ltmp31:
+	.loc	3 617 31 is_stmt 1              @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:617:31
+	movw	r0, :lower16:xTaskToNotify
+	movt	r0, :upper16:xTaskToNotify
+	str	r0, [sp, #12]                   @ 4-byte Spill
+	ldr	r0, [r0]
+	movs	r1, #4
+	.loc	3 617 13 is_stmt 0              @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:617:13
+	bl	MPU_vTaskPrioritySet
+	movs	r0, #0
+	str	r0, [sp, #8]                    @ 4-byte Spill
+	mvns	r2, r0
+	movs	r1, #1
+	.loc	3 621 50 is_stmt 1              @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:621:50
+	bl	MPU_ulTaskGenericNotifyTake
+	ldr	r1, [sp, #8]                    @ 4-byte Reload
+	mov	r4, r0
+	.loc	3 621 47 is_stmt 0              @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:621:47
+	ldr	r0, [sp, #12]                   @ 4-byte Reload
+	movw	r3, :lower16:ulTimerNotificationsReceived
+	movt	r3, :upper16:ulTimerNotificationsReceived
+	ldr	r2, [r3]
+	adds	r2, r2, r4
+	str	r2, [r3]
+	.loc	3 624 31 is_stmt 1              @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:624:31
+	ldr	r0, [r0]
+	.loc	3 624 13 is_stmt 0              @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:624:13
+	bl	MPU_vTaskPrioritySet
+	.loc	3 625 9 is_stmt 1               @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:625:9
+	b	.LBB1_12
+.Ltmp32:
+.LBB1_11:                               @   in Loop: Header=BB1_1 Depth=1
+	.loc	3 0 9 is_stmt 0                 @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:0:9
+	movs	r0, #0
+	mvns	r2, r0
+	movs	r1, #1
+.Ltmp33:
+	.loc	3 630 50 is_stmt 1              @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:630:50
+	bl	MPU_ulTaskGenericNotifyTake
+	mov	r2, r0
+	.loc	3 630 47 is_stmt 0              @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:630:47
+	movw	r1, :lower16:ulTimerNotificationsReceived
+	movt	r1, :upper16:ulTimerNotificationsReceived
+	ldr	r0, [r1]
+	adds	r0, r0, r2
+	str	r0, [r1]
+	b	.LBB1_12
+.Ltmp34:
+.LBB1_12:                               @   in Loop: Header=BB1_1 Depth=1
+	.loc	3 634 32 is_stmt 1              @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:634:32
+	movw	r1, :lower16:ulNotifyCycleCount
+	movt	r1, :upper16:ulNotifyCycleCount
+	ldr	r0, [r1]
+	adds	r0, r0, #1
+	str	r0, [r1]
+.Ltmp35:
+	.loc	3 564 5                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:564:5
+	b	.LBB1_1
+.Ltmp36:
+.Lfunc_end1:
+	.size	prvNotifiedTask, .Lfunc_end1-prvNotifiedTask
+	.cfi_endproc
+	.cantunwind
+	.fnend
+                                        @ -- End function
+	.section	.text.prvRand,"ax",%progbits
+	.p2align	1                               @ -- Begin function prvRand
+	.type	prvRand,%function
+	.code	16                              @ @prvRand
+	.thumb_func
+prvRand:
+.Lfunc_begin2:
+	.loc	3 726 0                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:726:0
+	.fnstart
+	.cfi_startproc
+@ %bb.0:
+	.pad	#8
+	sub	sp, #8
+	.cfi_def_cfa_offset 8
+	movw	r1, #20021
+	movt	r1, #346
+.Ltmp37:
+	.loc	3 727 18 prologue_end           @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:727:18
+	str	r1, [sp, #4]
+	movs	r0, #1
+	.loc	3 727 56 is_stmt 0              @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:727:56
+	str	r0, [sp]
+	.loc	3 730 40 is_stmt 1              @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:730:40
+	movw	r0, :lower16:uxNextRand
+	movt	r0, :upper16:uxNextRand
+	ldr	r2, [r0]
+	.loc	3 730 38 is_stmt 0              @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:730:38
+	muls	r1, r2, r1
+	.loc	3 730 58                        @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:730:58
+	adds	r1, r1, #1
+	.loc	3 730 21                        @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:730:21
+	str	r1, [r0]
+	.loc	3 731 15 is_stmt 1              @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:731:15
+	ldrh	r0, [r0, #2]
+	movw	r1, #32767
+	.loc	3 731 39 is_stmt 0              @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:731:39
+	ands	r0, r1
+	.loc	3 731 5                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:731:5
+	add	sp, #8
+	bx	lr
+.Ltmp38:
+.Lfunc_end2:
+	.size	prvRand, .Lfunc_end2-prvRand
+	.cfi_endproc
+	.cantunwind
+	.fnend
+                                        @ -- End function
+	.section	.text.prvNotifyingTimer,"ax",%progbits
+	.p2align	1                               @ -- Begin function prvNotifyingTimer
+	.type	prvNotifyingTimer,%function
+	.code	16                              @ @prvNotifyingTimer
+	.thumb_func
+prvNotifyingTimer:
+.Lfunc_begin3:
+	.loc	3 534 0 is_stmt 1               @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:534:0
+	.fnstart
+	.cfi_startproc
+@ %bb.0:
+	.save	{r7, lr}
+	push	{r7, lr}
+	.cfi_def_cfa_offset 8
+	.cfi_offset lr, -4
+	.cfi_offset r7, -8
+	.pad	#8
+	sub	sp, #8
+	.cfi_def_cfa_offset 16
+	str	r0, [sp, #4]
+.Ltmp39:
+	.loc	3 537 5 prologue_end            @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:537:5
+	movw	r0, :lower16:xTaskToNotify
+	movt	r0, :upper16:xTaskToNotify
+	ldr	r0, [r0]
+	movs	r2, #0
+	str	r2, [sp]
+	movs	r3, #2
+	mov	r1, r2
+	bl	MPU_xTaskGenericNotify
+	.loc	3 540 5                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:540:5
+	bl	vPortEnterCritical
+.Ltmp40:
+	.loc	3 542 38                        @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:542:38
+	movw	r1, :lower16:ulTimerNotificationsSent
+	movt	r1, :upper16:ulTimerNotificationsSent
+	ldr	r0, [r1]
+	adds	r0, r0, #1
+	str	r0, [r1]
+.Ltmp41:
+	.loc	3 544 5                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:544:5
+	bl	vPortExitCritical
+	.loc	3 545 1                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:545:1
+	add	sp, #8
+	pop	{r7, pc}
+.Ltmp42:
+.Lfunc_end3:
+	.size	prvNotifyingTimer, .Lfunc_end3-prvNotifyingTimer
+	.cfi_endproc
+	.cantunwind
+	.fnend
+                                        @ -- End function
+	.section	.text.prvSuspendedTaskTimerTestCallback,"ax",%progbits
+	.p2align	1                               @ -- Begin function prvSuspendedTaskTimerTestCallback
+	.type	prvSuspendedTaskTimerTestCallback,%function
+	.code	16                              @ @prvSuspendedTaskTimerTestCallback
+	.thumb_func
+prvSuspendedTaskTimerTestCallback:
+.Lfunc_begin4:
+	.loc	3 497 0                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:497:0
+	.fnstart
+	.cfi_startproc
+@ %bb.0:
+	.save	{r7, lr}
+	push	{r7, lr}
+	.cfi_def_cfa_offset 8
+	.cfi_offset lr, -4
+	.cfi_offset r7, -8
+	.pad	#16
+	sub	sp, #16
+	.cfi_def_cfa_offset 24
+	str	r0, [sp, #12]
+.Ltmp43:
+	.loc	3 508 9 prologue_end            @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:508:9
+	movw	r0, :lower16:prvSuspendedTaskTimerTestCallback.ulCallCount
+	movt	r0, :upper16:prvSuspendedTaskTimerTestCallback.ulCallCount
+	ldr	r0, [r0]
+.Ltmp44:
+	.loc	3 508 9 is_stmt 0               @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:508:9
+	cbnz	r0, .LBB4_5
+	b	.LBB4_1
+.LBB4_1:
+.Ltmp45:
+	.loc	3 510 23 is_stmt 1              @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:510:23
+	movw	r0, :lower16:xTaskToNotify
+	movt	r0, :upper16:xTaskToNotify
+	str	r0, [sp, #8]                    @ 4-byte Spill
+	ldr	r0, [r0]
+	.loc	3 510 9 is_stmt 0               @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:510:9
+	bl	MPU_vTaskSuspend
+	ldr	r0, [sp, #8]                    @ 4-byte Reload
+.Ltmp46:
+	.loc	3 511 9 is_stmt 1               @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:511:9
+	ldr	r0, [r0]
+	bl	MPU_eTaskGetState
+.Ltmp47:
+	.loc	3 511 9 is_stmt 0               @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:511:9
+	cmp	r0, #3
+	beq	.LBB4_4
+	b	.LBB4_2
+.LBB4_2:
+.Ltmp48:
+	.loc	3 511 9                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:511:9
+	@APP
+	cpsid i
+	@NO_APP
+	b	.LBB4_3
+.LBB4_3:                                @ =>This Inner Loop Header: Depth=1
+.Ltmp49:
+	.loc	3 511 9                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:511:9
+	b	.LBB4_3
+.Ltmp50:
+.LBB4_4:
+	.loc	3 512 22 is_stmt 1              @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:512:22
+	movw	r0, :lower16:xTaskToNotify
+	movt	r0, :upper16:xTaskToNotify
+	ldr	r0, [r0]
+	.loc	3 512 9 is_stmt 0               @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:512:9
+	bl	MPU_vTaskResume
+	.loc	3 513 5 is_stmt 1               @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:513:5
+	b	.LBB4_9
+.Ltmp51:
+.LBB4_5:
+	.loc	3 516 23                        @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:516:23
+	movw	r0, :lower16:xTaskToNotify
+	movt	r0, :upper16:xTaskToNotify
+	str	r0, [sp, #4]                    @ 4-byte Spill
+	ldr	r0, [r0]
+	.loc	3 516 9 is_stmt 0               @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:516:9
+	bl	MPU_vTaskSuspend
+	ldr	r0, [sp, #4]                    @ 4-byte Reload
+	.loc	3 521 9 is_stmt 1               @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:521:9
+	ldr	r0, [r0]
+	movw	r1, :lower16:prvSuspendedTaskTimerTestCallback.ulCallCount
+	movt	r1, :upper16:prvSuspendedTaskTimerTestCallback.ulCallCount
+	ldr	r2, [r1]
+	movs	r1, #0
+	str	r1, [sp]
+	movs	r3, #3
+	bl	MPU_xTaskGenericNotify
+                                        @ kill: def $r1 killed $r0
+.Ltmp52:
+	.loc	3 524 9                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:524:9
+	ldr	r0, [sp, #4]                    @ 4-byte Reload
+	ldr	r0, [r0]
+	bl	MPU_eTaskGetState
+.Ltmp53:
+	.loc	3 524 9 is_stmt 0               @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:524:9
+	cmp	r0, #3
+	beq	.LBB4_8
+	b	.LBB4_6
+.LBB4_6:
+.Ltmp54:
+	.loc	3 524 9                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:524:9
+	@APP
+	cpsid i
+	@NO_APP
+	b	.LBB4_7
+.LBB4_7:                                @ =>This Inner Loop Header: Depth=1
+.Ltmp55:
+	.loc	3 524 9                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:524:9
+	b	.LBB4_7
+.Ltmp56:
+.LBB4_8:
+	.loc	3 526 22 is_stmt 1              @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:526:22
+	movw	r0, :lower16:xTaskToNotify
+	movt	r0, :upper16:xTaskToNotify
+	ldr	r0, [r0]
+	.loc	3 526 9 is_stmt 0               @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:526:9
+	bl	MPU_vTaskResume
+	b	.LBB4_9
+.Ltmp57:
+.LBB4_9:
+	.loc	3 529 16 is_stmt 1              @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:529:16
+	movw	r1, :lower16:prvSuspendedTaskTimerTestCallback.ulCallCount
+	movt	r1, :upper16:prvSuspendedTaskTimerTestCallback.ulCallCount
+	ldr	r0, [r1]
+	adds	r0, r0, #1
+	str	r0, [r1]
+	.loc	3 530 1                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:530:1
+	add	sp, #16
+	pop	{r7, pc}
+.Ltmp58:
+.Lfunc_end4:
+	.size	prvSuspendedTaskTimerTestCallback, .Lfunc_end4-prvSuspendedTaskTimerTestCallback
+	.cfi_endproc
+	.cantunwind
+	.fnend
+                                        @ -- End function
+	.section	.text.xNotifyTaskFromISR,"ax",%progbits
+	.hidden	xNotifyTaskFromISR              @ -- Begin function xNotifyTaskFromISR
+	.globl	xNotifyTaskFromISR
+	.p2align	1
+	.type	xNotifyTaskFromISR,%function
+	.code	16                              @ @xNotifyTaskFromISR
+	.thumb_func
+xNotifyTaskFromISR:
+.Lfunc_begin5:
+	.loc	3 640 0                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:640:0
+	.fnstart
+	.cfi_startproc
+@ %bb.0:
+	.save	{r7, lr}
+	push	{r7, lr}
+	.cfi_def_cfa_offset 8
+	.cfi_offset lr, -4
+	.cfi_offset r7, -8
+	.pad	#24
+	sub	sp, #24
+	.cfi_def_cfa_offset 32
+	movs	r0, #5
+.Ltmp59:
+	.loc	3 642 22 prologue_end           @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:642:22
+	str	r0, [sp, #20]
+	movs	r0, #255
+	.loc	3 644 20                        @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:644:20
+	str	r0, [sp, #12]
+.Ltmp60:
+	.loc	3 647 5                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:647:5
+	movw	r0, :lower16:xTaskToNotify
+	movt	r0, :upper16:xTaskToNotify
+	ldr	r0, [r0]
+.Ltmp61:
+	.loc	3 647 5 is_stmt 0               @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:647:5
+	cbnz	r0, .LBB5_3
+	b	.LBB5_1
+.LBB5_1:
+.Ltmp62:
+	.loc	3 647 5                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:647:5
+	@APP
+	cpsid i
+	@NO_APP
+	b	.LBB5_2
+.LBB5_2:                                @ =>This Inner Loop Header: Depth=1
+.Ltmp63:
+	.loc	3 647 5                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:647:5
+	b	.LBB5_2
+.Ltmp64:
+.LBB5_3:
+	.loc	3 653 9 is_stmt 1               @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:653:9
+	movw	r0, :lower16:xTimer
+	movt	r0, :upper16:xTimer
+	ldr	r0, [r0, #8]
+.Ltmp65:
+	.loc	3 653 9 is_stmt 0               @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:653:9
+	cmp	r0, #0
+	beq	.LBB5_17
+	b	.LBB5_4
+.LBB5_4:
+.Ltmp66:
+	.loc	3 655 19 is_stmt 1              @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:655:19
+	movw	r0, :lower16:xNotifyTaskFromISR.xCallCount
+	movt	r0, :upper16:xNotifyTaskFromISR.xCallCount
+	ldr	r1, [r0]
+	adds	r1, r1, #1
+	str	r1, [r0]
+.Ltmp67:
+	.loc	3 657 13                        @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:657:13
+	ldr	r0, [r0]
+.Ltmp68:
+	.loc	3 657 13 is_stmt 0              @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:657:13
+	cmp	r0, #5
+	blt	.LBB5_16
+	b	.LBB5_5
+.LBB5_5:
+.Ltmp69:
+	.loc	3 660 24 is_stmt 1              @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:660:24
+	movw	r1, :lower16:xNotifyTaskFromISR.xCallCount
+	movt	r1, :upper16:xNotifyTaskFromISR.xCallCount
+	movs	r0, #0
+	str	r0, [r1]
+	.loc	3 664 21                        @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:664:21
+	movw	r0, :lower16:xNotifyTaskFromISR.xAPIToUse
+	movt	r0, :upper16:xNotifyTaskFromISR.xAPIToUse
+	ldr	r0, [r0]
+	.loc	3 664 13 is_stmt 0              @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:664:13
+	str	r0, [sp, #8]                    @ 4-byte Spill
+	cbz	r0, .LBB5_8
+	b	.LBB5_6
+.LBB5_6:
+	ldr	r0, [sp, #8]                    @ 4-byte Reload
+	cmp	r0, #1
+	beq	.LBB5_9
+	b	.LBB5_7
+.LBB5_7:
+	ldr	r0, [sp, #8]                    @ 4-byte Reload
+	cmp	r0, #2
+	beq	.LBB5_10
+	b	.LBB5_14
+.LBB5_8:
+.Ltmp70:
+	.loc	3 667 21 is_stmt 1              @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:667:21
+	movw	r0, :lower16:xTaskToNotify
+	movt	r0, :upper16:xTaskToNotify
+	ldr	r0, [r0]
+	movs	r2, #0
+	mov	r1, r2
+	bl	vTaskGenericNotifyGiveFromISR
+	.loc	3 668 30                        @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:668:30
+	movw	r1, :lower16:xNotifyTaskFromISR.xAPIToUse
+	movt	r1, :upper16:xNotifyTaskFromISR.xAPIToUse
+	ldr	r0, [r1]
+	adds	r0, r0, #1
+	str	r0, [r1]
+	.loc	3 669 21                        @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:669:21
+	b	.LBB5_15
+.LBB5_9:
+	.loc	3 672 21                        @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:672:21
+	movw	r0, :lower16:xTaskToNotify
+	movt	r0, :upper16:xTaskToNotify
+	ldr	r0, [r0]
+	movs	r2, #0
+	str	r2, [sp, #4]
+	str	r2, [sp]
+	movs	r3, #2
+	mov	r1, r2
+	bl	xTaskGenericNotifyFromISR
+	.loc	3 673 30                        @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:673:30
+	movw	r1, :lower16:xNotifyTaskFromISR.xAPIToUse
+	movt	r1, :upper16:xNotifyTaskFromISR.xAPIToUse
+	ldr	r0, [r1]
+	adds	r0, r0, #1
+	str	r0, [r1]
+	.loc	3 674 21                        @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:674:21
+	b	.LBB5_15
+.LBB5_10:
+	.loc	3 0 21 is_stmt 0                @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:0:21
+	movs	r0, #255
+	.loc	3 677 37 is_stmt 1              @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:677:37
+	str	r0, [sp, #16]
+	.loc	3 678 21                        @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:678:21
+	movw	r0, :lower16:xTaskToNotify
+	movt	r0, :upper16:xTaskToNotify
+	ldr	r0, [r0]
+	movs	r2, #0
+	str	r2, [sp, #4]
+	add	r1, sp, #16
+	str	r1, [sp]
+	movs	r3, #2
+	mov	r1, r2
+	bl	xTaskGenericNotifyFromISR
+.Ltmp71:
+	.loc	3 679 21                        @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:679:21
+	ldr	r0, [sp, #16]
+.Ltmp72:
+	.loc	3 679 21 is_stmt 0              @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:679:21
+	cmp	r0, #255
+	bne	.LBB5_13
+	b	.LBB5_11
+.LBB5_11:
+.Ltmp73:
+	.loc	3 679 21                        @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:679:21
+	@APP
+	cpsid i
+	@NO_APP
+	b	.LBB5_12
+.LBB5_12:                               @ =>This Inner Loop Header: Depth=1
+.Ltmp74:
+	.loc	3 679 21                        @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:679:21
+	b	.LBB5_12
+.Ltmp75:
+.LBB5_13:
+	.loc	3 680 31 is_stmt 1              @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:680:31
+	movw	r1, :lower16:xNotifyTaskFromISR.xAPIToUse
+	movt	r1, :upper16:xNotifyTaskFromISR.xAPIToUse
+	movs	r0, #0
+	str	r0, [r1]
+	.loc	3 681 21                        @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:681:21
+	b	.LBB5_15
+.LBB5_14:
+	.loc	3 684 21                        @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:684:21
+	b	.LBB5_15
+.Ltmp76:
+.LBB5_15:
+	.loc	3 687 42                        @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:687:42
+	movw	r1, :lower16:ulTimerNotificationsSent
+	movt	r1, :upper16:ulTimerNotificationsSent
+	ldr	r0, [r1]
+	adds	r0, r0, #1
+	str	r0, [r1]
+	.loc	3 688 9                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:688:9
+	b	.LBB5_16
+.Ltmp77:
+.LBB5_16:
+	.loc	3 689 5                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:689:5
+	b	.LBB5_17
+.Ltmp78:
+.LBB5_17:
+	.loc	3 690 1                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:690:1
+	add	sp, #24
+	pop	{r7, pc}
+.Ltmp79:
+.Lfunc_end5:
+	.size	xNotifyTaskFromISR, .Lfunc_end5-xNotifyTaskFromISR
+	.cfi_endproc
+	.cantunwind
+	.fnend
+                                        @ -- End function
+	.section	.text.xAreTaskNotificationTasksStillRunning,"ax",%progbits
+	.hidden	xAreTaskNotificationTasksStillRunning @ -- Begin function xAreTaskNotificationTasksStillRunning
+	.globl	xAreTaskNotificationTasksStillRunning
+	.p2align	1
+	.type	xAreTaskNotificationTasksStillRunning,%function
+	.code	16                              @ @xAreTaskNotificationTasksStillRunning
+	.thumb_func
+xAreTaskNotificationTasksStillRunning:
+.Lfunc_begin6:
+	.loc	3 696 0                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:696:0
+	.fnstart
+	.cfi_startproc
+@ %bb.0:
+	.pad	#4
+	sub	sp, #4
+	.cfi_def_cfa_offset 4
+	movs	r0, #5
+.Ltmp80:
+	.loc	3 698 20 prologue_end           @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:698:20
+	str	r0, [sp]
+.Ltmp81:
+	.loc	3 702 9                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:702:9
+	movw	r0, :lower16:xAreTaskNotificationTasksStillRunning.ulLastNotifyCycleCount
+	movt	r0, :upper16:xAreTaskNotificationTasksStillRunning.ulLastNotifyCycleCount
+	ldr	r0, [r0]
+	.loc	3 702 35 is_stmt 0              @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:702:35
+	movw	r1, :lower16:ulNotifyCycleCount
+	movt	r1, :upper16:ulNotifyCycleCount
+	ldr	r1, [r1]
+.Ltmp82:
+	.loc	3 702 9                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:702:9
+	cmp	r0, r1
+	bne	.LBB6_2
+	b	.LBB6_1
+.LBB6_1:
+.Ltmp83:
+	.loc	3 704 27 is_stmt 1              @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:704:27
+	movw	r1, :lower16:xErrorStatus
+	movt	r1, :upper16:xErrorStatus
+	movs	r0, #0
+	str	r0, [r1]
+	.loc	3 705 5                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:705:5
+	b	.LBB6_3
+.Ltmp84:
+.LBB6_2:
+	.loc	3 708 34                        @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:708:34
+	movw	r0, :lower16:ulNotifyCycleCount
+	movt	r0, :upper16:ulNotifyCycleCount
+	ldr	r0, [r0]
+	.loc	3 708 32 is_stmt 0              @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:708:32
+	movw	r1, :lower16:xAreTaskNotificationTasksStillRunning.ulLastNotifyCycleCount
+	movt	r1, :upper16:xAreTaskNotificationTasksStillRunning.ulLastNotifyCycleCount
+	str	r0, [r1]
+	b	.LBB6_3
+.Ltmp85:
+.LBB6_3:
+	.loc	3 713 9 is_stmt 1               @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:713:9
+	movw	r0, :lower16:ulTimerNotificationsSent
+	movt	r0, :upper16:ulTimerNotificationsSent
+	ldr	r0, [r0]
+	.loc	3 713 41 is_stmt 0              @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:713:41
+	movw	r1, :lower16:ulTimerNotificationsReceived
+	movt	r1, :upper16:ulTimerNotificationsReceived
+	ldr	r1, [r1]
+.Ltmp86:
+	.loc	3 713 9                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:713:9
+	cmp	r0, r1
+	bls	.LBB6_7
+	b	.LBB6_4
+.LBB6_4:
+.Ltmp87:
+	.loc	3 715 15 is_stmt 1              @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:715:15
+	movw	r0, :lower16:ulTimerNotificationsSent
+	movt	r0, :upper16:ulTimerNotificationsSent
+	ldr	r0, [r0]
+	.loc	3 715 47 is_stmt 0              @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:715:47
+	movw	r1, :lower16:ulTimerNotificationsReceived
+	movt	r1, :upper16:ulTimerNotificationsReceived
+	ldr	r1, [r1]
+	.loc	3 715 45                        @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:715:45
+	subs	r0, r0, r1
+.Ltmp88:
+	.loc	3 715 13                        @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:715:13
+	cmp	r0, #6
+	blo	.LBB6_6
+	b	.LBB6_5
+.LBB6_5:
+.Ltmp89:
+	.loc	3 717 31 is_stmt 1              @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:717:31
+	movw	r1, :lower16:xErrorStatus
+	movt	r1, :upper16:xErrorStatus
+	movs	r0, #0
+	str	r0, [r1]
+	.loc	3 718 9                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:718:9
+	b	.LBB6_6
+.Ltmp90:
+.LBB6_6:
+	.loc	3 719 5                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:719:5
+	b	.LBB6_7
+.Ltmp91:
+.LBB6_7:
+	.loc	3 721 12                        @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:721:12
+	movw	r0, :lower16:xErrorStatus
+	movt	r0, :upper16:xErrorStatus
+	ldr	r0, [r0]
+	.loc	3 721 5 is_stmt 0               @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:721:5
+	add	sp, #4
+	bx	lr
+.Ltmp92:
+.Lfunc_end6:
+	.size	xAreTaskNotificationTasksStillRunning, .Lfunc_end6-xAreTaskNotificationTasksStillRunning
+	.cfi_endproc
+	.cantunwind
+	.fnend
+                                        @ -- End function
+	.section	.text.prvSingleTaskTests,"ax",%progbits
+	.p2align	1                               @ -- Begin function prvSingleTaskTests
+	.type	prvSingleTaskTests,%function
+	.code	16                              @ @prvSingleTaskTests
+	.thumb_func
+prvSingleTaskTests:
+.Lfunc_begin7:
+	.loc	3 149 0 is_stmt 1               @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:149:0
+	.fnstart
+	.cfi_startproc
+@ %bb.0:
+	.save	{r7, lr}
+	push	{r7, lr}
+	.cfi_def_cfa_offset 8
+	.cfi_offset lr, -4
+	.cfi_offset r7, -8
+	.pad	#128
+	sub	sp, #128
+	.cfi_def_cfa_offset 136
+	movs	r0, #10
+.Ltmp93:
+	.loc	3 150 22 prologue_end           @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:150:22
+	str	r0, [sp, #72]                   @ 4-byte Spill
+	str	r0, [sp, #124]
+	movw	r0, #34465
+	movt	r0, #1
+	.loc	3 154 20                        @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:154:20
+	str	r0, [sp, #92]
+	movw	r0, #5555
+	.loc	3 154 53 is_stmt 0              @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:154:53
+	str	r0, [sp, #88]
+	movs	r0, #5
+	.loc	3 154 90                        @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:154:90
+	str	r0, [sp, #84]
+	movs	r0, #1
+	.loc	3 155 20 is_stmt 1              @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:155:20
+	str	r0, [sp, #80]
+	movs	r0, #2
+	.loc	3 155 37 is_stmt 0              @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:155:37
+	str	r0, [sp, #76]
+	.loc	3 160 23 is_stmt 1              @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:160:23
+	bl	MPU_xTaskGetTickCount
+	mov	r1, r0
+	.loc	3 160 21 is_stmt 0              @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:160:21
+	ldr	r0, [sp, #72]                   @ 4-byte Reload
+	str	r1, [sp, #96]
+	.loc	3 161 17 is_stmt 1              @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:161:17
+	str	r0, [sp]
+	movs	r2, #0
+	mvns	r1, r2
+	add	r3, sp, #116
+	mov	r0, r2
+	bl	MPU_xTaskGenericNotifyWait
+	.loc	3 161 15 is_stmt 0              @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:161:15
+	str	r0, [sp, #120]
+.Ltmp94:
+	.loc	3 165 11 is_stmt 1              @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:165:11
+	bl	MPU_xTaskGetTickCount
+	.loc	3 165 33 is_stmt 0              @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:165:33
+	ldr	r1, [sp, #96]
+	.loc	3 165 31                        @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:165:31
+	subs	r0, r0, r1
+.Ltmp95:
+	.loc	3 165 9                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:165:9
+	cmp	r0, #9
+	bhi	.LBB7_2
+	b	.LBB7_1
+.LBB7_1:
+.Ltmp96:
+	.loc	3 167 27 is_stmt 1              @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:167:27
+	movw	r1, :lower16:xErrorStatus
+	movt	r1, :upper16:xErrorStatus
+	movs	r0, #0
+	str	r0, [r1]
+	.loc	3 168 5                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:168:5
+	b	.LBB7_2
+.Ltmp97:
+.LBB7_2:
+	.loc	3 170 5                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:170:5
+	ldr	r0, [sp, #120]
+.Ltmp98:
+	.loc	3 170 5 is_stmt 0               @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:170:5
+	cbz	r0, .LBB7_5
+	b	.LBB7_3
+.LBB7_3:
+.Ltmp99:
+	.loc	3 170 5                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:170:5
+	@APP
+	cpsid i
+	@NO_APP
+	b	.LBB7_4
+.LBB7_4:                                @ =>This Inner Loop Header: Depth=1
+.Ltmp100:
+	.loc	3 170 5                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:170:5
+	b	.LBB7_4
+.Ltmp101:
+.LBB7_5:
+	.loc	3 171 5 is_stmt 1               @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:171:5
+	ldr	r0, [sp, #116]
+.Ltmp102:
+	.loc	3 171 5 is_stmt 0               @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:171:5
+	cbz	r0, .LBB7_8
+	b	.LBB7_6
+.LBB7_6:
+.Ltmp103:
+	.loc	3 171 5                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:171:5
+	@APP
+	cpsid i
+	@NO_APP
+	b	.LBB7_7
+.LBB7_7:                                @ =>This Inner Loop Header: Depth=1
+.Ltmp104:
+	.loc	3 171 5                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:171:5
+	b	.LBB7_7
+.Ltmp105:
+.LBB7_8:
+	.loc	3 181 17 is_stmt 1              @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:181:17
+	movw	r0, :lower16:xTaskToNotify
+	movt	r0, :upper16:xTaskToNotify
+	ldr	r0, [r0]
+	add	r1, sp, #104
+	str	r1, [sp]
+	movs	r1, #0
+	movw	r2, #34465
+	movt	r2, #1
+	movs	r3, #4
+	bl	MPU_xTaskGenericNotify
+	.loc	3 181 15 is_stmt 0              @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:181:15
+	str	r0, [sp, #120]
+.Ltmp106:
+	.loc	3 185 5 is_stmt 1               @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:185:5
+	ldr	r0, [sp, #120]
+.Ltmp107:
+	.loc	3 185 5 is_stmt 0               @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:185:5
+	cmp	r0, #1
+	beq	.LBB7_11
+	b	.LBB7_9
+.LBB7_9:
+.Ltmp108:
+	.loc	3 185 5                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:185:5
+	@APP
+	cpsid i
+	@NO_APP
+	b	.LBB7_10
+.LBB7_10:                               @ =>This Inner Loop Header: Depth=1
+.Ltmp109:
+	.loc	3 185 5                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:185:5
+	b	.LBB7_10
+.Ltmp110:
+.LBB7_11:
+	.loc	3 189 5 is_stmt 1               @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:189:5
+	ldr	r0, [sp, #104]
+.Ltmp111:
+	.loc	3 189 5 is_stmt 0               @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:189:5
+	cbz	r0, .LBB7_14
+	b	.LBB7_12
+.LBB7_12:
+.Ltmp112:
+	.loc	3 189 5                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:189:5
+	@APP
+	cpsid i
+	@NO_APP
+	b	.LBB7_13
+.LBB7_13:                               @ =>This Inner Loop Header: Depth=1
+.Ltmp113:
+	.loc	3 189 5                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:189:5
+	b	.LBB7_13
+.Ltmp114:
+.LBB7_14:
+	.loc	3 193 23 is_stmt 1              @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:193:23
+	bl	MPU_xTaskGetTickCount
+	.loc	3 193 21 is_stmt 0              @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:193:21
+	str	r0, [sp, #96]
+	movs	r0, #10
+	.loc	3 194 17 is_stmt 1              @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:194:17
+	str	r0, [sp]
+	movs	r2, #0
+	mvns	r1, r2
+	add	r3, sp, #116
+	mov	r0, r2
+	bl	MPU_xTaskGenericNotifyWait
+	.loc	3 194 15 is_stmt 0              @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:194:15
+	str	r0, [sp, #120]
+.Ltmp115:
+	.loc	3 196 11 is_stmt 1              @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:196:11
+	bl	MPU_xTaskGetTickCount
+	.loc	3 196 33 is_stmt 0              @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:196:33
+	ldr	r1, [sp, #96]
+	.loc	3 196 31                        @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:196:31
+	subs	r0, r0, r1
+.Ltmp116:
+	.loc	3 196 9                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:196:9
+	cmp	r0, #10
+	blo	.LBB7_16
+	b	.LBB7_15
+.LBB7_15:
+.Ltmp117:
+	.loc	3 198 27 is_stmt 1              @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:198:27
+	movw	r1, :lower16:xErrorStatus
+	movt	r1, :upper16:xErrorStatus
+	movs	r0, #0
+	str	r0, [r1]
+	.loc	3 199 5                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:199:5
+	b	.LBB7_16
+.Ltmp118:
+.LBB7_16:
+	.loc	3 203 5                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:203:5
+	ldr	r0, [sp, #120]
+.Ltmp119:
+	.loc	3 203 5 is_stmt 0               @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:203:5
+	cmp	r0, #1
+	beq	.LBB7_19
+	b	.LBB7_17
+.LBB7_17:
+.Ltmp120:
+	.loc	3 203 5                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:203:5
+	@APP
+	cpsid i
+	@NO_APP
+	b	.LBB7_18
+.LBB7_18:                               @ =>This Inner Loop Header: Depth=1
+.Ltmp121:
+	.loc	3 203 5                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:203:5
+	b	.LBB7_18
+.Ltmp122:
+.LBB7_19:
+	.loc	3 204 5 is_stmt 1               @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:204:5
+	ldr	r0, [sp, #116]
+	movw	r1, #34465
+	movt	r1, #1
+.Ltmp123:
+	.loc	3 204 5 is_stmt 0               @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:204:5
+	cmp	r0, r1
+	beq	.LBB7_22
+	b	.LBB7_20
+.LBB7_20:
+.Ltmp124:
+	.loc	3 204 5                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:204:5
+	@APP
+	cpsid i
+	@NO_APP
+	b	.LBB7_21
+.LBB7_21:                               @ =>This Inner Loop Header: Depth=1
+.Ltmp125:
+	.loc	3 204 5                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:204:5
+	b	.LBB7_21
+.Ltmp126:
+.LBB7_22:
+	.loc	3 209 28 is_stmt 1              @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:209:28
+	movw	r1, :lower16:ulNotifyCycleCount
+	movt	r1, :upper16:ulNotifyCycleCount
+	ldr	r0, [r1]
+	adds	r0, r0, #1
+	str	r0, [r1]
+	.loc	3 218 17                        @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:218:17
+	movw	r0, :lower16:xTaskToNotify
+	movt	r0, :upper16:xTaskToNotify
+	ldr	r0, [r0]
+	movs	r1, #0
+	str	r1, [sp]
+	movw	r2, #34465
+	movt	r2, #1
+	movs	r3, #4
+	bl	MPU_xTaskGenericNotify
+	.loc	3 218 15 is_stmt 0              @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:218:15
+	str	r0, [sp, #120]
+.Ltmp127:
+	.loc	3 219 5 is_stmt 1               @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:219:5
+	ldr	r0, [sp, #120]
+.Ltmp128:
+	.loc	3 219 5 is_stmt 0               @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:219:5
+	cmp	r0, #1
+	beq	.LBB7_25
+	b	.LBB7_23
+.LBB7_23:
+.Ltmp129:
+	.loc	3 219 5                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:219:5
+	@APP
+	cpsid i
+	@NO_APP
+	b	.LBB7_24
+.LBB7_24:                               @ =>This Inner Loop Header: Depth=1
+.Ltmp130:
+	.loc	3 219 5                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:219:5
+	b	.LBB7_24
+.Ltmp131:
+.LBB7_25:
+	.loc	3 222 17 is_stmt 1              @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:222:17
+	movw	r0, :lower16:xTaskToNotify
+	movt	r0, :upper16:xTaskToNotify
+	ldr	r0, [r0]
+	movs	r1, #0
+	str	r1, [sp]
+	movw	r2, #5555
+	movs	r3, #4
+	bl	MPU_xTaskGenericNotify
+	.loc	3 222 15 is_stmt 0              @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:222:15
+	str	r0, [sp, #120]
+.Ltmp132:
+	.loc	3 223 5 is_stmt 1               @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:223:5
+	ldr	r0, [sp, #120]
+.Ltmp133:
+	.loc	3 223 5 is_stmt 0               @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:223:5
+	cbz	r0, .LBB7_28
+	b	.LBB7_26
+.LBB7_26:
+.Ltmp134:
+	.loc	3 223 5                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:223:5
+	@APP
+	cpsid i
+	@NO_APP
+	b	.LBB7_27
+.LBB7_27:                               @ =>This Inner Loop Header: Depth=1
+.Ltmp135:
+	.loc	3 223 5                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:223:5
+	b	.LBB7_27
+.Ltmp136:
+.LBB7_28:
+	.loc	3 0 5                           @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:0:5
+	movs	r2, #0
+	.loc	3 228 17 is_stmt 1              @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:228:17
+	str	r2, [sp]
+	mvns	r1, r2
+	add	r3, sp, #116
+	mov	r0, r2
+	bl	MPU_xTaskGenericNotifyWait
+	.loc	3 228 15 is_stmt 0              @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:228:15
+	str	r0, [sp, #120]
+.Ltmp137:
+	.loc	3 230 5 is_stmt 1               @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:230:5
+	ldr	r0, [sp, #120]
+.Ltmp138:
+	.loc	3 230 5 is_stmt 0               @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:230:5
+	cmp	r0, #1
+	beq	.LBB7_31
+	b	.LBB7_29
+.LBB7_29:
+.Ltmp139:
+	.loc	3 230 5                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:230:5
+	@APP
+	cpsid i
+	@NO_APP
+	b	.LBB7_30
+.LBB7_30:                               @ =>This Inner Loop Header: Depth=1
+.Ltmp140:
+	.loc	3 230 5                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:230:5
+	b	.LBB7_30
+.Ltmp141:
+.LBB7_31:
+	.loc	3 231 5 is_stmt 1               @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:231:5
+	ldr	r0, [sp, #116]
+	movw	r1, #34465
+	movt	r1, #1
+.Ltmp142:
+	.loc	3 231 5 is_stmt 0               @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:231:5
+	cmp	r0, r1
+	beq	.LBB7_34
+	b	.LBB7_32
+.LBB7_32:
+.Ltmp143:
+	.loc	3 231 5                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:231:5
+	@APP
+	cpsid i
+	@NO_APP
+	b	.LBB7_33
+.LBB7_33:                               @ =>This Inner Loop Header: Depth=1
+.Ltmp144:
+	.loc	3 231 5                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:231:5
+	b	.LBB7_33
+.Ltmp145:
+.LBB7_34:
+	.loc	3 242 17 is_stmt 1              @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:242:17
+	movw	r0, :lower16:xTaskToNotify
+	movt	r0, :upper16:xTaskToNotify
+	ldr	r0, [r0]
+	movs	r1, #0
+	str	r1, [sp]
+	movw	r2, #34465
+	movt	r2, #1
+	movs	r3, #3
+	bl	MPU_xTaskGenericNotify
+	.loc	3 242 15 is_stmt 0              @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:242:15
+	str	r0, [sp, #120]
+.Ltmp146:
+	.loc	3 243 5 is_stmt 1               @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:243:5
+	ldr	r0, [sp, #120]
+.Ltmp147:
+	.loc	3 243 5 is_stmt 0               @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:243:5
+	cmp	r0, #1
+	beq	.LBB7_37
+	b	.LBB7_35
+.LBB7_35:
+.Ltmp148:
+	.loc	3 243 5                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:243:5
+	@APP
+	cpsid i
+	@NO_APP
+	b	.LBB7_36
+.LBB7_36:                               @ =>This Inner Loop Header: Depth=1
+.Ltmp149:
+	.loc	3 243 5                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:243:5
+	b	.LBB7_36
+.Ltmp150:
+.LBB7_37:
+	.loc	3 245 17 is_stmt 1              @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:245:17
+	movw	r0, :lower16:xTaskToNotify
+	movt	r0, :upper16:xTaskToNotify
+	ldr	r0, [r0]
+	movs	r1, #0
+	str	r1, [sp]
+	movw	r2, #5555
+	movs	r3, #3
+	bl	MPU_xTaskGenericNotify
+	.loc	3 245 15 is_stmt 0              @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:245:15
+	str	r0, [sp, #120]
+.Ltmp151:
+	.loc	3 246 5 is_stmt 1               @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:246:5
+	ldr	r0, [sp, #120]
+.Ltmp152:
+	.loc	3 246 5 is_stmt 0               @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:246:5
+	cmp	r0, #1
+	beq	.LBB7_40
+	b	.LBB7_38
+.LBB7_38:
+.Ltmp153:
+	.loc	3 246 5                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:246:5
+	@APP
+	cpsid i
+	@NO_APP
+	b	.LBB7_39
+.LBB7_39:                               @ =>This Inner Loop Header: Depth=1
+.Ltmp154:
+	.loc	3 246 5                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:246:5
+	b	.LBB7_39
+.Ltmp155:
+.LBB7_40:
+	.loc	3 0 5                           @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:0:5
+	movs	r2, #0
+	.loc	3 248 17 is_stmt 1              @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:248:17
+	str	r2, [sp]
+	mvns	r1, r2
+	add	r3, sp, #116
+	mov	r0, r2
+	bl	MPU_xTaskGenericNotifyWait
+	.loc	3 248 15 is_stmt 0              @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:248:15
+	str	r0, [sp, #120]
+.Ltmp156:
+	.loc	3 249 5 is_stmt 1               @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:249:5
+	ldr	r0, [sp, #120]
+.Ltmp157:
+	.loc	3 249 5 is_stmt 0               @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:249:5
+	cmp	r0, #1
+	beq	.LBB7_43
+	b	.LBB7_41
+.LBB7_41:
+.Ltmp158:
+	.loc	3 249 5                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:249:5
+	@APP
+	cpsid i
+	@NO_APP
+	b	.LBB7_42
+.LBB7_42:                               @ =>This Inner Loop Header: Depth=1
+.Ltmp159:
+	.loc	3 249 5                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:249:5
+	b	.LBB7_42
+.Ltmp160:
+.LBB7_43:
+	.loc	3 251 5 is_stmt 1               @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:251:5
+	ldr	r0, [sp, #116]
+	movw	r1, #5555
+.Ltmp161:
+	.loc	3 251 5 is_stmt 0               @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:251:5
+	cmp	r0, r1
+	beq	.LBB7_46
+	b	.LBB7_44
+.LBB7_44:
+.Ltmp162:
+	.loc	3 251 5                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:251:5
+	@APP
+	cpsid i
+	@NO_APP
+	b	.LBB7_45
+.LBB7_45:                               @ =>This Inner Loop Header: Depth=1
+.Ltmp163:
+	.loc	3 251 5                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:251:5
+	b	.LBB7_45
+.Ltmp164:
+.LBB7_46:
+	.loc	3 260 17 is_stmt 1              @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:260:17
+	movw	r0, :lower16:xTaskToNotify
+	movt	r0, :upper16:xTaskToNotify
+	ldr	r0, [r0]
+	movs	r3, #0
+	str	r3, [sp]
+	movw	r2, #34465
+	movt	r2, #1
+	mov	r1, r3
+	bl	MPU_xTaskGenericNotify
+	.loc	3 260 15 is_stmt 0              @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:260:15
+	str	r0, [sp, #120]
+.Ltmp165:
+	.loc	3 261 5 is_stmt 1               @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:261:5
+	ldr	r0, [sp, #120]
+.Ltmp166:
+	.loc	3 261 5 is_stmt 0               @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:261:5
+	cmp	r0, #1
+	beq	.LBB7_49
+	b	.LBB7_47
+.LBB7_47:
+.Ltmp167:
+	.loc	3 261 5                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:261:5
+	@APP
+	cpsid i
+	@NO_APP
+	b	.LBB7_48
+.LBB7_48:                               @ =>This Inner Loop Header: Depth=1
+.Ltmp168:
+	.loc	3 261 5                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:261:5
+	b	.LBB7_48
+.Ltmp169:
+.LBB7_49:
+	.loc	3 0 5                           @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:0:5
+	movs	r2, #0
+	.loc	3 263 17 is_stmt 1              @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:263:17
+	str	r2, [sp]
+	mvns	r1, r2
+	add	r3, sp, #116
+	mov	r0, r2
+	bl	MPU_xTaskGenericNotifyWait
+	.loc	3 263 15 is_stmt 0              @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:263:15
+	str	r0, [sp, #120]
+.Ltmp170:
+	.loc	3 264 5 is_stmt 1               @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:264:5
+	ldr	r0, [sp, #116]
+	movw	r1, #5555
+.Ltmp171:
+	.loc	3 264 5 is_stmt 0               @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:264:5
+	cmp	r0, r1
+	beq	.LBB7_52
+	b	.LBB7_50
+.LBB7_50:
+.Ltmp172:
+	.loc	3 264 5                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:264:5
+	@APP
+	cpsid i
+	@NO_APP
+	b	.LBB7_51
+.LBB7_51:                               @ =>This Inner Loop Header: Depth=1
+.Ltmp173:
+	.loc	3 264 5                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:264:5
+	b	.LBB7_51
+.Ltmp174:
+.LBB7_52:
+	.loc	3 0 5                           @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:0:5
+	movs	r0, #0
+.Ltmp175:
+	.loc	3 271 17 is_stmt 1              @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:271:17
+	str	r0, [sp, #112]
+	.loc	3 271 10 is_stmt 0              @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:271:10
+	b	.LBB7_53
+.LBB7_53:                               @ =>This Inner Loop Header: Depth=1
+.Ltmp176:
+	.loc	3 271 22                        @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:271:22
+	ldr	r0, [sp, #112]
+.Ltmp177:
+	.loc	3 271 5                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:271:5
+	cmp	r0, #4
+	bhi	.LBB7_59
+	b	.LBB7_54
+.LBB7_54:                               @   in Loop: Header=BB7_53 Depth=1
+.Ltmp178:
+	.loc	3 273 21 is_stmt 1              @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:273:21
+	movw	r0, :lower16:xTaskToNotify
+	movt	r0, :upper16:xTaskToNotify
+	ldr	r0, [r0]
+	movs	r2, #0
+	str	r2, [sp]
+	movs	r3, #2
+	mov	r1, r2
+	bl	MPU_xTaskGenericNotify
+	.loc	3 273 19 is_stmt 0              @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:273:19
+	str	r0, [sp, #120]
+.Ltmp179:
+	.loc	3 274 9 is_stmt 1               @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:274:9
+	ldr	r0, [sp, #120]
+.Ltmp180:
+	.loc	3 274 9 is_stmt 0               @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:274:9
+	cmp	r0, #1
+	beq	.LBB7_57
+	b	.LBB7_55
+.LBB7_55:
+.Ltmp181:
+	.loc	3 274 9                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:274:9
+	@APP
+	cpsid i
+	@NO_APP
+	b	.LBB7_56
+.LBB7_56:                               @ =>This Inner Loop Header: Depth=1
+.Ltmp182:
+	.loc	3 274 9                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:274:9
+	b	.LBB7_56
+.Ltmp183:
+.LBB7_57:                               @   in Loop: Header=BB7_53 Depth=1
+	.loc	3 276 5 is_stmt 1               @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:276:5
+	b	.LBB7_58
+.Ltmp184:
+.LBB7_58:                               @   in Loop: Header=BB7_53 Depth=1
+	.loc	3 271 49                        @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:271:49
+	ldr	r0, [sp, #112]
+	adds	r0, r0, #1
+	str	r0, [sp, #112]
+	.loc	3 271 5 is_stmt 0               @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:271:5
+	b	.LBB7_53
+.Ltmp185:
+.LBB7_59:
+	.loc	3 0 5                           @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:0:5
+	movs	r2, #0
+	.loc	3 278 17 is_stmt 1              @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:278:17
+	str	r2, [sp]
+	mvns	r1, r2
+	add	r3, sp, #116
+	mov	r0, r2
+	bl	MPU_xTaskGenericNotifyWait
+	.loc	3 278 15 is_stmt 0              @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:278:15
+	str	r0, [sp, #120]
+.Ltmp186:
+	.loc	3 279 5 is_stmt 1               @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:279:5
+	ldr	r0, [sp, #120]
+.Ltmp187:
+	.loc	3 279 5 is_stmt 0               @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:279:5
+	cmp	r0, #1
+	beq	.LBB7_62
+	b	.LBB7_60
+.LBB7_60:
+.Ltmp188:
+	.loc	3 279 5                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:279:5
+	@APP
+	cpsid i
+	@NO_APP
+	b	.LBB7_61
+.LBB7_61:                               @ =>This Inner Loop Header: Depth=1
+.Ltmp189:
+	.loc	3 279 5                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:279:5
+	b	.LBB7_61
+.Ltmp190:
+.LBB7_62:
+	.loc	3 280 5 is_stmt 1               @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:280:5
+	ldr	r0, [sp, #116]
+	movw	r1, #5560
+.Ltmp191:
+	.loc	3 280 5 is_stmt 0               @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:280:5
+	cmp	r0, r1
+	beq	.LBB7_65
+	b	.LBB7_63
+.LBB7_63:
+.Ltmp192:
+	.loc	3 280 5                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:280:5
+	@APP
+	cpsid i
+	@NO_APP
+	b	.LBB7_64
+.LBB7_64:                               @ =>This Inner Loop Header: Depth=1
+.Ltmp193:
+	.loc	3 280 5                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:280:5
+	b	.LBB7_64
+.Ltmp194:
+.LBB7_65:
+	.loc	3 0 5                           @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:0:5
+	movs	r2, #0
+	.loc	3 285 17 is_stmt 1              @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:285:17
+	str	r2, [sp]
+	add	r3, sp, #116
+	mov	r0, r2
+	mov	r1, r2
+	bl	MPU_xTaskGenericNotifyWait
+	.loc	3 285 15 is_stmt 0              @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:285:15
+	str	r0, [sp, #120]
+.Ltmp195:
+	.loc	3 286 5 is_stmt 1               @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:286:5
+	ldr	r0, [sp, #120]
+.Ltmp196:
+	.loc	3 286 5 is_stmt 0               @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:286:5
+	cbz	r0, .LBB7_68
+	b	.LBB7_66
+.LBB7_66:
+.Ltmp197:
+	.loc	3 286 5                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:286:5
+	@APP
+	cpsid i
+	@NO_APP
+	b	.LBB7_67
+.LBB7_67:                               @ =>This Inner Loop Header: Depth=1
+.Ltmp198:
+	.loc	3 286 5                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:286:5
+	b	.LBB7_67
+.Ltmp199:
+.LBB7_68:
+	.loc	3 0 5                           @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:0:5
+	movs	r0, #1
+	.loc	3 297 22 is_stmt 1              @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:297:22
+	str	r0, [sp, #108]
+	movs	r2, #0
+	.loc	3 298 12                        @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:298:12
+	str	r2, [sp, #112]
+	.loc	3 301 5                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:301:5
+	str	r2, [sp]
+	mvns	r1, r2
+	add	r3, sp, #116
+	mov	r0, r2
+	bl	MPU_xTaskGenericNotifyWait
+	.loc	3 303 5                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:303:5
+	b	.LBB7_69
+.LBB7_69:                               @ =>This Inner Loop Header: Depth=1
+.Ltmp200:
+	.loc	3 306 9                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:306:9
+	movw	r0, :lower16:xTaskToNotify
+	movt	r0, :upper16:xTaskToNotify
+	ldr	r0, [r0]
+	ldr	r2, [sp, #108]
+	movs	r1, #0
+	str	r1, [sp, #68]                   @ 4-byte Spill
+	str	r1, [sp]
+	movs	r3, #1
+	bl	MPU_xTaskGenericNotify
+	ldr	r2, [sp, #68]                   @ 4-byte Reload
+	.loc	3 311 21                        @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:311:21
+	str	r2, [sp]
+	add	r3, sp, #116
+	mov	r0, r2
+	mov	r1, r2
+	bl	MPU_xTaskGenericNotifyWait
+	.loc	3 311 19 is_stmt 0              @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:311:19
+	str	r0, [sp, #120]
+.Ltmp201:
+	.loc	3 312 9 is_stmt 1               @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:312:9
+	ldr	r0, [sp, #120]
+.Ltmp202:
+	.loc	3 312 9 is_stmt 0               @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:312:9
+	cmp	r0, #1
+	beq	.LBB7_72
+	b	.LBB7_70
+.LBB7_70:
+.Ltmp203:
+	.loc	3 312 9                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:312:9
+	@APP
+	cpsid i
+	@NO_APP
+	b	.LBB7_71
+.LBB7_71:                               @ =>This Inner Loop Header: Depth=1
+.Ltmp204:
+	.loc	3 312 9                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:312:9
+	b	.LBB7_71
+.Ltmp205:
+.LBB7_72:                               @   in Loop: Header=BB7_69 Depth=1
+	.loc	3 315 15 is_stmt 1              @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:315:15
+	ldr	r0, [sp, #112]
+	adds	r0, r0, #1
+	str	r0, [sp, #112]
+	.loc	3 318 26                        @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:318:26
+	ldr	r0, [sp, #108]
+	lsls	r0, r0, #1
+	str	r0, [sp, #108]
+	.loc	3 319 5                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:319:5
+	b	.LBB7_73
+.Ltmp206:
+.LBB7_73:                               @   in Loop: Header=BB7_69 Depth=1
+	.loc	3 319 14 is_stmt 0              @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:319:14
+	ldr	r0, [sp, #116]
+.Ltmp207:
+	.loc	3 319 5                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:319:5
+	adds	r0, r0, #1
+	cmp	r0, #0
+	bne	.LBB7_69
+	b	.LBB7_74
+.Ltmp208:
+.LBB7_74:
+	.loc	3 323 5 is_stmt 1               @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:323:5
+	ldr	r0, [sp, #112]
+.Ltmp209:
+	.loc	3 323 5 is_stmt 0               @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:323:5
+	cmp	r0, #32
+	beq	.LBB7_77
+	b	.LBB7_75
+.LBB7_75:
+.Ltmp210:
+	.loc	3 323 5                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:323:5
+	@APP
+	cpsid i
+	@NO_APP
+	b	.LBB7_76
+.LBB7_76:                               @ =>This Inner Loop Header: Depth=1
+.Ltmp211:
+	.loc	3 323 5                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:323:5
+	b	.LBB7_76
+.Ltmp212:
+.LBB7_77:
+	.loc	3 0 5                           @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:0:5
+	movs	r0, #10
+	.loc	3 334 17 is_stmt 1              @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:334:17
+	str	r0, [sp]
+	movs	r0, #0
+	movs	r1, #1
+	movs	r2, #2
+	add	r3, sp, #116
+	bl	MPU_xTaskGenericNotifyWait
+	.loc	3 334 15 is_stmt 0              @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:334:15
+	str	r0, [sp, #120]
+.Ltmp213:
+	.loc	3 335 5 is_stmt 1               @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:335:5
+	ldr	r0, [sp, #120]
+.Ltmp214:
+	.loc	3 335 5 is_stmt 0               @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:335:5
+	cbz	r0, .LBB7_80
+	b	.LBB7_78
+.LBB7_78:
+.Ltmp215:
+	.loc	3 335 5                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:335:5
+	@APP
+	cpsid i
+	@NO_APP
+	b	.LBB7_79
+.LBB7_79:                               @ =>This Inner Loop Header: Depth=1
+.Ltmp216:
+	.loc	3 335 5                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:335:5
+	b	.LBB7_79
+.Ltmp217:
+.LBB7_80:
+	.loc	3 340 5 is_stmt 1               @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:340:5
+	movw	r0, :lower16:xTaskToNotify
+	movt	r0, :upper16:xTaskToNotify
+	ldr	r0, [r0]
+	movs	r3, #0
+	str	r3, [sp, #64]                   @ 4-byte Spill
+	str	r3, [sp]
+	mvns	r2, r3
+	mov	r1, r3
+	bl	MPU_xTaskGenericNotify
+	ldr	r2, [sp, #64]                   @ 4-byte Reload
+	.loc	3 345 17                        @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:345:17
+	str	r2, [sp]
+	add	r3, sp, #116
+	mov	r0, r2
+	mov	r1, r2
+	bl	MPU_xTaskGenericNotifyWait
+	.loc	3 345 15 is_stmt 0              @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:345:15
+	str	r0, [sp, #120]
+.Ltmp218:
+	.loc	3 346 5 is_stmt 1               @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:346:5
+	ldr	r0, [sp, #120]
+.Ltmp219:
+	.loc	3 346 5 is_stmt 0               @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:346:5
+	cmp	r0, #1
+	beq	.LBB7_83
+	b	.LBB7_81
+.LBB7_81:
+.Ltmp220:
+	.loc	3 346 5                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:346:5
+	@APP
+	cpsid i
+	@NO_APP
+	b	.LBB7_82
+.LBB7_82:                               @ =>This Inner Loop Header: Depth=1
+.Ltmp221:
+	.loc	3 346 5                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:346:5
+	b	.LBB7_82
+.Ltmp222:
+.LBB7_83:
+	.loc	3 347 5 is_stmt 1               @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:347:5
+	ldr	r0, [sp, #116]
+.Ltmp223:
+	.loc	3 347 5 is_stmt 0               @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:347:5
+	adds	r0, r0, #2
+	cbz	r0, .LBB7_86
+	b	.LBB7_84
+.LBB7_84:
+.Ltmp224:
+	.loc	3 347 5                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:347:5
+	@APP
+	cpsid i
+	@NO_APP
+	b	.LBB7_85
+.LBB7_85:                               @ =>This Inner Loop Header: Depth=1
+.Ltmp225:
+	.loc	3 347 5                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:347:5
+	b	.LBB7_85
+.Ltmp226:
+.LBB7_86:
+	.loc	3 355 5 is_stmt 1               @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:355:5
+	movw	r0, :lower16:xTaskToNotify
+	movt	r0, :upper16:xTaskToNotify
+	ldr	r0, [r0]
+	movs	r3, #0
+	str	r3, [sp, #60]                   @ 4-byte Spill
+	str	r3, [sp]
+	mov	r1, r3
+	mov	r2, r3
+	bl	MPU_xTaskGenericNotify
+	ldr	r1, [sp, #60]                   @ 4-byte Reload
+	.loc	3 356 5                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:356:5
+	str	r1, [sp]
+	movs	r2, #2
+	add	r3, sp, #116
+	mov	r0, r1
+	bl	MPU_xTaskGenericNotifyWait
+.Ltmp227:
+	.loc	3 361 5                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:361:5
+	ldr	r0, [sp, #116]
+.Ltmp228:
+	.loc	3 361 5 is_stmt 0               @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:361:5
+	adds	r0, r0, #2
+	cbz	r0, .LBB7_89
+	b	.LBB7_87
+.LBB7_87:
+.Ltmp229:
+	.loc	3 361 5                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:361:5
+	@APP
+	cpsid i
+	@NO_APP
+	b	.LBB7_88
+.LBB7_88:                               @ =>This Inner Loop Header: Depth=1
+.Ltmp230:
+	.loc	3 361 5                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:361:5
+	b	.LBB7_88
+.Ltmp231:
+.LBB7_89:
+	.loc	3 0 5                           @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:0:5
+	movs	r2, #0
+	.loc	3 366 17 is_stmt 1              @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:366:17
+	str	r2, [sp]
+	add	r3, sp, #116
+	mov	r0, r2
+	mov	r1, r2
+	bl	MPU_xTaskGenericNotifyWait
+	.loc	3 366 15 is_stmt 0              @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:366:15
+	str	r0, [sp, #120]
+.Ltmp232:
+	.loc	3 367 5 is_stmt 1               @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:367:5
+	ldr	r0, [sp, #120]
+.Ltmp233:
+	.loc	3 367 5 is_stmt 0               @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:367:5
+	cbz	r0, .LBB7_92
+	b	.LBB7_90
+.LBB7_90:
+.Ltmp234:
+	.loc	3 367 5                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:367:5
+	@APP
+	cpsid i
+	@NO_APP
+	b	.LBB7_91
+.LBB7_91:                               @ =>This Inner Loop Header: Depth=1
+.Ltmp235:
+	.loc	3 367 5                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:367:5
+	b	.LBB7_91
+.Ltmp236:
+.LBB7_92:
+	.loc	3 368 5 is_stmt 1               @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:368:5
+	ldr	r0, [sp, #116]
+.Ltmp237:
+	.loc	3 368 5 is_stmt 0               @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:368:5
+	adds	r0, r0, #4
+	cbz	r0, .LBB7_95
+	b	.LBB7_93
+.LBB7_93:
+.Ltmp238:
+	.loc	3 368 5                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:368:5
+	@APP
+	cpsid i
+	@NO_APP
+	b	.LBB7_94
+.LBB7_94:                               @ =>This Inner Loop Header: Depth=1
+.Ltmp239:
+	.loc	3 368 5                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:368:5
+	b	.LBB7_94
+.Ltmp240:
+.LBB7_95:
+	.loc	3 375 5 is_stmt 1               @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:375:5
+	movw	r0, :lower16:xTaskToNotify
+	movt	r0, :upper16:xTaskToNotify
+	ldr	r0, [r0]
+	add	r1, sp, #104
+	str	r1, [sp]
+	movs	r2, #0
+	movs	r3, #1
+	mov	r1, r2
+	bl	MPU_xTaskGenericNotify
+.Ltmp241:
+	.loc	3 376 5                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:376:5
+	ldr	r0, [sp, #116]
+.Ltmp242:
+	.loc	3 376 5 is_stmt 0               @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:376:5
+	adds	r0, r0, #4
+	cbz	r0, .LBB7_98
+	b	.LBB7_96
+.LBB7_96:
+.Ltmp243:
+	.loc	3 376 5                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:376:5
+	@APP
+	cpsid i
+	@NO_APP
+	b	.LBB7_97
+.LBB7_97:                               @ =>This Inner Loop Header: Depth=1
+.Ltmp244:
+	.loc	3 376 5                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:376:5
+	b	.LBB7_97
+.Ltmp245:
+.LBB7_98:
+	.loc	3 0 5                           @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:0:5
+	movs	r1, #0
+	.loc	3 379 5 is_stmt 1               @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:379:5
+	str	r1, [sp, #56]                   @ 4-byte Spill
+	str	r1, [sp]
+	mvns	r2, r1
+	add	r3, sp, #116
+	mov	r0, r1
+	bl	MPU_xTaskGenericNotifyWait
+	ldr	r2, [sp, #56]                   @ 4-byte Reload
+	.loc	3 380 5                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:380:5
+	movw	r0, :lower16:xTaskToNotify
+	movt	r0, :upper16:xTaskToNotify
+	ldr	r0, [r0]
+	add	r1, sp, #104
+	str	r1, [sp]
+	movs	r3, #1
+	mov	r1, r2
+	bl	MPU_xTaskGenericNotify
+.Ltmp246:
+	.loc	3 381 5                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:381:5
+	ldr	r0, [sp, #104]
+.Ltmp247:
+	.loc	3 381 5 is_stmt 0               @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:381:5
+	cbz	r0, .LBB7_101
+	b	.LBB7_99
+.LBB7_99:
+.Ltmp248:
+	.loc	3 381 5                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:381:5
+	@APP
+	cpsid i
+	@NO_APP
+	b	.LBB7_100
+.LBB7_100:                              @ =>This Inner Loop Header: Depth=1
+.Ltmp249:
+	.loc	3 381 5                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:381:5
+	b	.LBB7_100
+.Ltmp250:
+.LBB7_101:
+	.loc	3 0 5                           @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:0:5
+	movs	r0, #0
+	.loc	3 383 21 is_stmt 1              @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:383:21
+	str	r0, [sp, #100]
+	movs	r0, #1
+.Ltmp251:
+	.loc	3 385 17                        @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:385:17
+	str	r0, [sp, #112]
+	.loc	3 385 10 is_stmt 0              @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:385:10
+	b	.LBB7_102
+.LBB7_102:                              @ =>This Inner Loop Header: Depth=1
+.Ltmp252:
+	.loc	3 385 25                        @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:385:25
+	ldr	r0, [sp, #112]
+.Ltmp253:
+	.loc	3 385 5                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:385:5
+	cmp	r0, #127
+	bhi	.LBB7_108
+	b	.LBB7_103
+.LBB7_103:                              @   in Loop: Header=BB7_102 Depth=1
+.Ltmp254:
+	.loc	3 390 9 is_stmt 1               @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:390:9
+	movw	r0, :lower16:xTaskToNotify
+	movt	r0, :upper16:xTaskToNotify
+	ldr	r0, [r0]
+	ldr	r2, [sp, #112]
+	add	r1, sp, #104
+	str	r1, [sp]
+	movs	r1, #0
+	movs	r3, #1
+	bl	MPU_xTaskGenericNotify
+.Ltmp255:
+	.loc	3 391 9                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:391:9
+	ldr	r0, [sp, #100]
+	ldr	r1, [sp, #104]
+.Ltmp256:
+	.loc	3 391 9 is_stmt 0               @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:391:9
+	cmp	r0, r1
+	beq	.LBB7_106
+	b	.LBB7_104
+.LBB7_104:
+.Ltmp257:
+	.loc	3 391 9                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:391:9
+	@APP
+	cpsid i
+	@NO_APP
+	b	.LBB7_105
+.LBB7_105:                              @ =>This Inner Loop Header: Depth=1
+.Ltmp258:
+	.loc	3 391 9                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:391:9
+	b	.LBB7_105
+.Ltmp259:
+.LBB7_106:                              @   in Loop: Header=BB7_102 Depth=1
+	.loc	3 392 28 is_stmt 1              @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:392:28
+	ldr	r1, [sp, #112]
+	.loc	3 392 25 is_stmt 0              @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:392:25
+	ldr	r0, [sp, #100]
+	orrs	r0, r1
+	str	r0, [sp, #100]
+	.loc	3 393 5 is_stmt 1               @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:393:5
+	b	.LBB7_107
+.Ltmp260:
+.LBB7_107:                              @   in Loop: Header=BB7_102 Depth=1
+	.loc	3 385 49                        @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:385:49
+	ldr	r0, [sp, #112]
+	lsls	r0, r0, #1
+	str	r0, [sp, #112]
+	.loc	3 385 5 is_stmt 0               @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:385:5
+	b	.LBB7_102
+.Ltmp261:
+.LBB7_108:
+	.loc	3 0 5                           @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:0:5
+	movs	r2, #0
+	.loc	3 397 5 is_stmt 1               @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:397:5
+	str	r2, [sp, #52]                   @ 4-byte Spill
+	str	r2, [sp]
+	mvns	r1, r2
+	add	r3, sp, #116
+	mov	r0, r2
+	bl	MPU_xTaskGenericNotifyWait
+	ldr	r1, [sp, #52]                   @ 4-byte Reload
+.Ltmp262:
+	.loc	3 401 5                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:401:5
+	mov	r0, r1
+	bl	MPU_xTaskGenericNotifyStateClear
+.Ltmp263:
+	.loc	3 401 5 is_stmt 0               @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:401:5
+	cbz	r0, .LBB7_111
+	b	.LBB7_109
+.LBB7_109:
+.Ltmp264:
+	.loc	3 401 5                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:401:5
+	@APP
+	cpsid i
+	@NO_APP
+	b	.LBB7_110
+.LBB7_110:                              @ =>This Inner Loop Header: Depth=1
+.Ltmp265:
+	.loc	3 401 5                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:401:5
+	b	.LBB7_110
+.Ltmp266:
+.LBB7_111:
+	.loc	3 405 5 is_stmt 1               @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:405:5
+	movw	r0, :lower16:xTaskToNotify
+	movt	r0, :upper16:xTaskToNotify
+	ldr	r0, [r0]
+	add	r1, sp, #104
+	str	r1, [sp]
+	movs	r1, #0
+	str	r1, [sp, #48]                   @ 4-byte Spill
+	movw	r2, #34465
+	movt	r2, #1
+	movs	r3, #4
+	bl	MPU_xTaskGenericNotify
+	ldr	r1, [sp, #48]                   @ 4-byte Reload
+.Ltmp267:
+	.loc	3 409 5                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:409:5
+	mov	r0, r1
+	bl	MPU_xTaskGenericNotifyStateClear
+.Ltmp268:
+	.loc	3 409 5 is_stmt 0               @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:409:5
+	cmp	r0, #1
+	beq	.LBB7_114
+	b	.LBB7_112
+.LBB7_112:
+.Ltmp269:
+	.loc	3 409 5                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:409:5
+	@APP
+	cpsid i
+	@NO_APP
+	b	.LBB7_113
+.LBB7_113:                              @ =>This Inner Loop Header: Depth=1
+.Ltmp270:
+	.loc	3 409 5                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:409:5
+	b	.LBB7_113
+.Ltmp271:
+.LBB7_114:
+	.loc	3 0 5                           @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:0:5
+	movs	r1, #0
+.Ltmp272:
+	.loc	3 410 5 is_stmt 1               @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:410:5
+	mov	r0, r1
+	bl	MPU_xTaskGenericNotifyStateClear
+.Ltmp273:
+	.loc	3 410 5 is_stmt 0               @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:410:5
+	cbz	r0, .LBB7_117
+	b	.LBB7_115
+.LBB7_115:
+.Ltmp274:
+	.loc	3 410 5                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:410:5
+	@APP
+	cpsid i
+	@NO_APP
+	b	.LBB7_116
+.LBB7_116:                              @ =>This Inner Loop Header: Depth=1
+.Ltmp275:
+	.loc	3 410 5                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:410:5
+	b	.LBB7_116
+.Ltmp276:
+.LBB7_117:
+	.loc	3 419 5 is_stmt 1               @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:419:5
+	movw	r0, :lower16:xTaskToNotify
+	movt	r0, :upper16:xTaskToNotify
+	str	r0, [sp, #44]                   @ 4-byte Spill
+	ldr	r0, [r0]
+	movs	r1, #0
+	str	r1, [sp, #40]                   @ 4-byte Spill
+	str	r1, [sp]
+	mvns	r2, r1
+	movs	r3, #1
+	bl	MPU_xTaskGenericNotify
+	ldr	r1, [sp, #40]                   @ 4-byte Reload
+                                        @ kill: def $r2 killed $r0
+.Ltmp277:
+	.loc	3 423 5                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:423:5
+	ldr	r0, [sp, #44]                   @ 4-byte Reload
+	ldr	r0, [r0]
+	movs	r2, #255
+	lsls	r2, r2, #24
+	bl	MPU_ulTaskGenericNotifyValueClear
+.Ltmp278:
+	.loc	3 423 5 is_stmt 0               @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:423:5
+	adds	r0, r0, #1
+	cbz	r0, .LBB7_120
+	b	.LBB7_118
+.LBB7_118:
+.Ltmp279:
+	.loc	3 423 5                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:423:5
+	@APP
+	cpsid i
+	@NO_APP
+	b	.LBB7_119
+.LBB7_119:                              @ =>This Inner Loop Header: Depth=1
+.Ltmp280:
+	.loc	3 423 5                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:423:5
+	b	.LBB7_119
+.Ltmp281:
+.LBB7_120:
+	.loc	3 427 5 is_stmt 1               @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:427:5
+	movw	r0, :lower16:xTaskToNotify
+	movt	r0, :upper16:xTaskToNotify
+	ldr	r0, [r0]
+	movs	r1, #0
+	movs	r2, #255
+	bl	MPU_ulTaskGenericNotifyValueClear
+	movw	r1, #65535
+	movt	r1, #255
+.Ltmp282:
+	.loc	3 427 5 is_stmt 0               @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:427:5
+	cmp	r0, r1
+	beq	.LBB7_123
+	b	.LBB7_121
+.LBB7_121:
+.Ltmp283:
+	.loc	3 427 5                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:427:5
+	@APP
+	cpsid i
+	@NO_APP
+	b	.LBB7_122
+.LBB7_122:                              @ =>This Inner Loop Header: Depth=1
+.Ltmp284:
+	.loc	3 427 5                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:427:5
+	b	.LBB7_122
+.Ltmp285:
+.LBB7_123:
+	.loc	3 431 5 is_stmt 1               @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:431:5
+	movw	r0, :lower16:xTaskToNotify
+	movt	r0, :upper16:xTaskToNotify
+	ldr	r0, [r0]
+	movs	r1, #0
+	mvns	r2, r1
+	bl	MPU_ulTaskGenericNotifyValueClear
+	movw	r1, #65280
+	movt	r1, #255
+.Ltmp286:
+	.loc	3 431 5 is_stmt 0               @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:431:5
+	cmp	r0, r1
+	beq	.LBB7_126
+	b	.LBB7_124
+.LBB7_124:
+.Ltmp287:
+	.loc	3 431 5                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:431:5
+	@APP
+	cpsid i
+	@NO_APP
+	b	.LBB7_125
+.LBB7_125:                              @ =>This Inner Loop Header: Depth=1
+.Ltmp288:
+	.loc	3 431 5                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:431:5
+	b	.LBB7_125
+.Ltmp289:
+.LBB7_126:
+	.loc	3 434 5 is_stmt 1               @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:434:5
+	movw	r0, :lower16:xTaskToNotify
+	movt	r0, :upper16:xTaskToNotify
+	ldr	r0, [r0]
+	movs	r1, #0
+	mvns	r2, r1
+	bl	MPU_ulTaskGenericNotifyValueClear
+.Ltmp290:
+	.loc	3 434 5 is_stmt 0               @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:434:5
+	cbz	r0, .LBB7_129
+	b	.LBB7_127
+.LBB7_127:
+.Ltmp291:
+	.loc	3 434 5                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:434:5
+	@APP
+	cpsid i
+	@NO_APP
+	b	.LBB7_128
+.LBB7_128:                              @ =>This Inner Loop Header: Depth=1
+.Ltmp292:
+	.loc	3 434 5                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:434:5
+	b	.LBB7_128
+.Ltmp293:
+.LBB7_129:
+	.loc	3 435 5 is_stmt 1               @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:435:5
+	movw	r0, :lower16:xTaskToNotify
+	movt	r0, :upper16:xTaskToNotify
+	ldr	r0, [r0]
+	movs	r2, #0
+	mov	r1, r2
+	bl	MPU_ulTaskGenericNotifyValueClear
+.Ltmp294:
+	.loc	3 435 5 is_stmt 0               @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:435:5
+	cbz	r0, .LBB7_132
+	b	.LBB7_130
+.LBB7_130:
+.Ltmp295:
+	.loc	3 435 5                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:435:5
+	@APP
+	cpsid i
+	@NO_APP
+	b	.LBB7_131
+.LBB7_131:                              @ =>This Inner Loop Header: Depth=1
+.Ltmp296:
+	.loc	3 435 5                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:435:5
+	b	.LBB7_131
+.Ltmp297:
+.LBB7_132:
+	.loc	3 436 5 is_stmt 1               @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:436:5
+	movw	r0, :lower16:xTaskToNotify
+	movt	r0, :upper16:xTaskToNotify
+	ldr	r0, [r0]
+	movs	r1, #0
+	mvns	r2, r1
+	bl	MPU_ulTaskGenericNotifyValueClear
+.Ltmp298:
+	.loc	3 436 5 is_stmt 0               @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:436:5
+	cbz	r0, .LBB7_135
+	b	.LBB7_133
+.LBB7_133:
+.Ltmp299:
+	.loc	3 436 5                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:436:5
+	@APP
+	cpsid i
+	@NO_APP
+	b	.LBB7_134
+.LBB7_134:                              @ =>This Inner Loop Header: Depth=1
+.Ltmp300:
+	.loc	3 436 5                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:436:5
+	b	.LBB7_134
+.Ltmp301:
+.LBB7_135:
+	.loc	3 0 5                           @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:0:5
+	movs	r1, #0
+.Ltmp302:
+	.loc	3 440 5 is_stmt 1               @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:440:5
+	mov	r0, r1
+	bl	MPU_xTaskGenericNotifyStateClear
+.Ltmp303:
+	.loc	3 440 5 is_stmt 0               @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:440:5
+	cmp	r0, #1
+	beq	.LBB7_138
+	b	.LBB7_136
+.LBB7_136:
+.Ltmp304:
+	.loc	3 440 5                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:440:5
+	@APP
+	cpsid i
+	@NO_APP
+	b	.LBB7_137
+.LBB7_137:                              @ =>This Inner Loop Header: Depth=1
+.Ltmp305:
+	.loc	3 440 5                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:440:5
+	b	.LBB7_137
+.Ltmp306:
+.LBB7_138:
+	.loc	3 0 5                           @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:0:5
+	movs	r1, #0
+.Ltmp307:
+	.loc	3 441 5 is_stmt 1               @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:441:5
+	mov	r0, r1
+	bl	MPU_xTaskGenericNotifyStateClear
+.Ltmp308:
+	.loc	3 441 5 is_stmt 0               @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:441:5
+	cbz	r0, .LBB7_141
+	b	.LBB7_139
+.LBB7_139:
+.Ltmp309:
+	.loc	3 441 5                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:441:5
+	@APP
+	cpsid i
+	@NO_APP
+	b	.LBB7_140
+.LBB7_140:                              @ =>This Inner Loop Header: Depth=1
+.Ltmp310:
+	.loc	3 441 5                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:441:5
+	b	.LBB7_140
+.Ltmp311:
+.LBB7_141:
+	.loc	3 446 28 is_stmt 1              @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:446:28
+	movw	r1, :lower16:ulNotifyCycleCount
+	movt	r1, :upper16:ulNotifyCycleCount
+	ldr	r0, [r1]
+	adds	r0, r0, #1
+	str	r0, [r1]
+	movs	r3, #0
+	.loc	3 449 5                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:449:5
+	str	r3, [sp, #32]                   @ 4-byte Spill
+	str	r3, [sp]
+	mvns	r1, r3
+	str	r1, [sp, #36]                   @ 4-byte Spill
+	mov	r0, r3
+	mov	r2, r3
+	bl	MPU_xTaskGenericNotifyWait
+                                        @ kill: def $r1 killed $r0
+	.loc	3 453 5                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:453:5
+	ldr	r0, [sp, #32]                   @ 4-byte Reload
+	movs	r1, #4
+	bl	MPU_vTaskPrioritySet
+	ldr	r0, [sp, #32]                   @ 4-byte Reload
+	.loc	3 459 21                        @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:459:21
+	str	r0, [sp, #116]
+	.loc	3 460 5                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:460:5
+	movw	r0, :lower16:xTimer
+	movt	r0, :upper16:xTimer
+	ldr	r0, [r0, #4]
+	str	r0, [sp, #28]                   @ 4-byte Spill
+	bl	MPU_xTaskGetTickCount
+	ldr	r1, [sp, #36]                   @ 4-byte Reload
+	ldr	r3, [sp, #32]                   @ 4-byte Reload
+	mov	r2, r0
+	ldr	r0, [sp, #28]                   @ 4-byte Reload
+	str	r1, [sp]
+	movs	r1, #1
+	bl	MPU_xTimerGenericCommand
+	ldr	r2, [sp, #32]                   @ 4-byte Reload
+                                        @ kill: def $r1 killed $r0
+	.loc	3 463 17                        @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:463:17
+	ldr	r0, [sp, #36]                   @ 4-byte Reload
+	str	r0, [sp]
+	add	r3, sp, #116
+	mov	r0, r2
+	mov	r1, r2
+	bl	MPU_xTaskGenericNotifyWait
+	.loc	3 463 15 is_stmt 0              @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:463:15
+	str	r0, [sp, #120]
+.Ltmp312:
+	.loc	3 464 5 is_stmt 1               @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:464:5
+	ldr	r0, [sp, #120]
+.Ltmp313:
+	.loc	3 464 5 is_stmt 0               @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:464:5
+	cbz	r0, .LBB7_144
+	b	.LBB7_142
+.LBB7_142:
+.Ltmp314:
+	.loc	3 464 5                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:464:5
+	@APP
+	cpsid i
+	@NO_APP
+	b	.LBB7_143
+.LBB7_143:                              @ =>This Inner Loop Header: Depth=1
+.Ltmp315:
+	.loc	3 464 5                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:464:5
+	b	.LBB7_143
+.Ltmp316:
+.LBB7_144:
+	.loc	3 465 5 is_stmt 1               @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:465:5
+	ldr	r0, [sp, #116]
+.Ltmp317:
+	.loc	3 465 5 is_stmt 0               @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:465:5
+	cbz	r0, .LBB7_147
+	b	.LBB7_145
+.LBB7_145:
+.Ltmp318:
+	.loc	3 465 5                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:465:5
+	@APP
+	cpsid i
+	@NO_APP
+	b	.LBB7_146
+.LBB7_146:                              @ =>This Inner Loop Header: Depth=1
+.Ltmp319:
+	.loc	3 465 5                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:465:5
+	b	.LBB7_146
+.Ltmp320:
+.LBB7_147:
+	.loc	3 469 28 is_stmt 1              @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:469:28
+	movw	r1, :lower16:ulNotifyCycleCount
+	movt	r1, :upper16:ulNotifyCycleCount
+	ldr	r0, [r1]
+	adds	r0, r0, #1
+	str	r0, [r1]
+	.loc	3 475 5                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:475:5
+	movw	r0, :lower16:xTimer
+	movt	r0, :upper16:xTimer
+	ldr	r0, [r0, #4]
+	str	r0, [sp, #16]                   @ 4-byte Spill
+	bl	MPU_xTaskGetTickCount
+	mov	r2, r0
+	ldr	r0, [sp, #16]                   @ 4-byte Reload
+	movs	r3, #0
+	str	r3, [sp, #20]                   @ 4-byte Spill
+	mvns	r1, r3
+	str	r1, [sp, #24]                   @ 4-byte Spill
+	str	r1, [sp]
+	movs	r1, #1
+	bl	MPU_xTimerGenericCommand
+	ldr	r2, [sp, #20]                   @ 4-byte Reload
+                                        @ kill: def $r1 killed $r0
+	.loc	3 478 17                        @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:478:17
+	ldr	r0, [sp, #24]                   @ 4-byte Reload
+	str	r0, [sp]
+	add	r3, sp, #116
+	mov	r0, r2
+	mov	r1, r2
+	bl	MPU_xTaskGenericNotifyWait
+	.loc	3 478 15 is_stmt 0              @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:478:15
+	str	r0, [sp, #120]
+.Ltmp321:
+	.loc	3 479 5 is_stmt 1               @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:479:5
+	ldr	r0, [sp, #120]
+.Ltmp322:
+	.loc	3 479 5 is_stmt 0               @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:479:5
+	cmp	r0, #1
+	beq	.LBB7_150
+	b	.LBB7_148
+.LBB7_148:
+.Ltmp323:
+	.loc	3 479 5                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:479:5
+	@APP
+	cpsid i
+	@NO_APP
+	b	.LBB7_149
+.LBB7_149:                              @ =>This Inner Loop Header: Depth=1
+.Ltmp324:
+	.loc	3 479 5                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:479:5
+	b	.LBB7_149
+.Ltmp325:
+.LBB7_150:
+	.loc	3 481 5 is_stmt 1               @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:481:5
+	ldr	r0, [sp, #116]
+.Ltmp326:
+	.loc	3 481 5 is_stmt 0               @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:481:5
+	cbnz	r0, .LBB7_153
+	b	.LBB7_151
+.LBB7_151:
+.Ltmp327:
+	.loc	3 481 5                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:481:5
+	@APP
+	cpsid i
+	@NO_APP
+	b	.LBB7_152
+.LBB7_152:                              @ =>This Inner Loop Header: Depth=1
+.Ltmp328:
+	.loc	3 481 5                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:481:5
+	b	.LBB7_152
+.Ltmp329:
+.LBB7_153:
+	.loc	3 0 5                           @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:0:5
+	movs	r1, #0
+	.loc	3 485 5 is_stmt 1               @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:485:5
+	str	r1, [sp, #12]                   @ 4-byte Spill
+	mov	r0, r1
+	bl	MPU_vTaskPrioritySet
+	ldr	r3, [sp, #12]                   @ 4-byte Reload
+	.loc	3 486 5                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:486:5
+	movw	r0, :lower16:xTimer
+	movt	r0, :upper16:xTimer
+	ldr	r0, [r0, #4]
+	mvns	r1, r3
+	str	r1, [sp, #8]                    @ 4-byte Spill
+	str	r1, [sp]
+	movs	r1, #5
+	mov	r2, r3
+	bl	MPU_xTimerGenericCommand
+	ldr	r1, [sp, #8]                    @ 4-byte Reload
+	ldr	r3, [sp, #12]                   @ 4-byte Reload
+	.loc	3 489 28                        @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:489:28
+	movw	r2, :lower16:ulNotifyCycleCount
+	movt	r2, :upper16:ulNotifyCycleCount
+	ldr	r0, [r2]
+	adds	r0, r0, #1
+	str	r0, [r2]
+	.loc	3 492 5                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:492:5
+	str	r3, [sp]
+	mov	r0, r3
+	mov	r2, r3
+	bl	MPU_xTaskGenericNotifyWait
+	.loc	3 493 1                         @ ../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo/TaskNotify.c:493:1
+	add	sp, #128
+	pop	{r7, pc}
+.Ltmp330:
+.Lfunc_end7:
+	.size	prvSingleTaskTests, .Lfunc_end7-prvSingleTaskTests
+	.cfi_endproc
+	.cantunwind
+	.fnend
+                                        @ -- End function
+	.type	vStartTaskNotifyTask.xNotifiedTaskStack,%object @ @vStartTaskNotifyTask.xNotifiedTaskStack
+	.section	.bss.vStartTaskNotifyTask.xNotifiedTaskStack,"aw",%nobits
+	.p2align	9, 0x0
+vStartTaskNotifyTask.xNotifiedTaskStack:
+	.zero	512
+	.size	vStartTaskNotifyTask.xNotifiedTaskStack, 512
+
+	.type	.L.str,%object                  @ @.str
+	.section	.rodata.str1.1,"aMS",%progbits,1
+.L.str:
+	.asciz	"Notified"
+	.size	.L.str, 9
+
+	.type	.L__const.vStartTaskNotifyTask.xNotifiedTask,%object @ @__const.vStartTaskNotifyTask.xNotifiedTask
+	.section	.rodata..L__const.vStartTaskNotifyTask.xNotifiedTask,"a",%progbits
+	.p2align	2, 0x0
+.L__const.vStartTaskNotifyTask.xNotifiedTask:
+	.long	prvNotifiedTask
+	.long	.L.str
+	.short	128                             @ 0x80
+	.zero	2
+	.long	0
+	.long	2147483648                      @ 0x80000000
+	.long	vStartTaskNotifyTask.xNotifiedTaskStack
+	.zero	36
+	.long	0
+	.size	.L__const.vStartTaskNotifyTask.xNotifiedTask, 64
+
+	.type	xTaskToNotify,%object           @ @xTaskToNotify
+	.section	.bss.xTaskToNotify,"aw",%nobits
+	.p2align	5, 0x0
+xTaskToNotify:
+	.zero	32
+	.size	xTaskToNotify, 32
+
+	.type	uxNextRand,%object              @ @uxNextRand
+	.section	.bss.uxNextRand,"aw",%nobits
+	.p2align	5, 0x0
+uxNextRand:
+	.zero	32
+	.size	uxNextRand, 32
+
+	.type	.L.str.1,%object                @ @.str.1
+	.section	.rodata.str1.1,"aMS",%progbits,1
+.L.str.1:
+	.asciz	"Notifier"
+	.size	.L.str.1, 9
+
+	.type	xTimer,%object                  @ @xTimer
+	.section	.bss.xTimer,"aw",%nobits
+	.p2align	5, 0x0
+xTimer:
+	.zero	32
+	.size	xTimer, 32
+
+	.type	.L.str.2,%object                @ @.str.2
+	.section	.rodata.str1.1,"aMS",%progbits,1
+.L.str.2:
+	.asciz	"SingleNotify"
+	.size	.L.str.2, 13
+
+	.type	xNotifyTaskFromISR.xCallCount,%object @ @xNotifyTaskFromISR.xCallCount
+	.section	.bss.xNotifyTaskFromISR.xCallCount,"aw",%nobits
+	.p2align	2, 0x0
+xNotifyTaskFromISR.xCallCount:
+	.long	0                               @ 0x0
+	.size	xNotifyTaskFromISR.xCallCount, 4
+
+	.type	xNotifyTaskFromISR.xAPIToUse,%object @ @xNotifyTaskFromISR.xAPIToUse
+	.section	.bss.xNotifyTaskFromISR.xAPIToUse,"aw",%nobits
+	.p2align	2, 0x0
+xNotifyTaskFromISR.xAPIToUse:
+	.long	0                               @ 0x0
+	.size	xNotifyTaskFromISR.xAPIToUse, 4
+
+	.type	ulTimerNotificationsSent,%object @ @ulTimerNotificationsSent
+	.section	.bss.ulTimerNotificationsSent,"aw",%nobits
+	.p2align	5, 0x0
+ulTimerNotificationsSent:
+	.zero	32
+	.size	ulTimerNotificationsSent, 32
+
+	.type	xAreTaskNotificationTasksStillRunning.ulLastNotifyCycleCount,%object @ @xAreTaskNotificationTasksStillRunning.ulLastNotifyCycleCount
+	.section	.bss.xAreTaskNotificationTasksStillRunning.ulLastNotifyCycleCount,"aw",%nobits
+	.p2align	2, 0x0
+xAreTaskNotificationTasksStillRunning.ulLastNotifyCycleCount:
+	.long	0                               @ 0x0
+	.size	xAreTaskNotificationTasksStillRunning.ulLastNotifyCycleCount, 4
+
+	.type	ulNotifyCycleCount,%object      @ @ulNotifyCycleCount
+	.section	.bss.ulNotifyCycleCount,"aw",%nobits
+	.p2align	5, 0x0
+ulNotifyCycleCount:
+	.zero	32
+	.size	ulNotifyCycleCount, 32
+
+	.type	xErrorStatus,%object            @ @xErrorStatus
+	.section	.data.xErrorStatus,"aw",%progbits
+	.p2align	5, 0x0
+xErrorStatus:
+	.long	1                               @ 0x1
+	.long	0                               @ 0x0
+	.long	0                               @ 0x0
+	.long	0                               @ 0x0
+	.long	0                               @ 0x0
+	.long	0                               @ 0x0
+	.long	0                               @ 0x0
+	.long	0                               @ 0x0
+	.size	xErrorStatus, 32
+
+	.type	ulTimerNotificationsReceived,%object @ @ulTimerNotificationsReceived
+	.section	.bss.ulTimerNotificationsReceived,"aw",%nobits
+	.p2align	5, 0x0
+ulTimerNotificationsReceived:
+	.zero	32
+	.size	ulTimerNotificationsReceived, 32
+
+	.type	prvSuspendedTaskTimerTestCallback.ulCallCount,%object @ @prvSuspendedTaskTimerTestCallback.ulCallCount
+	.section	.bss.prvSuspendedTaskTimerTestCallback.ulCallCount,"aw",%nobits
+	.p2align	2, 0x0
+prvSuspendedTaskTimerTestCallback.ulCallCount:
+	.long	0                               @ 0x0
+	.size	prvSuspendedTaskTimerTestCallback.ulCallCount, 4
+
+	.file	7 "C:\\Users\\karahulx\\Downloads\\Kernel\\FreeRTOS\\FreeRTOS\\Demo\\CORTEX_MPU_M23_Nuvoton_NuMaker_PFM_M2351_IAR_GCC\\Projects_NTZ\\Keil" "../../../../Source/include/projdefs.h"
+	.file	8 "C:\\Users\\karahulx\\Downloads\\Kernel\\FreeRTOS\\FreeRTOS\\Demo\\CORTEX_MPU_M23_Nuvoton_NuMaker_PFM_M2351_IAR_GCC\\Projects_NTZ\\Keil" "../../../../Source/include\\FreeRTOS.h"
+	.section	.debug_abbrev,"",%progbits
+	.byte	1                               @ Abbreviation Code
+	.byte	17                              @ DW_TAG_compile_unit
+	.byte	1                               @ DW_CHILDREN_yes
+	.byte	37                              @ DW_AT_producer
+	.byte	14                              @ DW_FORM_strp
+	.byte	19                              @ DW_AT_language
+	.byte	5                               @ DW_FORM_data2
+	.byte	3                               @ DW_AT_name
+	.byte	14                              @ DW_FORM_strp
+	.byte	16                              @ DW_AT_stmt_list
+	.byte	23                              @ DW_FORM_sec_offset
+	.byte	27                              @ DW_AT_comp_dir
+	.byte	14                              @ DW_FORM_strp
+	.byte	17                              @ DW_AT_low_pc
+	.byte	1                               @ DW_FORM_addr
+	.byte	85                              @ DW_AT_ranges
+	.byte	23                              @ DW_FORM_sec_offset
+	.byte	0                               @ EOM(1)
+	.byte	0                               @ EOM(2)
+	.byte	2                               @ Abbreviation Code
+	.byte	46                              @ DW_TAG_subprogram
+	.byte	1                               @ DW_CHILDREN_yes
+	.byte	17                              @ DW_AT_low_pc
+	.byte	1                               @ DW_FORM_addr
+	.byte	18                              @ DW_AT_high_pc
+	.byte	6                               @ DW_FORM_data4
+	.byte	64                              @ DW_AT_frame_base
+	.byte	24                              @ DW_FORM_exprloc
+	.byte	3                               @ DW_AT_name
+	.byte	14                              @ DW_FORM_strp
+	.byte	58                              @ DW_AT_decl_file
+	.byte	11                              @ DW_FORM_data1
+	.byte	59                              @ DW_AT_decl_line
+	.byte	11                              @ DW_FORM_data1
+	.byte	39                              @ DW_AT_prototyped
+	.byte	25                              @ DW_FORM_flag_present
+	.byte	63                              @ DW_AT_external
+	.byte	25                              @ DW_FORM_flag_present
+	.byte	0                               @ EOM(1)
+	.byte	0                               @ EOM(2)
+	.byte	3                               @ Abbreviation Code
+	.byte	52                              @ DW_TAG_variable
+	.byte	0                               @ DW_CHILDREN_no
+	.byte	3                               @ DW_AT_name
+	.byte	14                              @ DW_FORM_strp
+	.byte	73                              @ DW_AT_type
+	.byte	19                              @ DW_FORM_ref4
+	.byte	58                              @ DW_AT_decl_file
+	.byte	11                              @ DW_FORM_data1
+	.byte	59                              @ DW_AT_decl_line
+	.byte	11                              @ DW_FORM_data1
+	.ascii	"\210\001"                      @ DW_AT_alignment
+	.byte	15                              @ DW_FORM_udata
+	.byte	2                               @ DW_AT_location
+	.byte	24                              @ DW_FORM_exprloc
+	.byte	0                               @ EOM(1)
+	.byte	0                               @ EOM(2)
+	.byte	4                               @ Abbreviation Code
+	.byte	52                              @ DW_TAG_variable
+	.byte	0                               @ DW_CHILDREN_no
+	.byte	2                               @ DW_AT_location
+	.byte	24                              @ DW_FORM_exprloc
+	.byte	3                               @ DW_AT_name
+	.byte	14                              @ DW_FORM_strp
+	.byte	58                              @ DW_AT_decl_file
+	.byte	11                              @ DW_FORM_data1
+	.byte	59                              @ DW_AT_decl_line
+	.byte	11                              @ DW_FORM_data1
+	.byte	73                              @ DW_AT_type
+	.byte	19                              @ DW_FORM_ref4
+	.byte	0                               @ EOM(1)
+	.byte	0                               @ EOM(2)
+	.byte	5                               @ Abbreviation Code
+	.byte	1                               @ DW_TAG_array_type
+	.byte	1                               @ DW_CHILDREN_yes
+	.byte	73                              @ DW_AT_type
+	.byte	19                              @ DW_FORM_ref4
+	.byte	0                               @ EOM(1)
+	.byte	0                               @ EOM(2)
+	.byte	6                               @ Abbreviation Code
+	.byte	33                              @ DW_TAG_subrange_type
+	.byte	0                               @ DW_CHILDREN_no
+	.byte	73                              @ DW_AT_type
+	.byte	19                              @ DW_FORM_ref4
+	.byte	55                              @ DW_AT_count
+	.byte	11                              @ DW_FORM_data1
+	.byte	0                               @ EOM(1)
+	.byte	0                               @ EOM(2)
+	.byte	7                               @ Abbreviation Code
+	.byte	22                              @ DW_TAG_typedef
+	.byte	0                               @ DW_CHILDREN_no
+	.byte	73                              @ DW_AT_type
+	.byte	19                              @ DW_FORM_ref4
+	.byte	3                               @ DW_AT_name
+	.byte	14                              @ DW_FORM_strp
+	.byte	58                              @ DW_AT_decl_file
+	.byte	11                              @ DW_FORM_data1
+	.byte	59                              @ DW_AT_decl_line
+	.byte	11                              @ DW_FORM_data1
+	.byte	0                               @ EOM(1)
+	.byte	0                               @ EOM(2)
+	.byte	8                               @ Abbreviation Code
+	.byte	36                              @ DW_TAG_base_type
+	.byte	0                               @ DW_CHILDREN_no
+	.byte	3                               @ DW_AT_name
+	.byte	14                              @ DW_FORM_strp
+	.byte	62                              @ DW_AT_encoding
+	.byte	11                              @ DW_FORM_data1
+	.byte	11                              @ DW_AT_byte_size
+	.byte	11                              @ DW_FORM_data1
+	.byte	0                               @ EOM(1)
+	.byte	0                               @ EOM(2)
+	.byte	9                               @ Abbreviation Code
+	.byte	36                              @ DW_TAG_base_type
+	.byte	0                               @ DW_CHILDREN_no
+	.byte	3                               @ DW_AT_name
+	.byte	14                              @ DW_FORM_strp
+	.byte	11                              @ DW_AT_byte_size
+	.byte	11                              @ DW_FORM_data1
+	.byte	62                              @ DW_AT_encoding
+	.byte	11                              @ DW_FORM_data1
+	.byte	0                               @ EOM(1)
+	.byte	0                               @ EOM(2)
+	.byte	10                              @ Abbreviation Code
+	.byte	52                              @ DW_TAG_variable
+	.byte	0                               @ DW_CHILDREN_no
+	.byte	73                              @ DW_AT_type
+	.byte	19                              @ DW_FORM_ref4
+	.byte	58                              @ DW_AT_decl_file
+	.byte	11                              @ DW_FORM_data1
+	.byte	59                              @ DW_AT_decl_line
+	.byte	11                              @ DW_FORM_data1
+	.byte	2                               @ DW_AT_location
+	.byte	24                              @ DW_FORM_exprloc
+	.byte	0                               @ EOM(1)
+	.byte	0                               @ EOM(2)
+	.byte	11                              @ Abbreviation Code
+	.byte	46                              @ DW_TAG_subprogram
+	.byte	1                               @ DW_CHILDREN_yes
+	.byte	17                              @ DW_AT_low_pc
+	.byte	1                               @ DW_FORM_addr
+	.byte	18                              @ DW_AT_high_pc
+	.byte	6                               @ DW_FORM_data4
+	.byte	64                              @ DW_AT_frame_base
+	.byte	24                              @ DW_FORM_exprloc
+	.byte	3                               @ DW_AT_name
+	.byte	14                              @ DW_FORM_strp
+	.byte	58                              @ DW_AT_decl_file
+	.byte	11                              @ DW_FORM_data1
+	.byte	59                              @ DW_AT_decl_line
+	.byte	5                               @ DW_FORM_data2
+	.byte	39                              @ DW_AT_prototyped
+	.byte	25                              @ DW_FORM_flag_present
+	.byte	63                              @ DW_AT_external
+	.byte	25                              @ DW_FORM_flag_present
+	.byte	0                               @ EOM(1)
+	.byte	0                               @ EOM(2)
+	.byte	12                              @ Abbreviation Code
+	.byte	52                              @ DW_TAG_variable
+	.byte	0                               @ DW_CHILDREN_no
+	.byte	3                               @ DW_AT_name
+	.byte	14                              @ DW_FORM_strp
+	.byte	73                              @ DW_AT_type
+	.byte	19                              @ DW_FORM_ref4
+	.byte	58                              @ DW_AT_decl_file
+	.byte	11                              @ DW_FORM_data1
+	.byte	59                              @ DW_AT_decl_line
+	.byte	5                               @ DW_FORM_data2
+	.byte	2                               @ DW_AT_location
+	.byte	24                              @ DW_FORM_exprloc
+	.byte	0                               @ EOM(1)
+	.byte	0                               @ EOM(2)
+	.byte	13                              @ Abbreviation Code
+	.byte	52                              @ DW_TAG_variable
+	.byte	0                               @ DW_CHILDREN_no
+	.byte	2                               @ DW_AT_location
+	.byte	24                              @ DW_FORM_exprloc
+	.byte	3                               @ DW_AT_name
+	.byte	14                              @ DW_FORM_strp
+	.byte	58                              @ DW_AT_decl_file
+	.byte	11                              @ DW_FORM_data1
+	.byte	59                              @ DW_AT_decl_line
+	.byte	5                               @ DW_FORM_data2
+	.byte	73                              @ DW_AT_type
+	.byte	19                              @ DW_FORM_ref4
+	.byte	0                               @ EOM(1)
+	.byte	0                               @ EOM(2)
+	.byte	14                              @ Abbreviation Code
+	.byte	46                              @ DW_TAG_subprogram
+	.byte	1                               @ DW_CHILDREN_yes
+	.byte	17                              @ DW_AT_low_pc
+	.byte	1                               @ DW_FORM_addr
+	.byte	18                              @ DW_AT_high_pc
+	.byte	6                               @ DW_FORM_data4
+	.byte	64                              @ DW_AT_frame_base
+	.byte	24                              @ DW_FORM_exprloc
+	.byte	3                               @ DW_AT_name
+	.byte	14                              @ DW_FORM_strp
+	.byte	58                              @ DW_AT_decl_file
+	.byte	11                              @ DW_FORM_data1
+	.byte	59                              @ DW_AT_decl_line
+	.byte	5                               @ DW_FORM_data2
+	.byte	39                              @ DW_AT_prototyped
+	.byte	25                              @ DW_FORM_flag_present
+	.byte	73                              @ DW_AT_type
+	.byte	19                              @ DW_FORM_ref4
+	.byte	63                              @ DW_AT_external
+	.byte	25                              @ DW_FORM_flag_present
+	.byte	0                               @ EOM(1)
+	.byte	0                               @ EOM(2)
+	.byte	15                              @ Abbreviation Code
+	.byte	15                              @ DW_TAG_pointer_type
+	.byte	0                               @ DW_CHILDREN_no
+	.byte	73                              @ DW_AT_type
+	.byte	19                              @ DW_FORM_ref4
+	.byte	0                               @ EOM(1)
+	.byte	0                               @ EOM(2)
+	.byte	16                              @ Abbreviation Code
+	.byte	19                              @ DW_TAG_structure_type
+	.byte	0                               @ DW_CHILDREN_no
+	.byte	3                               @ DW_AT_name
+	.byte	14                              @ DW_FORM_strp
+	.byte	60                              @ DW_AT_declaration
+	.byte	25                              @ DW_FORM_flag_present
+	.byte	0                               @ EOM(1)
+	.byte	0                               @ EOM(2)
+	.byte	17                              @ Abbreviation Code
+	.byte	46                              @ DW_TAG_subprogram
+	.byte	1                               @ DW_CHILDREN_yes
+	.byte	17                              @ DW_AT_low_pc
+	.byte	1                               @ DW_FORM_addr
+	.byte	18                              @ DW_AT_high_pc
+	.byte	6                               @ DW_FORM_data4
+	.byte	64                              @ DW_AT_frame_base
+	.byte	24                              @ DW_FORM_exprloc
+	.byte	3                               @ DW_AT_name
+	.byte	14                              @ DW_FORM_strp
+	.byte	58                              @ DW_AT_decl_file
+	.byte	11                              @ DW_FORM_data1
+	.byte	59                              @ DW_AT_decl_line
+	.byte	5                               @ DW_FORM_data2
+	.byte	39                              @ DW_AT_prototyped
+	.byte	25                              @ DW_FORM_flag_present
+	.byte	0                               @ EOM(1)
+	.byte	0                               @ EOM(2)
+	.byte	18                              @ Abbreviation Code
+	.byte	5                               @ DW_TAG_formal_parameter
+	.byte	0                               @ DW_CHILDREN_no
+	.byte	2                               @ DW_AT_location
+	.byte	24                              @ DW_FORM_exprloc
+	.byte	3                               @ DW_AT_name
+	.byte	14                              @ DW_FORM_strp
+	.byte	58                              @ DW_AT_decl_file
+	.byte	11                              @ DW_FORM_data1
+	.byte	59                              @ DW_AT_decl_line
+	.byte	5                               @ DW_FORM_data2
+	.byte	73                              @ DW_AT_type
+	.byte	19                              @ DW_FORM_ref4
+	.byte	0                               @ EOM(1)
+	.byte	0                               @ EOM(2)
+	.byte	19                              @ Abbreviation Code
+	.byte	53                              @ DW_TAG_volatile_type
+	.byte	0                               @ DW_CHILDREN_no
+	.byte	73                              @ DW_AT_type
+	.byte	19                              @ DW_FORM_ref4
+	.byte	0                               @ EOM(1)
+	.byte	0                               @ EOM(2)
+	.byte	20                              @ Abbreviation Code
+	.byte	4                               @ DW_TAG_enumeration_type
+	.byte	1                               @ DW_CHILDREN_yes
+	.byte	73                              @ DW_AT_type
+	.byte	19                              @ DW_FORM_ref4
+	.byte	11                              @ DW_AT_byte_size
+	.byte	11                              @ DW_FORM_data1
+	.byte	58                              @ DW_AT_decl_file
+	.byte	11                              @ DW_FORM_data1
+	.byte	59                              @ DW_AT_decl_line
+	.byte	11                              @ DW_FORM_data1
+	.byte	0                               @ EOM(1)
+	.byte	0                               @ EOM(2)
+	.byte	21                              @ Abbreviation Code
+	.byte	40                              @ DW_TAG_enumerator
+	.byte	0                               @ DW_CHILDREN_no
+	.byte	3                               @ DW_AT_name
+	.byte	14                              @ DW_FORM_strp
+	.byte	28                              @ DW_AT_const_value
+	.byte	15                              @ DW_FORM_udata
+	.byte	0                               @ EOM(1)
+	.byte	0                               @ EOM(2)
+	.byte	22                              @ Abbreviation Code
+	.byte	46                              @ DW_TAG_subprogram
+	.byte	1                               @ DW_CHILDREN_yes
+	.byte	17                              @ DW_AT_low_pc
+	.byte	1                               @ DW_FORM_addr
+	.byte	18                              @ DW_AT_high_pc
+	.byte	6                               @ DW_FORM_data4
+	.byte	64                              @ DW_AT_frame_base
+	.byte	24                              @ DW_FORM_exprloc
+	.byte	3                               @ DW_AT_name
+	.byte	14                              @ DW_FORM_strp
+	.byte	58                              @ DW_AT_decl_file
+	.byte	11                              @ DW_FORM_data1
+	.byte	59                              @ DW_AT_decl_line
+	.byte	5                               @ DW_FORM_data2
+	.byte	39                              @ DW_AT_prototyped
+	.byte	25                              @ DW_FORM_flag_present
+	.byte	73                              @ DW_AT_type
+	.byte	19                              @ DW_FORM_ref4
+	.byte	0                               @ EOM(1)
+	.byte	0                               @ EOM(2)
+	.byte	23                              @ Abbreviation Code
+	.byte	46                              @ DW_TAG_subprogram
+	.byte	1                               @ DW_CHILDREN_yes
+	.byte	17                              @ DW_AT_low_pc
+	.byte	1                               @ DW_FORM_addr
+	.byte	18                              @ DW_AT_high_pc
+	.byte	6                               @ DW_FORM_data4
+	.byte	64                              @ DW_AT_frame_base
+	.byte	24                              @ DW_FORM_exprloc
+	.byte	3                               @ DW_AT_name
+	.byte	14                              @ DW_FORM_strp
+	.byte	58                              @ DW_AT_decl_file
+	.byte	11                              @ DW_FORM_data1
+	.byte	59                              @ DW_AT_decl_line
+	.byte	11                              @ DW_FORM_data1
+	.byte	39                              @ DW_AT_prototyped
+	.byte	25                              @ DW_FORM_flag_present
+	.byte	0                               @ EOM(1)
+	.byte	0                               @ EOM(2)
+	.byte	24                              @ Abbreviation Code
+	.byte	38                              @ DW_TAG_const_type
+	.byte	0                               @ DW_CHILDREN_no
+	.byte	73                              @ DW_AT_type
+	.byte	19                              @ DW_FORM_ref4
+	.byte	0                               @ EOM(1)
+	.byte	0                               @ EOM(2)
+	.byte	25                              @ Abbreviation Code
+	.byte	19                              @ DW_TAG_structure_type
+	.byte	1                               @ DW_CHILDREN_yes
+	.byte	3                               @ DW_AT_name
+	.byte	14                              @ DW_FORM_strp
+	.byte	11                              @ DW_AT_byte_size
+	.byte	11                              @ DW_FORM_data1
+	.byte	58                              @ DW_AT_decl_file
+	.byte	11                              @ DW_FORM_data1
+	.byte	59                              @ DW_AT_decl_line
+	.byte	11                              @ DW_FORM_data1
+	.byte	0                               @ EOM(1)
+	.byte	0                               @ EOM(2)
+	.byte	26                              @ Abbreviation Code
+	.byte	13                              @ DW_TAG_member
+	.byte	0                               @ DW_CHILDREN_no
+	.byte	3                               @ DW_AT_name
+	.byte	14                              @ DW_FORM_strp
+	.byte	73                              @ DW_AT_type
+	.byte	19                              @ DW_FORM_ref4
+	.byte	58                              @ DW_AT_decl_file
+	.byte	11                              @ DW_FORM_data1
+	.byte	59                              @ DW_AT_decl_line
+	.byte	11                              @ DW_FORM_data1
+	.byte	56                              @ DW_AT_data_member_location
+	.byte	11                              @ DW_FORM_data1
+	.byte	0                               @ EOM(1)
+	.byte	0                               @ EOM(2)
+	.byte	27                              @ Abbreviation Code
+	.byte	21                              @ DW_TAG_subroutine_type
+	.byte	1                               @ DW_CHILDREN_yes
+	.byte	39                              @ DW_AT_prototyped
+	.byte	25                              @ DW_FORM_flag_present
+	.byte	0                               @ EOM(1)
+	.byte	0                               @ EOM(2)
+	.byte	28                              @ Abbreviation Code
+	.byte	5                               @ DW_TAG_formal_parameter
+	.byte	0                               @ DW_CHILDREN_no
+	.byte	73                              @ DW_AT_type
+	.byte	19                              @ DW_FORM_ref4
+	.byte	0                               @ EOM(1)
+	.byte	0                               @ EOM(2)
+	.byte	29                              @ Abbreviation Code
+	.byte	15                              @ DW_TAG_pointer_type
+	.byte	0                               @ DW_CHILDREN_no
+	.byte	0                               @ EOM(1)
+	.byte	0                               @ EOM(2)
+	.byte	30                              @ Abbreviation Code
+	.byte	22                              @ DW_TAG_typedef
+	.byte	0                               @ DW_CHILDREN_no
+	.byte	73                              @ DW_AT_type
+	.byte	19                              @ DW_FORM_ref4
+	.byte	3                               @ DW_AT_name
+	.byte	14                              @ DW_FORM_strp
+	.byte	58                              @ DW_AT_decl_file
+	.byte	11                              @ DW_FORM_data1
+	.byte	59                              @ DW_AT_decl_line
+	.byte	5                               @ DW_FORM_data2
+	.byte	0                               @ EOM(1)
+	.byte	0                               @ EOM(2)
+	.byte	31                              @ Abbreviation Code
+	.byte	19                              @ DW_TAG_structure_type
+	.byte	1                               @ DW_CHILDREN_yes
+	.byte	3                               @ DW_AT_name
+	.byte	14                              @ DW_FORM_strp
+	.byte	11                              @ DW_AT_byte_size
+	.byte	11                              @ DW_FORM_data1
+	.byte	58                              @ DW_AT_decl_file
+	.byte	11                              @ DW_FORM_data1
+	.byte	59                              @ DW_AT_decl_line
+	.byte	5                               @ DW_FORM_data2
+	.byte	0                               @ EOM(1)
+	.byte	0                               @ EOM(2)
+	.byte	32                              @ Abbreviation Code
+	.byte	13                              @ DW_TAG_member
+	.byte	0                               @ DW_CHILDREN_no
+	.byte	3                               @ DW_AT_name
+	.byte	14                              @ DW_FORM_strp
+	.byte	73                              @ DW_AT_type
+	.byte	19                              @ DW_FORM_ref4
+	.byte	58                              @ DW_AT_decl_file
+	.byte	11                              @ DW_FORM_data1
+	.byte	59                              @ DW_AT_decl_line
+	.byte	5                               @ DW_FORM_data2
+	.byte	56                              @ DW_AT_data_member_location
+	.byte	11                              @ DW_FORM_data1
+	.byte	0                               @ EOM(1)
+	.byte	0                               @ EOM(2)
+	.byte	0                               @ EOM(3)
+	.section	.debug_info,"",%progbits
+.Lcu_begin0:
+	.long	.Ldebug_info_end0-.Ldebug_info_start0 @ Length of Unit
+.Ldebug_info_start0:
+	.short	4                               @ DWARF version number
+	.long	.debug_abbrev                   @ Offset Into Abbrev. Section
+	.byte	4                               @ Address Size (in bytes)
+	.byte	1                               @ Abbrev [1] 0xb:0x78c DW_TAG_compile_unit
+	.long	.Linfo_string0                  @ DW_AT_producer
+	.short	12                              @ DW_AT_language
+	.long	.Linfo_string1                  @ DW_AT_name
+	.long	.Lline_table_start0             @ DW_AT_stmt_list
+	.long	.Linfo_string2                  @ DW_AT_comp_dir
+	.long	0                               @ DW_AT_low_pc
+	.long	.Ldebug_ranges0                 @ DW_AT_ranges
+	.byte	2                               @ Abbrev [2] 0x26:0x42 DW_TAG_subprogram
+	.long	.Lfunc_begin0                   @ DW_AT_low_pc
+	.long	.Lfunc_end0-.Lfunc_begin0       @ DW_AT_high_pc
+	.byte	1                               @ DW_AT_frame_base
+	.byte	93
+	.long	.Linfo_string41                 @ DW_AT_name
+	.byte	3                               @ DW_AT_decl_file
+	.byte	116                             @ DW_AT_decl_line
+                                        @ DW_AT_prototyped
+                                        @ DW_AT_external
+	.byte	3                               @ Abbrev [3] 0x37:0x13 DW_TAG_variable
+	.long	.Linfo_string3                  @ DW_AT_name
+	.long	104                             @ DW_AT_type
+	.byte	3                               @ DW_AT_decl_file
+	.byte	121                             @ DW_AT_decl_line
+	.ascii	"\200\004"                      @ DW_AT_alignment
+	.byte	5                               @ DW_AT_location
+	.byte	3
+	.long	vStartTaskNotifyTask.xNotifiedTaskStack
+	.byte	4                               @ Abbrev [4] 0x4a:0xf DW_TAG_variable
+	.byte	3                               @ DW_AT_location
+	.byte	145
+	.asciz	"\314"
+	.long	.Linfo_string49                 @ DW_AT_name
+	.byte	3                               @ DW_AT_decl_file
+	.byte	120                             @ DW_AT_decl_line
+	.long	1226                            @ DW_AT_type
+	.byte	4                               @ Abbrev [4] 0x59:0xe DW_TAG_variable
+	.byte	2                               @ DW_AT_location
+	.byte	145
+	.byte	12
+	.long	.Linfo_string50                 @ DW_AT_name
+	.byte	3                               @ DW_AT_decl_file
+	.byte	122                             @ DW_AT_decl_line
+	.long	1231                            @ DW_AT_type
+	.byte	0                               @ End Of Children Mark
+	.byte	5                               @ Abbrev [5] 0x68:0xc DW_TAG_array_type
+	.long	116                             @ DW_AT_type
+	.byte	6                               @ Abbrev [6] 0x6d:0x6 DW_TAG_subrange_type
+	.long	145                             @ DW_AT_type
+	.byte	128                             @ DW_AT_count
+	.byte	0                               @ End Of Children Mark
+	.byte	7                               @ Abbrev [7] 0x74:0xb DW_TAG_typedef
+	.long	127                             @ DW_AT_type
+	.long	.Linfo_string6                  @ DW_AT_name
+	.byte	2                               @ DW_AT_decl_file
+	.byte	73                              @ DW_AT_decl_line
+	.byte	7                               @ Abbrev [7] 0x7f:0xb DW_TAG_typedef
+	.long	138                             @ DW_AT_type
+	.long	.Linfo_string5                  @ DW_AT_name
+	.byte	1                               @ DW_AT_decl_file
+	.byte	64                              @ DW_AT_decl_line
+	.byte	8                               @ Abbrev [8] 0x8a:0x7 DW_TAG_base_type
+	.long	.Linfo_string4                  @ DW_AT_name
+	.byte	7                               @ DW_AT_encoding
+	.byte	4                               @ DW_AT_byte_size
+	.byte	9                               @ Abbrev [9] 0x91:0x7 DW_TAG_base_type
+	.long	.Linfo_string7                  @ DW_AT_name
+	.byte	8                               @ DW_AT_byte_size
+	.byte	7                               @ DW_AT_encoding
+	.byte	10                              @ Abbrev [10] 0x98:0xd DW_TAG_variable
+	.long	165                             @ DW_AT_type
+	.byte	3                               @ DW_AT_decl_file
+	.byte	125                             @ DW_AT_decl_line
+	.byte	5                               @ DW_AT_location
+	.byte	3
+	.long	.L.str
+	.byte	5                               @ Abbrev [5] 0xa5:0xc DW_TAG_array_type
+	.long	177                             @ DW_AT_type
+	.byte	6                               @ Abbrev [6] 0xaa:0x6 DW_TAG_subrange_type
+	.long	145                             @ DW_AT_type
+	.byte	9                               @ DW_AT_count
+	.byte	0                               @ End Of Children Mark
+	.byte	8                               @ Abbrev [8] 0xb1:0x7 DW_TAG_base_type
+	.long	.Linfo_string8                  @ DW_AT_name
+	.byte	8                               @ DW_AT_encoding
+	.byte	1                               @ DW_AT_byte_size
+	.byte	10                              @ Abbrev [10] 0xb8:0xd DW_TAG_variable
+	.long	165                             @ DW_AT_type
+	.byte	3                               @ DW_AT_decl_file
+	.byte	141                             @ DW_AT_decl_line
+	.byte	5                               @ DW_AT_location
+	.byte	3
+	.long	.L.str.1
+	.byte	10                              @ Abbrev [10] 0xc5:0xd DW_TAG_variable
+	.long	210                             @ DW_AT_type
+	.byte	3                               @ DW_AT_decl_file
+	.byte	143                             @ DW_AT_decl_line
+	.byte	5                               @ DW_AT_location
+	.byte	3
+	.long	.L.str.2
+	.byte	5                               @ Abbrev [5] 0xd2:0xc DW_TAG_array_type
+	.long	177                             @ DW_AT_type
+	.byte	6                               @ Abbrev [6] 0xd7:0x6 DW_TAG_subrange_type
+	.long	145                             @ DW_AT_type
+	.byte	13                              @ DW_AT_count
+	.byte	0                               @ End Of Children Mark
+	.byte	11                              @ Abbrev [11] 0xde:0x64 DW_TAG_subprogram
+	.long	.Lfunc_begin5                   @ DW_AT_low_pc
+	.long	.Lfunc_end5-.Lfunc_begin5       @ DW_AT_high_pc
+	.byte	1                               @ DW_AT_frame_base
+	.byte	93
+	.long	.Linfo_string46                 @ DW_AT_name
+	.byte	3                               @ DW_AT_decl_file
+	.short	639                             @ DW_AT_decl_line
+                                        @ DW_AT_prototyped
+                                        @ DW_AT_external
+	.byte	12                              @ Abbrev [12] 0xf0:0x12 DW_TAG_variable
+	.long	.Linfo_string9                  @ DW_AT_name
+	.long	322                             @ DW_AT_type
+	.byte	3                               @ DW_AT_decl_file
+	.short	641                             @ DW_AT_decl_line
+	.byte	5                               @ DW_AT_location
+	.byte	3
+	.long	xNotifyTaskFromISR.xCallCount
+	.byte	12                              @ Abbrev [12] 0x102:0x12 DW_TAG_variable
+	.long	.Linfo_string12                 @ DW_AT_name
+	.long	322                             @ DW_AT_type
+	.byte	3                               @ DW_AT_decl_file
+	.short	641                             @ DW_AT_decl_line
+	.byte	5                               @ DW_AT_location
+	.byte	3
+	.long	xNotifyTaskFromISR.xAPIToUse
+	.byte	13                              @ Abbrev [13] 0x114:0xf DW_TAG_variable
+	.byte	2                               @ DW_AT_location
+	.byte	145
+	.byte	20
+	.long	.Linfo_string105                @ DW_AT_name
+	.byte	3                               @ DW_AT_decl_file
+	.short	642                             @ DW_AT_decl_line
+	.long	1937                            @ DW_AT_type
+	.byte	13                              @ Abbrev [13] 0x123:0xf DW_TAG_variable
+	.byte	2                               @ DW_AT_location
+	.byte	145
+	.byte	16
+	.long	.Linfo_string106                @ DW_AT_name
+	.byte	3                               @ DW_AT_decl_file
+	.short	643                             @ DW_AT_decl_line
+	.long	127                             @ DW_AT_type
+	.byte	13                              @ Abbrev [13] 0x132:0xf DW_TAG_variable
+	.byte	2                               @ DW_AT_location
+	.byte	145
+	.byte	12
+	.long	.Linfo_string107                @ DW_AT_name
+	.byte	3                               @ DW_AT_decl_file
+	.short	644                             @ DW_AT_decl_line
+	.long	1927                            @ DW_AT_type
+	.byte	0                               @ End Of Children Mark
+	.byte	7                               @ Abbrev [7] 0x142:0xb DW_TAG_typedef
+	.long	333                             @ DW_AT_type
+	.long	.Linfo_string11                 @ DW_AT_name
+	.byte	2                               @ DW_AT_decl_file
+	.byte	74                              @ DW_AT_decl_line
+	.byte	8                               @ Abbrev [8] 0x14d:0x7 DW_TAG_base_type
+	.long	.Linfo_string10                 @ DW_AT_name
+	.byte	5                               @ DW_AT_encoding
+	.byte	4                               @ DW_AT_byte_size
+	.byte	14                              @ Abbrev [14] 0x154:0x38 DW_TAG_subprogram
+	.long	.Lfunc_begin6                   @ DW_AT_low_pc
+	.long	.Lfunc_end6-.Lfunc_begin6       @ DW_AT_high_pc
+	.byte	1                               @ DW_AT_frame_base
+	.byte	93
+	.long	.Linfo_string47                 @ DW_AT_name
+	.byte	3                               @ DW_AT_decl_file
+	.short	695                             @ DW_AT_decl_line
+                                        @ DW_AT_prototyped
+	.long	322                             @ DW_AT_type
+                                        @ DW_AT_external
+	.byte	12                              @ Abbrev [12] 0x16a:0x12 DW_TAG_variable
+	.long	.Linfo_string13                 @ DW_AT_name
+	.long	127                             @ DW_AT_type
+	.byte	3                               @ DW_AT_decl_file
+	.short	697                             @ DW_AT_decl_line
+	.byte	5                               @ DW_AT_location
+	.byte	3
+	.long	xAreTaskNotificationTasksStillRunning.ulLastNotifyCycleCount
+	.byte	13                              @ Abbrev [13] 0x17c:0xf DW_TAG_variable
+	.byte	2                               @ DW_AT_location
+	.byte	145
+	.byte	0
+	.long	.Linfo_string108                @ DW_AT_name
+	.byte	3                               @ DW_AT_decl_file
+	.short	698                             @ DW_AT_decl_line
+	.long	1927                            @ DW_AT_type
+	.byte	0                               @ End Of Children Mark
+	.byte	3                               @ Abbrev [3] 0x18c:0x12 DW_TAG_variable
+	.long	.Linfo_string14                 @ DW_AT_name
+	.long	414                             @ DW_AT_type
+	.byte	3                               @ DW_AT_decl_file
+	.byte	100                             @ DW_AT_decl_line
+	.byte	32                              @ DW_AT_alignment
+	.byte	5                               @ DW_AT_location
+	.byte	3
+	.long	xTaskToNotify
+	.byte	5                               @ Abbrev [5] 0x19e:0xc DW_TAG_array_type
+	.long	426                             @ DW_AT_type
+	.byte	6                               @ Abbrev [6] 0x1a3:0x6 DW_TAG_subrange_type
+	.long	145                             @ DW_AT_type
+	.byte	8                               @ DW_AT_count
+	.byte	0                               @ End Of Children Mark
+	.byte	7                               @ Abbrev [7] 0x1aa:0xb DW_TAG_typedef
+	.long	437                             @ DW_AT_type
+	.long	.Linfo_string16                 @ DW_AT_name
+	.byte	4                               @ DW_AT_decl_file
+	.byte	92                              @ DW_AT_decl_line
+	.byte	15                              @ Abbrev [15] 0x1b5:0x5 DW_TAG_pointer_type
+	.long	442                             @ DW_AT_type
+	.byte	16                              @ Abbrev [16] 0x1ba:0x5 DW_TAG_structure_type
+	.long	.Linfo_string15                 @ DW_AT_name
+                                        @ DW_AT_declaration
+	.byte	3                               @ Abbrev [3] 0x1bf:0x12 DW_TAG_variable
+	.long	.Linfo_string17                 @ DW_AT_name
+	.long	465                             @ DW_AT_type
+	.byte	3                               @ DW_AT_decl_file
+	.byte	112                             @ DW_AT_decl_line
+	.byte	32                              @ DW_AT_alignment
+	.byte	5                               @ DW_AT_location
+	.byte	3
+	.long	uxNextRand
+	.byte	5                               @ Abbrev [5] 0x1d1:0xc DW_TAG_array_type
+	.long	477                             @ DW_AT_type
+	.byte	6                               @ Abbrev [6] 0x1d6:0x6 DW_TAG_subrange_type
+	.long	145                             @ DW_AT_type
+	.byte	8                               @ DW_AT_count
+	.byte	0                               @ End Of Children Mark
+	.byte	7                               @ Abbrev [7] 0x1dd:0xb DW_TAG_typedef
+	.long	138                             @ DW_AT_type
+	.long	.Linfo_string18                 @ DW_AT_name
+	.byte	5                               @ DW_AT_decl_file
+	.byte	53                              @ DW_AT_decl_line
+	.byte	3                               @ Abbrev [3] 0x1e8:0x12 DW_TAG_variable
+	.long	.Linfo_string19                 @ DW_AT_name
+	.long	506                             @ DW_AT_type
+	.byte	3                               @ DW_AT_decl_file
+	.byte	109                             @ DW_AT_decl_line
+	.byte	32                              @ DW_AT_alignment
+	.byte	5                               @ DW_AT_location
+	.byte	3
+	.long	xTimer
+	.byte	5                               @ Abbrev [5] 0x1fa:0xc DW_TAG_array_type
+	.long	518                             @ DW_AT_type
+	.byte	6                               @ Abbrev [6] 0x1ff:0x6 DW_TAG_subrange_type
+	.long	145                             @ DW_AT_type
+	.byte	8                               @ DW_AT_count
+	.byte	0                               @ End Of Children Mark
+	.byte	7                               @ Abbrev [7] 0x206:0xb DW_TAG_typedef
+	.long	529                             @ DW_AT_type
+	.long	.Linfo_string21                 @ DW_AT_name
+	.byte	6                               @ DW_AT_decl_file
+	.byte	80                              @ DW_AT_decl_line
+	.byte	15                              @ Abbrev [15] 0x211:0x5 DW_TAG_pointer_type
+	.long	534                             @ DW_AT_type
+	.byte	16                              @ Abbrev [16] 0x216:0x5 DW_TAG_structure_type
+	.long	.Linfo_string20                 @ DW_AT_name
+                                        @ DW_AT_declaration
+	.byte	17                              @ Abbrev [17] 0x21b:0x34 DW_TAG_subprogram
+	.long	.Lfunc_begin4                   @ DW_AT_low_pc
+	.long	.Lfunc_end4-.Lfunc_begin4       @ DW_AT_high_pc
+	.byte	1                               @ DW_AT_frame_base
+	.byte	93
+	.long	.Linfo_string45                 @ DW_AT_name
+	.byte	3                               @ DW_AT_decl_file
+	.short	496                             @ DW_AT_decl_line
+                                        @ DW_AT_prototyped
+	.byte	12                              @ Abbrev [12] 0x22d:0x12 DW_TAG_variable
+	.long	.Linfo_string22                 @ DW_AT_name
+	.long	127                             @ DW_AT_type
+	.byte	3                               @ DW_AT_decl_file
+	.short	498                             @ DW_AT_decl_line
+	.byte	5                               @ DW_AT_location
+	.byte	3
+	.long	prvSuspendedTaskTimerTestCallback.ulCallCount
+	.byte	18                              @ Abbrev [18] 0x23f:0xf DW_TAG_formal_parameter
+	.byte	2                               @ DW_AT_location
+	.byte	145
+	.byte	12
+	.long	.Linfo_string104                @ DW_AT_name
+	.byte	3                               @ DW_AT_decl_file
+	.short	496                             @ DW_AT_decl_line
+	.long	518                             @ DW_AT_type
+	.byte	0                               @ End Of Children Mark
+	.byte	3                               @ Abbrev [3] 0x24f:0x12 DW_TAG_variable
+	.long	.Linfo_string23                 @ DW_AT_name
+	.long	609                             @ DW_AT_type
+	.byte	3                               @ DW_AT_decl_file
+	.byte	106                             @ DW_AT_decl_line
+	.byte	32                              @ DW_AT_alignment
+	.byte	5                               @ DW_AT_location
+	.byte	3
+	.long	ulTimerNotificationsSent
+	.byte	5                               @ Abbrev [5] 0x261:0xc DW_TAG_array_type
+	.long	127                             @ DW_AT_type
+	.byte	6                               @ Abbrev [6] 0x266:0x6 DW_TAG_subrange_type
+	.long	145                             @ DW_AT_type
+	.byte	8                               @ DW_AT_count
+	.byte	0                               @ End Of Children Mark
+	.byte	3                               @ Abbrev [3] 0x26d:0x12 DW_TAG_variable
+	.long	.Linfo_string24                 @ DW_AT_name
+	.long	639                             @ DW_AT_type
+	.byte	3                               @ DW_AT_decl_file
+	.byte	97                              @ DW_AT_decl_line
+	.byte	32                              @ DW_AT_alignment
+	.byte	5                               @ DW_AT_location
+	.byte	3
+	.long	ulNotifyCycleCount
+	.byte	5                               @ Abbrev [5] 0x27f:0xc DW_TAG_array_type
+	.long	651                             @ DW_AT_type
+	.byte	6                               @ Abbrev [6] 0x284:0x6 DW_TAG_subrange_type
+	.long	145                             @ DW_AT_type
+	.byte	8                               @ DW_AT_count
+	.byte	0                               @ End Of Children Mark
+	.byte	19                              @ Abbrev [19] 0x28b:0x5 DW_TAG_volatile_type
+	.long	127                             @ DW_AT_type
+	.byte	3                               @ Abbrev [3] 0x290:0x12 DW_TAG_variable
+	.long	.Linfo_string25                 @ DW_AT_name
+	.long	674                             @ DW_AT_type
+	.byte	3                               @ DW_AT_decl_file
+	.byte	94                              @ DW_AT_decl_line
+	.byte	32                              @ DW_AT_alignment
+	.byte	5                               @ DW_AT_location
+	.byte	3
+	.long	xErrorStatus
+	.byte	5                               @ Abbrev [5] 0x2a2:0xc DW_TAG_array_type
+	.long	322                             @ DW_AT_type
+	.byte	6                               @ Abbrev [6] 0x2a7:0x6 DW_TAG_subrange_type
+	.long	145                             @ DW_AT_type
+	.byte	8                               @ DW_AT_count
+	.byte	0                               @ End Of Children Mark
+	.byte	3                               @ Abbrev [3] 0x2ae:0x12 DW_TAG_variable
+	.long	.Linfo_string26                 @ DW_AT_name
+	.long	609                             @ DW_AT_type
+	.byte	3                               @ DW_AT_decl_file
+	.byte	105                             @ DW_AT_decl_line
+	.byte	32                              @ DW_AT_alignment
+	.byte	5                               @ DW_AT_location
+	.byte	3
+	.long	ulTimerNotificationsReceived
+	.byte	20                              @ Abbrev [20] 0x2c0:0x27 DW_TAG_enumeration_type
+	.long	138                             @ DW_AT_type
+	.byte	4                               @ DW_AT_byte_size
+	.byte	4                               @ DW_AT_decl_file
+	.byte	112                             @ DW_AT_decl_line
+	.byte	21                              @ Abbrev [21] 0x2c8:0x6 DW_TAG_enumerator
+	.long	.Linfo_string27                 @ DW_AT_name
+	.byte	0                               @ DW_AT_const_value
+	.byte	21                              @ Abbrev [21] 0x2ce:0x6 DW_TAG_enumerator
+	.long	.Linfo_string28                 @ DW_AT_name
+	.byte	1                               @ DW_AT_const_value
+	.byte	21                              @ Abbrev [21] 0x2d4:0x6 DW_TAG_enumerator
+	.long	.Linfo_string29                 @ DW_AT_name
+	.byte	2                               @ DW_AT_const_value
+	.byte	21                              @ Abbrev [21] 0x2da:0x6 DW_TAG_enumerator
+	.long	.Linfo_string30                 @ DW_AT_name
+	.byte	3                               @ DW_AT_const_value
+	.byte	21                              @ Abbrev [21] 0x2e0:0x6 DW_TAG_enumerator
+	.long	.Linfo_string31                 @ DW_AT_name
+	.byte	4                               @ DW_AT_const_value
+	.byte	0                               @ End Of Children Mark
+	.byte	20                              @ Abbrev [20] 0x2e7:0x2d DW_TAG_enumeration_type
+	.long	138                             @ DW_AT_type
+	.byte	4                               @ DW_AT_byte_size
+	.byte	4                               @ DW_AT_decl_file
+	.byte	101                             @ DW_AT_decl_line
+	.byte	21                              @ Abbrev [21] 0x2ef:0x6 DW_TAG_enumerator
+	.long	.Linfo_string32                 @ DW_AT_name
+	.byte	0                               @ DW_AT_const_value
+	.byte	21                              @ Abbrev [21] 0x2f5:0x6 DW_TAG_enumerator
+	.long	.Linfo_string33                 @ DW_AT_name
+	.byte	1                               @ DW_AT_const_value
+	.byte	21                              @ Abbrev [21] 0x2fb:0x6 DW_TAG_enumerator
+	.long	.Linfo_string34                 @ DW_AT_name
+	.byte	2                               @ DW_AT_const_value
+	.byte	21                              @ Abbrev [21] 0x301:0x6 DW_TAG_enumerator
+	.long	.Linfo_string35                 @ DW_AT_name
+	.byte	3                               @ DW_AT_const_value
+	.byte	21                              @ Abbrev [21] 0x307:0x6 DW_TAG_enumerator
+	.long	.Linfo_string36                 @ DW_AT_name
+	.byte	4                               @ DW_AT_const_value
+	.byte	21                              @ Abbrev [21] 0x30d:0x6 DW_TAG_enumerator
+	.long	.Linfo_string37                 @ DW_AT_name
+	.byte	5                               @ DW_AT_const_value
+	.byte	0                               @ End Of Children Mark
+	.byte	7                               @ Abbrev [7] 0x314:0xb DW_TAG_typedef
+	.long	127                             @ DW_AT_type
+	.long	.Linfo_string38                 @ DW_AT_name
+	.byte	2                               @ DW_AT_decl_file
+	.byte	81                              @ DW_AT_decl_line
+	.byte	7                               @ Abbrev [7] 0x31f:0xb DW_TAG_typedef
+	.long	810                             @ DW_AT_type
+	.long	.Linfo_string40                 @ DW_AT_name
+	.byte	2                               @ DW_AT_decl_file
+	.byte	75                              @ DW_AT_decl_line
+	.byte	8                               @ Abbrev [8] 0x32a:0x7 DW_TAG_base_type
+	.long	.Linfo_string39                 @ DW_AT_name
+	.byte	7                               @ DW_AT_encoding
+	.byte	4                               @ DW_AT_byte_size
+	.byte	17                              @ Abbrev [17] 0x331:0x6d DW_TAG_subprogram
+	.long	.Lfunc_begin1                   @ DW_AT_low_pc
+	.long	.Lfunc_end1-.Lfunc_begin1       @ DW_AT_high_pc
+	.byte	1                               @ DW_AT_frame_base
+	.byte	93
+	.long	.Linfo_string42                 @ DW_AT_name
+	.byte	3                               @ DW_AT_decl_file
+	.short	548                             @ DW_AT_decl_line
+                                        @ DW_AT_prototyped
+	.byte	18                              @ Abbrev [18] 0x343:0xf DW_TAG_formal_parameter
+	.byte	2                               @ DW_AT_location
+	.byte	145
+	.byte	44
+	.long	.Linfo_string57                 @ DW_AT_name
+	.byte	3                               @ DW_AT_decl_file
+	.short	548                             @ DW_AT_decl_line
+	.long	1370                            @ DW_AT_type
+	.byte	13                              @ Abbrev [13] 0x352:0xf DW_TAG_variable
+	.byte	2                               @ DW_AT_location
+	.byte	145
+	.byte	40
+	.long	.Linfo_string49                 @ DW_AT_name
+	.byte	3                               @ DW_AT_decl_file
+	.short	550                             @ DW_AT_decl_line
+	.long	1226                            @ DW_AT_type
+	.byte	13                              @ Abbrev [13] 0x361:0xf DW_TAG_variable
+	.byte	2                               @ DW_AT_location
+	.byte	145
+	.byte	36
+	.long	.Linfo_string97                 @ DW_AT_name
+	.byte	3                               @ DW_AT_decl_file
+	.short	550                             @ DW_AT_decl_line
+	.long	1226                            @ DW_AT_type
+	.byte	13                              @ Abbrev [13] 0x370:0xf DW_TAG_variable
+	.byte	2                               @ DW_AT_location
+	.byte	145
+	.byte	32
+	.long	.Linfo_string98                 @ DW_AT_name
+	.byte	3                               @ DW_AT_decl_file
+	.short	550                             @ DW_AT_decl_line
+	.long	1226                            @ DW_AT_type
+	.byte	13                              @ Abbrev [13] 0x37f:0xf DW_TAG_variable
+	.byte	2                               @ DW_AT_location
+	.byte	145
+	.byte	28
+	.long	.Linfo_string99                 @ DW_AT_name
+	.byte	3                               @ DW_AT_decl_file
+	.short	551                             @ DW_AT_decl_line
+	.long	788                             @ DW_AT_type
+	.byte	13                              @ Abbrev [13] 0x38e:0xf DW_TAG_variable
+	.byte	2                               @ DW_AT_location
+	.byte	145
+	.byte	24
+	.long	.Linfo_string100                @ DW_AT_name
+	.byte	3                               @ DW_AT_decl_file
+	.short	552                             @ DW_AT_decl_line
+	.long	1927                            @ DW_AT_type
+	.byte	0                               @ End Of Children Mark
+	.byte	22                              @ Abbrev [22] 0x39e:0x35 DW_TAG_subprogram
+	.long	.Lfunc_begin2                   @ DW_AT_low_pc
+	.long	.Lfunc_end2-.Lfunc_begin2       @ DW_AT_high_pc
+	.byte	1                               @ DW_AT_frame_base
+	.byte	93
+	.long	.Linfo_string43                 @ DW_AT_name
+	.byte	3                               @ DW_AT_decl_file
+	.short	725                             @ DW_AT_decl_line
+                                        @ DW_AT_prototyped
+	.long	799                             @ DW_AT_type
+	.byte	13                              @ Abbrev [13] 0x3b4:0xf DW_TAG_variable
+	.byte	2                               @ DW_AT_location
+	.byte	145
+	.byte	4
+	.long	.Linfo_string101                @ DW_AT_name
+	.byte	3                               @ DW_AT_decl_file
+	.short	727                             @ DW_AT_decl_line
+	.long	1932                            @ DW_AT_type
+	.byte	13                              @ Abbrev [13] 0x3c3:0xf DW_TAG_variable
+	.byte	2                               @ DW_AT_location
+	.byte	145
+	.byte	0
+	.long	.Linfo_string102                @ DW_AT_name
+	.byte	3                               @ DW_AT_decl_file
+	.short	727                             @ DW_AT_decl_line
+	.long	1932                            @ DW_AT_type
+	.byte	0                               @ End Of Children Mark
+	.byte	17                              @ Abbrev [17] 0x3d3:0x22 DW_TAG_subprogram
+	.long	.Lfunc_begin3                   @ DW_AT_low_pc
+	.long	.Lfunc_end3-.Lfunc_begin3       @ DW_AT_high_pc
+	.byte	1                               @ DW_AT_frame_base
+	.byte	93
+	.long	.Linfo_string44                 @ DW_AT_name
+	.byte	3                               @ DW_AT_decl_file
+	.short	533                             @ DW_AT_decl_line
+                                        @ DW_AT_prototyped
+	.byte	18                              @ Abbrev [18] 0x3e5:0xf DW_TAG_formal_parameter
+	.byte	2                               @ DW_AT_location
+	.byte	145
+	.byte	4
+	.long	.Linfo_string103                @ DW_AT_name
+	.byte	3                               @ DW_AT_decl_file
+	.short	533                             @ DW_AT_decl_line
+	.long	518                             @ DW_AT_type
+	.byte	0                               @ End Of Children Mark
+	.byte	23                              @ Abbrev [23] 0x3f5:0xd5 DW_TAG_subprogram
+	.long	.Lfunc_begin7                   @ DW_AT_low_pc
+	.long	.Lfunc_end7-.Lfunc_begin7       @ DW_AT_high_pc
+	.byte	1                               @ DW_AT_frame_base
+	.byte	93
+	.long	.Linfo_string48                 @ DW_AT_name
+	.byte	3                               @ DW_AT_decl_file
+	.byte	148                             @ DW_AT_decl_line
+                                        @ DW_AT_prototyped
+	.byte	4                               @ Abbrev [4] 0x406:0xf DW_TAG_variable
+	.byte	3                               @ DW_AT_location
+	.byte	145
+	.asciz	"\374"
+	.long	.Linfo_string109                @ DW_AT_name
+	.byte	3                               @ DW_AT_decl_file
+	.byte	150                             @ DW_AT_decl_line
+	.long	1226                            @ DW_AT_type
+	.byte	4                               @ Abbrev [4] 0x415:0xf DW_TAG_variable
+	.byte	3                               @ DW_AT_location
+	.byte	145
+	.asciz	"\370"
+	.long	.Linfo_string110                @ DW_AT_name
+	.byte	3                               @ DW_AT_decl_file
+	.byte	151                             @ DW_AT_decl_line
+	.long	322                             @ DW_AT_type
+	.byte	4                               @ Abbrev [4] 0x424:0xf DW_TAG_variable
+	.byte	3                               @ DW_AT_location
+	.byte	145
+	.asciz	"\364"
+	.long	.Linfo_string111                @ DW_AT_name
+	.byte	3                               @ DW_AT_decl_file
+	.byte	152                             @ DW_AT_decl_line
+	.long	127                             @ DW_AT_type
+	.byte	4                               @ Abbrev [4] 0x433:0xf DW_TAG_variable
+	.byte	3                               @ DW_AT_location
+	.byte	145
+	.asciz	"\360"
+	.long	.Linfo_string112                @ DW_AT_name
+	.byte	3                               @ DW_AT_decl_file
+	.byte	152                             @ DW_AT_decl_line
+	.long	127                             @ DW_AT_type
+	.byte	4                               @ Abbrev [4] 0x442:0xf DW_TAG_variable
+	.byte	3                               @ DW_AT_location
+	.byte	145
+	.asciz	"\354"
+	.long	.Linfo_string113                @ DW_AT_name
+	.byte	3                               @ DW_AT_decl_file
+	.byte	152                             @ DW_AT_decl_line
+	.long	127                             @ DW_AT_type
+	.byte	4                               @ Abbrev [4] 0x451:0xf DW_TAG_variable
+	.byte	3                               @ DW_AT_location
+	.byte	145
+	.asciz	"\350"
+	.long	.Linfo_string106                @ DW_AT_name
+	.byte	3                               @ DW_AT_decl_file
+	.byte	152                             @ DW_AT_decl_line
+	.long	127                             @ DW_AT_type
+	.byte	4                               @ Abbrev [4] 0x460:0xf DW_TAG_variable
+	.byte	3                               @ DW_AT_location
+	.byte	145
+	.asciz	"\344"
+	.long	.Linfo_string114                @ DW_AT_name
+	.byte	3                               @ DW_AT_decl_file
+	.byte	152                             @ DW_AT_decl_line
+	.long	127                             @ DW_AT_type
+	.byte	4                               @ Abbrev [4] 0x46f:0xf DW_TAG_variable
+	.byte	3                               @ DW_AT_location
+	.byte	145
+	.asciz	"\340"
+	.long	.Linfo_string115                @ DW_AT_name
+	.byte	3                               @ DW_AT_decl_file
+	.byte	153                             @ DW_AT_decl_line
+	.long	788                             @ DW_AT_type
+	.byte	4                               @ Abbrev [4] 0x47e:0xf DW_TAG_variable
+	.byte	3                               @ DW_AT_location
+	.byte	145
+	.asciz	"\334"
+	.long	.Linfo_string116                @ DW_AT_name
+	.byte	3                               @ DW_AT_decl_file
+	.byte	154                             @ DW_AT_decl_line
+	.long	1927                            @ DW_AT_type
+	.byte	4                               @ Abbrev [4] 0x48d:0xf DW_TAG_variable
+	.byte	3                               @ DW_AT_location
+	.byte	145
+	.asciz	"\330"
+	.long	.Linfo_string117                @ DW_AT_name
+	.byte	3                               @ DW_AT_decl_file
+	.byte	154                             @ DW_AT_decl_line
+	.long	1927                            @ DW_AT_type
+	.byte	4                               @ Abbrev [4] 0x49c:0xf DW_TAG_variable
+	.byte	3                               @ DW_AT_location
+	.byte	145
+	.asciz	"\324"
+	.long	.Linfo_string118                @ DW_AT_name
+	.byte	3                               @ DW_AT_decl_file
+	.byte	154                             @ DW_AT_decl_line
+	.long	1927                            @ DW_AT_type
+	.byte	4                               @ Abbrev [4] 0x4ab:0xf DW_TAG_variable
+	.byte	3                               @ DW_AT_location
+	.byte	145
+	.asciz	"\320"
+	.long	.Linfo_string119                @ DW_AT_name
+	.byte	3                               @ DW_AT_decl_file
+	.byte	155                             @ DW_AT_decl_line
+	.long	1927                            @ DW_AT_type
+	.byte	4                               @ Abbrev [4] 0x4ba:0xf DW_TAG_variable
+	.byte	3                               @ DW_AT_location
+	.byte	145
+	.asciz	"\314"
+	.long	.Linfo_string120                @ DW_AT_name
+	.byte	3                               @ DW_AT_decl_file
+	.byte	155                             @ DW_AT_decl_line
+	.long	1927                            @ DW_AT_type
+	.byte	0                               @ End Of Children Mark
+	.byte	24                              @ Abbrev [24] 0x4ca:0x5 DW_TAG_const_type
+	.long	788                             @ DW_AT_type
+	.byte	7                               @ Abbrev [7] 0x4cf:0xb DW_TAG_typedef
+	.long	1242                            @ DW_AT_type
+	.long	.Linfo_string96                 @ DW_AT_name
+	.byte	4                               @ DW_AT_decl_file
+	.byte	155                             @ DW_AT_decl_line
+	.byte	25                              @ Abbrev [25] 0x4da:0x69 DW_TAG_structure_type
+	.long	.Linfo_string95                 @ DW_AT_name
+	.byte	64                              @ DW_AT_byte_size
+	.byte	4                               @ DW_AT_decl_file
+	.byte	143                             @ DW_AT_decl_line
+	.byte	26                              @ Abbrev [26] 0x4e2:0xc DW_TAG_member
+	.long	.Linfo_string51                 @ DW_AT_name
+	.long	1347                            @ DW_AT_type
+	.byte	4                               @ DW_AT_decl_file
+	.byte	145                             @ DW_AT_decl_line
+	.byte	0                               @ DW_AT_data_member_location
+	.byte	26                              @ Abbrev [26] 0x4ee:0xc DW_TAG_member
+	.long	.Linfo_string53                 @ DW_AT_name
+	.long	1371                            @ DW_AT_type
+	.byte	4                               @ DW_AT_decl_file
+	.byte	146                             @ DW_AT_decl_line
+	.byte	4                               @ DW_AT_data_member_location
+	.byte	26                              @ Abbrev [26] 0x4fa:0xc DW_TAG_member
+	.long	.Linfo_string54                 @ DW_AT_name
+	.long	1381                            @ DW_AT_type
+	.byte	4                               @ DW_AT_decl_file
+	.byte	147                             @ DW_AT_decl_line
+	.byte	8                               @ DW_AT_data_member_location
+	.byte	26                              @ Abbrev [26] 0x506:0xc DW_TAG_member
+	.long	.Linfo_string57                 @ DW_AT_name
+	.long	1370                            @ DW_AT_type
+	.byte	4                               @ DW_AT_decl_file
+	.byte	148                             @ DW_AT_decl_line
+	.byte	12                              @ DW_AT_data_member_location
+	.byte	26                              @ Abbrev [26] 0x512:0xc DW_TAG_member
+	.long	.Linfo_string58                 @ DW_AT_name
+	.long	799                             @ DW_AT_type
+	.byte	4                               @ DW_AT_decl_file
+	.byte	149                             @ DW_AT_decl_line
+	.byte	16                              @ DW_AT_data_member_location
+	.byte	26                              @ Abbrev [26] 0x51e:0xc DW_TAG_member
+	.long	.Linfo_string59                 @ DW_AT_name
+	.long	1399                            @ DW_AT_type
+	.byte	4                               @ DW_AT_decl_file
+	.byte	150                             @ DW_AT_decl_line
+	.byte	20                              @ DW_AT_data_member_location
+	.byte	26                              @ Abbrev [26] 0x52a:0xc DW_TAG_member
+	.long	.Linfo_string60                 @ DW_AT_name
+	.long	1404                            @ DW_AT_type
+	.byte	4                               @ DW_AT_decl_file
+	.byte	151                             @ DW_AT_decl_line
+	.byte	24                              @ DW_AT_data_member_location
+	.byte	26                              @ Abbrev [26] 0x536:0xc DW_TAG_member
+	.long	.Linfo_string66                 @ DW_AT_name
+	.long	1472                            @ DW_AT_type
+	.byte	4                               @ DW_AT_decl_file
+	.byte	153                             @ DW_AT_decl_line
+	.byte	60                              @ DW_AT_data_member_location
+	.byte	0                               @ End Of Children Mark
+	.byte	7                               @ Abbrev [7] 0x543:0xb DW_TAG_typedef
+	.long	1358                            @ DW_AT_type
+	.long	.Linfo_string52                 @ DW_AT_name
+	.byte	7                               @ DW_AT_decl_file
+	.byte	36                              @ DW_AT_decl_line
+	.byte	15                              @ Abbrev [15] 0x54e:0x5 DW_TAG_pointer_type
+	.long	1363                            @ DW_AT_type
+	.byte	27                              @ Abbrev [27] 0x553:0x7 DW_TAG_subroutine_type
+                                        @ DW_AT_prototyped
+	.byte	28                              @ Abbrev [28] 0x554:0x5 DW_TAG_formal_parameter
+	.long	1370                            @ DW_AT_type
+	.byte	0                               @ End Of Children Mark
+	.byte	29                              @ Abbrev [29] 0x55a:0x1 DW_TAG_pointer_type
+	.byte	15                              @ Abbrev [15] 0x55b:0x5 DW_TAG_pointer_type
+	.long	1376                            @ DW_AT_type
+	.byte	24                              @ Abbrev [24] 0x560:0x5 DW_TAG_const_type
+	.long	177                             @ DW_AT_type
+	.byte	7                               @ Abbrev [7] 0x565:0xb DW_TAG_typedef
+	.long	1392                            @ DW_AT_type
+	.long	.Linfo_string56                 @ DW_AT_name
+	.byte	1                               @ DW_AT_decl_file
+	.byte	63                              @ DW_AT_decl_line
+	.byte	8                               @ Abbrev [8] 0x570:0x7 DW_TAG_base_type
+	.long	.Linfo_string55                 @ DW_AT_name
+	.byte	7                               @ DW_AT_encoding
+	.byte	2                               @ DW_AT_byte_size
+	.byte	15                              @ Abbrev [15] 0x577:0x5 DW_TAG_pointer_type
+	.long	116                             @ DW_AT_type
+	.byte	5                               @ Abbrev [5] 0x57c:0xc DW_TAG_array_type
+	.long	1416                            @ DW_AT_type
+	.byte	6                               @ Abbrev [6] 0x581:0x6 DW_TAG_subrange_type
+	.long	145                             @ DW_AT_type
+	.byte	3                               @ DW_AT_count
+	.byte	0                               @ End Of Children Mark
+	.byte	7                               @ Abbrev [7] 0x588:0xb DW_TAG_typedef
+	.long	1427                            @ DW_AT_type
+	.long	.Linfo_string65                 @ DW_AT_name
+	.byte	4                               @ DW_AT_decl_file
+	.byte	138                             @ DW_AT_decl_line
+	.byte	25                              @ Abbrev [25] 0x593:0x2d DW_TAG_structure_type
+	.long	.Linfo_string64                 @ DW_AT_name
+	.byte	12                              @ DW_AT_byte_size
+	.byte	4                               @ DW_AT_decl_file
+	.byte	133                             @ DW_AT_decl_line
+	.byte	26                              @ Abbrev [26] 0x59b:0xc DW_TAG_member
+	.long	.Linfo_string61                 @ DW_AT_name
+	.long	1370                            @ DW_AT_type
+	.byte	4                               @ DW_AT_decl_file
+	.byte	135                             @ DW_AT_decl_line
+	.byte	0                               @ DW_AT_data_member_location
+	.byte	26                              @ Abbrev [26] 0x5a7:0xc DW_TAG_member
+	.long	.Linfo_string62                 @ DW_AT_name
+	.long	127                             @ DW_AT_type
+	.byte	4                               @ DW_AT_decl_file
+	.byte	136                             @ DW_AT_decl_line
+	.byte	4                               @ DW_AT_data_member_location
+	.byte	26                              @ Abbrev [26] 0x5b3:0xc DW_TAG_member
+	.long	.Linfo_string63                 @ DW_AT_name
+	.long	127                             @ DW_AT_type
+	.byte	4                               @ DW_AT_decl_file
+	.byte	137                             @ DW_AT_decl_line
+	.byte	8                               @ DW_AT_data_member_location
+	.byte	0                               @ End Of Children Mark
+	.byte	24                              @ Abbrev [24] 0x5c0:0x5 DW_TAG_const_type
+	.long	1477                            @ DW_AT_type
+	.byte	15                              @ Abbrev [15] 0x5c5:0x5 DW_TAG_pointer_type
+	.long	1482                            @ DW_AT_type
+	.byte	30                              @ Abbrev [30] 0x5ca:0xc DW_TAG_typedef
+	.long	1494                            @ DW_AT_type
+	.long	.Linfo_string94                 @ DW_AT_name
+	.byte	8                               @ DW_AT_decl_file
+	.short	1316                            @ DW_AT_decl_line
+	.byte	31                              @ Abbrev [31] 0x5d6:0xa6 DW_TAG_structure_type
+	.long	.Linfo_string93                 @ DW_AT_name
+	.byte	220                             @ DW_AT_byte_size
+	.byte	8                               @ DW_AT_decl_file
+	.short	1268                            @ DW_AT_decl_line
+	.byte	32                              @ Abbrev [32] 0x5df:0xd DW_TAG_member
+	.long	.Linfo_string67                 @ DW_AT_name
+	.long	1370                            @ DW_AT_type
+	.byte	8                               @ DW_AT_decl_file
+	.short	1270                            @ DW_AT_decl_line
+	.byte	0                               @ DW_AT_data_member_location
+	.byte	32                              @ Abbrev [32] 0x5ec:0xd DW_TAG_member
+	.long	.Linfo_string68                 @ DW_AT_name
+	.long	1660                            @ DW_AT_type
+	.byte	8                               @ DW_AT_decl_file
+	.short	1272                            @ DW_AT_decl_line
+	.byte	4                               @ DW_AT_data_member_location
+	.byte	32                              @ Abbrev [32] 0x5f9:0xd DW_TAG_member
+	.long	.Linfo_string78                 @ DW_AT_name
+	.long	1789                            @ DW_AT_type
+	.byte	8                               @ DW_AT_decl_file
+	.short	1274                            @ DW_AT_decl_line
+	.byte	124                             @ DW_AT_data_member_location
+	.byte	32                              @ Abbrev [32] 0x606:0xd DW_TAG_member
+	.long	.Linfo_string82                 @ DW_AT_name
+	.long	799                             @ DW_AT_type
+	.byte	8                               @ DW_AT_decl_file
+	.short	1275                            @ DW_AT_decl_line
+	.byte	164                             @ DW_AT_data_member_location
+	.byte	32                              @ Abbrev [32] 0x613:0xd DW_TAG_member
+	.long	.Linfo_string83                 @ DW_AT_name
+	.long	1370                            @ DW_AT_type
+	.byte	8                               @ DW_AT_decl_file
+	.short	1276                            @ DW_AT_decl_line
+	.byte	168                             @ DW_AT_data_member_location
+	.byte	32                              @ Abbrev [32] 0x620:0xd DW_TAG_member
+	.long	.Linfo_string84                 @ DW_AT_name
+	.long	1861                            @ DW_AT_type
+	.byte	8                               @ DW_AT_decl_file
+	.short	1277                            @ DW_AT_decl_line
+	.byte	172                             @ DW_AT_data_member_location
+	.byte	32                              @ Abbrev [32] 0x62d:0xd DW_TAG_member
+	.long	.Linfo_string87                 @ DW_AT_name
+	.long	1891                            @ DW_AT_type
+	.byte	8                               @ DW_AT_decl_file
+	.short	1285                            @ DW_AT_decl_line
+	.byte	184                             @ DW_AT_data_member_location
+	.byte	32                              @ Abbrev [32] 0x63a:0xd DW_TAG_member
+	.long	.Linfo_string88                 @ DW_AT_name
+	.long	1891                            @ DW_AT_type
+	.byte	8                               @ DW_AT_decl_file
+	.short	1288                            @ DW_AT_decl_line
+	.byte	192                             @ DW_AT_data_member_location
+	.byte	32                              @ Abbrev [32] 0x647:0xd DW_TAG_member
+	.long	.Linfo_string89                 @ DW_AT_name
+	.long	1903                            @ DW_AT_type
+	.byte	8                               @ DW_AT_decl_file
+	.short	1303                            @ DW_AT_decl_line
+	.byte	200                             @ DW_AT_data_member_location
+	.byte	32                              @ Abbrev [32] 0x654:0xd DW_TAG_member
+	.long	.Linfo_string90                 @ DW_AT_name
+	.long	1915                            @ DW_AT_type
+	.byte	8                               @ DW_AT_decl_file
+	.short	1304                            @ DW_AT_decl_line
+	.byte	212                             @ DW_AT_data_member_location
+	.byte	32                              @ Abbrev [32] 0x661:0xd DW_TAG_member
+	.long	.Linfo_string91                 @ DW_AT_name
+	.long	1873                            @ DW_AT_type
+	.byte	8                               @ DW_AT_decl_file
+	.short	1307                            @ DW_AT_decl_line
+	.byte	215                             @ DW_AT_data_member_location
+	.byte	32                              @ Abbrev [32] 0x66e:0xd DW_TAG_member
+	.long	.Linfo_string92                 @ DW_AT_name
+	.long	1873                            @ DW_AT_type
+	.byte	8                               @ DW_AT_decl_file
+	.short	1311                            @ DW_AT_decl_line
+	.byte	216                             @ DW_AT_data_member_location
+	.byte	0                               @ End Of Children Mark
+	.byte	30                              @ Abbrev [30] 0x67c:0xc DW_TAG_typedef
+	.long	1672                            @ DW_AT_type
+	.long	.Linfo_string77                 @ DW_AT_name
+	.byte	2                               @ DW_AT_decl_file
+	.short	269                             @ DW_AT_decl_line
+	.byte	31                              @ Abbrev [31] 0x688:0x31 DW_TAG_structure_type
+	.long	.Linfo_string76                 @ DW_AT_name
+	.byte	120                             @ DW_AT_byte_size
+	.byte	2                               @ DW_AT_decl_file
+	.short	264                             @ DW_AT_decl_line
+	.byte	32                              @ Abbrev [32] 0x691:0xd DW_TAG_member
+	.long	.Linfo_string69                 @ DW_AT_name
+	.long	127                             @ DW_AT_type
+	.byte	2                               @ DW_AT_decl_file
+	.short	266                             @ DW_AT_decl_line
+	.byte	0                               @ DW_AT_data_member_location
+	.byte	32                              @ Abbrev [32] 0x69e:0xd DW_TAG_member
+	.long	.Linfo_string70                 @ DW_AT_name
+	.long	1721                            @ DW_AT_type
+	.byte	2                               @ DW_AT_decl_file
+	.short	267                             @ DW_AT_decl_line
+	.byte	4                               @ DW_AT_data_member_location
+	.byte	32                              @ Abbrev [32] 0x6ab:0xd DW_TAG_member
+	.long	.Linfo_string75                 @ DW_AT_name
+	.long	1777                            @ DW_AT_type
+	.byte	2                               @ DW_AT_decl_file
+	.short	268                             @ DW_AT_decl_line
+	.byte	36                              @ DW_AT_data_member_location
+	.byte	0                               @ End Of Children Mark
+	.byte	5                               @ Abbrev [5] 0x6b9:0xc DW_TAG_array_type
+	.long	1733                            @ DW_AT_type
+	.byte	6                               @ Abbrev [6] 0x6be:0x6 DW_TAG_subrange_type
+	.long	145                             @ DW_AT_type
+	.byte	4                               @ DW_AT_count
+	.byte	0                               @ End Of Children Mark
+	.byte	7                               @ Abbrev [7] 0x6c5:0xb DW_TAG_typedef
+	.long	1744                            @ DW_AT_type
+	.long	.Linfo_string74                 @ DW_AT_name
+	.byte	2                               @ DW_AT_decl_file
+	.byte	196                             @ DW_AT_decl_line
+	.byte	25                              @ Abbrev [25] 0x6d0:0x21 DW_TAG_structure_type
+	.long	.Linfo_string73                 @ DW_AT_name
+	.byte	8                               @ DW_AT_byte_size
+	.byte	2                               @ DW_AT_decl_file
+	.byte	192                             @ DW_AT_decl_line
+	.byte	26                              @ Abbrev [26] 0x6d8:0xc DW_TAG_member
+	.long	.Linfo_string71                 @ DW_AT_name
+	.long	127                             @ DW_AT_type
+	.byte	2                               @ DW_AT_decl_file
+	.byte	194                             @ DW_AT_decl_line
+	.byte	0                               @ DW_AT_data_member_location
+	.byte	26                              @ Abbrev [26] 0x6e4:0xc DW_TAG_member
+	.long	.Linfo_string72                 @ DW_AT_name
+	.long	127                             @ DW_AT_type
+	.byte	2                               @ DW_AT_decl_file
+	.byte	195                             @ DW_AT_decl_line
+	.byte	4                               @ DW_AT_data_member_location
+	.byte	0                               @ End Of Children Mark
+	.byte	5                               @ Abbrev [5] 0x6f1:0xc DW_TAG_array_type
+	.long	127                             @ DW_AT_type
+	.byte	6                               @ Abbrev [6] 0x6f6:0x6 DW_TAG_subrange_type
+	.long	145                             @ DW_AT_type
+	.byte	21                              @ DW_AT_count
+	.byte	0                               @ End Of Children Mark
+	.byte	5                               @ Abbrev [5] 0x6fd:0xc DW_TAG_array_type
+	.long	1801                            @ DW_AT_type
+	.byte	6                               @ Abbrev [6] 0x702:0x6 DW_TAG_subrange_type
+	.long	145                             @ DW_AT_type
+	.byte	2                               @ DW_AT_count
+	.byte	0                               @ End Of Children Mark
+	.byte	30                              @ Abbrev [30] 0x709:0xc DW_TAG_typedef
+	.long	1813                            @ DW_AT_type
+	.long	.Linfo_string81                 @ DW_AT_name
+	.byte	8                               @ DW_AT_decl_file
+	.short	1224                            @ DW_AT_decl_line
+	.byte	31                              @ Abbrev [31] 0x715:0x24 DW_TAG_structure_type
+	.long	.Linfo_string80                 @ DW_AT_name
+	.byte	20                              @ DW_AT_byte_size
+	.byte	8                               @ DW_AT_decl_file
+	.short	1213                            @ DW_AT_decl_line
+	.byte	32                              @ Abbrev [32] 0x71e:0xd DW_TAG_member
+	.long	.Linfo_string68                 @ DW_AT_name
+	.long	788                             @ DW_AT_type
+	.byte	8                               @ DW_AT_decl_file
+	.short	1218                            @ DW_AT_decl_line
+	.byte	0                               @ DW_AT_data_member_location
+	.byte	32                              @ Abbrev [32] 0x72b:0xd DW_TAG_member
+	.long	.Linfo_string79                 @ DW_AT_name
+	.long	1849                            @ DW_AT_type
+	.byte	8                               @ DW_AT_decl_file
+	.short	1219                            @ DW_AT_decl_line
+	.byte	4                               @ DW_AT_data_member_location
+	.byte	0                               @ End Of Children Mark
+	.byte	5                               @ Abbrev [5] 0x739:0xc DW_TAG_array_type
+	.long	1370                            @ DW_AT_type
+	.byte	6                               @ Abbrev [6] 0x73e:0x6 DW_TAG_subrange_type
+	.long	145                             @ DW_AT_type
+	.byte	4                               @ DW_AT_count
+	.byte	0                               @ End Of Children Mark
+	.byte	5                               @ Abbrev [5] 0x745:0xc DW_TAG_array_type
+	.long	1873                            @ DW_AT_type
+	.byte	6                               @ Abbrev [6] 0x74a:0x6 DW_TAG_subrange_type
+	.long	145                             @ DW_AT_type
+	.byte	12                              @ DW_AT_count
+	.byte	0                               @ End Of Children Mark
+	.byte	7                               @ Abbrev [7] 0x751:0xb DW_TAG_typedef
+	.long	1884                            @ DW_AT_type
+	.long	.Linfo_string86                 @ DW_AT_name
+	.byte	1                               @ DW_AT_decl_file
+	.byte	62                              @ DW_AT_decl_line
+	.byte	8                               @ Abbrev [8] 0x75c:0x7 DW_TAG_base_type
+	.long	.Linfo_string85                 @ DW_AT_name
+	.byte	8                               @ DW_AT_encoding
+	.byte	1                               @ DW_AT_byte_size
+	.byte	5                               @ Abbrev [5] 0x763:0xc DW_TAG_array_type
+	.long	799                             @ DW_AT_type
+	.byte	6                               @ Abbrev [6] 0x768:0x6 DW_TAG_subrange_type
+	.long	145                             @ DW_AT_type
+	.byte	2                               @ DW_AT_count
+	.byte	0                               @ End Of Children Mark
+	.byte	5                               @ Abbrev [5] 0x76f:0xc DW_TAG_array_type
+	.long	127                             @ DW_AT_type
+	.byte	6                               @ Abbrev [6] 0x774:0x6 DW_TAG_subrange_type
+	.long	145                             @ DW_AT_type
+	.byte	3                               @ DW_AT_count
+	.byte	0                               @ End Of Children Mark
+	.byte	5                               @ Abbrev [5] 0x77b:0xc DW_TAG_array_type
+	.long	1873                            @ DW_AT_type
+	.byte	6                               @ Abbrev [6] 0x780:0x6 DW_TAG_subrange_type
+	.long	145                             @ DW_AT_type
+	.byte	3                               @ DW_AT_count
+	.byte	0                               @ End Of Children Mark
+	.byte	24                              @ Abbrev [24] 0x787:0x5 DW_TAG_const_type
+	.long	127                             @ DW_AT_type
+	.byte	24                              @ Abbrev [24] 0x78c:0x5 DW_TAG_const_type
+	.long	477                             @ DW_AT_type
+	.byte	24                              @ Abbrev [24] 0x791:0x5 DW_TAG_const_type
+	.long	322                             @ DW_AT_type
+	.byte	0                               @ End Of Children Mark
+.Ldebug_info_end0:
+	.section	.debug_ranges,"",%progbits
+.Ldebug_ranges0:
+	.long	.Lfunc_begin0
+	.long	.Lfunc_end0
+	.long	.Lfunc_begin1
+	.long	.Lfunc_end1
+	.long	.Lfunc_begin2
+	.long	.Lfunc_end2
+	.long	.Lfunc_begin3
+	.long	.Lfunc_end3
+	.long	.Lfunc_begin4
+	.long	.Lfunc_end4
+	.long	.Lfunc_begin5
+	.long	.Lfunc_end5
+	.long	.Lfunc_begin6
+	.long	.Lfunc_end6
+	.long	.Lfunc_begin7
+	.long	.Lfunc_end7
+	.long	0
+	.long	0
+	.section	.debug_str,"MS",%progbits,1
+.Linfo_string0:
+	.asciz	"Component: Arm Compiler for Embedded 6.19 Tool: armclang [5e73cb00]" @ string offset=0
+.Linfo_string1:
+	.asciz	"../../../CORTEX_MPU_M3_NUCLEO_L152RE_GCC/Demo\\TaskNotify.c" @ string offset=68
+.Linfo_string2:
+	.asciz	"C:\\Users\\karahulx\\Downloads\\Kernel\\FreeRTOS\\FreeRTOS\\Demo\\CORTEX_MPU_M23_Nuvoton_NuMaker_PFM_M2351_IAR_GCC\\Projects_NTZ\\Keil" @ string offset=127
+.Linfo_string3:
+	.asciz	"xNotifiedTaskStack"            @ string offset=252
+.Linfo_string4:
+	.asciz	"unsigned int"                  @ string offset=271
+.Linfo_string5:
+	.asciz	"uint32_t"                      @ string offset=284
+.Linfo_string6:
+	.asciz	"StackType_t"                   @ string offset=293
+.Linfo_string7:
+	.asciz	"__ARRAY_SIZE_TYPE__"           @ string offset=305
+.Linfo_string8:
+	.asciz	"char"                          @ string offset=325
+.Linfo_string9:
+	.asciz	"xCallCount"                    @ string offset=330
+.Linfo_string10:
+	.asciz	"long"                          @ string offset=341
+.Linfo_string11:
+	.asciz	"BaseType_t"                    @ string offset=346
+.Linfo_string12:
+	.asciz	"xAPIToUse"                     @ string offset=357
+.Linfo_string13:
+	.asciz	"ulLastNotifyCycleCount"        @ string offset=367
+.Linfo_string14:
+	.asciz	"xTaskToNotify"                 @ string offset=390
+.Linfo_string15:
+	.asciz	"tskTaskControlBlock"           @ string offset=404
+.Linfo_string16:
+	.asciz	"TaskHandle_t"                  @ string offset=424
+.Linfo_string17:
+	.asciz	"uxNextRand"                    @ string offset=437
+.Linfo_string18:
+	.asciz	"size_t"                        @ string offset=448
+.Linfo_string19:
+	.asciz	"xTimer"                        @ string offset=455
+.Linfo_string20:
+	.asciz	"tmrTimerControl"               @ string offset=462
+.Linfo_string21:
+	.asciz	"TimerHandle_t"                 @ string offset=478
+.Linfo_string22:
+	.asciz	"ulCallCount"                   @ string offset=492
+.Linfo_string23:
+	.asciz	"ulTimerNotificationsSent"      @ string offset=504
+.Linfo_string24:
+	.asciz	"ulNotifyCycleCount"            @ string offset=529
+.Linfo_string25:
+	.asciz	"xErrorStatus"                  @ string offset=548
+.Linfo_string26:
+	.asciz	"ulTimerNotificationsReceived"  @ string offset=561
+.Linfo_string27:
+	.asciz	"eNoAction"                     @ string offset=590
+.Linfo_string28:
+	.asciz	"eSetBits"                      @ string offset=600
+.Linfo_string29:
+	.asciz	"eIncrement"                    @ string offset=609
+.Linfo_string30:
+	.asciz	"eSetValueWithOverwrite"        @ string offset=620
+.Linfo_string31:
+	.asciz	"eSetValueWithoutOverwrite"     @ string offset=643
+.Linfo_string32:
+	.asciz	"eRunning"                      @ string offset=669
+.Linfo_string33:
+	.asciz	"eReady"                        @ string offset=678
+.Linfo_string34:
+	.asciz	"eBlocked"                      @ string offset=685
+.Linfo_string35:
+	.asciz	"eSuspended"                    @ string offset=694
+.Linfo_string36:
+	.asciz	"eDeleted"                      @ string offset=705
+.Linfo_string37:
+	.asciz	"eInvalid"                      @ string offset=714
+.Linfo_string38:
+	.asciz	"TickType_t"                    @ string offset=723
+.Linfo_string39:
+	.asciz	"unsigned long"                 @ string offset=734
+.Linfo_string40:
+	.asciz	"UBaseType_t"                   @ string offset=748
+.Linfo_string41:
+	.asciz	"vStartTaskNotifyTask"          @ string offset=760
+.Linfo_string42:
+	.asciz	"prvNotifiedTask"               @ string offset=781
+.Linfo_string43:
+	.asciz	"prvRand"                       @ string offset=797
+.Linfo_string44:
+	.asciz	"prvNotifyingTimer"             @ string offset=805
+.Linfo_string45:
+	.asciz	"prvSuspendedTaskTimerTestCallback" @ string offset=823
+.Linfo_string46:
+	.asciz	"xNotifyTaskFromISR"            @ string offset=857
+.Linfo_string47:
+	.asciz	"xAreTaskNotificationTasksStillRunning" @ string offset=876
+.Linfo_string48:
+	.asciz	"prvSingleTaskTests"            @ string offset=914
+.Linfo_string49:
+	.asciz	"xMaxPeriod"                    @ string offset=933
+.Linfo_string50:
+	.asciz	"xNotifiedTask"                 @ string offset=944
+.Linfo_string51:
+	.asciz	"pvTaskCode"                    @ string offset=958
+.Linfo_string52:
+	.asciz	"TaskFunction_t"                @ string offset=969
+.Linfo_string53:
+	.asciz	"pcName"                        @ string offset=984
+.Linfo_string54:
+	.asciz	"usStackDepth"                  @ string offset=991
+.Linfo_string55:
+	.asciz	"unsigned short"                @ string offset=1004
+.Linfo_string56:
+	.asciz	"uint16_t"                      @ string offset=1019
+.Linfo_string57:
+	.asciz	"pvParameters"                  @ string offset=1028
+.Linfo_string58:
+	.asciz	"uxPriority"                    @ string offset=1041
+.Linfo_string59:
+	.asciz	"puxStackBuffer"                @ string offset=1052
+.Linfo_string60:
+	.asciz	"xRegions"                      @ string offset=1067
+.Linfo_string61:
+	.asciz	"pvBaseAddress"                 @ string offset=1076
+.Linfo_string62:
+	.asciz	"ulLengthInBytes"               @ string offset=1090
+.Linfo_string63:
+	.asciz	"ulParameters"                  @ string offset=1106
+.Linfo_string64:
+	.asciz	"xMEMORY_REGION"                @ string offset=1119
+.Linfo_string65:
+	.asciz	"MemoryRegion_t"                @ string offset=1134
+.Linfo_string66:
+	.asciz	"pxTaskBuffer"                  @ string offset=1149
+.Linfo_string67:
+	.asciz	"pxDummy1"                      @ string offset=1162
+.Linfo_string68:
+	.asciz	"xDummy2"                       @ string offset=1171
+.Linfo_string69:
+	.asciz	"ulMAIR0"                       @ string offset=1179
+.Linfo_string70:
+	.asciz	"xRegionsSettings"              @ string offset=1187
+.Linfo_string71:
+	.asciz	"ulRBAR"                        @ string offset=1204
+.Linfo_string72:
+	.asciz	"ulRLAR"                        @ string offset=1211
+.Linfo_string73:
+	.asciz	"MPURegionSettings"             @ string offset=1218
+.Linfo_string74:
+	.asciz	"MPURegionSettings_t"           @ string offset=1236
+.Linfo_string75:
+	.asciz	"ulContext"                     @ string offset=1256
+.Linfo_string76:
+	.asciz	"MPU_SETTINGS"                  @ string offset=1266
+.Linfo_string77:
+	.asciz	"xMPU_SETTINGS"                 @ string offset=1279
+.Linfo_string78:
+	.asciz	"xDummy3"                       @ string offset=1293
+.Linfo_string79:
+	.asciz	"pvDummy3"                      @ string offset=1301
+.Linfo_string80:
+	.asciz	"xSTATIC_LIST_ITEM"             @ string offset=1310
+.Linfo_string81:
+	.asciz	"StaticListItem_t"              @ string offset=1328
+.Linfo_string82:
+	.asciz	"uxDummy5"                      @ string offset=1345
+.Linfo_string83:
+	.asciz	"pxDummy6"                      @ string offset=1354
+.Linfo_string84:
+	.asciz	"ucDummy7"                      @ string offset=1363
+.Linfo_string85:
+	.asciz	"unsigned char"                 @ string offset=1372
+.Linfo_string86:
+	.asciz	"uint8_t"                       @ string offset=1386
+.Linfo_string87:
+	.asciz	"uxDummy10"                     @ string offset=1394
+.Linfo_string88:
+	.asciz	"uxDummy12"                     @ string offset=1404
+.Linfo_string89:
+	.asciz	"ulDummy18"                     @ string offset=1414
+.Linfo_string90:
+	.asciz	"ucDummy19"                     @ string offset=1424
+.Linfo_string91:
+	.asciz	"uxDummy20"                     @ string offset=1434
+.Linfo_string92:
+	.asciz	"ucDummy21"                     @ string offset=1444
+.Linfo_string93:
+	.asciz	"xSTATIC_TCB"                   @ string offset=1454
+.Linfo_string94:
+	.asciz	"StaticTask_t"                  @ string offset=1466
+.Linfo_string95:
+	.asciz	"xTASK_PARAMETERS"              @ string offset=1479
+.Linfo_string96:
+	.asciz	"TaskParameters_t"              @ string offset=1496
+.Linfo_string97:
+	.asciz	"xMinPeriod"                    @ string offset=1513
+.Linfo_string98:
+	.asciz	"xDontBlock"                    @ string offset=1524
+.Linfo_string99:
+	.asciz	"xPeriod"                       @ string offset=1535
+.Linfo_string100:
+	.asciz	"ulCyclesToRaisePriority"       @ string offset=1543
+.Linfo_string101:
+	.asciz	"uxMultiplier"                  @ string offset=1567
+.Linfo_string102:
+	.asciz	"uxIncrement"                   @ string offset=1580
+.Linfo_string103:
+	.asciz	"xNotUsed"                      @ string offset=1592
+.Linfo_string104:
+	.asciz	"xExpiredTimer"                 @ string offset=1601
+.Linfo_string105:
+	.asciz	"xCallInterval"                 @ string offset=1615
+.Linfo_string106:
+	.asciz	"ulPreviousValue"               @ string offset=1629
+.Linfo_string107:
+	.asciz	"ulUnexpectedValue"             @ string offset=1645
+.Linfo_string108:
+	.asciz	"ulMaxSendReceiveDeviation"     @ string offset=1663
+.Linfo_string109:
+	.asciz	"xTicksToWait"                  @ string offset=1689
+.Linfo_string110:
+	.asciz	"xReturned"                     @ string offset=1702
+.Linfo_string111:
+	.asciz	"ulNotifiedValue"               @ string offset=1712
+.Linfo_string112:
+	.asciz	"ulLoop"                        @ string offset=1728
+.Linfo_string113:
+	.asciz	"ulNotifyingValue"              @ string offset=1735
+.Linfo_string114:
+	.asciz	"ulExpectedValue"               @ string offset=1752
+.Linfo_string115:
+	.asciz	"xTimeOnEntering"               @ string offset=1768
+.Linfo_string116:
+	.asciz	"ulFirstNotifiedConst"          @ string offset=1784
+.Linfo_string117:
+	.asciz	"ulSecondNotifiedValueConst"    @ string offset=1805
+.Linfo_string118:
+	.asciz	"ulMaxLoops"                    @ string offset=1832
+.Linfo_string119:
+	.asciz	"ulBit0"                        @ string offset=1843
+.Linfo_string120:
+	.asciz	"ulBit1"                        @ string offset=1850
+	.ident	"Component: Arm Compiler for Embedded 6.19 Tool: armclang [5e73cb00]"
+	.section	".note.GNU-stack","",%progbits
+	.eabi_attribute	30, 6	@ Tag_ABI_optimization_goals
+	.ARM_attribute	16, 1	@ Tag_AV_eba
+	.section	.debug_line,"",%progbits
+.Lline_table_start0:

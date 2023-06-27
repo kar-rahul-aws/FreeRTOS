@@ -1,0 +1,802 @@
+	.text
+	.syntax unified
+	.eabi_attribute	67, "2.09"	@ Tag_conformance
+	.eabi_attribute	6, 16	@ Tag_CPU_arch
+	.eabi_attribute	7, 77	@ Tag_CPU_arch_profile
+	.eabi_attribute	8, 0	@ Tag_ARM_ISA_use
+	.eabi_attribute	9, 3	@ Tag_THUMB_ISA_use
+	.eabi_attribute	34, 0	@ Tag_CPU_unaligned_access
+	.eabi_attribute	17, 1	@ Tag_ABI_PCS_GOT_use
+	.eabi_attribute	20, 2	@ Tag_ABI_FP_denormal
+	.eabi_attribute	21, 0	@ Tag_ABI_FP_exceptions
+	.eabi_attribute	23, 1	@ Tag_ABI_FP_number_model
+	.eabi_attribute	24, 1	@ Tag_ABI_align_needed
+	.eabi_attribute	25, 1	@ Tag_ABI_align_preserved
+	.eabi_attribute	38, 1	@ Tag_ABI_FP_16bit_format
+	.eabi_attribute	18, 4	@ Tag_ABI_PCS_wchar_t
+	.eabi_attribute	26, 2	@ Tag_ABI_enum_size
+	.eabi_attribute	14, 0	@ Tag_ABI_PCS_R9_use
+	.file	"portasm.c"
+	.section	privileged_functions,"ax",%progbits
+	.hidden	vRestoreContextOfFirstTask      @ -- Begin function vRestoreContextOfFirstTask
+	.globl	vRestoreContextOfFirstTask
+	.p2align	1
+	.type	vRestoreContextOfFirstTask,%function
+	.code	16                              @ @vRestoreContextOfFirstTask
+	.thumb_func
+vRestoreContextOfFirstTask:
+.Lfunc_begin0:
+	.file	1 "C:\\Users\\karahulx\\Downloads\\Kernel\\FreeRTOS\\FreeRTOS\\Demo\\CORTEX_MPU_M23_Nuvoton_NuMaker_PFM_M2351_IAR_GCC\\Projects_NTZ\\Keil" "../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/portasm.c"
+	.loc	1 50 0                          @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/portasm.c:50:0
+	.fnstart
+	.cfi_sections .debug_frame
+	.cfi_startproc
+@ %bb.0:
+	.loc	1 51 5 prologue_end             @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/portasm.c:51:5
+	@APP
+
+program_mpu_first_task:
+	ldr	r3, pxCurrentTCBConst2
+	ldr	r0, [r3]
+
+	dmb	sy
+	ldr	r1, xMPUCTRLConst2
+	ldr	r2, [r1]
+	movs	r3, #1
+	bics	r2, r3
+	str	r2, [r1]
+
+	adds	r0, #4
+	ldr	r1, [r0]
+	ldr	r2, xMAIR0Const2
+	str	r1, [r2]
+
+	adds	r0, #4
+	ldr	r1, xRNRConst2
+
+	movs	r3, #4
+	str	r3, [r1]
+	ldm	r0!, {r4, r5}
+	ldr	r2, xRBARConst2
+	stm	r2!, {r4, r5}
+	movs	r3, #5
+	str	r3, [r1]
+	ldm	r0!, {r4, r5}
+	ldr	r2, xRBARConst2
+	stm	r2!, {r4, r5}
+	movs	r3, #6
+	str	r3, [r1]
+	ldm	r0!, {r4, r5}
+	ldr	r2, xRBARConst2
+	stm	r2!, {r4, r5}
+	movs	r3, #7
+	str	r3, [r1]
+	ldm	r0!, {r4, r5}
+	ldr	r2, xRBARConst2
+	stm	r2!, {r4, r5}
+
+	ldr	r1, xMPUCTRLConst2
+	ldr	r2, [r1]
+	movs	r3, #1
+	orrs	r2, r3
+	str	r2, [r1]
+	dsb	sy
+
+restore_context_first_task:
+	ldr	r2, pxCurrentTCBConst2
+	ldr	r0, [r2]
+	ldr	r1, [r0]
+
+restore_special_regs_first_task:
+	subs	r1, #16
+	ldm	r1!, {r2, r3, r4, r5}
+	subs	r1, #16
+	msr	psp, r2
+	msr	psplim, r3
+	msr	control, r4
+	mov	lr, r5
+
+restore_general_regs_first_task:
+	subs	r1, #32
+	ldm	r1!, {r4, r5, r6, r7}
+	stm	r2!, {r4, r5, r6, r7}
+	ldm	r1!, {r4, r5, r6, r7}
+	stm	r2!, {r4, r5, r6, r7}
+	subs	r1, #48
+	ldm	r1!, {r4, r5, r6, r7}
+	mov	r8, r4
+	mov	r9, r5
+	mov	r10, r6
+	mov	r11, r7
+	subs	r1, #32
+	ldm	r1!, {r4, r5, r6, r7}
+	subs	r1, #16
+
+restore_context_done_first_task:
+	str	r1, [r0]
+	bx	lr
+
+	.p2align	4
+pxCurrentTCBConst2:
+	.long	pxCurrentTCB
+xMPUCTRLConst2:
+	.long	3758157204
+xMAIR0Const2:
+	.long	3758157248
+xRNRConst2:
+	.long	3758157208
+xRBARConst2:
+	.long	3758157212
+
+	@NO_APP
+.Ltmp0:
+.Lfunc_end0:
+	.size	vRestoreContextOfFirstTask, .Lfunc_end0-vRestoreContextOfFirstTask
+	.cfi_endproc
+	.cantunwind
+	.fnend
+                                        @ -- End function
+	.section	.text.xIsPrivileged,"ax",%progbits
+	.hidden	xIsPrivileged                   @ -- Begin function xIsPrivileged
+	.globl	xIsPrivileged
+	.p2align	1
+	.type	xIsPrivileged,%function
+	.code	16                              @ @xIsPrivileged
+	.thumb_func
+xIsPrivileged:
+.Lfunc_begin1:
+	.loc	1 175 0                         @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/portasm.c:175:0
+	.fnstart
+	.cfi_startproc
+@ %bb.0:
+	.loc	1 176 5 prologue_end            @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/portasm.c:176:5
+	@APP
+
+	mrs	r0, control
+	movs	r1, #1
+	tst	r0, r1
+	beq	running_privileged
+	movs	r0, #0
+	bx	lr
+running_privileged:
+	movs	r0, #1
+	bx	lr
+
+	.p2align	4
+
+	@NO_APP
+.Ltmp1:
+.Lfunc_end1:
+	.size	xIsPrivileged, .Lfunc_end1-xIsPrivileged
+	.cfi_endproc
+	.cantunwind
+	.fnend
+                                        @ -- End function
+	.section	privileged_functions,"ax",%progbits
+	.hidden	vRaisePrivilege                 @ -- Begin function vRaisePrivilege
+	.globl	vRaisePrivilege
+	.p2align	1
+	.type	vRaisePrivilege,%function
+	.code	16                              @ @vRaisePrivilege
+	.thumb_func
+vRaisePrivilege:
+.Lfunc_begin2:
+	.loc	1 197 0                         @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/portasm.c:197:0
+	.fnstart
+	.cfi_startproc
+@ %bb.0:
+	.loc	1 198 5 prologue_end            @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/portasm.c:198:5
+	@APP
+
+	mrs	r0, control
+	movs	r1, #1
+	bics	r0, r1
+	msr	control, r0
+	bx	lr
+
+	@NO_APP
+.Ltmp2:
+.Lfunc_end2:
+	.size	vRaisePrivilege, .Lfunc_end2-vRaisePrivilege
+	.cfi_endproc
+	.cantunwind
+	.fnend
+                                        @ -- End function
+	.section	.text.vResetPrivilege,"ax",%progbits
+	.hidden	vResetPrivilege                 @ -- Begin function vResetPrivilege
+	.globl	vResetPrivilege
+	.p2align	1
+	.type	vResetPrivilege,%function
+	.code	16                              @ @vResetPrivilege
+	.thumb_func
+vResetPrivilege:
+.Lfunc_begin3:
+	.loc	1 213 0                         @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/portasm.c:213:0
+	.fnstart
+	.cfi_startproc
+@ %bb.0:
+	.loc	1 214 5 prologue_end            @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/portasm.c:214:5
+	@APP
+
+	mrs	r0, control
+	movs	r1, #1
+	orrs	r0, r1
+	msr	control, r0
+	bx	lr
+
+	@NO_APP
+.Ltmp3:
+.Lfunc_end3:
+	.size	vResetPrivilege, .Lfunc_end3-vResetPrivilege
+	.cfi_endproc
+	.cantunwind
+	.fnend
+                                        @ -- End function
+	.section	privileged_functions,"ax",%progbits
+	.hidden	vStartFirstTask                 @ -- Begin function vStartFirstTask
+	.globl	vStartFirstTask
+	.p2align	1
+	.type	vStartFirstTask,%function
+	.code	16                              @ @vStartFirstTask
+	.thumb_func
+vStartFirstTask:
+.Lfunc_begin4:
+	.loc	1 229 0                         @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/portasm.c:229:0
+	.fnstart
+	.cfi_startproc
+@ %bb.0:
+	.loc	1 230 5 prologue_end            @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/portasm.c:230:5
+	@APP
+
+	ldr	r0, xVTORConst
+	ldr	r0, [r0]
+	ldr	r0, [r0]
+	msr	msp, r0
+	cpsie i
+	dsb	sy
+	isb	sy
+	svc	#2
+	nop
+
+	.p2align	4
+xVTORConst:
+	.long	3758157064
+
+	@NO_APP
+.Ltmp4:
+.Lfunc_end4:
+	.size	vStartFirstTask, .Lfunc_end4-vStartFirstTask
+	.cfi_endproc
+	.cantunwind
+	.fnend
+                                        @ -- End function
+	.hidden	ulSetInterruptMask              @ -- Begin function ulSetInterruptMask
+	.globl	ulSetInterruptMask
+	.p2align	1
+	.type	ulSetInterruptMask,%function
+	.code	16                              @ @ulSetInterruptMask
+	.thumb_func
+ulSetInterruptMask:
+.Lfunc_begin5:
+	.loc	1 252 0                         @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/portasm.c:252:0
+	.fnstart
+	.cfi_startproc
+@ %bb.0:
+	.loc	1 253 5 prologue_end            @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/portasm.c:253:5
+	@APP
+
+	mrs	r0, primask
+	cpsid i
+	bx	lr
+
+	@NO_APP
+.Ltmp5:
+.Lfunc_end5:
+	.size	ulSetInterruptMask, .Lfunc_end5-ulSetInterruptMask
+	.cfi_endproc
+	.cantunwind
+	.fnend
+                                        @ -- End function
+	.hidden	vClearInterruptMask             @ -- Begin function vClearInterruptMask
+	.globl	vClearInterruptMask
+	.p2align	1
+	.type	vClearInterruptMask,%function
+	.code	16                              @ @vClearInterruptMask
+	.thumb_func
+vClearInterruptMask:
+.Lfunc_begin6:
+	.loc	1 266 0                         @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/portasm.c:266:0
+	.fnstart
+	.cfi_startproc
+@ %bb.0:
+	.loc	1 267 5 prologue_end            @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/portasm.c:267:5
+	@APP
+
+	msr	primask, r0
+	bx	lr
+
+	@NO_APP
+.Ltmp6:
+.Lfunc_end6:
+	.size	vClearInterruptMask, .Lfunc_end6-vClearInterruptMask
+	.cfi_endproc
+	.cantunwind
+	.fnend
+                                        @ -- End function
+	.hidden	PendSV_Handler                  @ -- Begin function PendSV_Handler
+	.globl	PendSV_Handler
+	.p2align	1
+	.type	PendSV_Handler,%function
+	.code	16                              @ @PendSV_Handler
+	.thumb_func
+PendSV_Handler:
+.Lfunc_begin7:
+	.loc	1 281 0                         @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/portasm.c:281:0
+	.fnstart
+	.cfi_startproc
+@ %bb.0:
+	.loc	1 282 5 prologue_end            @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/portasm.c:282:5
+	@APP
+
+	ldr	r2, pxCurrentTCBConst
+	ldr	r0, [r2]
+	ldr	r1, [r0]
+	mrs	r2, psp
+
+save_general_regs:
+	stm	r1!, {r4, r5, r6, r7}
+	mov	r4, r8
+	mov	r5, r9
+	mov	r6, r10
+	mov	r7, r11
+	stm	r1!, {r4, r5, r6, r7}
+	ldm	r2!, {r4, r5, r6, r7}
+	stm	r1!, {r4, r5, r6, r7}
+	ldm	r2!, {r4, r5, r6, r7}
+	stm	r1!, {r4, r5, r6, r7}
+
+save_special_regs:
+	mrs	r2, psp
+	mrs	r3, psplim
+	mrs	r4, control
+	mov	r5, lr
+	stm	r1!, {r2, r3, r4, r5}
+	str	r1, [r0]
+
+select_next_task:
+	cpsid i
+	bl	vTaskSwitchContext
+	cpsie i
+
+program_mpu:
+	ldr	r3, pxCurrentTCBConst
+	ldr	r0, [r3]
+
+	dmb	sy
+	ldr	r1, xMPUCTRLConst
+	ldr	r2, [r1]
+	movs	r3, #1
+	bics	r2, r3
+	str	r2, [r1]
+
+	adds	r0, #4
+	ldr	r1, [r0]
+	ldr	r2, xMAIR0Const
+	str	r1, [r2]
+
+	adds	r0, #4
+	ldr	r1, xRNRConst
+
+	movs	r3, #4
+	str	r3, [r1]
+	ldm	r0!, {r4, r5}
+	ldr	r2, xRBARConst
+	stm	r2!, {r4, r5}
+	movs	r3, #5
+	str	r3, [r1]
+	ldm	r0!, {r4, r5}
+	ldr	r2, xRBARConst
+	stm	r2!, {r4, r5}
+	movs	r3, #6
+	str	r3, [r1]
+	ldm	r0!, {r4, r5}
+	ldr	r2, xRBARConst
+	stm	r2!, {r4, r5}
+	movs	r3, #7
+	str	r3, [r1]
+	ldm	r0!, {r4, r5}
+	ldr	r2, xRBARConst
+	stm	r2!, {r4, r5}
+
+	ldr	r1, xMPUCTRLConst
+	ldr	r2, [r1]
+	movs	r3, #1
+	orrs	r2, r3
+	str	r2, [r1]
+	dsb	sy
+
+restore_context:
+	ldr	r2, pxCurrentTCBConst
+	ldr	r0, [r2]
+	ldr	r1, [r0]
+
+restore_special_regs:
+	subs	r1, #16
+	ldm	r1!, {r2, r3, r4, r5}
+	subs	r1, #16
+	msr	psp, r2
+	msr	psplim, r3
+	msr	control, r4
+	mov	lr, r5
+
+restore_general_regs:
+	subs	r1, #32
+	ldm	r1!, {r4, r5, r6, r7}
+	stm	r2!, {r4, r5, r6, r7}
+	ldm	r1!, {r4, r5, r6, r7}
+	stm	r2!, {r4, r5, r6, r7}
+	subs	r1, #48
+	ldm	r1!, {r4, r5, r6, r7}
+	mov	r8, r4
+	mov	r9, r5
+	mov	r10, r6
+	mov	r11, r7
+	subs	r1, #32
+	ldm	r1!, {r4, r5, r6, r7}
+	subs	r1, #16
+
+restore_context_done:
+	str	r1, [r0]
+	bx	lr
+
+	.p2align	4
+pxCurrentTCBConst:
+	.long	pxCurrentTCB
+xMPUCTRLConst:
+	.long	3758157204
+xMAIR0Const:
+	.long	3758157248
+xRNRConst:
+	.long	3758157208
+xRBARConst:
+	.long	3758157212
+
+	@NO_APP
+.Ltmp7:
+.Lfunc_end7:
+	.size	PendSV_Handler, .Lfunc_end7-PendSV_Handler
+	.cfi_endproc
+	.cantunwind
+	.fnend
+                                        @ -- End function
+	.hidden	SVC_Handler                     @ -- Begin function SVC_Handler
+	.globl	SVC_Handler
+	.p2align	1
+	.type	SVC_Handler,%function
+	.code	16                              @ @SVC_Handler
+	.thumb_func
+SVC_Handler:
+.Lfunc_begin8:
+	.loc	1 457 0                         @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/portasm.c:457:0
+	.fnstart
+	.cfi_startproc
+@ %bb.0:
+	.loc	1 458 5 prologue_end            @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/portasm.c:458:5
+	@APP
+
+	movs	r0, #4
+	mov	r1, lr
+	tst	r0, r1
+	beq	stacking_used_msp
+	mrs	r0, psp
+	ldr	r2, svchandler_address_const
+	bx	r2
+stacking_used_msp:
+	mrs	r0, msp
+	ldr	r2, svchandler_address_const
+	bx	r2
+
+	.p2align	4
+svchandler_address_const:
+	.long	vPortSVCHandler_C
+
+	@NO_APP
+.Ltmp8:
+.Lfunc_end8:
+	.size	SVC_Handler, .Lfunc_end8-SVC_Handler
+	.cfi_endproc
+	.cantunwind
+	.fnend
+                                        @ -- End function
+	.file	2 "C:\\Users\\karahulx\\Downloads\\Kernel\\FreeRTOS\\FreeRTOS\\Demo\\CORTEX_MPU_M23_Nuvoton_NuMaker_PFM_M2351_IAR_GCC\\Projects_NTZ\\Keil" "../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/portmacrocommon.h"
+	.file	3 "C:\\Keil_v5\\ARM\\ARMCLANG\\Bin\\..\\include" "stdint.h"
+	.section	.debug_abbrev,"",%progbits
+	.byte	1                               @ Abbreviation Code
+	.byte	17                              @ DW_TAG_compile_unit
+	.byte	1                               @ DW_CHILDREN_yes
+	.byte	37                              @ DW_AT_producer
+	.byte	14                              @ DW_FORM_strp
+	.byte	19                              @ DW_AT_language
+	.byte	5                               @ DW_FORM_data2
+	.byte	3                               @ DW_AT_name
+	.byte	14                              @ DW_FORM_strp
+	.byte	16                              @ DW_AT_stmt_list
+	.byte	23                              @ DW_FORM_sec_offset
+	.byte	27                              @ DW_AT_comp_dir
+	.byte	14                              @ DW_FORM_strp
+	.byte	17                              @ DW_AT_low_pc
+	.byte	1                               @ DW_FORM_addr
+	.byte	85                              @ DW_AT_ranges
+	.byte	23                              @ DW_FORM_sec_offset
+	.byte	0                               @ EOM(1)
+	.byte	0                               @ EOM(2)
+	.byte	2                               @ Abbreviation Code
+	.byte	46                              @ DW_TAG_subprogram
+	.byte	0                               @ DW_CHILDREN_no
+	.byte	17                              @ DW_AT_low_pc
+	.byte	1                               @ DW_FORM_addr
+	.byte	18                              @ DW_AT_high_pc
+	.byte	6                               @ DW_FORM_data4
+	.byte	64                              @ DW_AT_frame_base
+	.byte	24                              @ DW_FORM_exprloc
+	.byte	3                               @ DW_AT_name
+	.byte	14                              @ DW_FORM_strp
+	.byte	58                              @ DW_AT_decl_file
+	.byte	11                              @ DW_FORM_data1
+	.byte	59                              @ DW_AT_decl_line
+	.byte	11                              @ DW_FORM_data1
+	.byte	39                              @ DW_AT_prototyped
+	.byte	25                              @ DW_FORM_flag_present
+	.byte	63                              @ DW_AT_external
+	.byte	25                              @ DW_FORM_flag_present
+	.byte	0                               @ EOM(1)
+	.byte	0                               @ EOM(2)
+	.byte	3                               @ Abbreviation Code
+	.byte	46                              @ DW_TAG_subprogram
+	.byte	0                               @ DW_CHILDREN_no
+	.byte	17                              @ DW_AT_low_pc
+	.byte	1                               @ DW_FORM_addr
+	.byte	18                              @ DW_AT_high_pc
+	.byte	6                               @ DW_FORM_data4
+	.byte	64                              @ DW_AT_frame_base
+	.byte	24                              @ DW_FORM_exprloc
+	.byte	3                               @ DW_AT_name
+	.byte	14                              @ DW_FORM_strp
+	.byte	58                              @ DW_AT_decl_file
+	.byte	11                              @ DW_FORM_data1
+	.byte	59                              @ DW_AT_decl_line
+	.byte	11                              @ DW_FORM_data1
+	.byte	39                              @ DW_AT_prototyped
+	.byte	25                              @ DW_FORM_flag_present
+	.byte	73                              @ DW_AT_type
+	.byte	19                              @ DW_FORM_ref4
+	.byte	63                              @ DW_AT_external
+	.byte	25                              @ DW_FORM_flag_present
+	.byte	0                               @ EOM(1)
+	.byte	0                               @ EOM(2)
+	.byte	4                               @ Abbreviation Code
+	.byte	46                              @ DW_TAG_subprogram
+	.byte	0                               @ DW_CHILDREN_no
+	.byte	17                              @ DW_AT_low_pc
+	.byte	1                               @ DW_FORM_addr
+	.byte	18                              @ DW_AT_high_pc
+	.byte	6                               @ DW_FORM_data4
+	.byte	64                              @ DW_AT_frame_base
+	.byte	24                              @ DW_FORM_exprloc
+	.byte	3                               @ DW_AT_name
+	.byte	14                              @ DW_FORM_strp
+	.byte	58                              @ DW_AT_decl_file
+	.byte	11                              @ DW_FORM_data1
+	.byte	59                              @ DW_AT_decl_line
+	.byte	5                               @ DW_FORM_data2
+	.byte	39                              @ DW_AT_prototyped
+	.byte	25                              @ DW_FORM_flag_present
+	.byte	63                              @ DW_AT_external
+	.byte	25                              @ DW_FORM_flag_present
+	.byte	0                               @ EOM(1)
+	.byte	0                               @ EOM(2)
+	.byte	5                               @ Abbreviation Code
+	.byte	22                              @ DW_TAG_typedef
+	.byte	0                               @ DW_CHILDREN_no
+	.byte	73                              @ DW_AT_type
+	.byte	19                              @ DW_FORM_ref4
+	.byte	3                               @ DW_AT_name
+	.byte	14                              @ DW_FORM_strp
+	.byte	58                              @ DW_AT_decl_file
+	.byte	11                              @ DW_FORM_data1
+	.byte	59                              @ DW_AT_decl_line
+	.byte	11                              @ DW_FORM_data1
+	.byte	0                               @ EOM(1)
+	.byte	0                               @ EOM(2)
+	.byte	6                               @ Abbreviation Code
+	.byte	36                              @ DW_TAG_base_type
+	.byte	0                               @ DW_CHILDREN_no
+	.byte	3                               @ DW_AT_name
+	.byte	14                              @ DW_FORM_strp
+	.byte	62                              @ DW_AT_encoding
+	.byte	11                              @ DW_FORM_data1
+	.byte	11                              @ DW_AT_byte_size
+	.byte	11                              @ DW_FORM_data1
+	.byte	0                               @ EOM(1)
+	.byte	0                               @ EOM(2)
+	.byte	0                               @ EOM(3)
+	.section	.debug_info,"",%progbits
+.Lcu_begin0:
+	.long	.Ldebug_info_end0-.Ldebug_info_start0 @ Length of Unit
+.Ldebug_info_start0:
+	.short	4                               @ DWARF version number
+	.long	.debug_abbrev                   @ Offset Into Abbrev. Section
+	.byte	4                               @ Address Size (in bytes)
+	.byte	1                               @ Abbrev [1] 0xb:0xe4 DW_TAG_compile_unit
+	.long	.Linfo_string0                  @ DW_AT_producer
+	.short	12                              @ DW_AT_language
+	.long	.Linfo_string1                  @ DW_AT_name
+	.long	.Lline_table_start0             @ DW_AT_stmt_list
+	.long	.Linfo_string2                  @ DW_AT_comp_dir
+	.long	0                               @ DW_AT_low_pc
+	.long	.Ldebug_ranges0                 @ DW_AT_ranges
+	.byte	2                               @ Abbrev [2] 0x26:0x11 DW_TAG_subprogram
+	.long	.Lfunc_begin0                   @ DW_AT_low_pc
+	.long	.Lfunc_end0-.Lfunc_begin0       @ DW_AT_high_pc
+	.byte	1                               @ DW_AT_frame_base
+	.byte	93
+	.long	.Linfo_string3                  @ DW_AT_name
+	.byte	1                               @ DW_AT_decl_file
+	.byte	49                              @ DW_AT_decl_line
+                                        @ DW_AT_prototyped
+                                        @ DW_AT_external
+	.byte	3                               @ Abbrev [3] 0x37:0x15 DW_TAG_subprogram
+	.long	.Lfunc_begin1                   @ DW_AT_low_pc
+	.long	.Lfunc_end1-.Lfunc_begin1       @ DW_AT_high_pc
+	.byte	1                               @ DW_AT_frame_base
+	.byte	93
+	.long	.Linfo_string4                  @ DW_AT_name
+	.byte	1                               @ DW_AT_decl_file
+	.byte	174                             @ DW_AT_decl_line
+                                        @ DW_AT_prototyped
+	.long	202                             @ DW_AT_type
+                                        @ DW_AT_external
+	.byte	2                               @ Abbrev [2] 0x4c:0x11 DW_TAG_subprogram
+	.long	.Lfunc_begin2                   @ DW_AT_low_pc
+	.long	.Lfunc_end2-.Lfunc_begin2       @ DW_AT_high_pc
+	.byte	1                               @ DW_AT_frame_base
+	.byte	93
+	.long	.Linfo_string7                  @ DW_AT_name
+	.byte	1                               @ DW_AT_decl_file
+	.byte	196                             @ DW_AT_decl_line
+                                        @ DW_AT_prototyped
+                                        @ DW_AT_external
+	.byte	2                               @ Abbrev [2] 0x5d:0x11 DW_TAG_subprogram
+	.long	.Lfunc_begin3                   @ DW_AT_low_pc
+	.long	.Lfunc_end3-.Lfunc_begin3       @ DW_AT_high_pc
+	.byte	1                               @ DW_AT_frame_base
+	.byte	93
+	.long	.Linfo_string8                  @ DW_AT_name
+	.byte	1                               @ DW_AT_decl_file
+	.byte	212                             @ DW_AT_decl_line
+                                        @ DW_AT_prototyped
+                                        @ DW_AT_external
+	.byte	2                               @ Abbrev [2] 0x6e:0x11 DW_TAG_subprogram
+	.long	.Lfunc_begin4                   @ DW_AT_low_pc
+	.long	.Lfunc_end4-.Lfunc_begin4       @ DW_AT_high_pc
+	.byte	1                               @ DW_AT_frame_base
+	.byte	93
+	.long	.Linfo_string9                  @ DW_AT_name
+	.byte	1                               @ DW_AT_decl_file
+	.byte	228                             @ DW_AT_decl_line
+                                        @ DW_AT_prototyped
+                                        @ DW_AT_external
+	.byte	3                               @ Abbrev [3] 0x7f:0x15 DW_TAG_subprogram
+	.long	.Lfunc_begin5                   @ DW_AT_low_pc
+	.long	.Lfunc_end5-.Lfunc_begin5       @ DW_AT_high_pc
+	.byte	1                               @ DW_AT_frame_base
+	.byte	93
+	.long	.Linfo_string10                 @ DW_AT_name
+	.byte	1                               @ DW_AT_decl_file
+	.byte	251                             @ DW_AT_decl_line
+                                        @ DW_AT_prototyped
+	.long	220                             @ DW_AT_type
+                                        @ DW_AT_external
+	.byte	4                               @ Abbrev [4] 0x94:0x12 DW_TAG_subprogram
+	.long	.Lfunc_begin6                   @ DW_AT_low_pc
+	.long	.Lfunc_end6-.Lfunc_begin6       @ DW_AT_high_pc
+	.byte	1                               @ DW_AT_frame_base
+	.byte	93
+	.long	.Linfo_string13                 @ DW_AT_name
+	.byte	1                               @ DW_AT_decl_file
+	.short	265                             @ DW_AT_decl_line
+                                        @ DW_AT_prototyped
+                                        @ DW_AT_external
+	.byte	4                               @ Abbrev [4] 0xa6:0x12 DW_TAG_subprogram
+	.long	.Lfunc_begin7                   @ DW_AT_low_pc
+	.long	.Lfunc_end7-.Lfunc_begin7       @ DW_AT_high_pc
+	.byte	1                               @ DW_AT_frame_base
+	.byte	93
+	.long	.Linfo_string14                 @ DW_AT_name
+	.byte	1                               @ DW_AT_decl_file
+	.short	280                             @ DW_AT_decl_line
+                                        @ DW_AT_prototyped
+                                        @ DW_AT_external
+	.byte	4                               @ Abbrev [4] 0xb8:0x12 DW_TAG_subprogram
+	.long	.Lfunc_begin8                   @ DW_AT_low_pc
+	.long	.Lfunc_end8-.Lfunc_begin8       @ DW_AT_high_pc
+	.byte	1                               @ DW_AT_frame_base
+	.byte	93
+	.long	.Linfo_string15                 @ DW_AT_name
+	.byte	1                               @ DW_AT_decl_file
+	.short	456                             @ DW_AT_decl_line
+                                        @ DW_AT_prototyped
+                                        @ DW_AT_external
+	.byte	5                               @ Abbrev [5] 0xca:0xb DW_TAG_typedef
+	.long	213                             @ DW_AT_type
+	.long	.Linfo_string6                  @ DW_AT_name
+	.byte	2                               @ DW_AT_decl_file
+	.byte	74                              @ DW_AT_decl_line
+	.byte	6                               @ Abbrev [6] 0xd5:0x7 DW_TAG_base_type
+	.long	.Linfo_string5                  @ DW_AT_name
+	.byte	5                               @ DW_AT_encoding
+	.byte	4                               @ DW_AT_byte_size
+	.byte	5                               @ Abbrev [5] 0xdc:0xb DW_TAG_typedef
+	.long	231                             @ DW_AT_type
+	.long	.Linfo_string12                 @ DW_AT_name
+	.byte	3                               @ DW_AT_decl_file
+	.byte	64                              @ DW_AT_decl_line
+	.byte	6                               @ Abbrev [6] 0xe7:0x7 DW_TAG_base_type
+	.long	.Linfo_string11                 @ DW_AT_name
+	.byte	7                               @ DW_AT_encoding
+	.byte	4                               @ DW_AT_byte_size
+	.byte	0                               @ End Of Children Mark
+.Ldebug_info_end0:
+	.section	.debug_ranges,"",%progbits
+.Ldebug_ranges0:
+	.long	.Lfunc_begin0
+	.long	.Lfunc_end0
+	.long	.Lfunc_begin2
+	.long	.Lfunc_end2
+	.long	.Lfunc_begin4
+	.long	.Lfunc_end8
+	.long	.Lfunc_begin1
+	.long	.Lfunc_end1
+	.long	.Lfunc_begin3
+	.long	.Lfunc_end3
+	.long	0
+	.long	0
+	.section	.debug_str,"MS",%progbits,1
+.Linfo_string0:
+	.asciz	"Component: Arm Compiler for Embedded 6.19 Tool: armclang [5e73cb00]" @ string offset=0
+.Linfo_string1:
+	.asciz	"../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure\\portasm.c" @ string offset=68
+.Linfo_string2:
+	.asciz	"C:\\Users\\karahulx\\Downloads\\Kernel\\FreeRTOS\\FreeRTOS\\Demo\\CORTEX_MPU_M23_Nuvoton_NuMaker_PFM_M2351_IAR_GCC\\Projects_NTZ\\Keil" @ string offset=134
+.Linfo_string3:
+	.asciz	"vRestoreContextOfFirstTask"    @ string offset=259
+.Linfo_string4:
+	.asciz	"xIsPrivileged"                 @ string offset=286
+.Linfo_string5:
+	.asciz	"long"                          @ string offset=300
+.Linfo_string6:
+	.asciz	"BaseType_t"                    @ string offset=305
+.Linfo_string7:
+	.asciz	"vRaisePrivilege"               @ string offset=316
+.Linfo_string8:
+	.asciz	"vResetPrivilege"               @ string offset=332
+.Linfo_string9:
+	.asciz	"vStartFirstTask"               @ string offset=348
+.Linfo_string10:
+	.asciz	"ulSetInterruptMask"            @ string offset=364
+.Linfo_string11:
+	.asciz	"unsigned int"                  @ string offset=383
+.Linfo_string12:
+	.asciz	"uint32_t"                      @ string offset=396
+.Linfo_string13:
+	.asciz	"vClearInterruptMask"           @ string offset=405
+.Linfo_string14:
+	.asciz	"PendSV_Handler"                @ string offset=425
+.Linfo_string15:
+	.asciz	"SVC_Handler"                   @ string offset=440
+	.ident	"Component: Arm Compiler for Embedded 6.19 Tool: armclang [5e73cb00]"
+	.section	".note.GNU-stack","",%progbits
+	.eabi_attribute	30, 6	@ Tag_ABI_optimization_goals
+	.ARM_attribute	16, 1	@ Tag_AV_eba
+	.section	.debug_line,"",%progbits
+.Lline_table_start0:

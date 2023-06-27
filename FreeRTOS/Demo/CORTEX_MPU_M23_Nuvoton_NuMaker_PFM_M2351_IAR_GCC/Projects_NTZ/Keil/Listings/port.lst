@@ -1,0 +1,3718 @@
+	.text
+	.syntax unified
+	.eabi_attribute	67, "2.09"	@ Tag_conformance
+	.eabi_attribute	6, 16	@ Tag_CPU_arch
+	.eabi_attribute	7, 77	@ Tag_CPU_arch_profile
+	.eabi_attribute	8, 0	@ Tag_ARM_ISA_use
+	.eabi_attribute	9, 3	@ Tag_THUMB_ISA_use
+	.eabi_attribute	34, 0	@ Tag_CPU_unaligned_access
+	.eabi_attribute	17, 1	@ Tag_ABI_PCS_GOT_use
+	.eabi_attribute	20, 2	@ Tag_ABI_FP_denormal
+	.eabi_attribute	21, 0	@ Tag_ABI_FP_exceptions
+	.eabi_attribute	23, 1	@ Tag_ABI_FP_number_model
+	.eabi_attribute	24, 1	@ Tag_ABI_align_needed
+	.eabi_attribute	25, 1	@ Tag_ABI_align_preserved
+	.eabi_attribute	38, 1	@ Tag_ABI_FP_16bit_format
+	.eabi_attribute	18, 4	@ Tag_ABI_PCS_wchar_t
+	.eabi_attribute	26, 2	@ Tag_ABI_enum_size
+	.eabi_attribute	14, 0	@ Tag_ABI_PCS_R9_use
+	.file	"port.c"
+	.file	1 "C:\\Keil_v5\\ARM\\ARMCLANG\\Bin\\..\\include" "stdint.h"
+	.file	2 "C:\\Users\\karahulx\\Downloads\\Kernel\\FreeRTOS\\FreeRTOS\\Demo\\CORTEX_MPU_M23_Nuvoton_NuMaker_PFM_M2351_IAR_GCC\\Projects_NTZ\\Keil" "../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c"
+	.file	3 "C:\\Users\\karahulx\\Downloads\\Kernel\\FreeRTOS\\FreeRTOS\\Demo\\CORTEX_MPU_M23_Nuvoton_NuMaker_PFM_M2351_IAR_GCC\\Projects_NTZ\\Keil" "../../../../Source/include\\task.h"
+	.file	4 "C:\\Users\\karahulx\\Downloads\\Kernel\\FreeRTOS\\FreeRTOS\\Demo\\CORTEX_MPU_M23_Nuvoton_NuMaker_PFM_M2351_IAR_GCC\\Projects_NTZ\\Keil" "../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/portmacrocommon.h"
+	.section	.text.vPortSuppressTicksAndSleep,"ax",%progbits
+	.hidden	vPortSuppressTicksAndSleep      @ -- Begin function vPortSuppressTicksAndSleep
+	.weak	vPortSuppressTicksAndSleep
+	.p2align	1
+	.type	vPortSuppressTicksAndSleep,%function
+	.code	16                              @ @vPortSuppressTicksAndSleep
+	.thumb_func
+vPortSuppressTicksAndSleep:
+.Lfunc_begin0:
+	.loc	2 454 0                         @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:454:0
+	.fnstart
+	.cfi_sections .debug_frame
+	.cfi_startproc
+@ %bb.0:
+	.save	{r7, lr}
+	push	{r7, lr}
+	.cfi_def_cfa_offset 8
+	.cfi_offset lr, -4
+	.cfi_offset r7, -8
+	.pad	#32
+	sub	sp, #32
+	.cfi_def_cfa_offset 40
+	str	r0, [sp, #28]
+.Ltmp0:
+	.loc	2 459 13 prologue_end           @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:459:13
+	ldr	r0, [sp, #28]
+	.loc	2 459 33 is_stmt 0              @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:459:33
+	movw	r1, :lower16:xMaximumPossibleSuppressedTicks
+	movt	r1, :upper16:xMaximumPossibleSuppressedTicks
+	ldr	r1, [r1]
+.Ltmp1:
+	.loc	2 459 13                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:459:13
+	cmp	r0, r1
+	bls	.LBB0_2
+	b	.LBB0_1
+.LBB0_1:
+.Ltmp2:
+	.loc	2 461 33 is_stmt 1              @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:461:33
+	movw	r0, :lower16:xMaximumPossibleSuppressedTicks
+	movt	r0, :upper16:xMaximumPossibleSuppressedTicks
+	ldr	r0, [r0]
+	.loc	2 461 31 is_stmt 0              @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:461:31
+	str	r0, [sp, #28]
+	.loc	2 462 9 is_stmt 1               @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:462:9
+	b	.LBB0_2
+.Ltmp3:
+.LBB0_2:
+	.loc	2 466 9                         @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:466:9
+	@APP
+	cpsid i
+	@NO_APP
+	.loc	2 467 9                         @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:467:9
+	@APP
+	dsb	sy
+	@NO_APP
+	.loc	2 468 9                         @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:468:9
+	@APP
+	isb	sy
+	@NO_APP
+.Ltmp4:
+	.loc	2 472 13                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:472:13
+	bl	eTaskConfirmSleepModeStatus
+.Ltmp5:
+	.loc	2 472 13 is_stmt 0              @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:472:13
+	cbnz	r0, .LBB0_4
+	b	.LBB0_3
+.LBB0_3:
+.Ltmp6:
+	.loc	2 476 13 is_stmt 1              @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:476:13
+	@APP
+	cpsie i
+	@NO_APP
+	.loc	2 477 9                         @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:477:9
+	b	.LBB0_19
+.Ltmp7:
+.LBB0_4:
+	.loc	2 0 9 is_stmt 0                 @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:0:9
+	movw	r1, #57360
+	movt	r1, #57344
+	movs	r0, #6
+.Ltmp8:
+	.loc	2 484 39 is_stmt 1              @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:484:39
+	str	r0, [r1]
+	movw	r0, #57368
+	movt	r0, #57344
+	.loc	2 491 39                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:491:39
+	ldr	r0, [r0]
+	.loc	2 491 37 is_stmt 0              @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:491:37
+	str	r0, [sp, #12]
+.Ltmp9:
+	.loc	2 493 17 is_stmt 1              @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:493:17
+	ldr	r0, [sp, #12]
+.Ltmp10:
+	.loc	2 493 17 is_stmt 0              @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:493:17
+	cbnz	r0, .LBB0_6
+	b	.LBB0_5
+.LBB0_5:
+.Ltmp11:
+	.loc	2 495 43 is_stmt 1              @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:495:43
+	movw	r0, :lower16:ulTimerCountsForOneTick
+	movt	r0, :upper16:ulTimerCountsForOneTick
+	ldr	r0, [r0]
+	.loc	2 495 41 is_stmt 0              @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:495:41
+	str	r0, [sp, #12]
+	.loc	2 496 13 is_stmt 1              @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:496:13
+	b	.LBB0_6
+.Ltmp12:
+.LBB0_6:
+	.loc	2 504 29                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:504:29
+	ldr	r0, [sp, #12]
+	.loc	2 504 57 is_stmt 0              @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:504:57
+	movw	r1, :lower16:ulTimerCountsForOneTick
+	movt	r1, :upper16:ulTimerCountsForOneTick
+	ldr	r2, [r1]
+	.loc	2 504 85                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:504:85
+	ldr	r1, [sp, #28]
+	.loc	2 504 103                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:504:103
+	subs	r1, r1, #1
+	.loc	2 504 81                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:504:81
+	muls	r1, r2, r1
+	.loc	2 504 53                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:504:53
+	adds	r0, r0, r1
+	.loc	2 504 27                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:504:27
+	str	r0, [sp, #24]
+	movw	r0, #60676
+	movt	r0, #57344
+.Ltmp13:
+	.loc	2 506 19 is_stmt 1              @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:506:19
+	ldr	r0, [r0]
+.Ltmp14:
+	.loc	2 506 17 is_stmt 0              @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:506:17
+	lsls	r0, r0, #5
+	cmp	r0, #0
+	bpl	.LBB0_8
+	b	.LBB0_7
+.LBB0_7:
+	.loc	2 0 17                          @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:0:17
+	movs	r0, #1
+	lsls	r0, r0, #25
+	movw	r1, #60676
+	movt	r1, #57344
+.Ltmp15:
+	.loc	2 508 39 is_stmt 1              @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:508:39
+	str	r0, [r1]
+	.loc	2 509 34                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:509:34
+	movw	r0, :lower16:ulTimerCountsForOneTick
+	movt	r0, :upper16:ulTimerCountsForOneTick
+	ldr	r1, [r0]
+	.loc	2 509 31 is_stmt 0              @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:509:31
+	ldr	r0, [sp, #24]
+	subs	r0, r0, r1
+	str	r0, [sp, #24]
+	.loc	2 510 13 is_stmt 1              @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:510:13
+	b	.LBB0_8
+.Ltmp16:
+.LBB0_8:
+	.loc	2 512 17                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:512:17
+	ldr	r0, [sp, #24]
+	.loc	2 512 33 is_stmt 0              @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:512:33
+	movw	r1, :lower16:ulStoppedTimerCompensation
+	movt	r1, :upper16:ulStoppedTimerCompensation
+	ldr	r1, [r1]
+.Ltmp17:
+	.loc	2 512 17                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:512:17
+	cmp	r0, r1
+	bls	.LBB0_10
+	b	.LBB0_9
+.LBB0_9:
+.Ltmp18:
+	.loc	2 514 34 is_stmt 1              @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:514:34
+	movw	r0, :lower16:ulStoppedTimerCompensation
+	movt	r0, :upper16:ulStoppedTimerCompensation
+	ldr	r1, [r0]
+	.loc	2 514 31 is_stmt 0              @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:514:31
+	ldr	r0, [sp, #24]
+	subs	r0, r0, r1
+	str	r0, [sp, #24]
+	.loc	2 515 13 is_stmt 1              @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:515:13
+	b	.LBB0_10
+.Ltmp19:
+.LBB0_10:
+	.loc	2 518 41                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:518:41
+	ldr	r0, [sp, #24]
+	movw	r1, #57364
+	movt	r1, #57344
+	.loc	2 518 39 is_stmt 0              @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:518:39
+	str	r0, [r1]
+	movw	r1, #57368
+	movt	r1, #57344
+	movs	r0, #0
+	.loc	2 522 48 is_stmt 1              @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:522:48
+	str	r0, [r1]
+	movw	r1, #57360
+	movt	r1, #57344
+	.loc	2 525 39                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:525:39
+	ldr	r0, [r1]
+	movs	r2, #1
+	orrs	r0, r2
+	str	r0, [r1]
+	.loc	2 532 35                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:532:35
+	ldr	r0, [sp, #28]
+	.loc	2 532 33 is_stmt 0              @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:532:33
+	str	r0, [sp, #8]
+.Ltmp20:
+	.loc	2 535 17 is_stmt 1              @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:535:17
+	ldr	r0, [sp, #8]
+.Ltmp21:
+	.loc	2 535 17 is_stmt 0              @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:535:17
+	cbz	r0, .LBB0_12
+	b	.LBB0_11
+.LBB0_11:
+.Ltmp22:
+	.loc	2 537 17 is_stmt 1              @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:537:17
+	@APP
+	dsb	sy
+	@NO_APP
+	.loc	2 538 17                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:538:17
+	@APP
+	wfi
+	@NO_APP
+	.loc	2 539 17                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:539:17
+	@APP
+	isb	sy
+	@NO_APP
+	.loc	2 540 13                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:540:13
+	b	.LBB0_12
+.Ltmp23:
+.LBB0_12:
+	.loc	2 547 13                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:547:13
+	@APP
+	cpsie i
+	@NO_APP
+	.loc	2 548 13                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:548:13
+	@APP
+	dsb	sy
+	@NO_APP
+	.loc	2 549 13                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:549:13
+	@APP
+	isb	sy
+	@NO_APP
+	.loc	2 555 13                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:555:13
+	@APP
+	cpsid i
+	@NO_APP
+	.loc	2 556 13                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:556:13
+	@APP
+	dsb	sy
+	@NO_APP
+	.loc	2 557 13                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:557:13
+	@APP
+	isb	sy
+	@NO_APP
+	movw	r0, #57360
+	movt	r0, #57344
+	movs	r1, #6
+	.loc	2 566 39                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:566:39
+	str	r1, [r0]
+.Ltmp24:
+	.loc	2 569 19                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:569:19
+	ldr	r0, [r0]
+.Ltmp25:
+	.loc	2 569 17 is_stmt 0              @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:569:17
+	lsls	r0, r0, #15
+	cmp	r0, #0
+	bpl	.LBB0_17
+	b	.LBB0_13
+.LBB0_13:
+.Ltmp26:
+	.loc	2 576 43 is_stmt 1              @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:576:43
+	movw	r0, :lower16:ulTimerCountsForOneTick
+	movt	r0, :upper16:ulTimerCountsForOneTick
+	ldr	r0, [r0]
+	.loc	2 576 79 is_stmt 0              @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:576:79
+	ldr	r2, [sp, #24]
+	movw	r1, #57368
+	movt	r1, #57344
+	.loc	2 576 95                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:576:95
+	ldr	r1, [r1]
+	.loc	2 576 75                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:576:75
+	subs	r1, r1, r2
+	adds	r0, r0, r1
+	subs	r0, r0, #1
+	.loc	2 576 39                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:576:39
+	str	r0, [sp, #4]
+.Ltmp27:
+	.loc	2 582 23 is_stmt 1              @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:582:23
+	ldr	r0, [sp, #4]
+	.loc	2 582 48 is_stmt 0              @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:582:48
+	movw	r1, :lower16:ulStoppedTimerCompensation
+	movt	r1, :upper16:ulStoppedTimerCompensation
+	ldr	r1, [r1]
+	.loc	2 582 77                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:582:77
+	cmp	r0, r1
+	bls	.LBB0_15
+	b	.LBB0_14
+.LBB0_14:
+	.loc	2 582 82                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:582:82
+	ldr	r0, [sp, #4]
+	.loc	2 582 106                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:582:106
+	movw	r1, :lower16:ulTimerCountsForOneTick
+	movt	r1, :upper16:ulTimerCountsForOneTick
+	ldr	r1, [r1]
+.Ltmp28:
+	.loc	2 582 21                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:582:21
+	cmp	r0, r1
+	bls	.LBB0_16
+	b	.LBB0_15
+.LBB0_15:
+.Ltmp29:
+	.loc	2 584 47 is_stmt 1              @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:584:47
+	movw	r0, :lower16:ulTimerCountsForOneTick
+	movt	r0, :upper16:ulTimerCountsForOneTick
+	ldr	r0, [r0]
+	.loc	2 584 71 is_stmt 0              @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:584:71
+	subs	r0, r0, #1
+	.loc	2 584 43                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:584:43
+	str	r0, [sp, #4]
+	.loc	2 585 17 is_stmt 1              @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:585:17
+	b	.LBB0_16
+.Ltmp30:
+.LBB0_16:
+	.loc	2 587 45                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:587:45
+	ldr	r0, [sp, #4]
+	movw	r1, #57364
+	movt	r1, #57344
+	.loc	2 587 43 is_stmt 0              @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:587:43
+	str	r0, [r1]
+	.loc	2 592 41 is_stmt 1              @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:592:41
+	ldr	r0, [sp, #28]
+	.loc	2 592 59 is_stmt 0              @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:592:59
+	subs	r0, r0, #1
+	.loc	2 592 39                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:592:39
+	str	r0, [sp, #20]
+	.loc	2 593 13 is_stmt 1              @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:593:13
+	b	.LBB0_18
+.Ltmp31:
+.LBB0_17:
+	.loc	2 0 13 is_stmt 0                @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:0:13
+	movw	r0, #57368
+	movt	r0, #57344
+.Ltmp32:
+	.loc	2 601 43 is_stmt 1              @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:601:43
+	ldr	r0, [r0]
+	.loc	2 601 41 is_stmt 0              @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:601:41
+	str	r0, [sp, #12]
+	.loc	2 619 50 is_stmt 1              @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:619:50
+	ldr	r2, [sp, #28]
+	.loc	2 619 70 is_stmt 0              @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:619:70
+	movw	r0, :lower16:ulTimerCountsForOneTick
+	movt	r0, :upper16:ulTimerCountsForOneTick
+	ldr	r1, [r0]
+	.loc	2 619 68                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:619:68
+	muls	r1, r2, r1
+	.loc	2 619 98                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:619:98
+	ldr	r2, [sp, #12]
+	.loc	2 619 96                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:619:96
+	subs	r1, r1, r2
+	.loc	2 619 46                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:619:46
+	str	r1, [sp, #16]
+	.loc	2 623 41 is_stmt 1              @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:623:41
+	ldr	r1, [sp, #16]
+	.loc	2 623 72 is_stmt 0              @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:623:72
+	ldr	r2, [r0]
+	.loc	2 623 70                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:623:70
+	udiv	r1, r1, r2
+	.loc	2 623 39                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:623:39
+	str	r1, [sp, #20]
+	.loc	2 627 49 is_stmt 1              @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:627:49
+	ldr	r1, [sp, #20]
+	.loc	2 627 71 is_stmt 0              @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:627:71
+	adds	r1, r1, #1
+	.loc	2 627 81                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:627:81
+	ldr	r0, [r0]
+	.loc	2 627 79                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:627:79
+	muls	r0, r1, r0
+	.loc	2 627 109                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:627:109
+	ldr	r1, [sp, #16]
+	.loc	2 627 107                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:627:107
+	subs	r0, r0, r1
+	movw	r1, #57364
+	movt	r1, #57344
+	.loc	2 627 43                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:627:43
+	str	r0, [r1]
+	b	.LBB0_18
+.Ltmp33:
+.LBB0_18:
+	.loc	2 0 43                          @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:0:43
+	movw	r1, #57368
+	movt	r1, #57344
+	movs	r0, #0
+	.loc	2 637 48 is_stmt 1              @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:637:48
+	str	r0, [r1]
+	movw	r1, #57360
+	movt	r1, #57344
+	movs	r0, #7
+	.loc	2 638 39                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:638:39
+	str	r0, [r1]
+.Ltmp34:
+	.loc	2 641 45                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:641:45
+	movw	r0, :lower16:ulTimerCountsForOneTick
+	movt	r0, :upper16:ulTimerCountsForOneTick
+	ldr	r0, [r0]
+	.loc	2 641 69 is_stmt 0              @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:641:69
+	subs	r0, r0, #1
+	movw	r1, #57364
+	movt	r1, #57344
+	.loc	2 641 43                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:641:43
+	str	r0, [r1]
+.Ltmp35:
+	.loc	2 662 28 is_stmt 1              @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:662:28
+	ldr	r0, [sp, #20]
+	.loc	2 662 13 is_stmt 0              @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:662:13
+	bl	vTaskStepTick
+	.loc	2 665 13 is_stmt 1              @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:665:13
+	@APP
+	cpsie i
+	@NO_APP
+	b	.LBB0_19
+.Ltmp36:
+.LBB0_19:
+	.loc	2 667 5                         @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:667:5
+	add	sp, #32
+	pop	{r7, pc}
+.Ltmp37:
+.Lfunc_end0:
+	.size	vPortSuppressTicksAndSleep, .Lfunc_end0-vPortSuppressTicksAndSleep
+	.cfi_endproc
+	.cantunwind
+	.fnend
+                                        @ -- End function
+	.section	privileged_functions,"ax",%progbits
+	.hidden	vPortSetupTimerInterrupt        @ -- Begin function vPortSetupTimerInterrupt
+	.weak	vPortSetupTimerInterrupt
+	.p2align	1
+	.type	vPortSetupTimerInterrupt,%function
+	.code	16                              @ @vPortSetupTimerInterrupt
+	.thumb_func
+vPortSetupTimerInterrupt:
+.Lfunc_begin1:
+	.loc	2 672 0                         @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:672:0
+	.fnstart
+	.cfi_startproc
+@ %bb.0:
+	.save	{r4, lr}
+	push	{r4, lr}
+	.cfi_def_cfa_offset 8
+	.cfi_offset lr, -4
+	.cfi_offset r4, -8
+.Ltmp38:
+	.loc	2 676 37 prologue_end           @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:676:37
+	movw	r0, :lower16:SystemCoreClock
+	movt	r0, :upper16:SystemCoreClock
+	ldr	r1, [r0]
+	movs	r2, #100
+	.loc	2 676 60 is_stmt 0              @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:676:60
+	udiv	r3, r1, r2
+	.loc	2 676 33                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:676:33
+	movw	r1, :lower16:ulTimerCountsForOneTick
+	movt	r1, :upper16:ulTimerCountsForOneTick
+	str	r3, [r1]
+	.loc	2 677 67 is_stmt 1              @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:677:67
+	ldr	r3, [r1]
+	movw	r1, #65535
+	movt	r1, #255
+	.loc	2 677 65 is_stmt 0              @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:677:65
+	udiv	r1, r1, r3
+	.loc	2 677 41                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:677:41
+	movw	r3, :lower16:xMaximumPossibleSuppressedTicks
+	movt	r3, :upper16:xMaximumPossibleSuppressedTicks
+	str	r1, [r3]
+	.loc	2 678 36 is_stmt 1              @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:678:36
+	movw	r3, :lower16:ulStoppedTimerCompensation
+	movt	r3, :upper16:ulStoppedTimerCompensation
+	movs	r1, #94
+	str	r1, [r3]
+	movw	r1, #57360
+	movt	r1, #57344
+	movs	r3, #0
+.Ltmp39:
+	.loc	2 683 31                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:683:31
+	str	r3, [r1]
+	movw	r4, #57368
+	movt	r4, #57344
+	.loc	2 684 40                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:684:40
+	str	r3, [r4]
+	.loc	2 687 35                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:687:35
+	ldr	r0, [r0]
+	.loc	2 687 58 is_stmt 0              @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:687:58
+	udiv	r0, r0, r2
+	.loc	2 687 81                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:687:81
+	subs	r0, r0, #1
+	movw	r2, #57364
+	movt	r2, #57344
+	.loc	2 687 31                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:687:31
+	str	r0, [r2]
+	movs	r0, #7
+	.loc	2 688 31 is_stmt 1              @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:688:31
+	str	r0, [r1]
+	.loc	2 689 1                         @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:689:1
+	pop	{r4, pc}
+.Ltmp40:
+.Lfunc_end1:
+	.size	vPortSetupTimerInterrupt, .Lfunc_end1-vPortSetupTimerInterrupt
+	.cfi_endproc
+	.cantunwind
+	.fnend
+                                        @ -- End function
+	.hidden	vPortYield                      @ -- Begin function vPortYield
+	.globl	vPortYield
+	.p2align	1
+	.type	vPortYield,%function
+	.code	16                              @ @vPortYield
+	.thumb_func
+vPortYield:
+.Lfunc_begin2:
+	.loc	2 855 0                         @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:855:0
+	.fnstart
+	.cfi_startproc
+@ %bb.0:
+	movs	r0, #1
+	lsls	r0, r0, #28
+	movw	r1, #60676
+	movt	r1, #57344
+.Ltmp41:
+	.loc	2 857 27 prologue_end           @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:857:27
+	str	r0, [r1]
+	.loc	2 861 5                         @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:861:5
+	@APP
+	dsb	sy
+	@NO_APP
+	.loc	2 862 5                         @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:862:5
+	@APP
+	isb	sy
+	@NO_APP
+	.loc	2 863 1                         @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:863:1
+	bx	lr
+.Ltmp42:
+.Lfunc_end2:
+	.size	vPortYield, .Lfunc_end2-vPortYield
+	.cfi_endproc
+	.cantunwind
+	.fnend
+                                        @ -- End function
+	.hidden	vPortEnterCritical              @ -- Begin function vPortEnterCritical
+	.globl	vPortEnterCritical
+	.p2align	1
+	.type	vPortEnterCritical,%function
+	.code	16                              @ @vPortEnterCritical
+	.thumb_func
+vPortEnterCritical:
+.Lfunc_begin3:
+	.loc	2 867 0                         @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:867:0
+	.fnstart
+	.cfi_startproc
+@ %bb.0:
+	.loc	2 868 5 prologue_end            @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:868:5
+	@APP
+	cpsid i
+	@NO_APP
+	.loc	2 869 22                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:869:22
+	movw	r1, :lower16:ulCriticalNesting
+	movt	r1, :upper16:ulCriticalNesting
+	ldr	r0, [r1]
+	adds	r0, r0, #1
+	str	r0, [r1]
+	.loc	2 873 5                         @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:873:5
+	@APP
+	dsb	sy
+	@NO_APP
+	.loc	2 874 5                         @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:874:5
+	@APP
+	isb	sy
+	@NO_APP
+	.loc	2 875 1                         @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:875:1
+	bx	lr
+.Ltmp43:
+.Lfunc_end3:
+	.size	vPortEnterCritical, .Lfunc_end3-vPortEnterCritical
+	.cfi_endproc
+	.cantunwind
+	.fnend
+                                        @ -- End function
+	.hidden	vPortExitCritical               @ -- Begin function vPortExitCritical
+	.globl	vPortExitCritical
+	.p2align	1
+	.type	vPortExitCritical,%function
+	.code	16                              @ @vPortExitCritical
+	.thumb_func
+vPortExitCritical:
+.Lfunc_begin4:
+	.loc	2 879 0                         @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:879:0
+	.fnstart
+	.cfi_startproc
+@ %bb.0:
+	.loc	2 880 5 prologue_end            @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:880:5
+	movw	r0, :lower16:ulCriticalNesting
+	movt	r0, :upper16:ulCriticalNesting
+	ldr	r0, [r0]
+.Ltmp44:
+	.loc	2 880 5 is_stmt 0               @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:880:5
+	cbnz	r0, .LBB4_3
+	b	.LBB4_1
+.LBB4_1:
+.Ltmp45:
+	.loc	2 880 5                         @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:880:5
+	@APP
+	cpsid i
+	@NO_APP
+	b	.LBB4_2
+.LBB4_2:                                @ =>This Inner Loop Header: Depth=1
+.Ltmp46:
+	.loc	2 880 5                         @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:880:5
+	b	.LBB4_2
+.Ltmp47:
+.LBB4_3:
+	.loc	2 881 22 is_stmt 1              @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:881:22
+	movw	r0, :lower16:ulCriticalNesting
+	movt	r0, :upper16:ulCriticalNesting
+	ldr	r1, [r0]
+	subs	r1, r1, #1
+	str	r1, [r0]
+.Ltmp48:
+	.loc	2 883 9                         @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:883:9
+	ldr	r0, [r0]
+.Ltmp49:
+	.loc	2 883 9 is_stmt 0               @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:883:9
+	cbnz	r0, .LBB4_5
+	b	.LBB4_4
+.LBB4_4:
+.Ltmp50:
+	.loc	2 885 9 is_stmt 1               @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:885:9
+	@APP
+	cpsie i
+	@NO_APP
+	.loc	2 886 5                         @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:886:5
+	b	.LBB4_5
+.Ltmp51:
+.LBB4_5:
+	.loc	2 887 1                         @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:887:1
+	bx	lr
+.Ltmp52:
+.Lfunc_end4:
+	.size	vPortExitCritical, .Lfunc_end4-vPortExitCritical
+	.cfi_endproc
+	.cantunwind
+	.fnend
+                                        @ -- End function
+	.hidden	SysTick_Handler                 @ -- Begin function SysTick_Handler
+	.globl	SysTick_Handler
+	.p2align	1
+	.type	SysTick_Handler,%function
+	.code	16                              @ @SysTick_Handler
+	.thumb_func
+SysTick_Handler:
+.Lfunc_begin5:
+	.loc	2 891 0                         @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:891:0
+	.fnstart
+	.cfi_startproc
+@ %bb.0:
+	.save	{r7, lr}
+	push	{r7, lr}
+	.cfi_def_cfa_offset 8
+	.cfi_offset lr, -4
+	.cfi_offset r7, -8
+	.pad	#8
+	sub	sp, #8
+	.cfi_def_cfa_offset 16
+.Ltmp53:
+	.loc	2 894 22 prologue_end           @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:894:22
+	bl	ulSetInterruptMask
+	.loc	2 894 20 is_stmt 0              @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:894:20
+	str	r0, [sp, #4]
+.Ltmp54:
+	.loc	2 897 13 is_stmt 1              @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:897:13
+	bl	xTaskIncrementTick
+.Ltmp55:
+	.loc	2 897 13 is_stmt 0              @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:897:13
+	cbz	r0, .LBB5_2
+	b	.LBB5_1
+.LBB5_1:
+	.loc	2 0 13                          @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:0:13
+	movs	r0, #1
+	lsls	r0, r0, #28
+	movw	r1, #60676
+	movt	r1, #57344
+.Ltmp56:
+	.loc	2 900 35 is_stmt 1              @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:900:35
+	str	r0, [r1]
+	.loc	2 901 9                         @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:901:9
+	b	.LBB5_2
+.Ltmp57:
+.LBB5_2:
+	.loc	2 903 5                         @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:903:5
+	ldr	r0, [sp, #4]
+	bl	vClearInterruptMask
+	.loc	2 904 1                         @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:904:1
+	add	sp, #8
+	pop	{r7, pc}
+.Ltmp58:
+.Lfunc_end5:
+	.size	SysTick_Handler, .Lfunc_end5-SysTick_Handler
+	.cfi_endproc
+	.cantunwind
+	.fnend
+                                        @ -- End function
+	.section	privileged_functions,"axR",%progbits,unique,1
+	.hidden	vPortSVCHandler_C               @ -- Begin function vPortSVCHandler_C
+	.globl	vPortSVCHandler_C
+	.p2align	1
+	.type	vPortSVCHandler_C,%function
+	.code	16                              @ @vPortSVCHandler_C
+	.thumb_func
+vPortSVCHandler_C:
+__tagsym$$used.0:
+.Lfunc_begin6:
+	.loc	2 908 0                         @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:908:0
+	.fnstart
+	.cfi_startproc
+@ %bb.0:
+	.save	{r7, lr}
+	push	{r7, lr}
+	.cfi_def_cfa_offset 8
+	.cfi_offset lr, -4
+	.cfi_offset r7, -8
+	.pad	#16
+	sub	sp, #16
+	.cfi_def_cfa_offset 24
+	str	r0, [sp, #12]
+.Ltmp59:
+	.loc	2 936 12 prologue_end           @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:936:12
+	ldr	r0, [sp, #12]
+	ldr	r0, [r0, #24]
+	.loc	2 936 10 is_stmt 0              @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:936:10
+	str	r0, [sp, #8]
+	.loc	2 937 35 is_stmt 1              @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:937:35
+	ldr	r0, [sp, #8]
+	.loc	2 937 19 is_stmt 0              @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:937:19
+	subs	r0, r0, #2
+	ldrb	r1, [r0]
+	add	r0, sp, #4
+	.loc	2 937 17                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:937:17
+	strb	r1, [r0]
+	.loc	2 939 13 is_stmt 1              @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:939:13
+	ldrb	r0, [r0]
+	.loc	2 939 5 is_stmt 0               @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:939:5
+	str	r0, [sp]                        @ 4-byte Spill
+	cmp	r0, #2
+	beq	.LBB6_2
+	b	.LBB6_1
+.LBB6_1:
+	ldr	r0, [sp]                        @ 4-byte Reload
+	cmp	r0, #3
+	beq	.LBB6_3
+	b	.LBB6_7
+.LBB6_2:
+.Ltmp60:
+	.loc	2 1004 13 is_stmt 1             @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1004:13
+	bl	vRestoreContextOfFirstTask
+	.loc	2 1005 13                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1005:13
+	b	.LBB6_9
+.LBB6_3:
+.Ltmp61:
+	.loc	2 1012 27                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1012:27
+	ldr	r0, [sp, #8]
+	.loc	2 1012 48 is_stmt 0             @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1012:48
+	movw	r1, :lower16:__syscalls_flash_start__
+	movt	r1, :upper16:__syscalls_flash_start__
+	ldr	r1, [r1]
+	.loc	2 1012 75                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1012:75
+	cmp	r0, r1
+	blo	.LBB6_6
+	b	.LBB6_4
+.LBB6_4:
+	.loc	2 1013 27 is_stmt 1             @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1013:27
+	ldr	r0, [sp, #8]
+	.loc	2 1013 48 is_stmt 0             @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1013:48
+	movw	r1, :lower16:__syscalls_flash_end__
+	movt	r1, :upper16:__syscalls_flash_end__
+	ldr	r1, [r1]
+.Ltmp62:
+	.loc	2 1012 25 is_stmt 1             @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1012:25
+	cmp	r0, r1
+	bhi	.LBB6_6
+	b	.LBB6_5
+.LBB6_5:
+.Ltmp63:
+	.loc	2 1015 25                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1015:25
+	bl	vRaisePrivilege
+	.loc	2 1016 21                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1016:21
+	b	.LBB6_6
+.Ltmp64:
+.LBB6_6:
+	.loc	2 1017 21                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1017:21
+	b	.LBB6_9
+.LBB6_7:
+.Ltmp65:
+	.loc	2 1022 13                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1022:13
+	@APP
+	cpsid i
+	@NO_APP
+	b	.LBB6_8
+.LBB6_8:                                @ =>This Inner Loop Header: Depth=1
+.Ltmp66:
+	.loc	2 1022 13 is_stmt 0             @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1022:13
+	b	.LBB6_8
+.Ltmp67:
+.LBB6_9:
+	.loc	2 1024 1 is_stmt 1              @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1024:1
+	add	sp, #16
+	pop	{r7, pc}
+.Ltmp68:
+.Lfunc_end6:
+	.size	vPortSVCHandler_C, .Lfunc_end6-vPortSVCHandler_C
+	.cfi_endproc
+	.cantunwind
+	.fnend
+                                        @ -- End function
+	.section	privileged_functions,"ax",%progbits
+	.hidden	pxPortInitialiseStack           @ -- Begin function pxPortInitialiseStack
+	.globl	pxPortInitialiseStack
+	.p2align	1
+	.type	pxPortInitialiseStack,%function
+	.code	16                              @ @pxPortInitialiseStack
+	.thumb_func
+pxPortInitialiseStack:
+.Lfunc_begin7:
+	.loc	2 1034 0                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1034:0
+	.fnstart
+	.cfi_startproc
+@ %bb.0:
+	.save	{r4, lr}
+	push	{r4, lr}
+	.cfi_def_cfa_offset 8
+	.cfi_offset lr, -4
+	.cfi_offset r4, -8
+	.pad	#20
+	sub	sp, #20
+	.cfi_def_cfa_offset 28
+	ldr	r4, [sp, #32]
+	ldr	r4, [sp, #28]
+	str	r0, [sp, #16]
+	str	r1, [sp, #12]
+	str	r2, [sp, #8]
+	str	r3, [sp, #4]
+	movs	r0, #0
+.Ltmp69:
+	.loc	2 1035 14 prologue_end          @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1035:14
+	str	r0, [sp]
+	.loc	2 1037 5                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1037:5
+	ldr	r0, [sp, #32]
+	.loc	2 1037 30 is_stmt 0             @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1037:30
+	ldr	r1, [sp]
+	.loc	2 1037 5                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1037:5
+	lsls	r1, r1, #2
+	.loc	2 1037 19                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1037:19
+	adds	r1, r0, r1
+	movw	r0, #1028
+	movt	r0, #1028
+	.loc	2 1037 40                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1037:40
+	str	r0, [r1, #36]
+	.loc	2 1038 12 is_stmt 1             @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1038:12
+	ldr	r0, [sp]
+	adds	r0, r0, #1
+	str	r0, [sp]
+	.loc	2 1039 5                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1039:5
+	ldr	r0, [sp, #32]
+	.loc	2 1039 30 is_stmt 0             @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1039:30
+	ldr	r1, [sp]
+	.loc	2 1039 5                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1039:5
+	lsls	r1, r1, #2
+	.loc	2 1039 19                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1039:19
+	adds	r1, r0, r1
+	movw	r0, #1285
+	movt	r0, #1285
+	.loc	2 1039 40                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1039:40
+	str	r0, [r1, #36]
+	.loc	2 1040 12 is_stmt 1             @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1040:12
+	ldr	r0, [sp]
+	adds	r0, r0, #1
+	str	r0, [sp]
+	.loc	2 1041 5                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1041:5
+	ldr	r0, [sp, #32]
+	.loc	2 1041 30 is_stmt 0             @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1041:30
+	ldr	r1, [sp]
+	.loc	2 1041 5                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1041:5
+	lsls	r1, r1, #2
+	.loc	2 1041 19                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1041:19
+	adds	r1, r0, r1
+	movw	r0, #1542
+	movt	r0, #1542
+	.loc	2 1041 40                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1041:40
+	str	r0, [r1, #36]
+	.loc	2 1042 12 is_stmt 1             @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1042:12
+	ldr	r0, [sp]
+	adds	r0, r0, #1
+	str	r0, [sp]
+	.loc	2 1043 5                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1043:5
+	ldr	r0, [sp, #32]
+	.loc	2 1043 30 is_stmt 0             @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1043:30
+	ldr	r1, [sp]
+	.loc	2 1043 5                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1043:5
+	lsls	r1, r1, #2
+	.loc	2 1043 19                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1043:19
+	adds	r1, r0, r1
+	movw	r0, #1799
+	movt	r0, #1799
+	.loc	2 1043 40                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1043:40
+	str	r0, [r1, #36]
+	.loc	2 1044 12 is_stmt 1             @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1044:12
+	ldr	r0, [sp]
+	adds	r0, r0, #1
+	str	r0, [sp]
+	.loc	2 1045 5                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1045:5
+	ldr	r0, [sp, #32]
+	.loc	2 1045 30 is_stmt 0             @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1045:30
+	ldr	r1, [sp]
+	.loc	2 1045 5                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1045:5
+	lsls	r1, r1, #2
+	.loc	2 1045 19                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1045:19
+	adds	r1, r0, r1
+	movw	r0, #2056
+	movt	r0, #2056
+	.loc	2 1045 40                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1045:40
+	str	r0, [r1, #36]
+	.loc	2 1046 12 is_stmt 1             @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1046:12
+	ldr	r0, [sp]
+	adds	r0, r0, #1
+	str	r0, [sp]
+	.loc	2 1047 5                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1047:5
+	ldr	r0, [sp, #32]
+	.loc	2 1047 30 is_stmt 0             @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1047:30
+	ldr	r1, [sp]
+	.loc	2 1047 5                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1047:5
+	lsls	r1, r1, #2
+	.loc	2 1047 19                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1047:19
+	adds	r1, r0, r1
+	movw	r0, #2313
+	movt	r0, #2313
+	.loc	2 1047 40                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1047:40
+	str	r0, [r1, #36]
+	.loc	2 1048 12 is_stmt 1             @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1048:12
+	ldr	r0, [sp]
+	adds	r0, r0, #1
+	str	r0, [sp]
+	.loc	2 1049 5                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1049:5
+	ldr	r0, [sp, #32]
+	.loc	2 1049 30 is_stmt 0             @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1049:30
+	ldr	r1, [sp]
+	.loc	2 1049 5                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1049:5
+	lsls	r1, r1, #2
+	.loc	2 1049 19                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1049:19
+	adds	r1, r0, r1
+	movw	r0, #4112
+	movt	r0, #4112
+	.loc	2 1049 40                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1049:40
+	str	r0, [r1, #36]
+	.loc	2 1050 12 is_stmt 1             @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1050:12
+	ldr	r0, [sp]
+	adds	r0, r0, #1
+	str	r0, [sp]
+	.loc	2 1051 5                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1051:5
+	ldr	r0, [sp, #32]
+	.loc	2 1051 30 is_stmt 0             @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1051:30
+	ldr	r1, [sp]
+	.loc	2 1051 5                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1051:5
+	lsls	r1, r1, #2
+	.loc	2 1051 19                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1051:19
+	adds	r1, r0, r1
+	movw	r0, #4369
+	movt	r0, #4369
+	.loc	2 1051 40                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1051:40
+	str	r0, [r1, #36]
+	.loc	2 1052 12 is_stmt 1             @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1052:12
+	ldr	r0, [sp]
+	adds	r0, r0, #1
+	str	r0, [sp]
+	.loc	2 1054 55                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1054:55
+	ldr	r0, [sp, #4]
+	.loc	2 1054 5 is_stmt 0              @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1054:5
+	ldr	r1, [sp, #32]
+	.loc	2 1054 30                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1054:30
+	ldr	r2, [sp]
+	.loc	2 1054 5                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1054:5
+	lsls	r2, r2, #2
+	.loc	2 1054 19                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1054:19
+	adds	r1, r1, r2
+	.loc	2 1054 40                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1054:40
+	str	r0, [r1, #36]
+	.loc	2 1055 12 is_stmt 1             @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1055:12
+	ldr	r0, [sp]
+	adds	r0, r0, #1
+	str	r0, [sp]
+	.loc	2 1056 5                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1056:5
+	ldr	r0, [sp, #32]
+	.loc	2 1056 30 is_stmt 0             @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1056:30
+	ldr	r1, [sp]
+	.loc	2 1056 5                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1056:5
+	lsls	r1, r1, #2
+	.loc	2 1056 19                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1056:19
+	adds	r1, r0, r1
+	movw	r0, #257
+	movt	r0, #257
+	.loc	2 1056 40                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1056:40
+	str	r0, [r1, #36]
+	.loc	2 1057 12 is_stmt 1             @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1057:12
+	ldr	r0, [sp]
+	adds	r0, r0, #1
+	str	r0, [sp]
+	.loc	2 1058 5                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1058:5
+	ldr	r0, [sp, #32]
+	.loc	2 1058 30 is_stmt 0             @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1058:30
+	ldr	r1, [sp]
+	.loc	2 1058 5                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1058:5
+	lsls	r1, r1, #2
+	.loc	2 1058 19                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1058:19
+	adds	r1, r0, r1
+	movw	r0, #514
+	movt	r0, #514
+	.loc	2 1058 40                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1058:40
+	str	r0, [r1, #36]
+	.loc	2 1059 12 is_stmt 1             @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1059:12
+	ldr	r0, [sp]
+	adds	r0, r0, #1
+	str	r0, [sp]
+	.loc	2 1060 5                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1060:5
+	ldr	r0, [sp, #32]
+	.loc	2 1060 30 is_stmt 0             @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1060:30
+	ldr	r1, [sp]
+	.loc	2 1060 5                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1060:5
+	lsls	r1, r1, #2
+	.loc	2 1060 19                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1060:19
+	adds	r1, r0, r1
+	movw	r0, #771
+	movt	r0, #771
+	.loc	2 1060 40                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1060:40
+	str	r0, [r1, #36]
+	.loc	2 1061 12 is_stmt 1             @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1061:12
+	ldr	r0, [sp]
+	adds	r0, r0, #1
+	str	r0, [sp]
+	.loc	2 1062 5                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1062:5
+	ldr	r0, [sp, #32]
+	.loc	2 1062 30 is_stmt 0             @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1062:30
+	ldr	r1, [sp]
+	.loc	2 1062 5                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1062:5
+	lsls	r1, r1, #2
+	.loc	2 1062 19                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1062:19
+	adds	r1, r0, r1
+	movw	r0, #4626
+	movt	r0, #4626
+	.loc	2 1062 40                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1062:40
+	str	r0, [r1, #36]
+	.loc	2 1063 12 is_stmt 1             @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1063:12
+	ldr	r0, [sp]
+	adds	r0, r0, #1
+	str	r0, [sp]
+	.loc	2 1064 5                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1064:5
+	ldr	r0, [sp, #32]
+	.loc	2 1064 30 is_stmt 0             @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1064:30
+	ldr	r1, [sp]
+	.loc	2 1064 5                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1064:5
+	lsls	r1, r1, #2
+	.loc	2 1064 19                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1064:19
+	adds	r1, r0, r1
+	.loc	2 1064 40                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1064:40
+	movw	r0, :lower16:prvTaskExitError
+	movt	r0, :upper16:prvTaskExitError
+	str	r0, [r1, #36]
+	.loc	2 1065 12 is_stmt 1             @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1065:12
+	ldr	r0, [sp]
+	adds	r0, r0, #1
+	str	r0, [sp]
+	.loc	2 1066 55                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1066:55
+	ldr	r0, [sp, #8]
+	.loc	2 1066 5 is_stmt 0              @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1066:5
+	ldr	r1, [sp, #32]
+	.loc	2 1066 30                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1066:30
+	ldr	r2, [sp]
+	.loc	2 1066 5                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1066:5
+	lsls	r2, r2, #2
+	.loc	2 1066 19                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1066:19
+	adds	r1, r1, r2
+	.loc	2 1066 40                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1066:40
+	str	r0, [r1, #36]
+	.loc	2 1067 12 is_stmt 1             @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1067:12
+	ldr	r0, [sp]
+	adds	r0, r0, #1
+	str	r0, [sp]
+	.loc	2 1068 5                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1068:5
+	ldr	r0, [sp, #32]
+	.loc	2 1068 30 is_stmt 0             @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1068:30
+	ldr	r1, [sp]
+	.loc	2 1068 5                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1068:5
+	lsls	r1, r1, #2
+	.loc	2 1068 19                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1068:19
+	adds	r1, r0, r1
+	movs	r0, #1
+	lsls	r0, r0, #24
+	.loc	2 1068 40                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1068:40
+	str	r0, [r1, #36]
+	.loc	2 1069 12 is_stmt 1             @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1069:12
+	ldr	r0, [sp]
+	adds	r0, r0, #1
+	str	r0, [sp]
+	.loc	2 1077 57                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1077:57
+	ldr	r0, [sp, #16]
+	.loc	2 1077 70 is_stmt 0             @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1077:70
+	subs	r0, #32
+	.loc	2 1077 5                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1077:5
+	ldr	r1, [sp, #32]
+	.loc	2 1077 30                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1077:30
+	ldr	r2, [sp]
+	.loc	2 1077 5                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1077:5
+	lsls	r2, r2, #2
+	.loc	2 1077 19                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1077:19
+	adds	r1, r1, r2
+	.loc	2 1077 40                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1077:40
+	str	r0, [r1, #36]
+	.loc	2 1078 12 is_stmt 1             @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1078:12
+	ldr	r0, [sp]
+	adds	r0, r0, #1
+	str	r0, [sp]
+	.loc	2 1079 55                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1079:55
+	ldr	r0, [sp, #12]
+	.loc	2 1079 5 is_stmt 0              @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1079:5
+	ldr	r1, [sp, #32]
+	.loc	2 1079 30                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1079:30
+	ldr	r2, [sp]
+	.loc	2 1079 5                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1079:5
+	lsls	r2, r2, #2
+	.loc	2 1079 19                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1079:19
+	adds	r1, r1, r2
+	.loc	2 1079 40                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1079:40
+	str	r0, [r1, #36]
+	.loc	2 1080 12 is_stmt 1             @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1080:12
+	ldr	r0, [sp]
+	adds	r0, r0, #1
+	str	r0, [sp]
+.Ltmp70:
+	.loc	2 1081 9                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1081:9
+	ldr	r0, [sp, #28]
+.Ltmp71:
+	.loc	2 1081 9 is_stmt 0              @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1081:9
+	cmp	r0, #1
+	bne	.LBB7_2
+	b	.LBB7_1
+.LBB7_1:
+.Ltmp72:
+	.loc	2 1083 9 is_stmt 1              @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1083:9
+	ldr	r0, [sp, #32]
+	.loc	2 1083 34 is_stmt 0             @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1083:34
+	ldr	r1, [sp]
+	.loc	2 1083 9                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1083:9
+	lsls	r1, r1, #2
+	.loc	2 1083 23                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1083:23
+	adds	r1, r0, r1
+	movs	r0, #2
+	.loc	2 1083 44                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1083:44
+	str	r0, [r1, #36]
+	.loc	2 1084 16 is_stmt 1             @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1084:16
+	ldr	r0, [sp]
+	adds	r0, r0, #1
+	str	r0, [sp]
+	.loc	2 1085 5                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1085:5
+	b	.LBB7_3
+.Ltmp73:
+.LBB7_2:
+	.loc	2 1088 9                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1088:9
+	ldr	r0, [sp, #32]
+	.loc	2 1088 34 is_stmt 0             @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1088:34
+	ldr	r1, [sp]
+	.loc	2 1088 9                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1088:9
+	lsls	r1, r1, #2
+	.loc	2 1088 23                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1088:23
+	adds	r1, r0, r1
+	movs	r0, #3
+	.loc	2 1088 44                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1088:44
+	str	r0, [r1, #36]
+	.loc	2 1089 16 is_stmt 1             @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1089:16
+	ldr	r0, [sp]
+	adds	r0, r0, #1
+	str	r0, [sp]
+	b	.LBB7_3
+.Ltmp74:
+.LBB7_3:
+	.loc	2 1091 5                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1091:5
+	ldr	r0, [sp, #32]
+	.loc	2 1091 30 is_stmt 0             @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1091:30
+	ldr	r1, [sp]
+	.loc	2 1091 5                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1091:5
+	lsls	r1, r1, #2
+	.loc	2 1091 19                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1091:19
+	adds	r1, r0, r1
+	movs	r0, #2
+	mvns	r0, r0
+	.loc	2 1091 40                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1091:40
+	str	r0, [r1, #36]
+	.loc	2 1092 12 is_stmt 1             @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1092:12
+	ldr	r0, [sp]
+	adds	r0, r0, #1
+	str	r0, [sp]
+	.loc	2 1094 15                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1094:15
+	ldr	r0, [sp, #32]
+	.loc	2 1094 40 is_stmt 0             @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1094:40
+	ldr	r1, [sp]
+	.loc	2 1094 15                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1094:15
+	lsls	r1, r1, #2
+	.loc	2 1094 29                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1094:29
+	adds	r0, r0, r1
+	.loc	2 1094 15                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1094:15
+	adds	r0, #36
+	.loc	2 1094 5                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1094:5
+	add	sp, #20
+	pop	{r4, pc}
+.Ltmp75:
+.Lfunc_end7:
+	.size	pxPortInitialiseStack, .Lfunc_end7-pxPortInitialiseStack
+	.cfi_endproc
+	.cantunwind
+	.fnend
+                                        @ -- End function
+	.section	.text.prvTaskExitError,"ax",%progbits
+	.p2align	1                               @ -- Begin function prvTaskExitError
+	.type	prvTaskExitError,%function
+	.code	16                              @ @prvTaskExitError
+	.thumb_func
+prvTaskExitError:
+.Lfunc_begin8:
+	.loc	2 693 0 is_stmt 1               @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:693:0
+	.fnstart
+	.cfi_startproc
+@ %bb.0:
+	.pad	#4
+	sub	sp, #4
+	.cfi_def_cfa_offset 4
+	movs	r0, #0
+.Ltmp76:
+	.loc	2 694 23 prologue_end           @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:694:23
+	str	r0, [sp]
+.Ltmp77:
+	.loc	2 701 5                         @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:701:5
+	movw	r0, :lower16:ulCriticalNesting
+	movt	r0, :upper16:ulCriticalNesting
+	ldr	r0, [r0]
+.Ltmp78:
+	.loc	2 701 5 is_stmt 0               @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:701:5
+	adds	r0, r0, #1
+	cbz	r0, .LBB8_3
+	b	.LBB8_1
+.LBB8_1:
+.Ltmp79:
+	.loc	2 701 5                         @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:701:5
+	@APP
+	cpsid i
+	@NO_APP
+	b	.LBB8_2
+.LBB8_2:                                @ =>This Inner Loop Header: Depth=1
+.Ltmp80:
+	.loc	2 701 5                         @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:701:5
+	b	.LBB8_2
+.Ltmp81:
+.LBB8_3:
+	.loc	2 702 5 is_stmt 1               @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:702:5
+	@APP
+	cpsid i
+	@NO_APP
+	.loc	2 704 5                         @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:704:5
+	b	.LBB8_4
+.LBB8_4:                                @ =>This Inner Loop Header: Depth=1
+	.loc	2 704 12 is_stmt 0              @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:704:12
+	ldr	r0, [sp]
+	.loc	2 704 5                         @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:704:5
+	cbnz	r0, .LBB8_6
+	b	.LBB8_5
+.LBB8_5:                                @   in Loop: Header=BB8_4 Depth=1
+	b	.LBB8_4
+.LBB8_6:
+	.loc	2 714 1 is_stmt 1               @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:714:1
+	add	sp, #4
+	bx	lr
+.Ltmp82:
+.Lfunc_end8:
+	.size	prvTaskExitError, .Lfunc_end8-prvTaskExitError
+	.cfi_endproc
+	.cantunwind
+	.fnend
+                                        @ -- End function
+	.section	privileged_functions,"ax",%progbits
+	.hidden	xPortStartScheduler             @ -- Begin function xPortStartScheduler
+	.globl	xPortStartScheduler
+	.p2align	1
+	.type	xPortStartScheduler,%function
+	.code	16                              @ @xPortStartScheduler
+	.thumb_func
+xPortStartScheduler:
+.Lfunc_begin9:
+	.loc	2 1183 0                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1183:0
+	.fnstart
+	.cfi_startproc
+@ %bb.0:
+	.save	{r7, lr}
+	push	{r7, lr}
+	.cfi_def_cfa_offset 8
+	.cfi_offset lr, -4
+	.cfi_offset r7, -8
+	.pad	#8
+	sub	sp, #8
+	.cfi_def_cfa_offset 16
+	movw	r1, #60704
+	movt	r1, #57344
+.Ltmp83:
+	.loc	2 1293 24 prologue_end          @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1293:24
+	ldr	r0, [r1]
+	movs	r2, #255
+	lsls	r3, r2, #16
+	orrs	r0, r3
+	str	r0, [r1]
+	.loc	2 1294 24                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1294:24
+	ldr	r0, [r1]
+	lsls	r2, r2, #24
+	orrs	r0, r2
+	str	r0, [r1]
+.Ltmp84:
+	.loc	2 1299 9                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1299:9
+	bl	prvSetupMPU
+.Ltmp85:
+	.loc	2 1305 5                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1305:5
+	bl	vPortSetupTimerInterrupt
+	.loc	2 1308 23                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1308:23
+	movw	r1, :lower16:ulCriticalNesting
+	movt	r1, :upper16:ulCriticalNesting
+	movs	r0, #0
+	str	r0, [sp, #4]                    @ 4-byte Spill
+	str	r0, [r1]
+	.loc	2 1311 5                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1311:5
+	bl	vStartFirstTask
+	.loc	2 1319 5                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1319:5
+	bl	vTaskSwitchContext
+	.loc	2 1320 5                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1320:5
+	bl	prvTaskExitError
+	ldr	r0, [sp, #4]                    @ 4-byte Reload
+	.loc	2 1323 5                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1323:5
+	add	sp, #8
+	pop	{r7, pc}
+.Ltmp86:
+.Lfunc_end9:
+	.size	xPortStartScheduler, .Lfunc_end9-xPortStartScheduler
+	.cfi_endproc
+	.cantunwind
+	.fnend
+                                        @ -- End function
+	.p2align	1                               @ -- Begin function prvSetupMPU
+	.type	prvSetupMPU,%function
+	.code	16                              @ @prvSetupMPU
+	.thumb_func
+prvSetupMPU:
+.Lfunc_begin10:
+	.loc	2 739 0                         @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:739:0
+	.fnstart
+	.cfi_startproc
+@ %bb.0:
+	.save	{r4, r5, r6, r7, lr}
+	push	{r4, r5, r6, r7, lr}
+	.cfi_def_cfa_offset 20
+	.cfi_offset lr, -4
+	.cfi_offset r7, -8
+	.cfi_offset r6, -12
+	.cfi_offset r5, -16
+	.cfi_offset r4, -20
+	movw	r0, #60816
+	movt	r0, #57344
+.Ltmp87:
+	.loc	2 768 9 prologue_end            @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:768:9
+	ldr	r0, [r0]
+	movw	r1, #2048
+.Ltmp88:
+	.loc	2 768 9 is_stmt 0               @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:768:9
+	cmp	r0, r1
+	beq	.LBB10_3
+	b	.LBB10_1
+.LBB10_1:
+.Ltmp89:
+	.loc	2 768 9                         @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:768:9
+	@APP
+	cpsid i
+	@NO_APP
+	b	.LBB10_2
+.LBB10_2:                               @ =>This Inner Loop Header: Depth=1
+.Ltmp90:
+	.loc	2 768 9                         @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:768:9
+	b	.LBB10_2
+.Ltmp91:
+.LBB10_3:
+	.loc	2 0 9                           @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:0:9
+	movw	r0, #60816
+	movt	r0, #57344
+.Ltmp92:
+	.loc	2 771 13 is_stmt 1              @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:771:13
+	ldr	r0, [r0]
+	movw	r1, #2048
+.Ltmp93:
+	.loc	2 771 13 is_stmt 0              @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:771:13
+	cmp	r0, r1
+	bne	.LBB10_5
+	b	.LBB10_4
+.LBB10_4:
+	.loc	2 0 13                          @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:0:13
+	movw	r1, #60864
+	movt	r1, #57344
+.Ltmp94:
+	.loc	2 774 31 is_stmt 1              @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:774:31
+	ldr	r0, [r1]
+	movs	r2, #255
+	orrs	r0, r2
+	str	r0, [r1]
+	.loc	2 776 31                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:776:31
+	ldr	r0, [r1]
+	movw	r2, #1024
+	orrs	r0, r2
+	str	r0, [r1]
+	movw	r5, #60824
+	movt	r5, #57344
+	movs	r0, #0
+	.loc	2 780 29                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:780:29
+	str	r0, [r5]
+	.loc	2 781 49                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:781:49
+	movw	r0, :lower16:__privileged_functions_start__
+	movt	r0, :upper16:__privileged_functions_start__
+	ldr	r0, [r0]
+	movs	r1, #4
+	.loc	2 781 82 is_stmt 0              @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:781:82
+	orrs	r0, r1
+	movs	r1, #27
+	.loc	2 782 65 is_stmt 1              @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:782:65
+	bics	r0, r1
+	movw	r4, #60828
+	movt	r4, #57344
+	.loc	2 781 30                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:781:30
+	str	r0, [r4]
+	.loc	2 784 49                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:784:49
+	movw	r0, :lower16:__privileged_functions_end__
+	movt	r0, :upper16:__privileged_functions_end__
+	ldr	r0, [r0]
+	movs	r2, #1
+	.loc	2 784 80 is_stmt 0              @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:784:80
+	orrs	r0, r2
+	movs	r1, #30
+	mvns	r3, r1
+	.loc	2 785 61 is_stmt 1              @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:785:61
+	ands	r0, r3
+	movw	r1, #60832
+	movt	r1, #57344
+	.loc	2 784 30                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:784:30
+	str	r0, [r1]
+	.loc	2 790 29                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:790:29
+	str	r2, [r5]
+	.loc	2 791 49                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:791:49
+	movw	r0, :lower16:__unprivileged_flash_start__
+	movt	r0, :upper16:__unprivileged_flash_start__
+	ldr	r0, [r0]
+	movs	r7, #6
+	.loc	2 791 80 is_stmt 0              @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:791:80
+	orrs	r0, r7
+	movs	r6, #25
+	mvns	r6, r6
+	.loc	2 792 65 is_stmt 1              @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:792:65
+	ands	r0, r6
+	.loc	2 791 30                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:791:30
+	str	r0, [r4]
+	.loc	2 794 49                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:794:49
+	movw	r0, :lower16:__unprivileged_flash_end__
+	movt	r0, :upper16:__unprivileged_flash_end__
+	ldr	r0, [r0]
+	.loc	2 794 78 is_stmt 0              @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:794:78
+	orrs	r0, r2
+	.loc	2 795 61 is_stmt 1              @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:795:61
+	ands	r0, r3
+	.loc	2 794 30                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:794:30
+	str	r0, [r1]
+	movs	r0, #2
+	.loc	2 800 29                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:800:29
+	str	r0, [r5]
+	.loc	2 801 49                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:801:49
+	movw	r0, :lower16:__syscalls_flash_start__
+	movt	r0, :upper16:__syscalls_flash_start__
+	ldr	r0, [r0]
+	.loc	2 801 76 is_stmt 0              @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:801:76
+	orrs	r0, r7
+	.loc	2 802 65 is_stmt 1              @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:802:65
+	ands	r0, r6
+	.loc	2 801 30                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:801:30
+	str	r0, [r4]
+	.loc	2 804 49                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:804:49
+	movw	r0, :lower16:__syscalls_flash_end__
+	movt	r0, :upper16:__syscalls_flash_end__
+	ldr	r0, [r0]
+	.loc	2 804 74 is_stmt 0              @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:804:74
+	orrs	r0, r2
+	.loc	2 805 61 is_stmt 1              @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:805:61
+	ands	r0, r3
+	.loc	2 804 30                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:804:30
+	str	r0, [r1]
+	movs	r0, #3
+	.loc	2 809 29                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:809:29
+	str	r0, [r5]
+	.loc	2 810 49                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:810:49
+	movw	r0, :lower16:__privileged_sram_start__
+	movt	r0, :upper16:__privileged_sram_start__
+	ldr	r0, [r0]
+	.loc	2 810 77 is_stmt 0              @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:810:77
+	orrs	r0, r2
+	.loc	2 812 73 is_stmt 1              @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:812:73
+	ands	r0, r3
+	.loc	2 810 30                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:810:30
+	str	r0, [r4]
+	.loc	2 814 49                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:814:49
+	movw	r0, :lower16:__privileged_sram_end__
+	movt	r0, :upper16:__privileged_sram_end__
+	ldr	r0, [r0]
+	.loc	2 814 75 is_stmt 0              @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:814:75
+	orrs	r0, r2
+	.loc	2 815 61 is_stmt 1              @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:815:61
+	ands	r0, r3
+	.loc	2 814 30                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:814:30
+	str	r0, [r1]
+	movw	r1, #60708
+	movt	r1, #57344
+	.loc	2 819 48                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:819:48
+	ldr	r0, [r1]
+	lsls	r2, r2, #16
+	orrs	r0, r2
+	str	r0, [r1]
+	movw	r1, #60820
+	movt	r1, #57344
+	.loc	2 823 30                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:823:30
+	ldr	r0, [r1]
+	movs	r2, #5
+	orrs	r0, r2
+	str	r0, [r1]
+	.loc	2 824 9                         @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:824:9
+	b	.LBB10_5
+.Ltmp95:
+.LBB10_5:
+	.loc	2 825 5                         @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:825:5
+	pop	{r4, r5, r6, r7, pc}
+.Ltmp96:
+.Lfunc_end10:
+	.size	prvSetupMPU, .Lfunc_end10-prvSetupMPU
+	.cfi_endproc
+	.cantunwind
+	.fnend
+                                        @ -- End function
+	.hidden	vPortEndScheduler               @ -- Begin function vPortEndScheduler
+	.globl	vPortEndScheduler
+	.p2align	1
+	.type	vPortEndScheduler,%function
+	.code	16                              @ @vPortEndScheduler
+	.thumb_func
+vPortEndScheduler:
+.Lfunc_begin11:
+	.loc	2 1328 0                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1328:0
+	.fnstart
+	.cfi_startproc
+@ %bb.0:
+	.loc	2 1331 5 prologue_end           @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1331:5
+	movw	r0, :lower16:ulCriticalNesting
+	movt	r0, :upper16:ulCriticalNesting
+	ldr	r0, [r0]
+	movw	r1, #1000
+.Ltmp97:
+	.loc	2 1331 5 is_stmt 0              @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1331:5
+	cmp	r0, r1
+	beq	.LBB11_3
+	b	.LBB11_1
+.LBB11_1:
+.Ltmp98:
+	.loc	2 1331 5                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1331:5
+	@APP
+	cpsid i
+	@NO_APP
+	b	.LBB11_2
+.LBB11_2:                               @ =>This Inner Loop Header: Depth=1
+.Ltmp99:
+	.loc	2 1331 5                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1331:5
+	b	.LBB11_2
+.Ltmp100:
+.LBB11_3:
+	.loc	2 1332 1 is_stmt 1              @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1332:1
+	bx	lr
+.Ltmp101:
+.Lfunc_end11:
+	.size	vPortEndScheduler, .Lfunc_end11-vPortEndScheduler
+	.cfi_endproc
+	.cantunwind
+	.fnend
+                                        @ -- End function
+	.hidden	vPortStoreTaskMPUSettings       @ -- Begin function vPortStoreTaskMPUSettings
+	.globl	vPortStoreTaskMPUSettings
+	.p2align	1
+	.type	vPortStoreTaskMPUSettings,%function
+	.code	16                              @ @vPortStoreTaskMPUSettings
+	.thumb_func
+vPortStoreTaskMPUSettings:
+.Lfunc_begin12:
+	.loc	2 1340 0                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1340:0
+	.fnstart
+	.cfi_startproc
+@ %bb.0:
+	.save	{r4, lr}
+	push	{r4, lr}
+	.cfi_def_cfa_offset 8
+	.cfi_offset lr, -4
+	.cfi_offset r4, -8
+	.pad	#32
+	sub	sp, #32
+	.cfi_def_cfa_offset 40
+	str	r0, [sp, #28]
+	str	r1, [sp, #24]
+	str	r2, [sp, #20]
+	str	r3, [sp, #16]
+	movs	r0, #0
+.Ltmp102:
+	.loc	2 1342 17 prologue_end          @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1342:17
+	str	r0, [sp]
+	.loc	2 1357 9                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1357:9
+	ldr	r1, [sp, #28]
+	movs	r0, #255
+	.loc	2 1357 31 is_stmt 0             @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1357:31
+	str	r0, [r1]
+	.loc	2 1358 9 is_stmt 1              @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1358:9
+	ldr	r1, [sp, #28]
+	.loc	2 1358 31 is_stmt 0             @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1358:31
+	ldr	r0, [r1]
+	movw	r2, #1024
+	orrs	r0, r2
+	str	r0, [r1]
+.Ltmp103:
+	.loc	2 1364 13 is_stmt 1             @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1364:13
+	ldr	r0, [sp, #16]
+.Ltmp104:
+	.loc	2 1364 13 is_stmt 0             @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1364:13
+	cbz	r0, .LBB12_6
+	b	.LBB12_1
+.LBB12_1:
+.Ltmp105:
+	.loc	2 1366 49 is_stmt 1             @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1366:49
+	ldr	r0, [sp, #20]
+	.loc	2 1366 34 is_stmt 0             @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1366:34
+	str	r0, [sp, #12]
+	.loc	2 1367 47 is_stmt 1             @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1367:47
+	ldr	r0, [sp, #20]
+	.loc	2 1367 67 is_stmt 0             @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1367:67
+	ldr	r1, [sp, #16]
+	.loc	2 1367 80                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1367:80
+	lsls	r1, r1, #2
+	.loc	2 1367 63                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1367:63
+	adds	r0, r0, r1
+	.loc	2 1367 119                      @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1367:119
+	subs	r0, r0, #1
+	.loc	2 1367 32                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1367:32
+	str	r0, [sp, #8]
+.Ltmp106:
+	.loc	2 1373 19 is_stmt 1             @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1373:19
+	ldr	r0, [sp, #12]
+	.loc	2 1373 56 is_stmt 0             @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1373:56
+	movw	r1, :lower16:__privileged_sram_start__
+	movt	r1, :upper16:__privileged_sram_start__
+	ldr	r1, [r1]
+	.loc	2 1373 84                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1373:84
+	cmp	r0, r1
+	blo	.LBB12_4
+	b	.LBB12_2
+.LBB12_2:
+	.loc	2 1374 19 is_stmt 1             @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1374:19
+	ldr	r0, [sp, #8]
+	.loc	2 1374 54 is_stmt 0             @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1374:54
+	movw	r1, :lower16:__privileged_sram_end__
+	movt	r1, :upper16:__privileged_sram_end__
+	ldr	r1, [r1]
+.Ltmp107:
+	.loc	2 1373 17 is_stmt 1             @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1373:17
+	cmp	r0, r1
+	bhi	.LBB12_4
+	b	.LBB12_3
+.LBB12_3:
+.Ltmp108:
+	.loc	2 1376 17                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1376:17
+	ldr	r1, [sp, #28]
+	movs	r0, #0
+	.loc	2 1376 60 is_stmt 0             @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1376:60
+	str	r0, [r1, #4]
+	.loc	2 1377 17 is_stmt 1             @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1377:17
+	ldr	r1, [sp, #28]
+	.loc	2 1377 60 is_stmt 0             @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1377:60
+	str	r0, [r1, #8]
+	.loc	2 1378 13 is_stmt 1             @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1378:13
+	b	.LBB12_5
+.Ltmp109:
+.LBB12_4:
+	.loc	2 1382 38                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1382:38
+	ldr	r0, [sp, #12]
+	movs	r1, #31
+	mvns	r1, r1
+	ands	r0, r1
+	str	r0, [sp, #12]
+	.loc	2 1383 36                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1383:36
+	ldr	r0, [sp, #8]
+	ands	r0, r1
+	str	r0, [sp, #8]
+	.loc	2 1385 64                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1385:64
+	ldr	r0, [sp, #12]
+	movs	r1, #3
+	.loc	2 1387 92                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1387:92
+	orrs	r0, r1
+	.loc	2 1385 17                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1385:17
+	ldr	r1, [sp, #28]
+	.loc	2 1385 60 is_stmt 0             @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1385:60
+	str	r0, [r1, #4]
+	.loc	2 1390 64 is_stmt 1             @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1390:64
+	ldr	r0, [sp, #8]
+	movs	r1, #1
+	.loc	2 1391 91                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1391:91
+	orrs	r0, r1
+	.loc	2 1390 17                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1390:17
+	ldr	r1, [sp, #28]
+	.loc	2 1390 60 is_stmt 0             @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1390:60
+	str	r0, [r1, #8]
+	b	.LBB12_5
+.Ltmp110:
+.LBB12_5:
+	.loc	2 1394 9 is_stmt 1              @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1394:9
+	b	.LBB12_6
+.Ltmp111:
+.LBB12_6:
+	.loc	2 0 9 is_stmt 0                 @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:0:9
+	movs	r0, #1
+.Ltmp112:
+	.loc	2 1397 29 is_stmt 1             @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1397:29
+	str	r0, [sp, #4]
+	.loc	2 1397 14 is_stmt 0             @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1397:14
+	b	.LBB12_7
+.LBB12_7:                               @ =>This Inner Loop Header: Depth=1
+.Ltmp113:
+	.loc	2 1397 34                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1397:34
+	ldr	r0, [sp, #4]
+.Ltmp114:
+	.loc	2 1397 9                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1397:9
+	cmp	r0, #3
+	bls	.LBB12_8
+	b	.LBB12_22
+.LBB12_8:                               @   in Loop: Header=BB12_7 Depth=1
+.Ltmp115:
+	.loc	2 1402 19 is_stmt 1             @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1402:19
+	ldr	r0, [sp, #24]
+	.loc	2 1402 38 is_stmt 0             @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1402:38
+	cmp	r0, #0
+	beq	.LBB12_19
+	b	.LBB12_9
+.LBB12_9:                               @   in Loop: Header=BB12_7 Depth=1
+	.loc	2 1402 43                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1402:43
+	ldr	r0, [sp, #24]
+	.loc	2 1402 53                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1402:53
+	ldr	r2, [sp]
+	movs	r1, #12
+	.loc	2 1402 43                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1402:43
+	muls	r1, r2, r1
+	adds	r0, r0, r1
+	.loc	2 1402 62                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1402:62
+	ldr	r0, [r0, #4]
+.Ltmp116:
+	.loc	2 1402 17                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1402:17
+	cmp	r0, #0
+	beq	.LBB12_19
+	b	.LBB12_10
+.LBB12_10:                              @   in Loop: Header=BB12_7 Depth=1
+.Ltmp117:
+	.loc	2 1407 55 is_stmt 1             @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1407:55
+	ldr	r0, [sp, #24]
+	.loc	2 1407 65 is_stmt 0             @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1407:65
+	ldr	r3, [sp]
+	movs	r1, #12
+	.loc	2 1407 55                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1407:55
+	mov	r2, r1
+	muls	r2, r3, r2
+	.loc	2 1407 74                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1407:74
+	ldr	r0, [r0, r2]
+	movs	r2, #31
+	mvns	r2, r2
+	.loc	2 1407 90                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1407:90
+	ands	r0, r2
+	.loc	2 1407 38                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1407:38
+	str	r0, [sp, #12]
+	.loc	2 1408 51 is_stmt 1             @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1408:51
+	ldr	r0, [sp, #24]
+	.loc	2 1408 61 is_stmt 0             @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1408:61
+	ldr	r3, [sp]
+	.loc	2 1408 51                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1408:51
+	mov	r4, r1
+	muls	r4, r3, r4
+	adds	r3, r0, r4
+	.loc	2 1408 70                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1408:70
+	ldr	r0, [r0, r4]
+	.loc	2 1408 105                      @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1408:105
+	ldr	r3, [r3, #4]
+	.loc	2 1408 84                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1408:84
+	adds	r0, r0, r3
+	.loc	2 1408 121                      @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1408:121
+	subs	r0, r0, #1
+	.loc	2 1408 36                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1408:36
+	str	r0, [sp, #8]
+	.loc	2 1409 36 is_stmt 1             @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1409:36
+	ldr	r0, [sp, #8]
+	ands	r0, r2
+	str	r0, [sp, #8]
+	.loc	2 1412 77                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1412:77
+	ldr	r0, [sp, #12]
+	.loc	2 1412 17 is_stmt 0             @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1412:17
+	ldr	r2, [sp, #28]
+	.loc	2 1412 49                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1412:49
+	ldr	r3, [sp, #4]
+	.loc	2 1412 17                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1412:17
+	lsls	r3, r3, #3
+	.loc	2 1412 31                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1412:31
+	adds	r2, r2, r3
+	.loc	2 1412 73                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1412:73
+	str	r0, [r2, #4]
+.Ltmp118:
+	.loc	2 1416 23 is_stmt 1             @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1416:23
+	ldr	r0, [sp, #24]
+	.loc	2 1416 33 is_stmt 0             @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1416:33
+	ldr	r2, [sp]
+	.loc	2 1416 23                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1416:23
+	muls	r1, r2, r1
+	adds	r0, r0, r1
+.Ltmp119:
+	.loc	2 1416 21                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1416:21
+	ldrb	r0, [r0, #8]
+	lsls	r0, r0, #31
+	cbz	r0, .LBB12_12
+	b	.LBB12_11
+.LBB12_11:                              @   in Loop: Header=BB12_7 Depth=1
+.Ltmp120:
+	.loc	2 1418 21 is_stmt 1             @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1418:21
+	ldr	r0, [sp, #28]
+	.loc	2 1418 53 is_stmt 0             @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1418:53
+	ldr	r1, [sp, #4]
+	.loc	2 1418 21                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1418:21
+	lsls	r1, r1, #3
+	.loc	2 1418 35                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1418:35
+	adds	r1, r0, r1
+	.loc	2 1418 77                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1418:77
+	ldr	r0, [r1, #4]
+	movs	r2, #6
+	orrs	r0, r2
+	str	r0, [r1, #4]
+	.loc	2 1419 17 is_stmt 1             @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1419:17
+	b	.LBB12_13
+.Ltmp121:
+.LBB12_12:                              @   in Loop: Header=BB12_7 Depth=1
+	.loc	2 1422 21                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1422:21
+	ldr	r0, [sp, #28]
+	.loc	2 1422 53 is_stmt 0             @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1422:53
+	ldr	r1, [sp, #4]
+	.loc	2 1422 21                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1422:21
+	lsls	r1, r1, #3
+	.loc	2 1422 35                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1422:35
+	adds	r1, r0, r1
+	.loc	2 1422 77                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1422:77
+	ldr	r0, [r1, #4]
+	movs	r2, #2
+	orrs	r0, r2
+	str	r0, [r1, #4]
+	b	.LBB12_13
+.Ltmp122:
+.LBB12_13:                              @   in Loop: Header=BB12_7 Depth=1
+	.loc	2 1426 23 is_stmt 1             @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1426:23
+	ldr	r0, [sp, #24]
+	.loc	2 1426 33 is_stmt 0             @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1426:33
+	ldr	r2, [sp]
+	movs	r1, #12
+	.loc	2 1426 23                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1426:23
+	muls	r1, r2, r1
+	adds	r0, r0, r1
+.Ltmp123:
+	.loc	2 1426 21                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1426:21
+	ldrb	r0, [r0, #8]
+	lsls	r0, r0, #29
+	cmp	r0, #0
+	bpl	.LBB12_15
+	b	.LBB12_14
+.LBB12_14:                              @   in Loop: Header=BB12_7 Depth=1
+.Ltmp124:
+	.loc	2 1428 21 is_stmt 1             @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1428:21
+	ldr	r0, [sp, #28]
+	.loc	2 1428 53 is_stmt 0             @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1428:53
+	ldr	r1, [sp, #4]
+	.loc	2 1428 21                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1428:21
+	lsls	r1, r1, #3
+	.loc	2 1428 35                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1428:35
+	adds	r1, r0, r1
+	.loc	2 1428 77                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1428:77
+	ldr	r0, [r1, #4]
+	movs	r2, #1
+	orrs	r0, r2
+	str	r0, [r1, #4]
+	.loc	2 1429 17 is_stmt 1             @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1429:17
+	b	.LBB12_15
+.Ltmp125:
+.LBB12_15:                              @   in Loop: Header=BB12_7 Depth=1
+	.loc	2 1432 77                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1432:77
+	ldr	r0, [sp, #8]
+	movs	r1, #1
+	.loc	2 1432 98 is_stmt 0             @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1432:98
+	orrs	r0, r1
+	.loc	2 1432 17                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1432:17
+	ldr	r1, [sp, #28]
+	.loc	2 1432 49                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1432:49
+	ldr	r2, [sp, #4]
+	.loc	2 1432 17                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1432:17
+	lsls	r2, r2, #3
+	.loc	2 1432 31                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1432:31
+	adds	r1, r1, r2
+	.loc	2 1432 73                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1432:73
+	str	r0, [r1, #8]
+.Ltmp126:
+	.loc	2 1436 23 is_stmt 1             @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1436:23
+	ldr	r0, [sp, #24]
+	.loc	2 1436 33 is_stmt 0             @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1436:33
+	ldr	r2, [sp]
+	movs	r1, #12
+	.loc	2 1436 23                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1436:23
+	muls	r1, r2, r1
+	adds	r0, r0, r1
+.Ltmp127:
+	.loc	2 1436 21                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1436:21
+	ldrb	r0, [r0, #8]
+	lsls	r0, r0, #27
+	cmp	r0, #0
+	bpl	.LBB12_17
+	b	.LBB12_16
+.LBB12_16:                              @   in Loop: Header=BB12_7 Depth=1
+.Ltmp128:
+	.loc	2 1439 21 is_stmt 1             @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1439:21
+	ldr	r0, [sp, #28]
+	.loc	2 1439 53 is_stmt 0             @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1439:53
+	ldr	r1, [sp, #4]
+	.loc	2 1439 21                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1439:21
+	lsls	r1, r1, #3
+	.loc	2 1439 35                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1439:35
+	adds	r1, r0, r1
+	.loc	2 1439 77                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1439:77
+	ldr	r0, [r1, #8]
+	movs	r2, #2
+	orrs	r0, r2
+	str	r0, [r1, #8]
+	.loc	2 1440 17 is_stmt 1             @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1440:17
+	b	.LBB12_18
+.Ltmp129:
+.LBB12_17:                              @   in Loop: Header=BB12_7 Depth=1
+	.loc	2 0 17 is_stmt 0                @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:0:17
+	b	.LBB12_18
+.LBB12_18:                              @   in Loop: Header=BB12_7 Depth=1
+	.loc	2 1446 13 is_stmt 1             @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1446:13
+	b	.LBB12_20
+.Ltmp130:
+.LBB12_19:                              @   in Loop: Header=BB12_7 Depth=1
+	.loc	2 1450 17                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1450:17
+	ldr	r0, [sp, #28]
+	.loc	2 1450 49 is_stmt 0             @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1450:49
+	ldr	r1, [sp, #4]
+	.loc	2 1450 17                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1450:17
+	lsls	r1, r1, #3
+	.loc	2 1450 31                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1450:31
+	adds	r1, r0, r1
+	movs	r0, #0
+	.loc	2 1450 73                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1450:73
+	str	r0, [r1, #4]
+	.loc	2 1451 17 is_stmt 1             @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1451:17
+	ldr	r1, [sp, #28]
+	.loc	2 1451 49 is_stmt 0             @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1451:49
+	ldr	r2, [sp, #4]
+	.loc	2 1451 17                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1451:17
+	lsls	r2, r2, #3
+	.loc	2 1451 31                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1451:31
+	adds	r1, r1, r2
+	.loc	2 1451 73                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1451:73
+	str	r0, [r1, #8]
+	b	.LBB12_20
+.Ltmp131:
+.LBB12_20:                              @   in Loop: Header=BB12_7 Depth=1
+	.loc	2 1454 19 is_stmt 1             @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1454:19
+	ldr	r0, [sp]
+	adds	r0, r0, #1
+	str	r0, [sp]
+	.loc	2 1455 9                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1455:9
+	b	.LBB12_21
+.Ltmp132:
+.LBB12_21:                              @   in Loop: Header=BB12_7 Depth=1
+	.loc	2 1397 96                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1397:96
+	ldr	r0, [sp, #4]
+	adds	r0, r0, #1
+	str	r0, [sp, #4]
+	.loc	2 1397 9 is_stmt 0              @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1397:9
+	b	.LBB12_7
+.Ltmp133:
+.LBB12_22:
+	.loc	2 1456 5 is_stmt 1              @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1456:5
+	add	sp, #32
+	pop	{r4, pc}
+.Ltmp134:
+.Lfunc_end12:
+	.size	vPortStoreTaskMPUSettings, .Lfunc_end12-vPortStoreTaskMPUSettings
+	.cfi_endproc
+	.cantunwind
+	.fnend
+                                        @ -- End function
+	.hidden	xPortIsAuthorizedToAccessBuffer @ -- Begin function xPortIsAuthorizedToAccessBuffer
+	.globl	xPortIsAuthorizedToAccessBuffer
+	.p2align	1
+	.type	xPortIsAuthorizedToAccessBuffer,%function
+	.code	16                              @ @xPortIsAuthorizedToAccessBuffer
+	.thumb_func
+xPortIsAuthorizedToAccessBuffer:
+.Lfunc_begin13:
+	.loc	2 1465 0                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1465:0
+	.fnstart
+	.cfi_startproc
+@ %bb.0:
+	.save	{r7, lr}
+	push	{r7, lr}
+	.cfi_def_cfa_offset 8
+	.cfi_offset lr, -4
+	.cfi_offset r7, -8
+	.pad	#40
+	sub	sp, #40
+	.cfi_def_cfa_offset 48
+	str	r0, [sp, #36]
+	str	r1, [sp, #32]
+	str	r2, [sp, #28]
+	movs	r0, #0
+.Ltmp135:
+	.loc	2 1467 20 prologue_end          @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1467:20
+	str	r0, [sp, #4]                    @ 4-byte Spill
+	str	r0, [sp, #12]
+	.loc	2 1468 50                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1468:50
+	bl	xTaskGetMPUSettings
+	mov	r1, r0
+	.loc	2 1468 31 is_stmt 0             @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1468:31
+	ldr	r0, [sp, #4]                    @ 4-byte Reload
+	str	r1, [sp, #8]
+	.loc	2 1470 45 is_stmt 1             @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1470:45
+	ldr	r1, [sp, #36]
+	.loc	2 1470 30 is_stmt 0             @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1470:30
+	str	r1, [sp, #20]
+	.loc	2 1471 47 is_stmt 1             @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1471:47
+	ldr	r1, [sp, #36]
+	.loc	2 1471 60 is_stmt 0             @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1471:60
+	ldr	r2, [sp, #32]
+	.loc	2 1471 58                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1471:58
+	adds	r1, r1, r2
+	.loc	2 1471 75                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1471:75
+	subs	r1, r1, #1
+	.loc	2 1471 28                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1471:28
+	str	r1, [sp, #16]
+.Ltmp136:
+	.loc	2 1473 16 is_stmt 1             @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1473:16
+	str	r0, [sp, #24]
+	.loc	2 1473 14 is_stmt 0             @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1473:14
+	b	.LBB13_1
+.LBB13_1:                               @ =>This Inner Loop Header: Depth=1
+.Ltmp137:
+	.loc	2 1473 21                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1473:21
+	ldr	r0, [sp, #24]
+.Ltmp138:
+	.loc	2 1473 9                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1473:9
+	cmp	r0, #3
+	bhi	.LBB13_12
+	b	.LBB13_2
+.LBB13_2:                               @   in Loop: Header=BB13_1 Depth=1
+.Ltmp139:
+	.loc	2 1476 19 is_stmt 1             @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1476:19
+	ldr	r0, [sp, #8]
+	.loc	2 1476 55 is_stmt 0             @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1476:55
+	ldr	r1, [sp, #24]
+	.loc	2 1476 19                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1476:19
+	lsls	r1, r1, #3
+	.loc	2 1476 37                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1476:37
+	adds	r0, r0, r1
+.Ltmp140:
+	.loc	2 1476 17                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1476:17
+	ldrb	r0, [r0, #8]
+	lsls	r0, r0, #31
+	cbz	r0, .LBB13_10
+	b	.LBB13_3
+.LBB13_3:                               @   in Loop: Header=BB13_1 Depth=1
+.Ltmp141:
+	.loc	2 1478 21 is_stmt 1             @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1478:21
+	ldr	r0, [sp, #20]
+	ldr	r1, [sp, #8]
+	ldr	r2, [sp, #24]
+	lsls	r2, r2, #3
+	adds	r1, r1, r2
+	ldr	r1, [r1, #4]
+	movs	r2, #31
+	bics	r1, r2
+	cmp	r0, r1
+	blo	.LBB13_9
+	b	.LBB13_4
+.LBB13_4:                               @   in Loop: Header=BB13_1 Depth=1
+	ldr	r0, [sp, #20]
+	ldr	r1, [sp, #8]
+	ldr	r2, [sp, #24]
+	lsls	r2, r2, #3
+	adds	r1, r1, r2
+	ldr	r1, [r1, #8]
+	movs	r2, #31
+	orrs	r1, r2
+	.loc	2 1480 137                      @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1480:137
+	cmp	r0, r1
+	bhi	.LBB13_9
+	b	.LBB13_5
+.LBB13_5:                               @   in Loop: Header=BB13_1 Depth=1
+	.loc	2 1481 21                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1481:21
+	ldr	r0, [sp, #16]
+	ldr	r1, [sp, #8]
+	ldr	r2, [sp, #24]
+	lsls	r2, r2, #3
+	adds	r1, r1, r2
+	ldr	r1, [r1, #4]
+	movs	r2, #31
+	bics	r1, r2
+	cmp	r0, r1
+	blo	.LBB13_9
+	b	.LBB13_6
+.LBB13_6:                               @   in Loop: Header=BB13_1 Depth=1
+	ldr	r0, [sp, #16]
+	ldr	r1, [sp, #8]
+	ldr	r2, [sp, #24]
+	lsls	r2, r2, #3
+	adds	r1, r1, r2
+	ldr	r1, [r1, #8]
+	movs	r2, #31
+	orrs	r1, r2
+	.loc	2 1483 137                      @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1483:137
+	cmp	r0, r1
+	bhi	.LBB13_9
+	b	.LBB13_7
+.LBB13_7:                               @   in Loop: Header=BB13_1 Depth=1
+	.loc	2 1484 21                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1484:21
+	ldr	r0, [sp, #8]
+	ldr	r1, [sp, #24]
+	lsls	r1, r1, #3
+	adds	r0, r0, r1
+	ldr	r0, [r0, #4]
+	bl	prvGetRegionAccessPermissions
+	ldr	r1, [sp, #28]
+	ands	r0, r1
+.Ltmp142:
+	.loc	2 1478 21                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1478:21
+	cmp	r0, r1
+	bne	.LBB13_9
+	b	.LBB13_8
+.LBB13_8:
+	.loc	2 0 21 is_stmt 0                @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:0:21
+	movs	r0, #1
+.Ltmp143:
+	.loc	2 1487 36 is_stmt 1             @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1487:36
+	str	r0, [sp, #12]
+	.loc	2 1488 21                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1488:21
+	b	.LBB13_12
+.Ltmp144:
+.LBB13_9:                               @   in Loop: Header=BB13_1 Depth=1
+	.loc	2 1490 13                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1490:13
+	b	.LBB13_10
+.Ltmp145:
+.LBB13_10:                              @   in Loop: Header=BB13_1 Depth=1
+	.loc	2 1491 9                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1491:9
+	b	.LBB13_11
+.Ltmp146:
+.LBB13_11:                              @   in Loop: Header=BB13_1 Depth=1
+	.loc	2 1473 49                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1473:49
+	ldr	r0, [sp, #24]
+	adds	r0, r0, #1
+	str	r0, [sp, #24]
+	.loc	2 1473 9 is_stmt 0              @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1473:9
+	b	.LBB13_1
+.Ltmp147:
+.LBB13_12:
+	.loc	2 1493 16 is_stmt 1             @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1493:16
+	ldr	r0, [sp, #12]
+	.loc	2 1493 9 is_stmt 0              @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1493:9
+	add	sp, #40
+	pop	{r7, pc}
+.Ltmp148:
+.Lfunc_end13:
+	.size	xPortIsAuthorizedToAccessBuffer, .Lfunc_end13-xPortIsAuthorizedToAccessBuffer
+	.cfi_endproc
+	.cantunwind
+	.fnend
+                                        @ -- End function
+	.p2align	1                               @ -- Begin function prvGetRegionAccessPermissions
+	.type	prvGetRegionAccessPermissions,%function
+	.code	16                              @ @prvGetRegionAccessPermissions
+	.thumb_func
+prvGetRegionAccessPermissions:
+.Lfunc_begin14:
+	.loc	2 719 0 is_stmt 1               @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:719:0
+	.fnstart
+	.cfi_startproc
+@ %bb.0:
+	.pad	#8
+	sub	sp, #8
+	.cfi_def_cfa_offset 8
+	str	r0, [sp, #4]
+	movs	r0, #0
+.Ltmp149:
+	.loc	2 720 18 prologue_end           @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:720:18
+	str	r0, [sp]
+.Ltmp150:
+	.loc	2 722 15                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:722:15
+	ldr	r0, [sp, #4]
+	movs	r1, #6
+	.loc	2 722 27 is_stmt 0              @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:722:27
+	ands	r0, r1
+.Ltmp151:
+	.loc	2 722 13                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:722:13
+	cmp	r0, #6
+	bne	.LBB14_2
+	b	.LBB14_1
+.LBB14_1:
+	.loc	2 0 13                          @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:0:13
+	movs	r0, #1
+.Ltmp152:
+	.loc	2 724 33 is_stmt 1              @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:724:33
+	str	r0, [sp]
+	.loc	2 725 9                         @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:725:9
+	b	.LBB14_2
+.Ltmp153:
+.LBB14_2:
+	.loc	2 727 15                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:727:15
+	ldr	r0, [sp, #4]
+	movs	r1, #6
+	.loc	2 727 27 is_stmt 0              @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:727:27
+	ands	r0, r1
+.Ltmp154:
+	.loc	2 727 13                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:727:13
+	cmp	r0, #2
+	bne	.LBB14_4
+	b	.LBB14_3
+.LBB14_3:
+	.loc	2 0 13                          @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:0:13
+	movs	r0, #3
+.Ltmp155:
+	.loc	2 729 33 is_stmt 1              @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:729:33
+	str	r0, [sp]
+	.loc	2 730 9                         @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:730:9
+	b	.LBB14_4
+.Ltmp156:
+.LBB14_4:
+	.loc	2 732 16                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:732:16
+	ldr	r0, [sp]
+	.loc	2 732 9 is_stmt 0               @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:732:9
+	add	sp, #8
+	bx	lr
+.Ltmp157:
+.Lfunc_end14:
+	.size	prvGetRegionAccessPermissions, .Lfunc_end14-prvGetRegionAccessPermissions
+	.cfi_endproc
+	.cantunwind
+	.fnend
+                                        @ -- End function
+	.section	.text.xPortIsInsideInterrupt,"ax",%progbits
+	.hidden	xPortIsInsideInterrupt          @ -- Begin function xPortIsInsideInterrupt
+	.globl	xPortIsInsideInterrupt
+	.p2align	1
+	.type	xPortIsInsideInterrupt,%function
+	.code	16                              @ @xPortIsInsideInterrupt
+	.thumb_func
+xPortIsInsideInterrupt:
+.Lfunc_begin15:
+	.loc	2 1499 0 is_stmt 1              @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1499:0
+	.fnstart
+	.cfi_startproc
+@ %bb.0:
+	.pad	#8
+	sub	sp, #8
+	.cfi_def_cfa_offset 8
+.Ltmp158:
+	.loc	2 1506 5 prologue_end           @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1506:5
+	@APP
+	mrs	r0, ipsr
+	@NO_APP
+	str	r0, [sp, #4]
+.Ltmp159:
+	.loc	2 1508 9                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1508:9
+	ldr	r0, [sp, #4]
+.Ltmp160:
+	.loc	2 1508 9 is_stmt 0              @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1508:9
+	cbnz	r0, .LBB15_2
+	b	.LBB15_1
+.LBB15_1:
+	.loc	2 0 9                           @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:0:9
+	movs	r0, #0
+.Ltmp161:
+	.loc	2 1510 17 is_stmt 1             @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1510:17
+	str	r0, [sp]
+	.loc	2 1511 5                        @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1511:5
+	b	.LBB15_3
+.Ltmp162:
+.LBB15_2:
+	.loc	2 0 5 is_stmt 0                 @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:0:5
+	movs	r0, #1
+.Ltmp163:
+	.loc	2 1514 17 is_stmt 1             @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1514:17
+	str	r0, [sp]
+	b	.LBB15_3
+.Ltmp164:
+.LBB15_3:
+	.loc	2 1517 12                       @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1517:12
+	ldr	r0, [sp]
+	.loc	2 1517 5 is_stmt 0              @ ../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure/port.c:1517:5
+	add	sp, #8
+	bx	lr
+.Ltmp165:
+.Lfunc_end15:
+	.size	xPortIsInsideInterrupt, .Lfunc_end15-xPortIsInsideInterrupt
+	.cfi_endproc
+	.cantunwind
+	.fnend
+                                        @ -- End function
+	.type	xMaximumPossibleSuppressedTicks,%object @ @xMaximumPossibleSuppressedTicks
+	.section	privileged_data,"aw",%progbits
+	.p2align	2, 0x0
+xMaximumPossibleSuppressedTicks:
+	.long	0                               @ 0x0
+	.size	xMaximumPossibleSuppressedTicks, 4
+
+	.type	ulTimerCountsForOneTick,%object @ @ulTimerCountsForOneTick
+	.p2align	2, 0x0
+ulTimerCountsForOneTick:
+	.long	0                               @ 0x0
+	.size	ulTimerCountsForOneTick, 4
+
+	.type	ulStoppedTimerCompensation,%object @ @ulStoppedTimerCompensation
+	.p2align	2, 0x0
+ulStoppedTimerCompensation:
+	.long	0                               @ 0x0
+	.size	ulStoppedTimerCompensation, 4
+
+	.type	ulCriticalNesting,%object       @ @ulCriticalNesting
+	.p2align	2, 0x0
+ulCriticalNesting:
+	.long	2863311530                      @ 0xaaaaaaaa
+	.size	ulCriticalNesting, 4
+
+	.file	5 "C:\\Users\\karahulx\\Downloads\\Kernel\\FreeRTOS\\FreeRTOS\\Demo\\CORTEX_MPU_M23_Nuvoton_NuMaker_PFM_M2351_IAR_GCC\\Projects_NTZ\\Keil" "../../../../Source/include/projdefs.h"
+	.section	.debug_abbrev,"",%progbits
+	.byte	1                               @ Abbreviation Code
+	.byte	17                              @ DW_TAG_compile_unit
+	.byte	1                               @ DW_CHILDREN_yes
+	.byte	37                              @ DW_AT_producer
+	.byte	14                              @ DW_FORM_strp
+	.byte	19                              @ DW_AT_language
+	.byte	5                               @ DW_FORM_data2
+	.byte	3                               @ DW_AT_name
+	.byte	14                              @ DW_FORM_strp
+	.byte	16                              @ DW_AT_stmt_list
+	.byte	23                              @ DW_FORM_sec_offset
+	.byte	27                              @ DW_AT_comp_dir
+	.byte	14                              @ DW_FORM_strp
+	.byte	17                              @ DW_AT_low_pc
+	.byte	1                               @ DW_FORM_addr
+	.byte	85                              @ DW_AT_ranges
+	.byte	23                              @ DW_FORM_sec_offset
+	.byte	0                               @ EOM(1)
+	.byte	0                               @ EOM(2)
+	.byte	2                               @ Abbreviation Code
+	.byte	52                              @ DW_TAG_variable
+	.byte	0                               @ DW_CHILDREN_no
+	.byte	3                               @ DW_AT_name
+	.byte	14                              @ DW_FORM_strp
+	.byte	73                              @ DW_AT_type
+	.byte	19                              @ DW_FORM_ref4
+	.byte	58                              @ DW_AT_decl_file
+	.byte	11                              @ DW_FORM_data1
+	.byte	59                              @ DW_AT_decl_line
+	.byte	5                               @ DW_FORM_data2
+	.byte	2                               @ DW_AT_location
+	.byte	24                              @ DW_FORM_exprloc
+	.byte	0                               @ EOM(1)
+	.byte	0                               @ EOM(2)
+	.byte	3                               @ Abbreviation Code
+	.byte	22                              @ DW_TAG_typedef
+	.byte	0                               @ DW_CHILDREN_no
+	.byte	73                              @ DW_AT_type
+	.byte	19                              @ DW_FORM_ref4
+	.byte	3                               @ DW_AT_name
+	.byte	14                              @ DW_FORM_strp
+	.byte	58                              @ DW_AT_decl_file
+	.byte	11                              @ DW_FORM_data1
+	.byte	59                              @ DW_AT_decl_line
+	.byte	11                              @ DW_FORM_data1
+	.byte	0                               @ EOM(1)
+	.byte	0                               @ EOM(2)
+	.byte	4                               @ Abbreviation Code
+	.byte	36                              @ DW_TAG_base_type
+	.byte	0                               @ DW_CHILDREN_no
+	.byte	3                               @ DW_AT_name
+	.byte	14                              @ DW_FORM_strp
+	.byte	62                              @ DW_AT_encoding
+	.byte	11                              @ DW_FORM_data1
+	.byte	11                              @ DW_AT_byte_size
+	.byte	11                              @ DW_FORM_data1
+	.byte	0                               @ EOM(1)
+	.byte	0                               @ EOM(2)
+	.byte	5                               @ Abbreviation Code
+	.byte	53                              @ DW_TAG_volatile_type
+	.byte	0                               @ DW_CHILDREN_no
+	.byte	73                              @ DW_AT_type
+	.byte	19                              @ DW_FORM_ref4
+	.byte	0                               @ EOM(1)
+	.byte	0                               @ EOM(2)
+	.byte	6                               @ Abbreviation Code
+	.byte	4                               @ DW_TAG_enumeration_type
+	.byte	1                               @ DW_CHILDREN_yes
+	.byte	73                              @ DW_AT_type
+	.byte	19                              @ DW_FORM_ref4
+	.byte	11                              @ DW_AT_byte_size
+	.byte	11                              @ DW_FORM_data1
+	.byte	58                              @ DW_AT_decl_file
+	.byte	11                              @ DW_FORM_data1
+	.byte	59                              @ DW_AT_decl_line
+	.byte	11                              @ DW_FORM_data1
+	.byte	0                               @ EOM(1)
+	.byte	0                               @ EOM(2)
+	.byte	7                               @ Abbreviation Code
+	.byte	40                              @ DW_TAG_enumerator
+	.byte	0                               @ DW_CHILDREN_no
+	.byte	3                               @ DW_AT_name
+	.byte	14                              @ DW_FORM_strp
+	.byte	28                              @ DW_AT_const_value
+	.byte	15                              @ DW_FORM_udata
+	.byte	0                               @ EOM(1)
+	.byte	0                               @ EOM(2)
+	.byte	8                               @ Abbreviation Code
+	.byte	15                              @ DW_TAG_pointer_type
+	.byte	0                               @ DW_CHILDREN_no
+	.byte	73                              @ DW_AT_type
+	.byte	19                              @ DW_FORM_ref4
+	.byte	0                               @ EOM(1)
+	.byte	0                               @ EOM(2)
+	.byte	9                               @ Abbreviation Code
+	.byte	46                              @ DW_TAG_subprogram
+	.byte	1                               @ DW_CHILDREN_yes
+	.byte	17                              @ DW_AT_low_pc
+	.byte	1                               @ DW_FORM_addr
+	.byte	18                              @ DW_AT_high_pc
+	.byte	6                               @ DW_FORM_data4
+	.byte	64                              @ DW_AT_frame_base
+	.byte	24                              @ DW_FORM_exprloc
+	.byte	3                               @ DW_AT_name
+	.byte	14                              @ DW_FORM_strp
+	.byte	58                              @ DW_AT_decl_file
+	.byte	11                              @ DW_FORM_data1
+	.byte	59                              @ DW_AT_decl_line
+	.byte	5                               @ DW_FORM_data2
+	.byte	39                              @ DW_AT_prototyped
+	.byte	25                              @ DW_FORM_flag_present
+	.byte	63                              @ DW_AT_external
+	.byte	25                              @ DW_FORM_flag_present
+	.byte	0                               @ EOM(1)
+	.byte	0                               @ EOM(2)
+	.byte	10                              @ Abbreviation Code
+	.byte	5                               @ DW_TAG_formal_parameter
+	.byte	0                               @ DW_CHILDREN_no
+	.byte	2                               @ DW_AT_location
+	.byte	24                              @ DW_FORM_exprloc
+	.byte	3                               @ DW_AT_name
+	.byte	14                              @ DW_FORM_strp
+	.byte	58                              @ DW_AT_decl_file
+	.byte	11                              @ DW_FORM_data1
+	.byte	59                              @ DW_AT_decl_line
+	.byte	5                               @ DW_FORM_data2
+	.byte	73                              @ DW_AT_type
+	.byte	19                              @ DW_FORM_ref4
+	.byte	0                               @ EOM(1)
+	.byte	0                               @ EOM(2)
+	.byte	11                              @ Abbreviation Code
+	.byte	52                              @ DW_TAG_variable
+	.byte	0                               @ DW_CHILDREN_no
+	.byte	2                               @ DW_AT_location
+	.byte	24                              @ DW_FORM_exprloc
+	.byte	3                               @ DW_AT_name
+	.byte	14                              @ DW_FORM_strp
+	.byte	58                              @ DW_AT_decl_file
+	.byte	11                              @ DW_FORM_data1
+	.byte	59                              @ DW_AT_decl_line
+	.byte	5                               @ DW_FORM_data2
+	.byte	73                              @ DW_AT_type
+	.byte	19                              @ DW_FORM_ref4
+	.byte	0                               @ EOM(1)
+	.byte	0                               @ EOM(2)
+	.byte	12                              @ Abbreviation Code
+	.byte	11                              @ DW_TAG_lexical_block
+	.byte	1                               @ DW_CHILDREN_yes
+	.byte	17                              @ DW_AT_low_pc
+	.byte	1                               @ DW_FORM_addr
+	.byte	18                              @ DW_AT_high_pc
+	.byte	6                               @ DW_FORM_data4
+	.byte	0                               @ EOM(1)
+	.byte	0                               @ EOM(2)
+	.byte	13                              @ Abbreviation Code
+	.byte	46                              @ DW_TAG_subprogram
+	.byte	0                               @ DW_CHILDREN_no
+	.byte	17                              @ DW_AT_low_pc
+	.byte	1                               @ DW_FORM_addr
+	.byte	18                              @ DW_AT_high_pc
+	.byte	6                               @ DW_FORM_data4
+	.byte	64                              @ DW_AT_frame_base
+	.byte	24                              @ DW_FORM_exprloc
+	.byte	3                               @ DW_AT_name
+	.byte	14                              @ DW_FORM_strp
+	.byte	58                              @ DW_AT_decl_file
+	.byte	11                              @ DW_FORM_data1
+	.byte	59                              @ DW_AT_decl_line
+	.byte	5                               @ DW_FORM_data2
+	.byte	39                              @ DW_AT_prototyped
+	.byte	25                              @ DW_FORM_flag_present
+	.byte	63                              @ DW_AT_external
+	.byte	25                              @ DW_FORM_flag_present
+	.byte	0                               @ EOM(1)
+	.byte	0                               @ EOM(2)
+	.byte	14                              @ Abbreviation Code
+	.byte	46                              @ DW_TAG_subprogram
+	.byte	1                               @ DW_CHILDREN_yes
+	.byte	17                              @ DW_AT_low_pc
+	.byte	1                               @ DW_FORM_addr
+	.byte	18                              @ DW_AT_high_pc
+	.byte	6                               @ DW_FORM_data4
+	.byte	64                              @ DW_AT_frame_base
+	.byte	24                              @ DW_FORM_exprloc
+	.byte	3                               @ DW_AT_name
+	.byte	14                              @ DW_FORM_strp
+	.byte	58                              @ DW_AT_decl_file
+	.byte	11                              @ DW_FORM_data1
+	.byte	59                              @ DW_AT_decl_line
+	.byte	5                               @ DW_FORM_data2
+	.byte	39                              @ DW_AT_prototyped
+	.byte	25                              @ DW_FORM_flag_present
+	.byte	73                              @ DW_AT_type
+	.byte	19                              @ DW_FORM_ref4
+	.byte	63                              @ DW_AT_external
+	.byte	25                              @ DW_FORM_flag_present
+	.byte	0                               @ EOM(1)
+	.byte	0                               @ EOM(2)
+	.byte	15                              @ Abbreviation Code
+	.byte	46                              @ DW_TAG_subprogram
+	.byte	1                               @ DW_CHILDREN_yes
+	.byte	17                              @ DW_AT_low_pc
+	.byte	1                               @ DW_FORM_addr
+	.byte	18                              @ DW_AT_high_pc
+	.byte	6                               @ DW_FORM_data4
+	.byte	64                              @ DW_AT_frame_base
+	.byte	24                              @ DW_FORM_exprloc
+	.byte	3                               @ DW_AT_name
+	.byte	14                              @ DW_FORM_strp
+	.byte	58                              @ DW_AT_decl_file
+	.byte	11                              @ DW_FORM_data1
+	.byte	59                              @ DW_AT_decl_line
+	.byte	5                               @ DW_FORM_data2
+	.byte	39                              @ DW_AT_prototyped
+	.byte	25                              @ DW_FORM_flag_present
+	.byte	0                               @ EOM(1)
+	.byte	0                               @ EOM(2)
+	.byte	16                              @ Abbreviation Code
+	.byte	46                              @ DW_TAG_subprogram
+	.byte	0                               @ DW_CHILDREN_no
+	.byte	17                              @ DW_AT_low_pc
+	.byte	1                               @ DW_FORM_addr
+	.byte	18                              @ DW_AT_high_pc
+	.byte	6                               @ DW_FORM_data4
+	.byte	64                              @ DW_AT_frame_base
+	.byte	24                              @ DW_FORM_exprloc
+	.byte	3                               @ DW_AT_name
+	.byte	14                              @ DW_FORM_strp
+	.byte	58                              @ DW_AT_decl_file
+	.byte	11                              @ DW_FORM_data1
+	.byte	59                              @ DW_AT_decl_line
+	.byte	5                               @ DW_FORM_data2
+	.byte	39                              @ DW_AT_prototyped
+	.byte	25                              @ DW_FORM_flag_present
+	.byte	73                              @ DW_AT_type
+	.byte	19                              @ DW_FORM_ref4
+	.byte	63                              @ DW_AT_external
+	.byte	25                              @ DW_FORM_flag_present
+	.byte	0                               @ EOM(1)
+	.byte	0                               @ EOM(2)
+	.byte	17                              @ Abbreviation Code
+	.byte	46                              @ DW_TAG_subprogram
+	.byte	0                               @ DW_CHILDREN_no
+	.byte	17                              @ DW_AT_low_pc
+	.byte	1                               @ DW_FORM_addr
+	.byte	18                              @ DW_AT_high_pc
+	.byte	6                               @ DW_FORM_data4
+	.byte	64                              @ DW_AT_frame_base
+	.byte	24                              @ DW_FORM_exprloc
+	.byte	3                               @ DW_AT_name
+	.byte	14                              @ DW_FORM_strp
+	.byte	58                              @ DW_AT_decl_file
+	.byte	11                              @ DW_FORM_data1
+	.byte	59                              @ DW_AT_decl_line
+	.byte	5                               @ DW_FORM_data2
+	.byte	39                              @ DW_AT_prototyped
+	.byte	25                              @ DW_FORM_flag_present
+	.byte	0                               @ EOM(1)
+	.byte	0                               @ EOM(2)
+	.byte	18                              @ Abbreviation Code
+	.byte	46                              @ DW_TAG_subprogram
+	.byte	1                               @ DW_CHILDREN_yes
+	.byte	17                              @ DW_AT_low_pc
+	.byte	1                               @ DW_FORM_addr
+	.byte	18                              @ DW_AT_high_pc
+	.byte	6                               @ DW_FORM_data4
+	.byte	64                              @ DW_AT_frame_base
+	.byte	24                              @ DW_FORM_exprloc
+	.byte	3                               @ DW_AT_name
+	.byte	14                              @ DW_FORM_strp
+	.byte	58                              @ DW_AT_decl_file
+	.byte	11                              @ DW_FORM_data1
+	.byte	59                              @ DW_AT_decl_line
+	.byte	5                               @ DW_FORM_data2
+	.byte	39                              @ DW_AT_prototyped
+	.byte	25                              @ DW_FORM_flag_present
+	.byte	73                              @ DW_AT_type
+	.byte	19                              @ DW_FORM_ref4
+	.byte	0                               @ EOM(1)
+	.byte	0                               @ EOM(2)
+	.byte	19                              @ Abbreviation Code
+	.byte	21                              @ DW_TAG_subroutine_type
+	.byte	1                               @ DW_CHILDREN_yes
+	.byte	39                              @ DW_AT_prototyped
+	.byte	25                              @ DW_FORM_flag_present
+	.byte	0                               @ EOM(1)
+	.byte	0                               @ EOM(2)
+	.byte	20                              @ Abbreviation Code
+	.byte	5                               @ DW_TAG_formal_parameter
+	.byte	0                               @ DW_CHILDREN_no
+	.byte	73                              @ DW_AT_type
+	.byte	19                              @ DW_FORM_ref4
+	.byte	0                               @ EOM(1)
+	.byte	0                               @ EOM(2)
+	.byte	21                              @ Abbreviation Code
+	.byte	15                              @ DW_TAG_pointer_type
+	.byte	0                               @ DW_CHILDREN_no
+	.byte	0                               @ EOM(1)
+	.byte	0                               @ EOM(2)
+	.byte	22                              @ Abbreviation Code
+	.byte	22                              @ DW_TAG_typedef
+	.byte	0                               @ DW_CHILDREN_no
+	.byte	73                              @ DW_AT_type
+	.byte	19                              @ DW_FORM_ref4
+	.byte	3                               @ DW_AT_name
+	.byte	14                              @ DW_FORM_strp
+	.byte	58                              @ DW_AT_decl_file
+	.byte	11                              @ DW_FORM_data1
+	.byte	59                              @ DW_AT_decl_line
+	.byte	5                               @ DW_FORM_data2
+	.byte	0                               @ EOM(1)
+	.byte	0                               @ EOM(2)
+	.byte	23                              @ Abbreviation Code
+	.byte	19                              @ DW_TAG_structure_type
+	.byte	1                               @ DW_CHILDREN_yes
+	.byte	3                               @ DW_AT_name
+	.byte	14                              @ DW_FORM_strp
+	.byte	11                              @ DW_AT_byte_size
+	.byte	11                              @ DW_FORM_data1
+	.byte	58                              @ DW_AT_decl_file
+	.byte	11                              @ DW_FORM_data1
+	.byte	59                              @ DW_AT_decl_line
+	.byte	5                               @ DW_FORM_data2
+	.byte	0                               @ EOM(1)
+	.byte	0                               @ EOM(2)
+	.byte	24                              @ Abbreviation Code
+	.byte	13                              @ DW_TAG_member
+	.byte	0                               @ DW_CHILDREN_no
+	.byte	3                               @ DW_AT_name
+	.byte	14                              @ DW_FORM_strp
+	.byte	73                              @ DW_AT_type
+	.byte	19                              @ DW_FORM_ref4
+	.byte	58                              @ DW_AT_decl_file
+	.byte	11                              @ DW_FORM_data1
+	.byte	59                              @ DW_AT_decl_line
+	.byte	5                               @ DW_FORM_data2
+	.byte	56                              @ DW_AT_data_member_location
+	.byte	11                              @ DW_FORM_data1
+	.byte	0                               @ EOM(1)
+	.byte	0                               @ EOM(2)
+	.byte	25                              @ Abbreviation Code
+	.byte	1                               @ DW_TAG_array_type
+	.byte	1                               @ DW_CHILDREN_yes
+	.byte	73                              @ DW_AT_type
+	.byte	19                              @ DW_FORM_ref4
+	.byte	0                               @ EOM(1)
+	.byte	0                               @ EOM(2)
+	.byte	26                              @ Abbreviation Code
+	.byte	33                              @ DW_TAG_subrange_type
+	.byte	0                               @ DW_CHILDREN_no
+	.byte	73                              @ DW_AT_type
+	.byte	19                              @ DW_FORM_ref4
+	.byte	55                              @ DW_AT_count
+	.byte	11                              @ DW_FORM_data1
+	.byte	0                               @ EOM(1)
+	.byte	0                               @ EOM(2)
+	.byte	27                              @ Abbreviation Code
+	.byte	19                              @ DW_TAG_structure_type
+	.byte	1                               @ DW_CHILDREN_yes
+	.byte	3                               @ DW_AT_name
+	.byte	14                              @ DW_FORM_strp
+	.byte	11                              @ DW_AT_byte_size
+	.byte	11                              @ DW_FORM_data1
+	.byte	58                              @ DW_AT_decl_file
+	.byte	11                              @ DW_FORM_data1
+	.byte	59                              @ DW_AT_decl_line
+	.byte	11                              @ DW_FORM_data1
+	.byte	0                               @ EOM(1)
+	.byte	0                               @ EOM(2)
+	.byte	28                              @ Abbreviation Code
+	.byte	13                              @ DW_TAG_member
+	.byte	0                               @ DW_CHILDREN_no
+	.byte	3                               @ DW_AT_name
+	.byte	14                              @ DW_FORM_strp
+	.byte	73                              @ DW_AT_type
+	.byte	19                              @ DW_FORM_ref4
+	.byte	58                              @ DW_AT_decl_file
+	.byte	11                              @ DW_FORM_data1
+	.byte	59                              @ DW_AT_decl_line
+	.byte	11                              @ DW_FORM_data1
+	.byte	56                              @ DW_AT_data_member_location
+	.byte	11                              @ DW_FORM_data1
+	.byte	0                               @ EOM(1)
+	.byte	0                               @ EOM(2)
+	.byte	29                              @ Abbreviation Code
+	.byte	36                              @ DW_TAG_base_type
+	.byte	0                               @ DW_CHILDREN_no
+	.byte	3                               @ DW_AT_name
+	.byte	14                              @ DW_FORM_strp
+	.byte	11                              @ DW_AT_byte_size
+	.byte	11                              @ DW_FORM_data1
+	.byte	62                              @ DW_AT_encoding
+	.byte	11                              @ DW_FORM_data1
+	.byte	0                               @ EOM(1)
+	.byte	0                               @ EOM(2)
+	.byte	30                              @ Abbreviation Code
+	.byte	38                              @ DW_TAG_const_type
+	.byte	0                               @ DW_CHILDREN_no
+	.byte	73                              @ DW_AT_type
+	.byte	19                              @ DW_FORM_ref4
+	.byte	0                               @ EOM(1)
+	.byte	0                               @ EOM(2)
+	.byte	31                              @ Abbreviation Code
+	.byte	38                              @ DW_TAG_const_type
+	.byte	0                               @ DW_CHILDREN_no
+	.byte	0                               @ EOM(1)
+	.byte	0                               @ EOM(2)
+	.byte	0                               @ EOM(3)
+	.section	.debug_info,"",%progbits
+.Lcu_begin0:
+	.long	.Ldebug_info_end0-.Ldebug_info_start0 @ Length of Unit
+.Ldebug_info_start0:
+	.short	4                               @ DWARF version number
+	.long	.debug_abbrev                   @ Offset Into Abbrev. Section
+	.byte	4                               @ Address Size (in bytes)
+	.byte	1                               @ Abbrev [1] 0xb:0x577 DW_TAG_compile_unit
+	.long	.Linfo_string0                  @ DW_AT_producer
+	.short	12                              @ DW_AT_language
+	.long	.Linfo_string1                  @ DW_AT_name
+	.long	.Lline_table_start0             @ DW_AT_stmt_list
+	.long	.Linfo_string2                  @ DW_AT_comp_dir
+	.long	0                               @ DW_AT_low_pc
+	.long	.Ldebug_ranges0                 @ DW_AT_ranges
+	.byte	2                               @ Abbrev [2] 0x26:0x12 DW_TAG_variable
+	.long	.Linfo_string3                  @ DW_AT_name
+	.long	56                              @ DW_AT_type
+	.byte	2                               @ DW_AT_decl_file
+	.short	442                             @ DW_AT_decl_line
+	.byte	5                               @ DW_AT_location
+	.byte	3
+	.long	xMaximumPossibleSuppressedTicks
+	.byte	3                               @ Abbrev [3] 0x38:0xb DW_TAG_typedef
+	.long	67                              @ DW_AT_type
+	.long	.Linfo_string5                  @ DW_AT_name
+	.byte	1                               @ DW_AT_decl_file
+	.byte	64                              @ DW_AT_decl_line
+	.byte	4                               @ Abbrev [4] 0x43:0x7 DW_TAG_base_type
+	.long	.Linfo_string4                  @ DW_AT_name
+	.byte	7                               @ DW_AT_encoding
+	.byte	4                               @ DW_AT_byte_size
+	.byte	2                               @ Abbrev [2] 0x4a:0x12 DW_TAG_variable
+	.long	.Linfo_string6                  @ DW_AT_name
+	.long	56                              @ DW_AT_type
+	.byte	2                               @ DW_AT_decl_file
+	.short	436                             @ DW_AT_decl_line
+	.byte	5                               @ DW_AT_location
+	.byte	3
+	.long	ulTimerCountsForOneTick
+	.byte	2                               @ Abbrev [2] 0x5c:0x12 DW_TAG_variable
+	.long	.Linfo_string7                  @ DW_AT_name
+	.long	56                              @ DW_AT_type
+	.byte	2                               @ DW_AT_decl_file
+	.short	448                             @ DW_AT_decl_line
+	.byte	5                               @ DW_AT_location
+	.byte	3
+	.long	ulStoppedTimerCompensation
+	.byte	2                               @ Abbrev [2] 0x6e:0x12 DW_TAG_variable
+	.long	.Linfo_string8                  @ DW_AT_name
+	.long	128                             @ DW_AT_type
+	.byte	2                               @ DW_AT_decl_file
+	.short	407                             @ DW_AT_decl_line
+	.byte	5                               @ DW_AT_location
+	.byte	3
+	.long	ulCriticalNesting
+	.byte	5                               @ Abbrev [5] 0x80:0x5 DW_TAG_volatile_type
+	.long	56                              @ DW_AT_type
+	.byte	6                               @ Abbrev [6] 0x85:0x1b DW_TAG_enumeration_type
+	.long	67                              @ DW_AT_type
+	.byte	4                               @ DW_AT_byte_size
+	.byte	3                               @ DW_AT_decl_file
+	.byte	177                             @ DW_AT_decl_line
+	.byte	7                               @ Abbrev [7] 0x8d:0x6 DW_TAG_enumerator
+	.long	.Linfo_string9                  @ DW_AT_name
+	.byte	0                               @ DW_AT_const_value
+	.byte	7                               @ Abbrev [7] 0x93:0x6 DW_TAG_enumerator
+	.long	.Linfo_string10                 @ DW_AT_name
+	.byte	1                               @ DW_AT_const_value
+	.byte	7                               @ Abbrev [7] 0x99:0x6 DW_TAG_enumerator
+	.long	.Linfo_string11                 @ DW_AT_name
+	.byte	2                               @ DW_AT_const_value
+	.byte	0                               @ End Of Children Mark
+	.byte	8                               @ Abbrev [8] 0xa0:0x5 DW_TAG_pointer_type
+	.long	128                             @ DW_AT_type
+	.byte	3                               @ Abbrev [3] 0xa5:0xb DW_TAG_typedef
+	.long	56                              @ DW_AT_type
+	.long	.Linfo_string12                 @ DW_AT_name
+	.byte	4                               @ DW_AT_decl_file
+	.byte	81                              @ DW_AT_decl_line
+	.byte	3                               @ Abbrev [3] 0xb0:0xb DW_TAG_typedef
+	.long	187                             @ DW_AT_type
+	.long	.Linfo_string14                 @ DW_AT_name
+	.byte	4                               @ DW_AT_decl_file
+	.byte	74                              @ DW_AT_decl_line
+	.byte	4                               @ Abbrev [4] 0xbb:0x7 DW_TAG_base_type
+	.long	.Linfo_string13                 @ DW_AT_name
+	.byte	5                               @ DW_AT_encoding
+	.byte	4                               @ DW_AT_byte_size
+	.byte	8                               @ Abbrev [8] 0xc2:0x5 DW_TAG_pointer_type
+	.long	199                             @ DW_AT_type
+	.byte	3                               @ Abbrev [3] 0xc7:0xb DW_TAG_typedef
+	.long	210                             @ DW_AT_type
+	.long	.Linfo_string16                 @ DW_AT_name
+	.byte	1                               @ DW_AT_decl_file
+	.byte	62                              @ DW_AT_decl_line
+	.byte	4                               @ Abbrev [4] 0xd2:0x7 DW_TAG_base_type
+	.long	.Linfo_string15                 @ DW_AT_name
+	.byte	8                               @ DW_AT_encoding
+	.byte	1                               @ DW_AT_byte_size
+	.byte	9                               @ Abbrev [9] 0xd9:0x86 DW_TAG_subprogram
+	.long	.Lfunc_begin0                   @ DW_AT_low_pc
+	.long	.Lfunc_end0-.Lfunc_begin0       @ DW_AT_high_pc
+	.byte	1                               @ DW_AT_frame_base
+	.byte	93
+	.long	.Linfo_string17                 @ DW_AT_name
+	.byte	2                               @ DW_AT_decl_file
+	.short	453                             @ DW_AT_decl_line
+                                        @ DW_AT_prototyped
+                                        @ DW_AT_external
+	.byte	10                              @ Abbrev [10] 0xeb:0xf DW_TAG_formal_parameter
+	.byte	2                               @ DW_AT_location
+	.byte	145
+	.byte	28
+	.long	.Linfo_string34                 @ DW_AT_name
+	.byte	2                               @ DW_AT_decl_file
+	.short	453                             @ DW_AT_decl_line
+	.long	165                             @ DW_AT_type
+	.byte	11                              @ Abbrev [11] 0xfa:0xf DW_TAG_variable
+	.byte	2                               @ DW_AT_location
+	.byte	145
+	.byte	24
+	.long	.Linfo_string35                 @ DW_AT_name
+	.byte	2                               @ DW_AT_decl_file
+	.short	455                             @ DW_AT_decl_line
+	.long	56                              @ DW_AT_type
+	.byte	11                              @ Abbrev [11] 0x109:0xf DW_TAG_variable
+	.byte	2                               @ DW_AT_location
+	.byte	145
+	.byte	20
+	.long	.Linfo_string36                 @ DW_AT_name
+	.byte	2                               @ DW_AT_decl_file
+	.short	455                             @ DW_AT_decl_line
+	.long	56                              @ DW_AT_type
+	.byte	11                              @ Abbrev [11] 0x118:0xf DW_TAG_variable
+	.byte	2                               @ DW_AT_location
+	.byte	145
+	.byte	16
+	.long	.Linfo_string37                 @ DW_AT_name
+	.byte	2                               @ DW_AT_decl_file
+	.short	455                             @ DW_AT_decl_line
+	.long	56                              @ DW_AT_type
+	.byte	11                              @ Abbrev [11] 0x127:0xf DW_TAG_variable
+	.byte	2                               @ DW_AT_location
+	.byte	145
+	.byte	12
+	.long	.Linfo_string38                 @ DW_AT_name
+	.byte	2                               @ DW_AT_decl_file
+	.short	455                             @ DW_AT_decl_line
+	.long	56                              @ DW_AT_type
+	.byte	11                              @ Abbrev [11] 0x136:0xf DW_TAG_variable
+	.byte	2                               @ DW_AT_location
+	.byte	145
+	.byte	8
+	.long	.Linfo_string39                 @ DW_AT_name
+	.byte	2                               @ DW_AT_decl_file
+	.short	456                             @ DW_AT_decl_line
+	.long	165                             @ DW_AT_type
+	.byte	12                              @ Abbrev [12] 0x145:0x19 DW_TAG_lexical_block
+	.long	.Ltmp26                         @ DW_AT_low_pc
+	.long	.Ltmp31-.Ltmp26                 @ DW_AT_high_pc
+	.byte	11                              @ Abbrev [11] 0x14e:0xf DW_TAG_variable
+	.byte	2                               @ DW_AT_location
+	.byte	145
+	.byte	4
+	.long	.Linfo_string40                 @ DW_AT_name
+	.byte	2                               @ DW_AT_decl_file
+	.short	571                             @ DW_AT_decl_line
+	.long	56                              @ DW_AT_type
+	.byte	0                               @ End Of Children Mark
+	.byte	0                               @ End Of Children Mark
+	.byte	13                              @ Abbrev [13] 0x15f:0x12 DW_TAG_subprogram
+	.long	.Lfunc_begin1                   @ DW_AT_low_pc
+	.long	.Lfunc_end1-.Lfunc_begin1       @ DW_AT_high_pc
+	.byte	1                               @ DW_AT_frame_base
+	.byte	93
+	.long	.Linfo_string18                 @ DW_AT_name
+	.byte	2                               @ DW_AT_decl_file
+	.short	671                             @ DW_AT_decl_line
+                                        @ DW_AT_prototyped
+                                        @ DW_AT_external
+	.byte	13                              @ Abbrev [13] 0x171:0x12 DW_TAG_subprogram
+	.long	.Lfunc_begin2                   @ DW_AT_low_pc
+	.long	.Lfunc_end2-.Lfunc_begin2       @ DW_AT_high_pc
+	.byte	1                               @ DW_AT_frame_base
+	.byte	93
+	.long	.Linfo_string19                 @ DW_AT_name
+	.byte	2                               @ DW_AT_decl_file
+	.short	854                             @ DW_AT_decl_line
+                                        @ DW_AT_prototyped
+                                        @ DW_AT_external
+	.byte	13                              @ Abbrev [13] 0x183:0x12 DW_TAG_subprogram
+	.long	.Lfunc_begin3                   @ DW_AT_low_pc
+	.long	.Lfunc_end3-.Lfunc_begin3       @ DW_AT_high_pc
+	.byte	1                               @ DW_AT_frame_base
+	.byte	93
+	.long	.Linfo_string20                 @ DW_AT_name
+	.byte	2                               @ DW_AT_decl_file
+	.short	866                             @ DW_AT_decl_line
+                                        @ DW_AT_prototyped
+                                        @ DW_AT_external
+	.byte	13                              @ Abbrev [13] 0x195:0x12 DW_TAG_subprogram
+	.long	.Lfunc_begin4                   @ DW_AT_low_pc
+	.long	.Lfunc_end4-.Lfunc_begin4       @ DW_AT_high_pc
+	.byte	1                               @ DW_AT_frame_base
+	.byte	93
+	.long	.Linfo_string21                 @ DW_AT_name
+	.byte	2                               @ DW_AT_decl_file
+	.short	878                             @ DW_AT_decl_line
+                                        @ DW_AT_prototyped
+                                        @ DW_AT_external
+	.byte	9                               @ Abbrev [9] 0x1a7:0x22 DW_TAG_subprogram
+	.long	.Lfunc_begin5                   @ DW_AT_low_pc
+	.long	.Lfunc_end5-.Lfunc_begin5       @ DW_AT_high_pc
+	.byte	1                               @ DW_AT_frame_base
+	.byte	93
+	.long	.Linfo_string22                 @ DW_AT_name
+	.byte	2                               @ DW_AT_decl_file
+	.short	890                             @ DW_AT_decl_line
+                                        @ DW_AT_prototyped
+                                        @ DW_AT_external
+	.byte	11                              @ Abbrev [11] 0x1b9:0xf DW_TAG_variable
+	.byte	2                               @ DW_AT_location
+	.byte	145
+	.byte	4
+	.long	.Linfo_string41                 @ DW_AT_name
+	.byte	2                               @ DW_AT_decl_file
+	.short	892                             @ DW_AT_decl_line
+	.long	56                              @ DW_AT_type
+	.byte	0                               @ End Of Children Mark
+	.byte	9                               @ Abbrev [9] 0x1c9:0x40 DW_TAG_subprogram
+	.long	.Lfunc_begin6                   @ DW_AT_low_pc
+	.long	.Lfunc_end6-.Lfunc_begin6       @ DW_AT_high_pc
+	.byte	1                               @ DW_AT_frame_base
+	.byte	93
+	.long	.Linfo_string23                 @ DW_AT_name
+	.byte	2                               @ DW_AT_decl_file
+	.short	907                             @ DW_AT_decl_line
+                                        @ DW_AT_prototyped
+                                        @ DW_AT_external
+	.byte	10                              @ Abbrev [10] 0x1db:0xf DW_TAG_formal_parameter
+	.byte	2                               @ DW_AT_location
+	.byte	145
+	.byte	12
+	.long	.Linfo_string42                 @ DW_AT_name
+	.byte	2                               @ DW_AT_decl_file
+	.short	907                             @ DW_AT_decl_line
+	.long	1145                            @ DW_AT_type
+	.byte	11                              @ Abbrev [11] 0x1ea:0xf DW_TAG_variable
+	.byte	2                               @ DW_AT_location
+	.byte	145
+	.byte	8
+	.long	.Linfo_string43                 @ DW_AT_name
+	.byte	2                               @ DW_AT_decl_file
+	.short	923                             @ DW_AT_decl_line
+	.long	56                              @ DW_AT_type
+	.byte	11                              @ Abbrev [11] 0x1f9:0xf DW_TAG_variable
+	.byte	2                               @ DW_AT_location
+	.byte	145
+	.byte	4
+	.long	.Linfo_string44                 @ DW_AT_name
+	.byte	2                               @ DW_AT_decl_file
+	.short	932                             @ DW_AT_decl_line
+	.long	199                             @ DW_AT_type
+	.byte	0                               @ End Of Children Mark
+	.byte	14                              @ Abbrev [14] 0x209:0x80 DW_TAG_subprogram
+	.long	.Lfunc_begin7                   @ DW_AT_low_pc
+	.long	.Lfunc_end7-.Lfunc_begin7       @ DW_AT_high_pc
+	.byte	1                               @ DW_AT_frame_base
+	.byte	93
+	.long	.Linfo_string24                 @ DW_AT_name
+	.byte	2                               @ DW_AT_decl_file
+	.short	1028                            @ DW_AT_decl_line
+                                        @ DW_AT_prototyped
+	.long	1129                            @ DW_AT_type
+                                        @ DW_AT_external
+	.byte	10                              @ Abbrev [10] 0x21f:0xf DW_TAG_formal_parameter
+	.byte	2                               @ DW_AT_location
+	.byte	145
+	.byte	16
+	.long	.Linfo_string45                 @ DW_AT_name
+	.byte	2                               @ DW_AT_decl_file
+	.short	1028                            @ DW_AT_decl_line
+	.long	1129                            @ DW_AT_type
+	.byte	10                              @ Abbrev [10] 0x22e:0xf DW_TAG_formal_parameter
+	.byte	2                               @ DW_AT_location
+	.byte	145
+	.byte	12
+	.long	.Linfo_string46                 @ DW_AT_name
+	.byte	2                               @ DW_AT_decl_file
+	.short	1029                            @ DW_AT_decl_line
+	.long	1129                            @ DW_AT_type
+	.byte	10                              @ Abbrev [10] 0x23d:0xf DW_TAG_formal_parameter
+	.byte	2                               @ DW_AT_location
+	.byte	145
+	.byte	8
+	.long	.Linfo_string47                 @ DW_AT_name
+	.byte	2                               @ DW_AT_decl_file
+	.short	1030                            @ DW_AT_decl_line
+	.long	1150                            @ DW_AT_type
+	.byte	10                              @ Abbrev [10] 0x24c:0xf DW_TAG_formal_parameter
+	.byte	2                               @ DW_AT_location
+	.byte	145
+	.byte	4
+	.long	.Linfo_string49                 @ DW_AT_name
+	.byte	2                               @ DW_AT_decl_file
+	.short	1031                            @ DW_AT_decl_line
+	.long	1173                            @ DW_AT_type
+	.byte	10                              @ Abbrev [10] 0x25b:0xf DW_TAG_formal_parameter
+	.byte	2                               @ DW_AT_location
+	.byte	145
+	.byte	28
+	.long	.Linfo_string50                 @ DW_AT_name
+	.byte	2                               @ DW_AT_decl_file
+	.short	1032                            @ DW_AT_decl_line
+	.long	176                             @ DW_AT_type
+	.byte	10                              @ Abbrev [10] 0x26a:0xf DW_TAG_formal_parameter
+	.byte	2                               @ DW_AT_location
+	.byte	145
+	.byte	32
+	.long	.Linfo_string51                 @ DW_AT_name
+	.byte	2                               @ DW_AT_decl_file
+	.short	1033                            @ DW_AT_decl_line
+	.long	1174                            @ DW_AT_type
+	.byte	11                              @ Abbrev [11] 0x279:0xf DW_TAG_variable
+	.byte	2                               @ DW_AT_location
+	.byte	145
+	.byte	0
+	.long	.Linfo_string62                 @ DW_AT_name
+	.byte	2                               @ DW_AT_decl_file
+	.short	1035                            @ DW_AT_decl_line
+	.long	56                              @ DW_AT_type
+	.byte	0                               @ End Of Children Mark
+	.byte	15                              @ Abbrev [15] 0x289:0x22 DW_TAG_subprogram
+	.long	.Lfunc_begin8                   @ DW_AT_low_pc
+	.long	.Lfunc_end8-.Lfunc_begin8       @ DW_AT_high_pc
+	.byte	1                               @ DW_AT_frame_base
+	.byte	93
+	.long	.Linfo_string26                 @ DW_AT_name
+	.byte	2                               @ DW_AT_decl_file
+	.short	692                             @ DW_AT_decl_line
+                                        @ DW_AT_prototyped
+	.byte	11                              @ Abbrev [11] 0x29b:0xf DW_TAG_variable
+	.byte	2                               @ DW_AT_location
+	.byte	145
+	.byte	0
+	.long	.Linfo_string63                 @ DW_AT_name
+	.byte	2                               @ DW_AT_decl_file
+	.short	694                             @ DW_AT_decl_line
+	.long	128                             @ DW_AT_type
+	.byte	0                               @ End Of Children Mark
+	.byte	16                              @ Abbrev [16] 0x2ab:0x16 DW_TAG_subprogram
+	.long	.Lfunc_begin9                   @ DW_AT_low_pc
+	.long	.Lfunc_end9-.Lfunc_begin9       @ DW_AT_high_pc
+	.byte	1                               @ DW_AT_frame_base
+	.byte	93
+	.long	.Linfo_string27                 @ DW_AT_name
+	.byte	2                               @ DW_AT_decl_file
+	.short	1182                            @ DW_AT_decl_line
+                                        @ DW_AT_prototyped
+	.long	176                             @ DW_AT_type
+                                        @ DW_AT_external
+	.byte	17                              @ Abbrev [17] 0x2c1:0x12 DW_TAG_subprogram
+	.long	.Lfunc_begin10                  @ DW_AT_low_pc
+	.long	.Lfunc_end10-.Lfunc_begin10     @ DW_AT_high_pc
+	.byte	1                               @ DW_AT_frame_base
+	.byte	93
+	.long	.Linfo_string28                 @ DW_AT_name
+	.byte	2                               @ DW_AT_decl_file
+	.short	738                             @ DW_AT_decl_line
+                                        @ DW_AT_prototyped
+	.byte	13                              @ Abbrev [13] 0x2d3:0x12 DW_TAG_subprogram
+	.long	.Lfunc_begin11                  @ DW_AT_low_pc
+	.long	.Lfunc_end11-.Lfunc_begin11     @ DW_AT_high_pc
+	.byte	1                               @ DW_AT_frame_base
+	.byte	93
+	.long	.Linfo_string29                 @ DW_AT_name
+	.byte	2                               @ DW_AT_decl_file
+	.short	1327                            @ DW_AT_decl_line
+                                        @ DW_AT_prototyped
+                                        @ DW_AT_external
+	.byte	9                               @ Abbrev [9] 0x2e5:0x8b DW_TAG_subprogram
+	.long	.Lfunc_begin12                  @ DW_AT_low_pc
+	.long	.Lfunc_end12-.Lfunc_begin12     @ DW_AT_high_pc
+	.byte	1                               @ DW_AT_frame_base
+	.byte	93
+	.long	.Linfo_string30                 @ DW_AT_name
+	.byte	2                               @ DW_AT_decl_file
+	.short	1336                            @ DW_AT_decl_line
+                                        @ DW_AT_prototyped
+                                        @ DW_AT_external
+	.byte	10                              @ Abbrev [10] 0x2f7:0xf DW_TAG_formal_parameter
+	.byte	2                               @ DW_AT_location
+	.byte	145
+	.byte	28
+	.long	.Linfo_string51                 @ DW_AT_name
+	.byte	2                               @ DW_AT_decl_file
+	.short	1336                            @ DW_AT_decl_line
+	.long	1174                            @ DW_AT_type
+	.byte	10                              @ Abbrev [10] 0x306:0xf DW_TAG_formal_parameter
+	.byte	2                               @ DW_AT_location
+	.byte	145
+	.byte	24
+	.long	.Linfo_string64                 @ DW_AT_name
+	.byte	2                               @ DW_AT_decl_file
+	.short	1337                            @ DW_AT_decl_line
+	.long	1315                            @ DW_AT_type
+	.byte	10                              @ Abbrev [10] 0x315:0xf DW_TAG_formal_parameter
+	.byte	2                               @ DW_AT_location
+	.byte	145
+	.byte	20
+	.long	.Linfo_string69                 @ DW_AT_name
+	.byte	2                               @ DW_AT_decl_file
+	.short	1338                            @ DW_AT_decl_line
+	.long	1129                            @ DW_AT_type
+	.byte	10                              @ Abbrev [10] 0x324:0xf DW_TAG_formal_parameter
+	.byte	2                               @ DW_AT_location
+	.byte	145
+	.byte	16
+	.long	.Linfo_string70                 @ DW_AT_name
+	.byte	2                               @ DW_AT_decl_file
+	.short	1339                            @ DW_AT_decl_line
+	.long	56                              @ DW_AT_type
+	.byte	11                              @ Abbrev [11] 0x333:0xf DW_TAG_variable
+	.byte	2                               @ DW_AT_location
+	.byte	145
+	.byte	12
+	.long	.Linfo_string71                 @ DW_AT_name
+	.byte	2                               @ DW_AT_decl_file
+	.short	1341                            @ DW_AT_decl_line
+	.long	56                              @ DW_AT_type
+	.byte	11                              @ Abbrev [11] 0x342:0xf DW_TAG_variable
+	.byte	2                               @ DW_AT_location
+	.byte	145
+	.byte	8
+	.long	.Linfo_string72                 @ DW_AT_name
+	.byte	2                               @ DW_AT_decl_file
+	.short	1341                            @ DW_AT_decl_line
+	.long	56                              @ DW_AT_type
+	.byte	11                              @ Abbrev [11] 0x351:0xf DW_TAG_variable
+	.byte	2                               @ DW_AT_location
+	.byte	145
+	.byte	4
+	.long	.Linfo_string73                 @ DW_AT_name
+	.byte	2                               @ DW_AT_decl_file
+	.short	1341                            @ DW_AT_decl_line
+	.long	56                              @ DW_AT_type
+	.byte	11                              @ Abbrev [11] 0x360:0xf DW_TAG_variable
+	.byte	2                               @ DW_AT_location
+	.byte	145
+	.byte	0
+	.long	.Linfo_string74                 @ DW_AT_name
+	.byte	2                               @ DW_AT_decl_file
+	.short	1342                            @ DW_AT_decl_line
+	.long	1375                            @ DW_AT_type
+	.byte	0                               @ End Of Children Mark
+	.byte	14                              @ Abbrev [14] 0x370:0x8f DW_TAG_subprogram
+	.long	.Lfunc_begin13                  @ DW_AT_low_pc
+	.long	.Lfunc_end13-.Lfunc_begin13     @ DW_AT_high_pc
+	.byte	1                               @ DW_AT_frame_base
+	.byte	93
+	.long	.Linfo_string31                 @ DW_AT_name
+	.byte	2                               @ DW_AT_decl_file
+	.short	1461                            @ DW_AT_decl_line
+                                        @ DW_AT_prototyped
+	.long	176                             @ DW_AT_type
+                                        @ DW_AT_external
+	.byte	10                              @ Abbrev [10] 0x386:0xf DW_TAG_formal_parameter
+	.byte	2                               @ DW_AT_location
+	.byte	145
+	.byte	36
+	.long	.Linfo_string77                 @ DW_AT_name
+	.byte	2                               @ DW_AT_decl_file
+	.short	1461                            @ DW_AT_decl_line
+	.long	1393                            @ DW_AT_type
+	.byte	10                              @ Abbrev [10] 0x395:0xf DW_TAG_formal_parameter
+	.byte	2                               @ DW_AT_location
+	.byte	145
+	.byte	32
+	.long	.Linfo_string78                 @ DW_AT_name
+	.byte	2                               @ DW_AT_decl_file
+	.short	1462                            @ DW_AT_decl_line
+	.long	56                              @ DW_AT_type
+	.byte	10                              @ Abbrev [10] 0x3a4:0xf DW_TAG_formal_parameter
+	.byte	2                               @ DW_AT_location
+	.byte	145
+	.byte	28
+	.long	.Linfo_string79                 @ DW_AT_name
+	.byte	2                               @ DW_AT_decl_file
+	.short	1463                            @ DW_AT_decl_line
+	.long	56                              @ DW_AT_type
+	.byte	11                              @ Abbrev [11] 0x3b3:0xf DW_TAG_variable
+	.byte	2                               @ DW_AT_location
+	.byte	145
+	.byte	24
+	.long	.Linfo_string80                 @ DW_AT_name
+	.byte	2                               @ DW_AT_decl_file
+	.short	1466                            @ DW_AT_decl_line
+	.long	56                              @ DW_AT_type
+	.byte	11                              @ Abbrev [11] 0x3c2:0xf DW_TAG_variable
+	.byte	2                               @ DW_AT_location
+	.byte	145
+	.byte	20
+	.long	.Linfo_string81                 @ DW_AT_name
+	.byte	2                               @ DW_AT_decl_file
+	.short	1466                            @ DW_AT_decl_line
+	.long	56                              @ DW_AT_type
+	.byte	11                              @ Abbrev [11] 0x3d1:0xf DW_TAG_variable
+	.byte	2                               @ DW_AT_location
+	.byte	145
+	.byte	16
+	.long	.Linfo_string82                 @ DW_AT_name
+	.byte	2                               @ DW_AT_decl_file
+	.short	1466                            @ DW_AT_decl_line
+	.long	56                              @ DW_AT_type
+	.byte	11                              @ Abbrev [11] 0x3e0:0xf DW_TAG_variable
+	.byte	2                               @ DW_AT_location
+	.byte	145
+	.byte	12
+	.long	.Linfo_string83                 @ DW_AT_name
+	.byte	2                               @ DW_AT_decl_file
+	.short	1467                            @ DW_AT_decl_line
+	.long	176                             @ DW_AT_type
+	.byte	11                              @ Abbrev [11] 0x3ef:0xf DW_TAG_variable
+	.byte	2                               @ DW_AT_location
+	.byte	145
+	.byte	8
+	.long	.Linfo_string84                 @ DW_AT_name
+	.byte	2                               @ DW_AT_decl_file
+	.short	1468                            @ DW_AT_decl_line
+	.long	1399                            @ DW_AT_type
+	.byte	0                               @ End Of Children Mark
+	.byte	18                              @ Abbrev [18] 0x3ff:0x35 DW_TAG_subprogram
+	.long	.Lfunc_begin14                  @ DW_AT_low_pc
+	.long	.Lfunc_end14-.Lfunc_begin14     @ DW_AT_high_pc
+	.byte	1                               @ DW_AT_frame_base
+	.byte	93
+	.long	.Linfo_string32                 @ DW_AT_name
+	.byte	2                               @ DW_AT_decl_file
+	.short	718                             @ DW_AT_decl_line
+                                        @ DW_AT_prototyped
+	.long	56                              @ DW_AT_type
+	.byte	10                              @ Abbrev [10] 0x415:0xf DW_TAG_formal_parameter
+	.byte	2                               @ DW_AT_location
+	.byte	145
+	.byte	4
+	.long	.Linfo_string85                 @ DW_AT_name
+	.byte	2                               @ DW_AT_decl_file
+	.short	718                             @ DW_AT_decl_line
+	.long	56                              @ DW_AT_type
+	.byte	11                              @ Abbrev [11] 0x424:0xf DW_TAG_variable
+	.byte	2                               @ DW_AT_location
+	.byte	145
+	.byte	0
+	.long	.Linfo_string86                 @ DW_AT_name
+	.byte	2                               @ DW_AT_decl_file
+	.short	720                             @ DW_AT_decl_line
+	.long	56                              @ DW_AT_type
+	.byte	0                               @ End Of Children Mark
+	.byte	14                              @ Abbrev [14] 0x434:0x35 DW_TAG_subprogram
+	.long	.Lfunc_begin15                  @ DW_AT_low_pc
+	.long	.Lfunc_end15-.Lfunc_begin15     @ DW_AT_high_pc
+	.byte	1                               @ DW_AT_frame_base
+	.byte	93
+	.long	.Linfo_string33                 @ DW_AT_name
+	.byte	2                               @ DW_AT_decl_file
+	.short	1498                            @ DW_AT_decl_line
+                                        @ DW_AT_prototyped
+	.long	176                             @ DW_AT_type
+                                        @ DW_AT_external
+	.byte	11                              @ Abbrev [11] 0x44a:0xf DW_TAG_variable
+	.byte	2                               @ DW_AT_location
+	.byte	145
+	.byte	4
+	.long	.Linfo_string87                 @ DW_AT_name
+	.byte	2                               @ DW_AT_decl_file
+	.short	1500                            @ DW_AT_decl_line
+	.long	56                              @ DW_AT_type
+	.byte	11                              @ Abbrev [11] 0x459:0xf DW_TAG_variable
+	.byte	2                               @ DW_AT_location
+	.byte	145
+	.byte	0
+	.long	.Linfo_string88                 @ DW_AT_name
+	.byte	2                               @ DW_AT_decl_file
+	.short	1501                            @ DW_AT_decl_line
+	.long	176                             @ DW_AT_type
+	.byte	0                               @ End Of Children Mark
+	.byte	8                               @ Abbrev [8] 0x469:0x5 DW_TAG_pointer_type
+	.long	1134                            @ DW_AT_type
+	.byte	3                               @ Abbrev [3] 0x46e:0xb DW_TAG_typedef
+	.long	56                              @ DW_AT_type
+	.long	.Linfo_string25                 @ DW_AT_name
+	.byte	4                               @ DW_AT_decl_file
+	.byte	73                              @ DW_AT_decl_line
+	.byte	8                               @ Abbrev [8] 0x479:0x5 DW_TAG_pointer_type
+	.long	56                              @ DW_AT_type
+	.byte	3                               @ Abbrev [3] 0x47e:0xb DW_TAG_typedef
+	.long	1161                            @ DW_AT_type
+	.long	.Linfo_string48                 @ DW_AT_name
+	.byte	5                               @ DW_AT_decl_file
+	.byte	36                              @ DW_AT_decl_line
+	.byte	8                               @ Abbrev [8] 0x489:0x5 DW_TAG_pointer_type
+	.long	1166                            @ DW_AT_type
+	.byte	19                              @ Abbrev [19] 0x48e:0x7 DW_TAG_subroutine_type
+                                        @ DW_AT_prototyped
+	.byte	20                              @ Abbrev [20] 0x48f:0x5 DW_TAG_formal_parameter
+	.long	1173                            @ DW_AT_type
+	.byte	0                               @ End Of Children Mark
+	.byte	21                              @ Abbrev [21] 0x495:0x1 DW_TAG_pointer_type
+	.byte	8                               @ Abbrev [8] 0x496:0x5 DW_TAG_pointer_type
+	.long	1179                            @ DW_AT_type
+	.byte	22                              @ Abbrev [22] 0x49b:0xc DW_TAG_typedef
+	.long	1191                            @ DW_AT_type
+	.long	.Linfo_string61                 @ DW_AT_name
+	.byte	4                               @ DW_AT_decl_file
+	.short	269                             @ DW_AT_decl_line
+	.byte	23                              @ Abbrev [23] 0x4a7:0x31 DW_TAG_structure_type
+	.long	.Linfo_string60                 @ DW_AT_name
+	.byte	120                             @ DW_AT_byte_size
+	.byte	4                               @ DW_AT_decl_file
+	.short	264                             @ DW_AT_decl_line
+	.byte	24                              @ Abbrev [24] 0x4b0:0xd DW_TAG_member
+	.long	.Linfo_string52                 @ DW_AT_name
+	.long	56                              @ DW_AT_type
+	.byte	4                               @ DW_AT_decl_file
+	.short	266                             @ DW_AT_decl_line
+	.byte	0                               @ DW_AT_data_member_location
+	.byte	24                              @ Abbrev [24] 0x4bd:0xd DW_TAG_member
+	.long	.Linfo_string53                 @ DW_AT_name
+	.long	1240                            @ DW_AT_type
+	.byte	4                               @ DW_AT_decl_file
+	.short	267                             @ DW_AT_decl_line
+	.byte	4                               @ DW_AT_data_member_location
+	.byte	24                              @ Abbrev [24] 0x4ca:0xd DW_TAG_member
+	.long	.Linfo_string59                 @ DW_AT_name
+	.long	1303                            @ DW_AT_type
+	.byte	4                               @ DW_AT_decl_file
+	.short	268                             @ DW_AT_decl_line
+	.byte	36                              @ DW_AT_data_member_location
+	.byte	0                               @ End Of Children Mark
+	.byte	25                              @ Abbrev [25] 0x4d8:0xc DW_TAG_array_type
+	.long	1252                            @ DW_AT_type
+	.byte	26                              @ Abbrev [26] 0x4dd:0x6 DW_TAG_subrange_type
+	.long	1296                            @ DW_AT_type
+	.byte	4                               @ DW_AT_count
+	.byte	0                               @ End Of Children Mark
+	.byte	3                               @ Abbrev [3] 0x4e4:0xb DW_TAG_typedef
+	.long	1263                            @ DW_AT_type
+	.long	.Linfo_string57                 @ DW_AT_name
+	.byte	4                               @ DW_AT_decl_file
+	.byte	196                             @ DW_AT_decl_line
+	.byte	27                              @ Abbrev [27] 0x4ef:0x21 DW_TAG_structure_type
+	.long	.Linfo_string56                 @ DW_AT_name
+	.byte	8                               @ DW_AT_byte_size
+	.byte	4                               @ DW_AT_decl_file
+	.byte	192                             @ DW_AT_decl_line
+	.byte	28                              @ Abbrev [28] 0x4f7:0xc DW_TAG_member
+	.long	.Linfo_string54                 @ DW_AT_name
+	.long	56                              @ DW_AT_type
+	.byte	4                               @ DW_AT_decl_file
+	.byte	194                             @ DW_AT_decl_line
+	.byte	0                               @ DW_AT_data_member_location
+	.byte	28                              @ Abbrev [28] 0x503:0xc DW_TAG_member
+	.long	.Linfo_string55                 @ DW_AT_name
+	.long	56                              @ DW_AT_type
+	.byte	4                               @ DW_AT_decl_file
+	.byte	195                             @ DW_AT_decl_line
+	.byte	4                               @ DW_AT_data_member_location
+	.byte	0                               @ End Of Children Mark
+	.byte	29                              @ Abbrev [29] 0x510:0x7 DW_TAG_base_type
+	.long	.Linfo_string58                 @ DW_AT_name
+	.byte	8                               @ DW_AT_byte_size
+	.byte	7                               @ DW_AT_encoding
+	.byte	25                              @ Abbrev [25] 0x517:0xc DW_TAG_array_type
+	.long	56                              @ DW_AT_type
+	.byte	26                              @ Abbrev [26] 0x51c:0x6 DW_TAG_subrange_type
+	.long	1296                            @ DW_AT_type
+	.byte	21                              @ DW_AT_count
+	.byte	0                               @ End Of Children Mark
+	.byte	30                              @ Abbrev [30] 0x523:0x5 DW_TAG_const_type
+	.long	1320                            @ DW_AT_type
+	.byte	8                               @ Abbrev [8] 0x528:0x5 DW_TAG_pointer_type
+	.long	1325                            @ DW_AT_type
+	.byte	30                              @ Abbrev [30] 0x52d:0x5 DW_TAG_const_type
+	.long	1330                            @ DW_AT_type
+	.byte	27                              @ Abbrev [27] 0x532:0x2d DW_TAG_structure_type
+	.long	.Linfo_string68                 @ DW_AT_name
+	.byte	12                              @ DW_AT_byte_size
+	.byte	3                               @ DW_AT_decl_file
+	.byte	133                             @ DW_AT_decl_line
+	.byte	28                              @ Abbrev [28] 0x53a:0xc DW_TAG_member
+	.long	.Linfo_string65                 @ DW_AT_name
+	.long	1173                            @ DW_AT_type
+	.byte	3                               @ DW_AT_decl_file
+	.byte	135                             @ DW_AT_decl_line
+	.byte	0                               @ DW_AT_data_member_location
+	.byte	28                              @ Abbrev [28] 0x546:0xc DW_TAG_member
+	.long	.Linfo_string66                 @ DW_AT_name
+	.long	56                              @ DW_AT_type
+	.byte	3                               @ DW_AT_decl_file
+	.byte	136                             @ DW_AT_decl_line
+	.byte	4                               @ DW_AT_data_member_location
+	.byte	28                              @ Abbrev [28] 0x552:0xc DW_TAG_member
+	.long	.Linfo_string67                 @ DW_AT_name
+	.long	56                              @ DW_AT_type
+	.byte	3                               @ DW_AT_decl_file
+	.byte	137                             @ DW_AT_decl_line
+	.byte	8                               @ DW_AT_data_member_location
+	.byte	0                               @ End Of Children Mark
+	.byte	3                               @ Abbrev [3] 0x55f:0xb DW_TAG_typedef
+	.long	1386                            @ DW_AT_type
+	.long	.Linfo_string76                 @ DW_AT_name
+	.byte	1                               @ DW_AT_decl_file
+	.byte	58                              @ DW_AT_decl_line
+	.byte	4                               @ Abbrev [4] 0x56a:0x7 DW_TAG_base_type
+	.long	.Linfo_string75                 @ DW_AT_name
+	.byte	5                               @ DW_AT_encoding
+	.byte	4                               @ DW_AT_byte_size
+	.byte	8                               @ Abbrev [8] 0x571:0x5 DW_TAG_pointer_type
+	.long	1398                            @ DW_AT_type
+	.byte	31                              @ Abbrev [31] 0x576:0x1 DW_TAG_const_type
+	.byte	8                               @ Abbrev [8] 0x577:0x5 DW_TAG_pointer_type
+	.long	1404                            @ DW_AT_type
+	.byte	30                              @ Abbrev [30] 0x57c:0x5 DW_TAG_const_type
+	.long	1179                            @ DW_AT_type
+	.byte	0                               @ End Of Children Mark
+.Ldebug_info_end0:
+	.section	.debug_ranges,"",%progbits
+.Ldebug_ranges0:
+	.long	.Lfunc_begin0
+	.long	.Lfunc_end0
+	.long	.Lfunc_begin1
+	.long	.Lfunc_end5
+	.long	.Lfunc_begin7
+	.long	.Lfunc_end7
+	.long	.Lfunc_begin9
+	.long	.Lfunc_end14
+	.long	.Lfunc_begin6
+	.long	.Lfunc_end6
+	.long	.Lfunc_begin8
+	.long	.Lfunc_end8
+	.long	.Lfunc_begin15
+	.long	.Lfunc_end15
+	.long	0
+	.long	0
+	.section	.debug_str,"MS",%progbits,1
+.Linfo_string0:
+	.asciz	"Component: Arm Compiler for Embedded 6.19 Tool: armclang [5e73cb00]" @ string offset=0
+.Linfo_string1:
+	.asciz	"../../../../Source/portable/GCC/ARM_CM23_NTZ/non_secure\\port.c" @ string offset=68
+.Linfo_string2:
+	.asciz	"C:\\Users\\karahulx\\Downloads\\Kernel\\FreeRTOS\\FreeRTOS\\Demo\\CORTEX_MPU_M23_Nuvoton_NuMaker_PFM_M2351_IAR_GCC\\Projects_NTZ\\Keil" @ string offset=131
+.Linfo_string3:
+	.asciz	"xMaximumPossibleSuppressedTicks" @ string offset=256
+.Linfo_string4:
+	.asciz	"unsigned int"                  @ string offset=288
+.Linfo_string5:
+	.asciz	"uint32_t"                      @ string offset=301
+.Linfo_string6:
+	.asciz	"ulTimerCountsForOneTick"       @ string offset=310
+.Linfo_string7:
+	.asciz	"ulStoppedTimerCompensation"    @ string offset=334
+.Linfo_string8:
+	.asciz	"ulCriticalNesting"             @ string offset=361
+.Linfo_string9:
+	.asciz	"eAbortSleep"                   @ string offset=379
+.Linfo_string10:
+	.asciz	"eStandardSleep"                @ string offset=391
+.Linfo_string11:
+	.asciz	"eNoTasksWaitingTimeout"        @ string offset=406
+.Linfo_string12:
+	.asciz	"TickType_t"                    @ string offset=429
+.Linfo_string13:
+	.asciz	"long"                          @ string offset=440
+.Linfo_string14:
+	.asciz	"BaseType_t"                    @ string offset=445
+.Linfo_string15:
+	.asciz	"unsigned char"                 @ string offset=456
+.Linfo_string16:
+	.asciz	"uint8_t"                       @ string offset=470
+.Linfo_string17:
+	.asciz	"vPortSuppressTicksAndSleep"    @ string offset=478
+.Linfo_string18:
+	.asciz	"vPortSetupTimerInterrupt"      @ string offset=505
+.Linfo_string19:
+	.asciz	"vPortYield"                    @ string offset=530
+.Linfo_string20:
+	.asciz	"vPortEnterCritical"            @ string offset=541
+.Linfo_string21:
+	.asciz	"vPortExitCritical"             @ string offset=560
+.Linfo_string22:
+	.asciz	"SysTick_Handler"               @ string offset=578
+.Linfo_string23:
+	.asciz	"vPortSVCHandler_C"             @ string offset=594
+.Linfo_string24:
+	.asciz	"pxPortInitialiseStack"         @ string offset=612
+.Linfo_string25:
+	.asciz	"StackType_t"                   @ string offset=634
+.Linfo_string26:
+	.asciz	"prvTaskExitError"              @ string offset=646
+.Linfo_string27:
+	.asciz	"xPortStartScheduler"           @ string offset=663
+.Linfo_string28:
+	.asciz	"prvSetupMPU"                   @ string offset=683
+.Linfo_string29:
+	.asciz	"vPortEndScheduler"             @ string offset=695
+.Linfo_string30:
+	.asciz	"vPortStoreTaskMPUSettings"     @ string offset=713
+.Linfo_string31:
+	.asciz	"xPortIsAuthorizedToAccessBuffer" @ string offset=739
+.Linfo_string32:
+	.asciz	"prvGetRegionAccessPermissions" @ string offset=771
+.Linfo_string33:
+	.asciz	"xPortIsInsideInterrupt"        @ string offset=801
+.Linfo_string34:
+	.asciz	"xExpectedIdleTime"             @ string offset=824
+.Linfo_string35:
+	.asciz	"ulReloadValue"                 @ string offset=842
+.Linfo_string36:
+	.asciz	"ulCompleteTickPeriods"         @ string offset=856
+.Linfo_string37:
+	.asciz	"ulCompletedSysTickDecrements"  @ string offset=878
+.Linfo_string38:
+	.asciz	"ulSysTickDecrementsLeft"       @ string offset=907
+.Linfo_string39:
+	.asciz	"xModifiableIdleTime"           @ string offset=931
+.Linfo_string40:
+	.asciz	"ulCalculatedLoadValue"         @ string offset=951
+.Linfo_string41:
+	.asciz	"ulPreviousMask"                @ string offset=973
+.Linfo_string42:
+	.asciz	"pulCallerStackAddress"         @ string offset=988
+.Linfo_string43:
+	.asciz	"ulPC"                          @ string offset=1010
+.Linfo_string44:
+	.asciz	"ucSVCNumber"                   @ string offset=1015
+.Linfo_string45:
+	.asciz	"pxTopOfStack"                  @ string offset=1027
+.Linfo_string46:
+	.asciz	"pxEndOfStack"                  @ string offset=1040
+.Linfo_string47:
+	.asciz	"pxCode"                        @ string offset=1053
+.Linfo_string48:
+	.asciz	"TaskFunction_t"                @ string offset=1060
+.Linfo_string49:
+	.asciz	"pvParameters"                  @ string offset=1075
+.Linfo_string50:
+	.asciz	"xRunPrivileged"                @ string offset=1088
+.Linfo_string51:
+	.asciz	"xMPUSettings"                  @ string offset=1103
+.Linfo_string52:
+	.asciz	"ulMAIR0"                       @ string offset=1116
+.Linfo_string53:
+	.asciz	"xRegionsSettings"              @ string offset=1124
+.Linfo_string54:
+	.asciz	"ulRBAR"                        @ string offset=1141
+.Linfo_string55:
+	.asciz	"ulRLAR"                        @ string offset=1148
+.Linfo_string56:
+	.asciz	"MPURegionSettings"             @ string offset=1155
+.Linfo_string57:
+	.asciz	"MPURegionSettings_t"           @ string offset=1173
+.Linfo_string58:
+	.asciz	"__ARRAY_SIZE_TYPE__"           @ string offset=1193
+.Linfo_string59:
+	.asciz	"ulContext"                     @ string offset=1213
+.Linfo_string60:
+	.asciz	"MPU_SETTINGS"                  @ string offset=1223
+.Linfo_string61:
+	.asciz	"xMPU_SETTINGS"                 @ string offset=1236
+.Linfo_string62:
+	.asciz	"ulIndex"                       @ string offset=1250
+.Linfo_string63:
+	.asciz	"ulDummy"                       @ string offset=1258
+.Linfo_string64:
+	.asciz	"xRegions"                      @ string offset=1266
+.Linfo_string65:
+	.asciz	"pvBaseAddress"                 @ string offset=1275
+.Linfo_string66:
+	.asciz	"ulLengthInBytes"               @ string offset=1289
+.Linfo_string67:
+	.asciz	"ulParameters"                  @ string offset=1305
+.Linfo_string68:
+	.asciz	"xMEMORY_REGION"                @ string offset=1318
+.Linfo_string69:
+	.asciz	"pxBottomOfStack"               @ string offset=1333
+.Linfo_string70:
+	.asciz	"ulStackDepth"                  @ string offset=1349
+.Linfo_string71:
+	.asciz	"ulRegionStartAddress"          @ string offset=1362
+.Linfo_string72:
+	.asciz	"ulRegionEndAddress"            @ string offset=1383
+.Linfo_string73:
+	.asciz	"ulRegionNumber"                @ string offset=1402
+.Linfo_string74:
+	.asciz	"lIndex"                        @ string offset=1417
+.Linfo_string75:
+	.asciz	"int"                           @ string offset=1424
+.Linfo_string76:
+	.asciz	"int32_t"                       @ string offset=1428
+.Linfo_string77:
+	.asciz	"pvBuffer"                      @ string offset=1436
+.Linfo_string78:
+	.asciz	"ulBufferLength"                @ string offset=1445
+.Linfo_string79:
+	.asciz	"ulAccessRequested"             @ string offset=1460
+.Linfo_string80:
+	.asciz	"i"                             @ string offset=1478
+.Linfo_string81:
+	.asciz	"ulBufferStartAddress"          @ string offset=1480
+.Linfo_string82:
+	.asciz	"ulBufferEndAddress"            @ string offset=1501
+.Linfo_string83:
+	.asciz	"xAccessGranted"                @ string offset=1520
+.Linfo_string84:
+	.asciz	"xTaskMpuSettings"              @ string offset=1535
+.Linfo_string85:
+	.asciz	"ulRBARValue"                   @ string offset=1552
+.Linfo_string86:
+	.asciz	"ulAccessPermissions"           @ string offset=1564
+.Linfo_string87:
+	.asciz	"ulCurrentInterrupt"            @ string offset=1584
+.Linfo_string88:
+	.asciz	"xReturn"                       @ string offset=1603
+	.ident	"Component: Arm Compiler for Embedded 6.19 Tool: armclang [5e73cb00]"
+	.section	".note.GNU-stack","",%progbits
+	.eabi_attribute	30, 6	@ Tag_ABI_optimization_goals
+	.ARM_attribute	16, 1	@ Tag_AV_eba
+	.section	.debug_line,"",%progbits
+.Lline_table_start0:

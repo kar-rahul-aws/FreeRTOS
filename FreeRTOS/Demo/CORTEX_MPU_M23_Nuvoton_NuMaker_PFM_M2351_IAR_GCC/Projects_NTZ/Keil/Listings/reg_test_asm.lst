@@ -1,0 +1,474 @@
+	.text
+	.syntax unified
+	.eabi_attribute	67, "2.09"	@ Tag_conformance
+	.eabi_attribute	6, 16	@ Tag_CPU_arch
+	.eabi_attribute	7, 77	@ Tag_CPU_arch_profile
+	.eabi_attribute	8, 0	@ Tag_ARM_ISA_use
+	.eabi_attribute	9, 3	@ Tag_THUMB_ISA_use
+	.eabi_attribute	34, 0	@ Tag_CPU_unaligned_access
+	.eabi_attribute	17, 1	@ Tag_ABI_PCS_GOT_use
+	.eabi_attribute	20, 2	@ Tag_ABI_FP_denormal
+	.eabi_attribute	21, 0	@ Tag_ABI_FP_exceptions
+	.eabi_attribute	23, 1	@ Tag_ABI_FP_number_model
+	.eabi_attribute	24, 1	@ Tag_ABI_align_needed
+	.eabi_attribute	25, 1	@ Tag_ABI_align_preserved
+	.eabi_attribute	38, 1	@ Tag_ABI_FP_16bit_format
+	.eabi_attribute	18, 4	@ Tag_ABI_PCS_wchar_t
+	.eabi_attribute	26, 2	@ Tag_ABI_enum_size
+	.eabi_attribute	14, 0	@ Tag_ABI_PCS_R9_use
+	.file	"reg_test_asm.c"
+	.section	.text.vRegTest1Asm_NonSecure,"ax",%progbits
+	.hidden	vRegTest1Asm_NonSecure          @ -- Begin function vRegTest1Asm_NonSecure
+	.globl	vRegTest1Asm_NonSecure
+	.p2align	1
+	.type	vRegTest1Asm_NonSecure,%function
+	.code	16                              @ @vRegTest1Asm_NonSecure
+	.thumb_func
+vRegTest1Asm_NonSecure:
+.Lfunc_begin0:
+	.file	1 "C:\\Users\\karahulx\\Downloads\\Kernel\\FreeRTOS\\FreeRTOS\\Demo\\CORTEX_MPU_M23_Nuvoton_NuMaker_PFM_M2351_IAR_GCC\\Projects_NTZ\\Keil" "../../../Common/ARMv8M/reg_tests/GCC/ARM_CM23/non_secure/reg_test_asm.c"
+	.loc	1 40 0                          @ ../../../Common/ARMv8M/reg_tests/GCC/ARM_CM23/non_secure/reg_test_asm.c:40:0
+	.fnstart
+	.cfi_sections .debug_frame
+	.cfi_startproc
+@ %bb.0:
+	.loc	1 41 5 prologue_end             @ ../../../Common/ARMv8M/reg_tests/GCC/ARM_CM23/non_secure/reg_test_asm.c:41:5
+	@APP
+
+	@ Fill the core registers with known values. 
+	movs	r1, #101
+	movs	r2, #102
+	movs	r3, #103
+	movs	r4, #104
+	movs	r5, #105
+	movs	r6, #106
+	movs	r7, #107
+	movs	r0, #108
+	mov	r8, r0
+	movs	r0, #109
+	mov	r9, r0
+	movs	r0, #110
+	mov	r10, r0
+	movs	r0, #111
+	mov	r11, r0
+	movs	r0, #112
+	mov	r12, r0
+	movs	r0, #100
+
+reg1_loop:
+
+	@ Verify that core registers contain correct values. 
+	cmp	r0, #100
+	bne	reg1_error_loop
+	cmp	r1, #101
+	bne	reg1_error_loop
+	cmp	r2, #102
+	bne	reg1_error_loop
+	cmp	r3, #103
+	bne	reg1_error_loop
+	cmp	r4, #104
+	bne	reg1_error_loop
+	cmp	r5, #105
+	bne	reg1_error_loop
+	cmp	r6, #106
+	bne	reg1_error_loop
+	cmp	r7, #107
+	bne	reg1_error_loop
+	movs	r0, #108
+	cmp	r8, r0
+	bne	reg1_error_loop
+	movs	r0, #109
+	cmp	r9, r0
+	bne	reg1_error_loop
+	movs	r0, #110
+	cmp	r10, r0
+	bne	reg1_error_loop
+	movs	r0, #111
+	cmp	r11, r0
+	bne	reg1_error_loop
+	movs	r0, #112
+	cmp	r12, r0
+	bne	reg1_error_loop
+
+	@ Everything passed, inc the loop counter. 
+	push	{r1}
+	ldr	r0, .Ltmp0
+	ldr	r1, [r0]
+	adds	r1, r1, #1
+	str	r1, [r0]
+
+	@ Yield to increase test coverage. 
+	movs	r0, #1
+	ldr	r1, .Ltmp1
+	lsls	r0, r0, #28
+	str	r0, [r1]
+	dsb	sy
+	pop	{r1}
+
+	@ Start again. 
+	movs	r0, #100
+	b	reg1_loop
+
+reg1_error_loop:	@ If this line is hit then there was an error in      
+	@     * a core register value. The loop ensures the         
+	@     * loop counter stops incrementing. 
+
+	b	reg1_error_loop
+	nop
+
+	@NO_APP
+.Ltmp2:
+.Lfunc_end0:
+	.size	vRegTest1Asm_NonSecure, .Lfunc_end0-vRegTest1Asm_NonSecure
+	.cfi_endproc
+	.cantunwind
+	.fnend
+                                        @ -- End function
+	.section	.text.vRegTest2Asm_NonSecure,"ax",%progbits
+	.hidden	vRegTest2Asm_NonSecure          @ -- Begin function vRegTest2Asm_NonSecure
+	.globl	vRegTest2Asm_NonSecure
+	.p2align	1
+	.type	vRegTest2Asm_NonSecure,%function
+	.code	16                              @ @vRegTest2Asm_NonSecure
+	.thumb_func
+vRegTest2Asm_NonSecure:
+.Lfunc_begin1:
+	.loc	1 131 0                         @ ../../../Common/ARMv8M/reg_tests/GCC/ARM_CM23/non_secure/reg_test_asm.c:131:0
+	.fnstart
+	.cfi_startproc
+@ %bb.0:
+	.loc	1 132 5 prologue_end            @ ../../../Common/ARMv8M/reg_tests/GCC/ARM_CM23/non_secure/reg_test_asm.c:132:5
+	@APP
+
+	@ Fill the core registers with known values. 
+	movs	r1, #1
+	movs	r2, #2
+	movs	r3, #3
+	movs	r4, #4
+	movs	r5, #5
+	movs	r6, #6
+	movs	r7, #7
+	movs	r0, #8
+	mov	r8, r0
+	movs	r0, #9
+	mov	r9, r0
+	movs	r0, #10
+	mov	r10, r0
+	movs	r0, #11
+	mov	r11, r0
+	movs	r0, #12
+	mov	r12, r0
+	movs	r0, #10
+
+reg2_loop:
+
+	@ Verify that core registers contain correct values. 
+	cmp	r0, #10
+	bne	reg2_error_loop
+	cmp	r1, #1
+	bne	reg2_error_loop
+	cmp	r2, #2
+	bne	reg2_error_loop
+	cmp	r3, #3
+	bne	reg2_error_loop
+	cmp	r4, #4
+	bne	reg2_error_loop
+	cmp	r5, #5
+	bne	reg2_error_loop
+	cmp	r6, #6
+	bne	reg2_error_loop
+	cmp	r7, #7
+	bne	reg2_error_loop
+	movs	r0, #8
+	cmp	r8, r0
+	bne	reg2_error_loop
+	movs	r0, #9
+	cmp	r9, r0
+	bne	reg2_error_loop
+	movs	r0, #10
+	cmp	r10, r0
+	bne	reg2_error_loop
+	movs	r0, #11
+	cmp	r11, r0
+	bne	reg2_error_loop
+	movs	r0, #12
+	cmp	r12, r0
+	bne	reg2_error_loop
+
+	@ Everything passed, inc the loop counter. 
+	push	{r1}
+	ldr	r0, .Ltmp3
+	ldr	r1, [r0]
+	adds	r1, r1, #1
+	str	r1, [r0]
+	pop	{r1}
+
+	@ Start again. 
+	movs	r0, #10
+	b	reg2_loop
+
+reg2_error_loop:	@ If this line is hit then there was an error in      
+	@     * a core register value. The loop ensures the         
+	@     * loop counter stops incrementing. 
+
+	b	reg2_error_loop
+	nop
+
+	@NO_APP
+.Ltmp4:
+.Lfunc_end1:
+	.size	vRegTest2Asm_NonSecure, .Lfunc_end1-vRegTest2Asm_NonSecure
+	.cfi_endproc
+	.cantunwind
+	.fnend
+                                        @ -- End function
+	.section	.text.vRegTestAsm_NonSecureCallback,"ax",%progbits
+	.hidden	vRegTestAsm_NonSecureCallback   @ -- Begin function vRegTestAsm_NonSecureCallback
+	.globl	vRegTestAsm_NonSecureCallback
+	.p2align	1
+	.type	vRegTestAsm_NonSecureCallback,%function
+	.code	16                              @ @vRegTestAsm_NonSecureCallback
+	.thumb_func
+vRegTestAsm_NonSecureCallback:
+.Lfunc_begin2:
+	.loc	1 215 0                         @ ../../../Common/ARMv8M/reg_tests/GCC/ARM_CM23/non_secure/reg_test_asm.c:215:0
+	.fnstart
+	.cfi_startproc
+@ %bb.0:
+	.loc	1 216 5 prologue_end            @ ../../../Common/ARMv8M/reg_tests/GCC/ARM_CM23/non_secure/reg_test_asm.c:216:5
+	@APP
+
+	@ Store callee saved registers. 
+	push	{r4, r5, r6, r7}
+	mov	r0, r8
+	mov	r1, r9
+	mov	r2, r10
+	mov	r3, r11
+	mov	r4, r12
+	push	{r0, r1, r2, r3, r4}
+
+	@ Fill the core registers with known values. 
+	movs	r1, #151
+	movs	r2, #152
+	movs	r3, #153
+	movs	r4, #154
+	movs	r5, #155
+	movs	r6, #156
+	movs	r7, #157
+	movs	r0, #158
+	mov	r8, r0
+	movs	r0, #159
+	mov	r9, r0
+	movs	r0, #160
+	mov	r10, r0
+	movs	r0, #161
+	mov	r11, r0
+	movs	r0, #162
+	mov	r12, r0
+	movs	r0, #150
+
+	@ Force a context switch by pending non-secure sv. 
+	push	{r0, r1}
+	movs	r0, #1
+	ldr	r1, .Ltmp5
+	lsls	r0, r0, #28
+	str	r0, [r1]
+	dsb	sy
+	pop	{r0, r1}
+
+	@ Verify that core registers contain correct values. 
+	cmp	r0, #150
+	bne	reg_nscb_error_loop
+	cmp	r1, #151
+	bne	reg_nscb_error_loop
+	cmp	r2, #152
+	bne	reg_nscb_error_loop
+	cmp	r3, #153
+	bne	reg_nscb_error_loop
+	cmp	r4, #154
+	bne	reg_nscb_error_loop
+	cmp	r5, #155
+	bne	reg_nscb_error_loop
+	cmp	r6, #156
+	bne	reg_nscb_error_loop
+	cmp	r7, #157
+	bne	reg_nscb_error_loop
+	movs	r0, #158
+	cmp	r8, r0
+	bne	reg_nscb_error_loop
+	movs	r0, #159
+	cmp	r9, r0
+	bne	reg_nscb_error_loop
+	movs	r0, #160
+	cmp	r10, r0
+	bne	reg_nscb_error_loop
+	movs	r0, #161
+	cmp	r11, r0
+	bne	reg_nscb_error_loop
+	movs	r0, #162
+	cmp	r12, r0
+	bne	reg_nscb_error_loop
+
+	@ Everything passed, finish. 
+	b	reg_nscb_success
+
+reg_nscb_error_loop:	@ If this line is hit then there was an error in          
+	@     * a core register value. The loop ensures the             
+	@     * loop counter stops incrementing. 
+
+	b	reg_nscb_error_loop
+	nop
+
+reg_nscb_success:	@ Restore callee saved registers. 
+
+	pop	{r0, r1, r2, r3, r4}
+	mov	r8, r0
+	mov	r9, r1
+	mov	r10, r2
+	mov	r11, r3
+	mov	r12, r4
+	pop	{r4, r5, r6, r7}
+
+	@NO_APP
+	.loc	1 311 1                         @ ../../../Common/ARMv8M/reg_tests/GCC/ARM_CM23/non_secure/reg_test_asm.c:311:1
+	bx	lr
+.Ltmp6:
+.Lfunc_end2:
+	.size	vRegTestAsm_NonSecureCallback, .Lfunc_end2-vRegTestAsm_NonSecureCallback
+	.cfi_endproc
+	.cantunwind
+	.fnend
+                                        @ -- End function
+	.section	.text.vRegTest1Asm_NonSecure,"ax",%progbits
+	.p2align	2, 0x0
+.Ltmp0:
+	.long	ulRegTest1LoopCounter
+	.p2align	2, 0x0
+.Ltmp1:
+	.long	3758157060
+	.section	.text.vRegTest2Asm_NonSecure,"ax",%progbits
+	.p2align	2, 0x0
+.Ltmp3:
+	.long	ulRegTest2LoopCounter
+	.section	.text.vRegTestAsm_NonSecureCallback,"ax",%progbits
+	.p2align	2, 0x0
+.Ltmp5:
+	.long	3758157060
+	.section	.debug_abbrev,"",%progbits
+	.byte	1                               @ Abbreviation Code
+	.byte	17                              @ DW_TAG_compile_unit
+	.byte	1                               @ DW_CHILDREN_yes
+	.byte	37                              @ DW_AT_producer
+	.byte	14                              @ DW_FORM_strp
+	.byte	19                              @ DW_AT_language
+	.byte	5                               @ DW_FORM_data2
+	.byte	3                               @ DW_AT_name
+	.byte	14                              @ DW_FORM_strp
+	.byte	16                              @ DW_AT_stmt_list
+	.byte	23                              @ DW_FORM_sec_offset
+	.byte	27                              @ DW_AT_comp_dir
+	.byte	14                              @ DW_FORM_strp
+	.byte	17                              @ DW_AT_low_pc
+	.byte	1                               @ DW_FORM_addr
+	.byte	85                              @ DW_AT_ranges
+	.byte	23                              @ DW_FORM_sec_offset
+	.byte	0                               @ EOM(1)
+	.byte	0                               @ EOM(2)
+	.byte	2                               @ Abbreviation Code
+	.byte	46                              @ DW_TAG_subprogram
+	.byte	0                               @ DW_CHILDREN_no
+	.byte	17                              @ DW_AT_low_pc
+	.byte	1                               @ DW_FORM_addr
+	.byte	18                              @ DW_AT_high_pc
+	.byte	6                               @ DW_FORM_data4
+	.byte	64                              @ DW_AT_frame_base
+	.byte	24                              @ DW_FORM_exprloc
+	.byte	3                               @ DW_AT_name
+	.byte	14                              @ DW_FORM_strp
+	.byte	58                              @ DW_AT_decl_file
+	.byte	11                              @ DW_FORM_data1
+	.byte	59                              @ DW_AT_decl_line
+	.byte	11                              @ DW_FORM_data1
+	.byte	39                              @ DW_AT_prototyped
+	.byte	25                              @ DW_FORM_flag_present
+	.byte	63                              @ DW_AT_external
+	.byte	25                              @ DW_FORM_flag_present
+	.byte	0                               @ EOM(1)
+	.byte	0                               @ EOM(2)
+	.byte	0                               @ EOM(3)
+	.section	.debug_info,"",%progbits
+.Lcu_begin0:
+	.long	.Ldebug_info_end0-.Ldebug_info_start0 @ Length of Unit
+.Ldebug_info_start0:
+	.short	4                               @ DWARF version number
+	.long	.debug_abbrev                   @ Offset Into Abbrev. Section
+	.byte	4                               @ Address Size (in bytes)
+	.byte	1                               @ Abbrev [1] 0xb:0x4f DW_TAG_compile_unit
+	.long	.Linfo_string0                  @ DW_AT_producer
+	.short	12                              @ DW_AT_language
+	.long	.Linfo_string1                  @ DW_AT_name
+	.long	.Lline_table_start0             @ DW_AT_stmt_list
+	.long	.Linfo_string2                  @ DW_AT_comp_dir
+	.long	0                               @ DW_AT_low_pc
+	.long	.Ldebug_ranges0                 @ DW_AT_ranges
+	.byte	2                               @ Abbrev [2] 0x26:0x11 DW_TAG_subprogram
+	.long	.Lfunc_begin0                   @ DW_AT_low_pc
+	.long	.Lfunc_end0-.Lfunc_begin0       @ DW_AT_high_pc
+	.byte	1                               @ DW_AT_frame_base
+	.byte	93
+	.long	.Linfo_string3                  @ DW_AT_name
+	.byte	1                               @ DW_AT_decl_file
+	.byte	39                              @ DW_AT_decl_line
+                                        @ DW_AT_prototyped
+                                        @ DW_AT_external
+	.byte	2                               @ Abbrev [2] 0x37:0x11 DW_TAG_subprogram
+	.long	.Lfunc_begin1                   @ DW_AT_low_pc
+	.long	.Lfunc_end1-.Lfunc_begin1       @ DW_AT_high_pc
+	.byte	1                               @ DW_AT_frame_base
+	.byte	93
+	.long	.Linfo_string4                  @ DW_AT_name
+	.byte	1                               @ DW_AT_decl_file
+	.byte	130                             @ DW_AT_decl_line
+                                        @ DW_AT_prototyped
+                                        @ DW_AT_external
+	.byte	2                               @ Abbrev [2] 0x48:0x11 DW_TAG_subprogram
+	.long	.Lfunc_begin2                   @ DW_AT_low_pc
+	.long	.Lfunc_end2-.Lfunc_begin2       @ DW_AT_high_pc
+	.byte	1                               @ DW_AT_frame_base
+	.byte	93
+	.long	.Linfo_string5                  @ DW_AT_name
+	.byte	1                               @ DW_AT_decl_file
+	.byte	214                             @ DW_AT_decl_line
+                                        @ DW_AT_prototyped
+                                        @ DW_AT_external
+	.byte	0                               @ End Of Children Mark
+.Ldebug_info_end0:
+	.section	.debug_ranges,"",%progbits
+.Ldebug_ranges0:
+	.long	.Lfunc_begin0
+	.long	.Lfunc_end0
+	.long	.Lfunc_begin1
+	.long	.Lfunc_end1
+	.long	.Lfunc_begin2
+	.long	.Lfunc_end2
+	.long	0
+	.long	0
+	.section	.debug_str,"MS",%progbits,1
+.Linfo_string0:
+	.asciz	"Component: Arm Compiler for Embedded 6.19 Tool: armclang [5e73cb00]" @ string offset=0
+.Linfo_string1:
+	.asciz	"../../../Common/ARMv8M/reg_tests/GCC/ARM_CM23/non_secure\\reg_test_asm.c" @ string offset=68
+.Linfo_string2:
+	.asciz	"C:\\Users\\karahulx\\Downloads\\Kernel\\FreeRTOS\\FreeRTOS\\Demo\\CORTEX_MPU_M23_Nuvoton_NuMaker_PFM_M2351_IAR_GCC\\Projects_NTZ\\Keil" @ string offset=140
+.Linfo_string3:
+	.asciz	"vRegTest1Asm_NonSecure"        @ string offset=265
+.Linfo_string4:
+	.asciz	"vRegTest2Asm_NonSecure"        @ string offset=288
+.Linfo_string5:
+	.asciz	"vRegTestAsm_NonSecureCallback" @ string offset=311
+	.ident	"Component: Arm Compiler for Embedded 6.19 Tool: armclang [5e73cb00]"
+	.section	".note.GNU-stack","",%progbits
+	.eabi_attribute	30, 6	@ Tag_ABI_optimization_goals
+	.ARM_attribute	16, 1	@ Tag_AV_eba
+	.section	.debug_line,"",%progbits
+.Lline_table_start0:
