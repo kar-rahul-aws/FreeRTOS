@@ -25,7 +25,6 @@
 	</buildSpec>
 	<natures>
 		<nature>org.eclipse.cdt.core.cnature</nature>
-		<nature>com.nxp.mcuxpresso.core.datamodels.sdkNature</nature>
 		<nature>org.eclipse.cdt.managedbuilder.core.managedBuildNature</nature>
 		<nature>org.eclipse.cdt.managedbuilder.core.ScannerConfigNature</nature>
 		<nature>org.eclipse.xtext.ui.shared.xtextNature</nature>
@@ -55,6 +54,136 @@
 			<name>User</name>
 			<type>2</type>
 			<locationURI>DEMO_ROOT/Demo/CORTEX_MPU_M33F_NXP_LPC55S69_MCUXpresso/User</locationURI>
+		</link>
+		<link>
+			<name>Demos/AbortDelay.c</name>
+			<type>1</type>
+			<locationURI>PARENT-3-PROJECT_LOC/Common/ARMv8M/soak_tests/AbortDelay.c</locationURI>
+		</link>
+		<link>
+			<name>Demos/BlockQ.c</name>
+			<type>1</type>
+			<locationURI>PARENT-3-PROJECT_LOC/Common/ARMv8M/soak_tests/BlockQ.c</locationURI>
+		</link>
+		<link>
+			<name>Demos/EventGroupsDemo.c</name>
+			<type>1</type>
+			<locationURI>PARENT-3-PROJECT_LOC/Common/ARMv8M/soak_tests/EventGroupsDemo.c</locationURI>
+		</link>
+		<link>
+			<name>Demos/GenQTest.c</name>
+			<type>1</type>
+			<locationURI>PARENT-3-PROJECT_LOC/Common/ARMv8M/soak_tests/GenQTest.c</locationURI>
+		</link>
+		<link>
+			<name>Demos/IntQueue.c</name>
+			<type>1</type>
+			<locationURI>PARENT-3-PROJECT_LOC/Common/ARMv8M/soak_tests/IntQueue.c</locationURI>
+		</link>
+		<link>
+			<name>Demos/IntQueueTimer.c</name>
+			<type>1</type>
+			<locationURI>PARENT-3-PROJECT_LOC/Common/ARMv8M/soak_tests/IntQueueTimer.c</locationURI>
+		</link>
+		<link>
+			<name>Demos/IntSemTest.c</name>
+			<type>1</type>
+			<locationURI>PARENT-3-PROJECT_LOC/Common/ARMv8M/soak_tests/IntSemTest.c</locationURI>
+		</link>
+		<link>
+			<name>Demos/MessageBufferDemo.c</name>
+			<type>1</type>
+			<locationURI>PARENT-3-PROJECT_LOC/Common/ARMv8M/soak_tests/MessageBufferDemo.c</locationURI>
+		</link>
+		<link>
+			<name>Demos/PollQ.c</name>
+			<type>1</type>
+			<locationURI>PARENT-3-PROJECT_LOC/Common/ARMv8M/soak_tests/PollQ.c</locationURI>
+		</link>
+		<link>
+			<name>Demos/QPeek.c</name>
+			<type>1</type>
+			<locationURI>PARENT-3-PROJECT_LOC/Common/ARMv8M/soak_tests/QPeek.c</locationURI>
+		</link>
+		<link>
+			<name>Demos/QueueOverwrite.c</name>
+			<type>1</type>
+			<locationURI>PARENT-3-PROJECT_LOC/Common/ARMv8M/soak_tests/QueueOverwrite.c</locationURI>
+		</link>
+		<link>
+			<name>Demos/QueueSet.c</name>
+			<type>1</type>
+			<locationURI>PARENT-3-PROJECT_LOC/Common/ARMv8M/soak_tests/QueueSet.c</locationURI>
+		</link>
+		<link>
+			<name>Demos/QueueSetPolling.c</name>
+			<type>1</type>
+			<locationURI>PARENT-3-PROJECT_LOC/Common/ARMv8M/soak_tests/QueueSetPolling.c</locationURI>
+		</link>
+		<link>
+			<name>Demos/StreamBufferDemo.c</name>
+			<type>1</type>
+			<locationURI>PARENT-3-PROJECT_LOC/Common/ARMv8M/soak_tests/StreamBufferDemo.c</locationURI>
+		</link>
+		<link>
+			<name>Demos/StreamBufferInterrupt.c</name>
+			<type>1</type>
+			<locationURI>PARENT-3-PROJECT_LOC/Common/ARMv8M/soak_tests/StreamBufferInterrupt.c</locationURI>
+		</link>
+		<link>
+			<name>Demos/TaskNotify.c</name>
+			<type>1</type>
+			<locationURI>PARENT-3-PROJECT_LOC/Common/ARMv8M/soak_tests/TaskNotify.c</locationURI>
+		</link>
+		<link>
+			<name>Demos/TaskNotifyArray.c</name>
+			<type>1</type>
+			<locationURI>PARENT-3-PROJECT_LOC/Common/ARMv8M/soak_tests/TaskNotifyArray.c</locationURI>
+		</link>
+		<link>
+			<name>Demos/TestRunner.c</name>
+			<type>1</type>
+			<locationURI>PARENT-3-PROJECT_LOC/Common/ARMv8M/soak_tests/TestRunner.c</locationURI>
+		</link>
+		<link>
+			<name>Demos/TimerDemo.c</name>
+			<type>1</type>
+			<locationURI>PARENT-3-PROJECT_LOC/Common/ARMv8M/soak_tests/TimerDemo.c</locationURI>
+		</link>
+		<link>
+			<name>Demos/blocktim.c</name>
+			<type>1</type>
+			<locationURI>PARENT-3-PROJECT_LOC/Common/ARMv8M/soak_tests/blocktim.c</locationURI>
+		</link>
+		<link>
+			<name>Demos/countsem.c</name>
+			<type>1</type>
+			<locationURI>PARENT-3-PROJECT_LOC/Common/ARMv8M/soak_tests/countsem.c</locationURI>
+		</link>
+		<link>
+			<name>Demos/dynamic.c</name>
+			<type>1</type>
+			<locationURI>PARENT-3-PROJECT_LOC/Common/ARMv8M/soak_tests/dynamic.c</locationURI>
+		</link>
+		<link>
+			<name>Demos/flop.c</name>
+			<type>1</type>
+			<locationURI>PARENT-3-PROJECT_LOC/Common/ARMv8M/soak_tests/flop.c</locationURI>
+		</link>
+		<link>
+			<name>Demos/integer.c</name>
+			<type>1</type>
+			<locationURI>PARENT-3-PROJECT_LOC/Common/ARMv8M/soak_tests/integer.c</locationURI>
+		</link>
+		<link>
+			<name>Demos/recmutex.c</name>
+			<type>1</type>
+			<locationURI>PARENT-3-PROJECT_LOC/Common/ARMv8M/soak_tests/recmutex.c</locationURI>
+		</link>
+		<link>
+			<name>Demos/semtest.c</name>
+			<type>1</type>
+			<locationURI>PARENT-3-PROJECT_LOC/Common/ARMv8M/soak_tests/semtest.c</locationURI>
 		</link>
 	</linkedResources>
 	<filteredResources>

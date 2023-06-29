@@ -39,7 +39,7 @@
 /* Demo includes. */
 #include "tz_demo.h"
 #include "mpu_demo.h"
-#include "reg_tests.h"
+#include "TestRunner.h"
 /*-----------------------------------------------------------*/
 
 /**
@@ -87,13 +87,13 @@ int main( void )
 static void prvCreateTasks( void )
 {
     /* Create tasks for the MPU Demo. */
-    vStartMPUDemo();
+    /* vStartMPUDemo(); */
 
     /* Create tasks for the TZ Demo. */
-    vStartTZDemo();
+    /* vStartTZDemo(); */
 
-    /* Create tasks for reg tests. */
-    vStartRegTests();
+    /* Create tasks for soak tests. */
+    vStartTests();
 }
 /*-----------------------------------------------------------*/
 
@@ -111,17 +111,29 @@ void SystemInit( void )
 /*-----------------------------------------------------------*/
 
 /* Stack overflow hook. */
-void vApplicationStackOverflowHook( TaskHandle_t xTask, char *pcTaskName )
+void vApplicationStackOverflowHook( TaskHandle_t xTask,
+                                    char * pcTaskName )
 {
     /* Force an assert. */
     configASSERT( pcTaskName == 0 );
 }
 /*-----------------------------------------------------------*/
 
+/* Malloc Failed hook. */
+void vApplicationMallocFailedHook( void )
+{
+    taskDISABLE_INTERRUPTS();
+
+    for( ;; )
+    {
+    }
+}
+/*-----------------------------------------------------------*/
+
 /* configUSE_STATIC_ALLOCATION is set to 1, so the application must provide an
  * implementation of vApplicationGetIdleTaskMemory() to provide the memory that
  * is used by the Idle task. */
-void vApplicationGetIdleTaskMemory(    StaticTask_t ** ppxIdleTaskTCBBuffer,
+void vApplicationGetIdleTaskMemory( StaticTask_t ** ppxIdleTaskTCBBuffer,
                                     StackType_t ** ppxIdleTaskStackBuffer,
                                     uint32_t * pulIdleTaskStackSize )
 {

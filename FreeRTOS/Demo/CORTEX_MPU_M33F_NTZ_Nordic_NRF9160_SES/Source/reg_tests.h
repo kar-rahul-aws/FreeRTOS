@@ -30,6 +30,7 @@
 /**
  * @brief Creates all the tasks for reg tests.
  */
-void vStartRegTests( void );
+void vStartRegisterTasks( void );
+BaseType_t xAreRegisterTasksStillRunning( void );
 
 #endif /* REG_TESTS_H */

@@ -70,7 +70,7 @@
                 </option>
                 <option>
                     <name>OGLastSavedByProductVersion</name>
-                    <state>9.32.2.57275</state>
+                    <state>9.30.1.50052</state>
                 </option>
                 <option>
                     <name>OGChipSelectEditMenu</name>
@@ -225,6 +225,7 @@
                     <state>DEBUG</state>
                     <state>CPU_LPC55S69JBD100_cm33_core0</state>
                     <state>MCUXPRESSO_SDK</state>
+                    <state>SDK_DEBUGCONSOLE_UART</state>
                 </option>
                 <option>
                     <name>CCPreprocFile</name>
@@ -358,6 +359,7 @@
                     <state>$PROJ_DIR$\..\..\..\Common\ARMv8M\mpu_demo</state>
                     <state>$PROJ_DIR$\..\..\..\Common\ARMv8M\reg_tests\IAR\ARM_CM33\non_secure</state>
                     <state>$PROJ_DIR$\..\..\RegTests</state>
+                    <state>$PROJ_DIR$\..\..\..\Common\include</state>
                 </option>
                 <option>
                     <name>CCStdIncCheck</name>
@@ -1111,6 +1113,84 @@
                 <name>$PROJ_DIR$\..\..\..\Common\ARMv8M\reg_tests\IAR\ARM_CM33\non_secure\reg_test_asm.s</name>
             </file>
         </group>
+        <file>
+            <name>$PROJ_DIR$\..\..\..\Common\ARMv8M\soak_tests\AbortDelay.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\..\Common\ARMv8M\soak_tests\BlockQ.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\..\Common\ARMv8M\soak_tests\blocktim.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\..\Common\ARMv8M\soak_tests\countsem.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\..\Common\ARMv8M\soak_tests\dynamic.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\..\Common\ARMv8M\soak_tests\EventGroupsDemo.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\..\Common\ARMv8M\soak_tests\flop.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\..\Common\ARMv8M\soak_tests\GenQTest.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\..\Common\ARMv8M\soak_tests\integer.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\..\Common\ARMv8M\soak_tests\IntQueue.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\..\Common\ARMv8M\soak_tests\IntQueueTimer.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\..\Common\ARMv8M\soak_tests\IntSemTest.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\..\Common\ARMv8M\soak_tests\MessageBufferDemo.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\..\Common\ARMv8M\soak_tests\PollQ.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\..\Common\ARMv8M\soak_tests\QPeek.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\..\Common\ARMv8M\soak_tests\QueueOverwrite.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\..\Common\ARMv8M\soak_tests\QueueSet.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\..\Common\ARMv8M\soak_tests\QueueSetPolling.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\..\Common\ARMv8M\soak_tests\recmutex.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\..\Common\ARMv8M\soak_tests\semtest.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\..\Common\ARMv8M\soak_tests\StreamBufferDemo.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\..\Common\ARMv8M\soak_tests\StreamBufferInterrupt.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\..\Common\ARMv8M\soak_tests\TaskNotify.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\..\Common\ARMv8M\soak_tests\TaskNotifyArray.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\..\Common\ARMv8M\soak_tests\TestRunner.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\..\Common\ARMv8M\soak_tests\TimerDemo.c</name>
+        </file>
     </group>
     <group>
         <name>FreeRTOS</name>
