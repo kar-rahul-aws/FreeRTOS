@@ -24,12 +24,28 @@
  *
  */
 
-#ifndef REG_TESTS_H
-#define REG_TESTS_H
+/* Scheduler includes. */
+#include "FreeRTOS.h"
+#include "task.h"
 
-/**
- * @brief Creates all the tasks for reg tests.
- */
-void vStartRegTests( void );
+/* Demo includes. */
+#include "IntQueueTimer.h"
+#include "IntQueue.h"
 
-#endif /* REG_TESTS_H */
+extern BaseType_t xErrorStatus[ 8 ];
+/*-----------------------------------------------------------*/
+
+void vInitialiseTimerForIntQueueTest( void )
+{
+    xErrorStatus[ 1 ] = 0xABCD;
+}
+/*-----------------------------------------------------------*/
+
+void IntQueueTestTimerHandler( void )
+{
+    if( xErrorStatus[ 1 ] == 0xABCD )
+    {
+        portYIELD_FROM_ISR( xSecondTimerHandler() );
+    }
+}
+/*-----------------------------------------------------------*/

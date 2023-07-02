@@ -43,12 +43,6 @@ static void prvRegTest3Task( void * pvParameters );
 static void prvRegTest4Task( void * pvParameters );
 
 /*
- * Check task periodically checks that reg tests tasks
- * are running fine.
- */
-static void prvCheckTask( void * pvParameters );
-
-/*
  * Functions implemented in assembly.
  */
 extern void vRegTest1Asm( void );
@@ -56,17 +50,6 @@ extern void vRegTest2Asm( void );
 extern void vRegTest3Asm( void );
 extern void vRegTest4Asm( void );
 /*-----------------------------------------------------------*/
-
-/*
- * Priority of the check task.
- */
-#define CHECK_TASK_PRIORITY                 ( configMAX_PRIORITIES - 1 )
-
-/*
- * Frequency of check task.
- */
-#define NO_ERROR_CHECK_TASK_PERIOD          ( pdMS_TO_TICKS( 5000UL ) )
-#define ERROR_CHECK_TASK_PERIOD             ( pdMS_TO_TICKS( 200UL ) )
 
 /*
  * Parameters passed to reg test tasks.
@@ -93,13 +76,13 @@ volatile unsigned long ulRegTest3LoopCounter = 0UL, ulRegTest4LoopCounter = 0UL;
 volatile unsigned long ulCheckTaskLoops = 0UL;
 /*-----------------------------------------------------------*/
 
-void vStartRegTests( void )
+void vStartRegisterTasks( void )
 {
 static StackType_t xRegTest1TaskStack[ configMINIMAL_STACK_SIZE ] __attribute__( ( aligned( configMINIMAL_STACK_SIZE * sizeof( StackType_t ) ) ) );
 static StackType_t xRegTest2TaskStack[ configMINIMAL_STACK_SIZE ] __attribute__( ( aligned( configMINIMAL_STACK_SIZE * sizeof( StackType_t ) ) ) );
 static StackType_t xRegTest3TaskStack[ configMINIMAL_STACK_SIZE ] __attribute__( ( aligned( configMINIMAL_STACK_SIZE * sizeof( StackType_t ) ) ) );
 static StackType_t xRegTest4TaskStack[ configMINIMAL_STACK_SIZE ] __attribute__( ( aligned( configMINIMAL_STACK_SIZE * sizeof( StackType_t ) ) ) );
-static StackType_t xCheckTaskStack[ configMINIMAL_STACK_SIZE ] __attribute__( ( aligned( configMINIMAL_STACK_SIZE * sizeof( StackType_t ) ) ) );
+
 
 TaskParameters_t xRegTest1TaskParameters =
 {
@@ -190,34 +173,10 @@ TaskParameters_t xRegTest4TaskParameters =
                         }
 };
 
-TaskParameters_t xCheckTaskParameters =
-{
-    .pvTaskCode      = prvCheckTask,
-    .pcName          = "Check",
-    .usStackDepth    = configMINIMAL_STACK_SIZE,
-    .pvParameters    = NULL,
-    .uxPriority      = ( CHECK_TASK_PRIORITY | portPRIVILEGE_BIT ),
-    .puxStackBuffer  = xCheckTaskStack,
-    .xRegions        =    {
-                            { 0, 0, 0 },
-                            { 0, 0, 0 },
-                            { 0, 0, 0 },
-                            { 0, 0, 0 },
-                            { 0, 0, 0 },
-                            { 0, 0, 0 },
-                            { 0, 0, 0 },
-                            { 0, 0, 0 },
-                            { 0, 0, 0 },
-                            { 0, 0, 0 },
-                            { 0, 0, 0 }
-                        }
-};
-
     xTaskCreateRestricted( &( xRegTest1TaskParameters ), NULL );
     xTaskCreateRestricted( &( xRegTest2TaskParameters ), NULL );
     xTaskCreateRestricted( &( xRegTest3TaskParameters ), NULL );
     xTaskCreateRestricted( &( xRegTest4TaskParameters ), NULL );
-    xTaskCreateRestricted( &( xCheckTaskParameters ), NULL );
 }
 /*-----------------------------------------------------------*/
 
@@ -297,31 +256,12 @@ static void prvRegTest4Task( void * pvParameters )
 }
 /*-----------------------------------------------------------*/
 
-static void prvCheckTask( void * pvParameters )
+BaseType_t xAreRegisterTasksStillRunning( void )
 {
-TickType_t xDelayPeriod = NO_ERROR_CHECK_TASK_PERIOD;
-TickType_t xLastExecutionTime;
 unsigned long ulErrorFound = pdFALSE;
 static unsigned long ulLastRegTest1Value = 0, ulLastRegTest2Value = 0;
 static unsigned long ulLastRegTest3Value = 0, ulLastRegTest4Value = 0;
 
-    /* Just to stop compiler warnings. */
-    ( void ) pvParameters;
-
-    /* Initialize xLastExecutionTime so the first call to vTaskDelayUntil()
-     * works correctly. */
-    xLastExecutionTime = xTaskGetTickCount();
-
-    /* Cycle for ever, delaying then checking all the other tasks are still
-     * operating without error.  The onboard LED is toggled on each iteration.
-     * If an error is detected then the delay period is decreased from
-     * mainNO_ERROR_CHECK_TASK_PERIOD to mainERROR_CHECK_TASK_PERIOD.  This has
-     * the effect of increasing the rate at which the onboard LED toggles, and
-     * in so doing gives visual feedback of the system status. */
-    for( ;; )
-    {
-        /* Delay until it is time to execute again. */
-        vTaskDelayUntil( &xLastExecutionTime, xDelayPeriod );
 
         /* Check that the register test 1 task is still running. */
         if( ulLastRegTest1Value == ulRegTest1LoopCounter )
@@ -351,26 +291,6 @@ static unsigned long ulLastRegTest3Value = 0, ulLastRegTest4Value = 0;
         }
         ulLastRegTest4Value = ulRegTest4LoopCounter;
 
-
-        /* Toggle the green LED to give an indication of the system status.
-         * If the LED toggles every NO_ERROR_CHECK_TASK_PERIOD milliseconds
-         * then everything is ok. A faster toggle indicates an error. */
-        HAL_GPIO_TogglePin( LD1_GPIO_Port, LD1_Pin );
-
-        if( ulErrorFound != pdFALSE )
-        {
-            /* An error has been detected in one of the tasks - flash the LED
-             * at a higher frequency to give visible feedback that something has
-             * gone wrong (it might just be that the loop back connector required
-             * by the comtest tasks has not been fitted). */
-            xDelayPeriod = ERROR_CHECK_TASK_PERIOD;
-
-            /* Turn on Red LED to indicate error. */
-            HAL_GPIO_WritePin( LD3_GPIO_Port, LD3_Pin, GPIO_PIN_SET );
-
-            /* Increment error detection count. */
-            ulCheckTaskLoops++;
-        }
-    }
+		return !ulErrorFound;
 }
 /*-----------------------------------------------------------*/

@@ -10,7 +10,6 @@
   * All rights reserved.</center></h2>
   *
   * This software component is licensed by ST under Ultimate Liberty license
-  * SLA0044, the "License"; You may not use this file except in compliance with
   * the License. You may obtain a copy of the License at:
   *                             www.st.com/SLA0044
   *
@@ -59,6 +58,7 @@
 
 /* External variables --------------------------------------------------------*/
 extern TIM_HandleTypeDef htim6;
+extern TIM_HandleTypeDef htim7;
 
 /* USER CODE BEGIN EV */
 
@@ -157,6 +157,20 @@ void TIM6_DAC_IRQHandler(void)
   /* USER CODE BEGIN TIM6_DAC_IRQn 1 */
 
   /* USER CODE END TIM6_DAC_IRQn 1 */
+}
+
+/**
+  * @brief This function handles TIM7 global interrupt.
+  */
+void TIM7_IRQHandler(void)
+{
+  /* USER CODE BEGIN TIM7_IRQn 0 */
+
+  /* USER CODE END TIM7_IRQn 0 */
+  HAL_TIM_IRQHandler(&htim7);
+  /* USER CODE BEGIN TIM7_IRQn 1 */
+
+  /* USER CODE END TIM7_IRQn 1 */
 }
 
 /* USER CODE BEGIN 1 */

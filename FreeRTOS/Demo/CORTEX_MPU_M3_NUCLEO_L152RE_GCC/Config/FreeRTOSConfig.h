@@ -53,11 +53,11 @@ build, this configuration file has all options turned on. */
 #define configUSE_PORT_OPTIMISED_TASK_SELECTION	1
 #define configUSE_QUEUE_SETS					1
 #define configUSE_IDLE_HOOK						0
-#define configUSE_TICK_HOOK						0
+#define configUSE_TICK_HOOK						1
 #define configCPU_CLOCK_HZ						48000000
 #define configMAX_PRIORITIES					( 5 )
 #define configMINIMAL_STACK_SIZE				( ( unsigned short ) 256 )
-#define configTOTAL_HEAP_SIZE					( ( size_t ) ( 16 * 1024 ) )
+#define configTOTAL_HEAP_SIZE					( ( size_t ) ( 12 * 1024 ) )
 #define configMAX_TASK_NAME_LEN					( 10 )
 #define configUSE_TRACE_FACILITY				1
 #define configUSE_16_BIT_TICKS					0
@@ -107,7 +107,7 @@ to exclude the API function. */
 #define INCLUDE_vTaskDelayUntil					1
 #define INCLUDE_vTaskDelay						1
 #define INCLUDE_eTaskGetState					1
-#define INCLUDE_xTimerPendFunctionCall			0
+#define INCLUDE_xTimerPendFunctionCall			1
 #define INCLUDE_xSemaphoreGetMutexHolder		1
 #define INCLUDE_xTaskGetHandle					1
 #define INCLUDE_xTaskGetCurrentTaskHandle		1
@@ -116,6 +116,8 @@ to exclude the API function. */
 #define INCLUDE_xTaskGetSchedulerState			1
 #define INCLUDE_xTaskGetIdleTaskHandle			1
 #define INCLUDE_uxTaskGetStackHighWaterMark 	1
+
+#define configRUN_ADDITIONAL_TESTS              1
 
 /* Cortex-M specific definitions. */
 #ifdef __NVIC_PRIO_BITS
@@ -156,8 +158,49 @@ header file. */
 /* Ensure that system calls can only be made from kernel code. */
 #define configENFORCE_SYSTEM_CALLS_FROM_KERNEL_ONLY		1
 
-/* Do not allow critical sections from unprivileged tasks. */
-#define configALLOW_UNPRIVILEGED_CRITICAL_SECTIONS	0
+/*
+ *Enable MPU Wrappers configuration
+ */
+
+#define configPROTECTED_KERNEL_OBJECT_POOL_SIZE     ( 150 )
+#define configPROTECTED_TIMER_OBJECT_POOL_SIZE      ( 20 )
+
+#define configUSE_MPU_WRAPPERS_V1                   ( 0 )
+#define configSYSTEM_CALL_STACK_SIZE                ( 128 )
+/* Defines for Testing Project https://github.com/FreeRTOS/FreeRTOS/tree/main/FreeRTOS/Demo/ThirdParty/Template*/
+
+#define configTASK_NOTIFICATION_ARRAY_ENTRIES       3
+#define configPRINTF( X )                           printf X /* Not thread safe currently, so must not be used from more than one task. */
+
+#define configSTART_TASK_NOTIFY_TESTS               0
+#define configSTART_TASK_NOTIFY_ARRAY_TESTS         0
+#define configSTART_BLOCKING_QUEUE_TESTS            0
+#define configSTART_SEMAPHORE_TESTS                 0
+#define configSTART_POLLED_QUEUE_TESTS              0
+#define configSTART_INTEGER_MATH_TESTS              0
+#define configSTART_GENERIC_QUEUE_TESTS             0
+#define configSTART_PEEK_QUEUE_TESTS                0
+#define configSTART_MATH_TESTS                      0
+#define configSTART_RECURSIVE_MUTEX_TESTS           0
+#define configSTART_COUNTING_SEMAPHORE_TESTS        0
+#define configSTART_QUEUE_SET_TESTS                 0
+#define configSTART_QUEUE_OVERWRITE_TESTS           0
+#define configSTART_EVENT_GROUP_TESTS               0
+#define configSTART_INTERRUPT_SEMAPHORE_TESTS       0
+#define configSTART_QUEUE_SET_POLLING_TESTS         0
+#define configSTART_BLOCK_TIME_TESTS                0
+#define configSTART_ABORT_DELAY_TESTS               0
+#define configSTART_DYNAMIC_TASK_TESTS              0
+#define configSTART_MESSAGE_BUFFER_TESTS            0
+#define configSTART_STREAM_BUFFER_TESTS             0
+#define configSTART_STREAM_BUFFER_INTERRUPT_TESTS   0
+#define configSTART_TIMER_TESTS                     0
+#define configSTART_INTERRUPT_QUEUE_TESTS           0
+#define configSTART_REGISTER_TESTS                  1
+#define configSTART_DELETE_SELF_TESTS               0
+
+#define configALLOW_UNPRIVILEGED_CRITICAL_SECTIONS  1 /* PolledQ tests need it. */
+#define configUSE_QUEUE_SETS                        1
 
 #ifdef __cplusplus
 }

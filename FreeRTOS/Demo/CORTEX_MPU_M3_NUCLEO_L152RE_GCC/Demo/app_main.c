@@ -32,15 +32,15 @@
 
 /* Demo includes. */
 #include "mpu_demo.h"
-#include "reg_tests.h"
+#include "TestRunner.h"
 
 void app_main( void )
 {
-	/* Start the MPU demo. */
-	vStartMPUDemo();
+	/* Start tests. */
+	vStartTests();
 
-	/* Start register tests. */
-	vStartRegTests();
+	/* Start the MPU demo. */
+	//vStartMPUDemo();
 
 	/* Start the scheduler. */
 	vTaskStartScheduler();

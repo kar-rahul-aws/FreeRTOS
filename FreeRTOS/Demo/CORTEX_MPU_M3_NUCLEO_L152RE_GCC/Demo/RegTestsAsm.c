@@ -45,7 +45,7 @@ void vRegTest1Asm( void ) /* __attribute__( ( naked ) ) */
 {
     __asm volatile
     (
-    ".extern ulRegTest1LoopCounter                              \n"
+    ".extern ulRegisterTest1Counter                             \n"
     ".syntax unified                                            \n"
     "                                                           \n"
     "    /* Fill the core registers with known values. */       \n"
@@ -95,7 +95,7 @@ void vRegTest1Asm( void ) /* __attribute__( ( naked ) ) */
     "                                                           \n"
     "    /* Everything passed, inc the loop counter. */         \n"
     "    push { r0, r1 }                                        \n"
-    "    ldr  r0, =ulRegTest1LoopCounter                        \n"
+    "    ldr  r0, =ulRegisterTest1Counter                       \n"
     "    ldr  r1, [r0]                                          \n"
     "    adds r1, r1, #1                                        \n"
     "    str  r1, [r0]                                          \n"
@@ -126,7 +126,7 @@ void vRegTest2Asm( void ) /* __attribute__( ( naked ) ) */
 {
     __asm volatile
     (
-    ".extern ulRegTest2LoopCounter                              \n"
+    ".extern ulRegisterTest2Counter                             \n"
     ".syntax unified                                            \n"
     "                                                           \n"
     "    /* Fill the core registers with known values. */       \n"
@@ -176,7 +176,7 @@ void vRegTest2Asm( void ) /* __attribute__( ( naked ) ) */
     "                                                           \n"
     "    /* Everything passed, inc the loop counter. */         \n"
     "    push { r0, r1 }                                        \n"
-    "    ldr  r0, =ulRegTest2LoopCounter                        \n"
+    "    ldr  r0, =ulRegisterTest2Counter                       \n"
     "    ldr  r1, [r0]                                          \n"
     "    adds r1, r1, #1                                        \n"
     "    str  r1, [r0]                                          \n"
@@ -200,7 +200,7 @@ void vRegTest3Asm( void ) /* __attribute__( ( naked ) ) */
 {
     __asm volatile
     (
-    ".extern ulRegTest3LoopCounter                              \n"
+    ".extern ulRegisterTest3Counter                             \n"
     ".syntax unified                                            \n"
     "                                                           \n"
     "    /* Fill the core registers with known values. */       \n"
@@ -250,7 +250,7 @@ void vRegTest3Asm( void ) /* __attribute__( ( naked ) ) */
     "                                                           \n"
     "    /* Everything passed, inc the loop counter. */         \n"
     "    push { r0, r1 }                                        \n"
-    "    ldr  r0, =ulRegTest3LoopCounter                        \n"
+    "    ldr  r0, =ulRegisterTest3Counter                       \n"
     "    ldr  r1, [r0]                                          \n"
     "    adds r1, r1, #1                                        \n"
     "    str  r1, [r0]                                          \n"
@@ -281,7 +281,7 @@ void vRegTest4Asm( void ) /* __attribute__( ( naked ) ) */
 {
     __asm volatile
     (
-    ".extern ulRegTest4LoopCounter                              \n"
+    ".extern ulRegisterTest4Counter                             \n"
     ".syntax unified                                            \n"
     "                                                           \n"
     "    /* Fill the core registers with known values. */       \n"
@@ -331,7 +331,7 @@ void vRegTest4Asm( void ) /* __attribute__( ( naked ) ) */
     "                                                           \n"
     "    /* Everything passed, inc the loop counter. */         \n"
     "    push { r0, r1 }                                        \n"
-    "    ldr  r0, =ulRegTest4LoopCounter                        \n"
+    "    ldr  r0, =ulRegisterTest4Counter                       \n"
     "    ldr  r1, [r0]                                          \n"
     "    adds r1, r1, #1                                        \n"
     "    str  r1, [r0]                                          \n"

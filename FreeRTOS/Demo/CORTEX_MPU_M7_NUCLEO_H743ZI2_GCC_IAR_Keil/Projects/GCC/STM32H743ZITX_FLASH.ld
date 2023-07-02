@@ -60,7 +60,7 @@ ENTRY(Reset_Handler)
 _estack = ORIGIN(RAM_D1) + LENGTH(RAM_D1);	/* end of "RAM_D1" Ram type memory */
 
 _Min_Heap_Size = 0x200;	/* required amount of heap  */
-_Min_Stack_Size = 0x400;	/* required amount of stack */
+_Min_Stack_Size = 0x200;	/* required amount of stack */
 
 /* Memories definition */
 MEMORY
@@ -75,8 +75,8 @@ MEMORY
 
 /* Initial 32K Flash is used to store kernel functions and
  * initial 32K RAM is used to store kernel data. */
-__privileged_functions_region_size__  = 32K;
-__privileged_data_region_size__       = 32K;
+__privileged_functions_region_size__  = 64K;
+__privileged_data_region_size__       = 256K;
 
 __FLASH_segment_start__               = ORIGIN( FLASH );
 __FLASH_segment_end__                 = __FLASH_segment_start__ + LENGTH( FLASH );
