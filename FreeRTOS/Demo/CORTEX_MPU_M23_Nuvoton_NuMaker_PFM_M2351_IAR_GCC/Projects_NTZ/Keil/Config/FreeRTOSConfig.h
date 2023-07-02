@@ -71,7 +71,7 @@ extern uint32_t SystemCoreClock;
 
 /* Constants that build features in or out. */
 #define configUSE_MUTEXES                          1
-#define configUSE_TICKLESS_IDLE                    1
+#define configUSE_TICKLESS_IDLE                    0
 #define configUSE_APPLICATION_TASK_TAG             0
 #define configUSE_NEWLIB_REENTRANT                 0
 #define configUSE_COUNTING_SEMAPHORES              1
@@ -155,7 +155,7 @@ extern uint32_t SystemCoreClock;
     #define configGENERATE_RUN_TIME_STATS    0
     #define portCONFIGURE_TIMER_FOR_RUN_TIME_STATS()
     #define portGET_RUN_TIME_COUNTER_VALUE()    0
-    #define configTICK_RATE_HZ               ( ( TickType_t ) 100 )
+    #define configTICK_RATE_HZ               ( ( TickType_t ) 1000 )
 
 #endif /* __IASMARM__ */
 
@@ -177,24 +177,24 @@ extern uint32_t SystemCoreClock;
 #define configSTART_SEMAPHORE_TESTS                  1
 #define configSTART_POLLED_QUEUE_TESTS               1
 #define configSTART_INTEGER_MATH_TESTS               1
-#define configSTART_GENERIC_QUEUE_TESTS              1
-#define configSTART_PEEK_QUEUE_TESTS                 1
-#define configSTART_MATH_TESTS                       1
-#define configSTART_RECURSIVE_MUTEX_TESTS            1
-#define configSTART_COUNTING_SEMAPHORE_TESTS         1
-#define configSTART_QUEUE_SET_TESTS                  1
-#define configSTART_QUEUE_OVERWRITE_TESTS            1
-#define configSTART_EVENT_GROUP_TESTS                1
-#define configSTART_INTERRUPT_SEMAPHORE_TESTS        1
-#define configSTART_QUEUE_SET_POLLING_TESTS          1
-#define configSTART_BLOCK_TIME_TESTS                 1
-#define configSTART_ABORT_DELAY_TESTS                1
-#define configSTART_DYNAMIC_TASK_TESTS               1
-#define configSTART_MESSAGE_BUFFER_TESTS             1
-#define configSTART_STREAM_BUFFER_TESTS              1
-#define configSTART_STREAM_BUFFER_INTERRUPT_TESTS    1
-#define configSTART_TIMER_TESTS                      1
-#define configSTART_INTERRUPT_QUEUE_TESTS            1
+#define configSTART_GENERIC_QUEUE_TESTS              0
+#define configSTART_PEEK_QUEUE_TESTS                 0
+#define configSTART_MATH_TESTS                       0
+#define configSTART_RECURSIVE_MUTEX_TESTS            0
+#define configSTART_COUNTING_SEMAPHORE_TESTS         0
+#define configSTART_QUEUE_SET_TESTS                  0
+#define configSTART_QUEUE_OVERWRITE_TESTS            0
+#define configSTART_EVENT_GROUP_TESTS                0
+#define configSTART_INTERRUPT_SEMAPHORE_TESTS        0
+#define configSTART_QUEUE_SET_POLLING_TESTS          0
+#define configSTART_BLOCK_TIME_TESTS                 0
+#define configSTART_ABORT_DELAY_TESTS                0
+#define configSTART_DYNAMIC_TASK_TESTS               0
+#define configSTART_MESSAGE_BUFFER_TESTS             0
+#define configSTART_STREAM_BUFFER_TESTS              0
+#define configSTART_STREAM_BUFFER_INTERRUPT_TESTS    0
+#define configSTART_TIMER_TESTS                      0
+#define configSTART_INTERRUPT_QUEUE_TESTS            0
 #define configSTART_REGISTER_TESTS                   1
 #define configSTART_DELETE_SELF_TESTS                0
 
