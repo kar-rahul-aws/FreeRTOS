@@ -389,6 +389,16 @@ void vStartMessageBufferTasks( configSTACK_DEPTH_TYPE xStackSize )
                       ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER ) },
                     { ( void * ) &( pc55ByteString[ 0 ] ),       128,
                       ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER ) }
+                #if ( configTOTAL_MPU_REGIONS == 16 )
+                    ,{ 0, 0, 0 }
+                    ,{ 0, 0, 0 }
+                    ,{ 0, 0, 0 }
+                    ,{ 0, 0, 0 }
+                    ,{ 0, 0, 0 }
+                    ,{ 0, 0, 0 }
+                    ,{ 0, 0, 0 }
+                    ,{ 0, 0, 0 }
+                #endif
                 }
             };
             TaskParameters_t xSenderTask2Parameters =
@@ -408,6 +418,17 @@ void vStartMessageBufferTasks( configSTACK_DEPTH_TYPE xStackSize )
                       ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER ) },
                     { ( void * ) &( pc55ByteString[ 0 ] ),       128,
                       ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER ) }
+                #if ( configTOTAL_MPU_REGIONS == 16 )
+                    ,{ 0, 0, 0 }
+                    ,{ 0, 0, 0 }
+                    ,{ 0, 0, 0 }
+                    ,{ 0, 0, 0 }
+                    ,{ 0, 0, 0 }
+                    ,{ 0, 0, 0 }
+                    ,{ 0, 0, 0 }
+                    ,{ 0, 0, 0 }
+                #endif
+
                 }
             };
             TaskParameters_t xReceivingTask1Parameters =
@@ -422,6 +443,16 @@ void vStartMessageBufferTasks( configSTACK_DEPTH_TYPE xStackSize )
                 {
                     { 0, 0, 0 },
                     { 0, 0, 0 },
+                #if ( configTOTAL_MPU_REGIONS == 16 )
+                    { 0, 0, 0 },
+                    { 0, 0, 0 },
+                    { 0, 0, 0 },
+                    { 0, 0, 0 },
+                    { 0, 0, 0 },
+                    { 0, 0, 0 },
+                    { 0, 0, 0 },
+                    { 0, 0, 0 },
+                #endif
                     { 0, 0, 0 }
                 }
             };
@@ -437,6 +468,16 @@ void vStartMessageBufferTasks( configSTACK_DEPTH_TYPE xStackSize )
                 {
                     { 0, 0, 0 },
                     { 0, 0, 0 },
+                #if ( configTOTAL_MPU_REGIONS == 16 )
+                    { 0, 0, 0 },
+                    { 0, 0, 0 },
+                    { 0, 0, 0 },
+                    { 0, 0, 0 },
+                    { 0, 0, 0 },
+                    { 0, 0, 0 },
+                    { 0, 0, 0 },
+                    { 0, 0, 0 },
+                #endif
                     { 0, 0, 0 }
                 }
             };
@@ -483,6 +524,16 @@ void vStartMessageBufferTasks( configSTACK_DEPTH_TYPE xStackSize )
                 {
                     { 0, 0, 0 },
                     { 0, 0, 0 },
+                #if ( configTOTAL_MPU_REGIONS == 16 )
+                    { 0, 0, 0 },
+                    { 0, 0, 0 },
+                    { 0, 0, 0 },
+                    { 0, 0, 0 },
+                    { 0, 0, 0 },
+                    { 0, 0, 0 },
+                    { 0, 0, 0 },
+                    { 0, 0, 0 },
+                #endif
                     { 0, 0, 0 }
                 }
             };
@@ -499,6 +550,16 @@ void vStartMessageBufferTasks( configSTACK_DEPTH_TYPE xStackSize )
                     { ( void * ) &( ulSizeCoherencyTestCycles[ 0 ] ), messagebufferSHARED_MEM_SIZE_BYTES,
                       ( tskMPU_REGION_READ_WRITE | tskMPU_REGION_EXECUTE_NEVER ) },
                     { 0,                                              0,                                 0  },
+                #if ( configTOTAL_MPU_REGIONS == 16 )
+                    { 0, 0, 0 },
+                    { 0, 0, 0 },
+                    { 0, 0, 0 },
+                    { 0, 0, 0 },
+                    { 0, 0, 0 },
+                    { 0, 0, 0 },
+                    { 0, 0, 0 },
+                    { 0, 0, 0 },
+                #endif
                     { 0,                                              0,                                 0  }
                 }
             };

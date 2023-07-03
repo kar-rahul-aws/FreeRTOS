@@ -225,7 +225,6 @@
                     <state>DEBUG</state>
                     <state>CPU_LPC55S69JBD100_cm33_core0</state>
                     <state>MCUXPRESSO_SDK</state>
-                    <state>SDK_DEBUGCONSOLE_UART</state>
                 </option>
                 <option>
                     <name>CCPreprocFile</name>

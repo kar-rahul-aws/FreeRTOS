@@ -355,6 +355,7 @@
                     <state>$PROJ_DIR$\..\..\..\NXP_Code\trustzone</state>
                     <state>$PROJ_DIR$\..\..\..\NXP_Code\utilities</state>
                     <state>$PROJ_DIR$\..\..\..\..\..\Source\portable\IAR\ARM_CM33\secure</state>
+                    <state>$PROJ_DIR$\..\..\..\NSC_Functions</state>
                 </option>
                 <option>
                     <name>CCStdIncCheck</name>

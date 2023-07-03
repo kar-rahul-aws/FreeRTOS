@@ -356,10 +356,15 @@ BaseType_t xAreRegisterTasksStillRunning( void )
 
     #if ( configENABLE_TRUSTZONE == 1 )
         static unsigned long ulLastRegTestSecureValue = 0, ulLastRegTestNonSecureCallbackValue = 0;
+        static unsigned long ulSecureContextAllocated = 0;
 
-        /* This task is going to call secure side functions for
-         * printing messages. */
-        portALLOCATE_SECURE_CONTEXT( configMINIMAL_SECURE_STACK_SIZE );
+        /* This is a heck for check task - the check task for this project
+         * calls secure side functions for printing messages. */
+        if( ulSecureContextAllocated == 0 )
+        {
+            portALLOCATE_SECURE_CONTEXT( configMINIMAL_SECURE_STACK_SIZE );
+            ulSecureContextAllocated = 1;
+        }
     #endif
 
     /* Check that the register test 1 task is still running. */
@@ -395,24 +400,24 @@ BaseType_t xAreRegisterTasksStillRunning( void )
     ulLastRegTest4Value = ulRegTest4LoopCounter;
 
     #if ( configENABLE_TRUSTZONE == 1 )
+    {
+        /* Check that the register test secure task is still running. */
+        if( ulLastRegTestSecureValue == ulRegTestSecureLoopCounter )
         {
-            /* Check that the register test secure task is still running. */
-            if( ulLastRegTestSecureValue == ulRegTestSecureLoopCounter )
-            {
-                ulErrorFound |= 1UL << 4UL;
-            }
-
-            ulLastRegTestSecureValue = ulRegTestSecureLoopCounter;
-
-            /* Check that the register test non-secure callback task is
-             * still running. */
-            if( ulLastRegTestNonSecureCallbackValue == ulRegTestNonSecureCallbackLoopCounter )
-            {
-                ulErrorFound |= 1UL << 5UL;
-            }
-
-            ulLastRegTestNonSecureCallbackValue = ulRegTestNonSecureCallbackLoopCounter;
+            ulErrorFound |= 1UL << 4UL;
         }
+
+        ulLastRegTestSecureValue = ulRegTestSecureLoopCounter;
+
+        /* Check that the register test non-secure callback task is
+            * still running. */
+        if( ulLastRegTestNonSecureCallbackValue == ulRegTestNonSecureCallbackLoopCounter )
+        {
+            ulErrorFound |= 1UL << 5UL;
+        }
+
+        ulLastRegTestNonSecureCallbackValue = ulRegTestNonSecureCallbackLoopCounter;
+    }
     #endif /* configENABLE_TRUSTZONE */
 
     return !ulErrorFound;
