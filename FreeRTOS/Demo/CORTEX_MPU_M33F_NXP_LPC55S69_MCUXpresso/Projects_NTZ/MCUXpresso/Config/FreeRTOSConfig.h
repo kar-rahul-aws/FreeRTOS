@@ -44,6 +44,7 @@
 *----------------------------------------------------------*/
 
 #include "clock_config.h"
+#include "fsl_debug_console.h"
 
 /* Cortex M33 port configuration. */
 #define configENABLE_MPU                           1
@@ -67,11 +68,11 @@
 #define configMINIMAL_STACK_SIZE                   ( ( uint16_t ) 128 )
 #define configMINIMAL_SECURE_STACK_SIZE            ( 1024 )
 #define configMAX_TASK_NAME_LEN                    ( 12 )
-#define configTOTAL_HEAP_SIZE                      ( ( size_t ) ( 50 * 1024 ) )
+#define configTOTAL_HEAP_SIZE                      ( ( size_t ) ( 100 * 1024 ) )
 
 /* Constants that build features in or out. */
 #define configUSE_MUTEXES                          1
-#define configUSE_TICKLESS_IDLE                    1
+#define configUSE_TICKLESS_IDLE                    0
 #define configUSE_APPLICATION_TASK_TAG             0
 #define configUSE_NEWLIB_REENTRANT                 0
 #define configUSE_COUNTING_SEMAPHORES              1
@@ -165,7 +166,7 @@
     #define configGENERATE_RUN_TIME_STATS    0
     #define portCONFIGURE_TIMER_FOR_RUN_TIME_STATS()
     #define portGET_RUN_TIME_COUNTER_VALUE()    0
-    #define configTICK_RATE_HZ               ( ( TickType_t ) 100 )
+    #define configTICK_RATE_HZ               ( ( TickType_t ) 1000 )
 
 #endif /* __IASMARM__ */
 
@@ -179,7 +180,7 @@
 #define configSYSTEM_CALL_STACK_SIZE                 ( 128 )
 
 #define configTASK_NOTIFICATION_ARRAY_ENTRIES        ( 3 )
-#define configPRINTF( X )    printf X                                                  /* Not thread safe currently, so must not be used from more than one task. */
+#define configPRINTF( X )    PRINTF X                                                  /* Not thread safe currently, so must not be used from more than one task. */
 
 #define configSTART_TASK_NOTIFY_TESTS                1
 #define configSTART_TASK_NOTIFY_ARRAY_TESTS          1
@@ -204,7 +205,7 @@
 #define configSTART_STREAM_BUFFER_TESTS              1
 #define configSTART_STREAM_BUFFER_INTERRUPT_TESTS    1
 #define configSTART_TIMER_TESTS                      1
-#define configSTART_INTERRUPT_QUEUE_TESTS            1
+#define configSTART_INTERRUPT_QUEUE_TESTS            0
 #define configSTART_REGISTER_TESTS                   1
 #define configSTART_DELETE_SELF_TESTS                0
 
