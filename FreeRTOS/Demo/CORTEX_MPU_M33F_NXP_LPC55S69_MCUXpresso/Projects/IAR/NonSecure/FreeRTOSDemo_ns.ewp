@@ -1267,6 +1267,9 @@
                 <file>
                     <name>$PROJ_DIR$\..\..\..\..\..\Source\portable\Common\mpu_wrappers.c</name>
                 </file>
+                <file>
+                    <name>$PROJ_DIR$\..\..\..\..\..\Source\portable\Common\mpu_wrappers_v2.c</name>
+                </file>
             </group>
             <group>
                 <name>IAR</name>
@@ -1274,6 +1277,9 @@
                     <name>ARM_CM33</name>
                     <group>
                         <name>non_secure</name>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\..\Source\portable\IAR\ARM_CM33\non_secure\mpu_wrappers_v2_asm.S</name>
+                        </file>
                         <file>
                             <name>$PROJ_DIR$\..\..\..\..\..\Source\portable\IAR\ARM_CM33\non_secure\port.c</name>
                         </file>

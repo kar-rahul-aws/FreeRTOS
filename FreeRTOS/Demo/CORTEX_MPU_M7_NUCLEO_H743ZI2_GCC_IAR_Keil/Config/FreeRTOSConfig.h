@@ -157,7 +157,6 @@ See http://www.FreeRTOS.org/RTOS-Cortex-M3-M4.html. */
  */
 
 #define configPROTECTED_KERNEL_OBJECT_POOL_SIZE     ( 150 )
-#define configPROTECTED_TIMER_OBJECT_POOL_SIZE      ( 20 )
 
 #define configUSE_MPU_WRAPPERS_V1                   ( 0 )
 #define configSYSTEM_CALL_STACK_SIZE                ( 256 )
@@ -167,21 +166,21 @@ See http://www.FreeRTOS.org/RTOS-Cortex-M3-M4.html. */
 #define configPRINTF( X )                           printf X /* Not thread safe currently, so must not be used from more than one task. */
 
 #define configSTART_TASK_NOTIFY_TESTS               1
-#define configSTART_TASK_NOTIFY_ARRAY_TESTS         0
-#define configSTART_BLOCKING_QUEUE_TESTS            0
-#define configSTART_SEMAPHORE_TESTS                 0
-#define configSTART_POLLED_QUEUE_TESTS              0
-#define configSTART_INTEGER_MATH_TESTS              0
-#define configSTART_GENERIC_QUEUE_TESTS             0
+#define configSTART_TASK_NOTIFY_ARRAY_TESTS         1
+#define configSTART_BLOCKING_QUEUE_TESTS            1
+#define configSTART_SEMAPHORE_TESTS                 1
+#define configSTART_POLLED_QUEUE_TESTS              1
+#define configSTART_INTEGER_MATH_TESTS              1
+#define configSTART_GENERIC_QUEUE_TESTS             1
 #define configSTART_PEEK_QUEUE_TESTS                1
 #define configSTART_MATH_TESTS                      1
 #define configSTART_RECURSIVE_MUTEX_TESTS           1
 #define configSTART_COUNTING_SEMAPHORE_TESTS        1
 #define configSTART_QUEUE_SET_TESTS                 1
 #define configSTART_QUEUE_OVERWRITE_TESTS           1
-#define configSTART_EVENT_GROUP_TESTS               0
-#define configSTART_INTERRUPT_SEMAPHORE_TESTS       0
-#define configSTART_QUEUE_SET_POLLING_TESTS         0
+#define configSTART_EVENT_GROUP_TESTS               1
+#define configSTART_INTERRUPT_SEMAPHORE_TESTS       1
+#define configSTART_QUEUE_SET_POLLING_TESTS         1
 #define configSTART_BLOCK_TIME_TESTS                1
 #define configSTART_ABORT_DELAY_TESTS               1
 #define configSTART_DYNAMIC_TASK_TESTS              1

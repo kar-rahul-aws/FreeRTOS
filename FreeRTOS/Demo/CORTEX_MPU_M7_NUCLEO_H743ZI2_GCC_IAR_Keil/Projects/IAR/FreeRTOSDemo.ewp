@@ -1260,6 +1260,9 @@
             <group>
                 <name>Common</name>
                 <file>
+                    <name>$PROJ_DIR$\..\..\..\..\Source\portable\Common\mpu_wrappers.c</name>
+                </file>
+                <file>
                     <name>$PROJ_DIR$\..\..\..\..\Source\portable\Common\mpu_wrappers_v2.c</name>
                 </file>
             </group>

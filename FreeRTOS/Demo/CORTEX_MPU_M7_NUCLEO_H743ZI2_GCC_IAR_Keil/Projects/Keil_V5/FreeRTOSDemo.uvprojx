@@ -619,6 +619,11 @@
               <FileType>1</FileType>
               <FilePath>..\..\..\..\Source\portable\RVDS\ARM_CM4_MPU\mpu_wrappers_v2_asm.c</FilePath>
             </File>
+            <File>
+              <FileName>mpu_wrappers.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\Source\portable\Common\mpu_wrappers.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
