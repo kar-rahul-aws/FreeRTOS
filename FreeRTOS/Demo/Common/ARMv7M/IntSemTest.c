@@ -259,6 +259,10 @@ void vStartInterruptSemaphoreTasks( void )
     xTaskCreateRestricted( &( xInterruptMutexMasterTaskParameters ), NULL );
     xTaskCreateRestricted( &( xInterruptCountingSemaphoreTaskParameters ), NULL );
 
+#if( configENABLE_ACCESS_CONTROL_LIST == 1 )
+    vGrantAccessToQueue( xSlaveHandle[ 0 ], xMasterSlaveMutex[ 0 ] );
+#endif
+
 }
 /*-----------------------------------------------------------*/
 

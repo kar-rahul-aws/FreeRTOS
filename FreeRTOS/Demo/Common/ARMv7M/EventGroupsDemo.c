@@ -325,6 +325,12 @@ void vStartEventGroupTasks( void )
     /* If the last task was created then the others will have been too. */
     configASSERT( xSyncTaskHandle[ SYNC_TASK_TWO_IDX ] );
 
+#if ( configENABLE_ACCESS_CONTROL_LIST == 1)
+    vGrantAccessToEventGroup( xTestSlaveTaskHandle, xEventGroup[ 0 ] );
+    vGrantAccessToEventGroup( xSyncTaskHandle[ SYNC_TASK_ONE_IDX ], xEventGroup[ 0 ] );
+    vGrantAccessToEventGroup( xSyncTaskHandle[ SYNC_TASK_TWO_IDX ], xEventGroup[ 0 ] );
+#endif
+
     /* Create the event group used by the ISR tests.  The event group used by
      * the tasks is created by the tasks themselves. */
     xISREventGroup = xEventGroupCreate();

@@ -111,6 +111,7 @@ static volatile UBaseType_t uxPollingCycles[ recmuSHARED_MEM_SIZE_WORDS ] __attr
  * (unsuspended). */
 #define CONTROLLING_TASK_IDX        0
 #define BLOCKING_TASK_IDX           1
+#define POLLING_TASK_IDX			2
 static TaskHandle_t xLocalTaskHandles[ recmuSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( recmuSHARED_MEM_SIZE_BYTES ) ) ) = { NULL };
 /*-----------------------------------------------------------*/
 
@@ -252,7 +253,16 @@ void vStartRecursiveMutexTasks( void )
 
         xTaskCreateRestricted( &( xRecursiveMutexControllingTaskParameters ), &( xLocalTaskHandles[ CONTROLLING_TASK_IDX ] ) );
         xTaskCreateRestricted( &( xRecursiveMutexBlockingTaskParameters ), &( xLocalTaskHandles[ BLOCKING_TASK_IDX ] ) );
-        xTaskCreateRestricted( &( xRecursiveMutexPollingTaskParameters ), NULL );
+        xTaskCreateRestricted( &( xRecursiveMutexPollingTaskParameters ), &( xLocalTaskHandles[ POLLING_TASK_IDX ] ) );
+
+#if( configENABLE_ACCESS_CONTROL_LIST == 1)
+        vGrantAccessToQueue( xLocalTaskHandles[ CONTROLLING_TASK_IDX ], xMutex[ 0 ] );
+        vGrantAccessToQueue( xLocalTaskHandles[ BLOCKING_TASK_IDX ], xMutex[ 0 ] );
+        vGrantAccessToQueue( xLocalTaskHandles[ POLLING_TASK_IDX ], xMutex[ 0 ] );
+
+        vGrantAccessToTask( xLocalTaskHandles[ CONTROLLING_TASK_IDX ], xLocalTaskHandles[ POLLING_TASK_IDX ] );
+        vGrantAccessToTask( xLocalTaskHandles[ BLOCKING_TASK_IDX ], xLocalTaskHandles[ POLLING_TASK_IDX ] );
+#endif
     }
 }
 /*-----------------------------------------------------------*/
