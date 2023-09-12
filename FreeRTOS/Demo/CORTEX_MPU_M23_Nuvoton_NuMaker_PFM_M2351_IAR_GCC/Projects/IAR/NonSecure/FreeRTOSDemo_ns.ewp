@@ -677,7 +677,7 @@
             <data>
                 <extensions></extensions>
                 <cmdline></cmdline>
-                <hasPrio>160</hasPrio>
+                <hasPrio>1</hasPrio>
                 <buildSequence>inputOutputBased</buildSequence>
             </data>
         </settings>
@@ -1215,6 +1215,12 @@
         </file>
         <file>
             <name>$PROJ_DIR$\..\..\..\..\..\Source\portable\Common\mpu_wrappers.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\..\..\..\Source\portable\Common\mpu_wrappers_v2.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\..\..\..\Source\portable\IAR\ARM_CM23\non_secure\mpu_wrappers_v2_asm.S</name>
         </file>
         <file>
             <name>$PROJ_DIR$\..\..\..\..\..\Source\portable\IAR\ARM_CM23\non_secure\port.c</name>

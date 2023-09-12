@@ -71,7 +71,7 @@
 #define configMINIMAL_STACK_SIZE                   ( ( uint16_t ) 128 )
 #define configMINIMAL_SECURE_STACK_SIZE            ( 1024 )
 #define configMAX_TASK_NAME_LEN                    ( 12 )
-#define configTOTAL_HEAP_SIZE                      ( ( size_t ) ( 30 * 1024 ) )
+#define configTOTAL_HEAP_SIZE                      ( ( size_t ) ( 20 * 1024 ) )
 
 /* Constants that build features in or out. */
 #define configUSE_MUTEXES                          1
@@ -179,7 +179,7 @@
 #define configSTART_TASK_NOTIFY_ARRAY_TESTS          1
 #define configSTART_BLOCKING_QUEUE_TESTS             1
 #define configSTART_SEMAPHORE_TESTS                  1
-#define configSTART_POLLED_QUEUE_TESTS               1
+#define configSTART_POLLED_QUEUE_TESTS               0
 #define configSTART_INTEGER_MATH_TESTS               0
 #define configSTART_GENERIC_QUEUE_TESTS              0
 #define configSTART_PEEK_QUEUE_TESTS                 0
@@ -199,7 +199,7 @@
 #define configSTART_STREAM_BUFFER_INTERRUPT_TESTS    0
 #define configSTART_TIMER_TESTS                      0
 #define configSTART_INTERRUPT_QUEUE_TESTS            0
-#define configSTART_REGISTER_TESTS                   1
+#define configSTART_REGISTER_TESTS                   0
 #define configSTART_DELETE_SELF_TESTS                0
 
 #endif /* FREERTOS_CONFIG_H */
