@@ -170,7 +170,7 @@
 #define configSUPPORT_STATIC_ALLOCATION                 1
 
 #define configPROTECTED_KERNEL_OBJECT_POOL_SIZE         ( 150 )
-
+#define configENABLE_ACCESS_CONTROL_LIST                ( 1 )
 #define configUSE_MPU_WRAPPERS_V1                       ( 0 )
 #define configSYSTEM_CALL_STACK_SIZE                    ( 128 )
 
