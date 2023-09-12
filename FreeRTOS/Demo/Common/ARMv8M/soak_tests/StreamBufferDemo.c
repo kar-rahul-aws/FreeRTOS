@@ -189,8 +189,12 @@ static BaseType_t xErrorStatus[ streambufferSHARED_MEM_SIZE_WORDS ] __attribute_
 #define ECHO_STREAM_BUFFERS_2_IDX    1
 static EchoStreamBuffers_t xEchoStreamBuffersArray[ streambufferSHARED_MEM_SIZE_DOUBLE_WORDS ] __attribute__( ( aligned( 32 ) ) ) = { NULL };
 
-#define ECHO_CLIENT_TASK1_IDX        0
-#define ECHO_CLIENT_TASK2_IDX        1
+#define ECHO_CLIENT_TASK1_IDX 		0
+#define ECHO_CLIENT_TASK2_IDX 		1
+#define ECHO_SERVER_TASK1_IDX 		2
+#define ECHO_SERVER_TASK2_IDX 		3
+#define NON_BLOCK_RCV_TASK_IDX		4
+#define NON_BLOCK_SEND_TASK_IDX		5
 static TaskHandle_t xEchoClientTaskHandles[ streambufferSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( 32 ) ) ) = { NULL };
 /*-----------------------------------------------------------*/
 
@@ -419,8 +423,8 @@ void vStartStreamBufferTasks( void )
      * the other has the client as the higher priority. */
     xEchoServerTask1Parameters.pvParameters = ( void * ) &( xEchoStreamBuffersArray[ ECHO_STREAM_BUFFERS_1_IDX ] );
     xEchoServerTask2Parameters.pvParameters = ( void * ) &( xEchoStreamBuffersArray[ ECHO_STREAM_BUFFERS_2_IDX ] );
-    xTaskCreateRestricted( &( xEchoServerTask1Parameters ), NULL );
-    xTaskCreateRestricted( &( xEchoServerTask2Parameters ), NULL );
+    xTaskCreateRestricted( &( xEchoServerTask1Parameters ), &( xEchoClientTaskHandles[ ECHO_SERVER_TASK1_IDX ] ) );
+    xTaskCreateRestricted( &( xEchoServerTask2Parameters ), &( xEchoClientTaskHandles[ ECHO_SERVER_TASK2_IDX ] ) );
 
     /* The non blocking tasks run continuously and will interleave with each
      * other, so must be created at the lowest priority.  The stream buffer they
@@ -428,8 +432,13 @@ void vStartStreamBufferTasks( void )
     xStreamBuffer = xStreamBufferCreate( sbSTREAM_BUFFER_LENGTH_BYTES, sbTRIGGER_LEVEL_1 );
     xNonBlockingReceiverTaskParameters.pvParameters = ( void * ) xStreamBuffer;
     xNonBlockingSenderTaskParameters.pvParameters = ( void * ) xStreamBuffer;
-    xTaskCreateRestricted( &( xNonBlockingReceiverTaskParameters ), NULL );
-    xTaskCreateRestricted( &( xNonBlockingSenderTaskParameters ), NULL );
+    xTaskCreateRestricted( &( xNonBlockingReceiverTaskParameters ), &( xEchoClientTaskHandles[ NON_BLOCK_RCV_TASK_IDX ] ) );
+    xTaskCreateRestricted( &( xNonBlockingSenderTaskParameters ), &( xEchoClientTaskHandles[ NON_BLOCK_SEND_TASK_IDX ] ) );
+
+#if( configENABLE_ACCESS_CONTROL_LIST == 1)
+    vGrantAccessToStreamBuffer( xEchoClientTaskHandles[ NON_BLOCK_RCV_TASK_IDX ], xStreamBuffer );
+    vGrantAccessToStreamBuffer( xEchoClientTaskHandles[ NON_BLOCK_SEND_TASK_IDX ], xStreamBuffer );
+#endif
 
     /* The task that receives bytes from an interrupt to test that it unblocks
      * at a specific trigger level must run at a high priority to minimize the risk
@@ -442,6 +451,12 @@ void vStartStreamBufferTasks( void )
     xEchoClientTask2Parameters.pvParameters = ( void * ) &( xEchoStreamBuffersArray[ ECHO_STREAM_BUFFERS_2_IDX ] );
     xTaskCreateRestricted( &( xEchoClientTask1Parameters ), &( xEchoClientTaskHandles[ ECHO_CLIENT_TASK1_IDX ] ) );
     xTaskCreateRestricted( &( xEchoClientTask2Parameters ), &( xEchoClientTaskHandles[ ECHO_CLIENT_TASK2_IDX ] ) );
+#if( configENABLE_ACCESS_CONTROL_LIST == 1)
+    vGrantAccessToStreamBuffer( xEchoClientTaskHandles[ ECHO_SERVER_TASK2_IDX ], xEchoStreamBuffersArray[ ECHO_STREAM_BUFFERS_2_IDX ].xEchoClientBuffer);
+    vGrantAccessToStreamBuffer( xEchoClientTaskHandles[ ECHO_SERVER_TASK2_IDX ], xEchoStreamBuffersArray[ ECHO_STREAM_BUFFERS_2_IDX ].xEchoServerBuffer);
+
+    vGrantAccessToTask( xEchoClientTaskHandles[ ECHO_CLIENT_TASK2_IDX ], xEchoClientTaskHandles[ ECHO_SERVER_TASK2_IDX ] );
+#endif
     vTaskSuspend( xEchoClientTaskHandles[ ECHO_CLIENT_TASK1_IDX ] );
     vTaskSuspend( xEchoClientTaskHandles[ ECHO_CLIENT_TASK2_IDX ] );
 
@@ -545,6 +560,11 @@ void vStartStreamBufferTasks( void )
             xReceivingTask2Parameters.pvParameters = ( void * ) xStreamBufferForStaticTests2;
             xTaskCreateRestricted( &( xReceivingTask1Parameters ), &( xReceiverTaskHandles[ RECEIVER_TASK1_IDX ] ) );
             xTaskCreateRestricted( &( xReceivingTask2Parameters ), &( xReceiverTaskHandles[ RECEIVER_TASK2_IDX ] ) );
+
+#if( configENABLE_ACCESS_CONTROL_LIST == 1)
+            vGrantAccessToStreamBuffer( xReceiverTaskHandles[ RECEIVER_TASK1_IDX ], xStreamBufferForStaticTests1 );
+            vGrantAccessToStreamBuffer( xReceiverTaskHandles[ RECEIVER_TASK2_IDX ], xStreamBufferForStaticTests2 );
+#endif
 
             vTaskSuspend( xReceiverTaskHandles[ RECEIVER_TASK1_IDX ] );
             vTaskSuspend( xReceiverTaskHandles[ RECEIVER_TASK2_IDX ] );

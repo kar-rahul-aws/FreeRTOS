@@ -95,6 +95,8 @@
 
         static StackType_t xQueueSetReceivingTaskStack[ configMINIMAL_STACK_SIZE ] __attribute__( ( aligned( 32 ) ) );
 
+        static TaskHandle_t xQueueSetReceivingTaskHandle = NULL;
+
         TaskParameters_t xQueueSetReceivingTaskParameters =
         {
             .pvTaskCode     = prvQueueSetReceivingTask,
@@ -129,7 +131,12 @@
             xQueueAddToSet( xQueue, xQueueSet[ 0 ] );
 
             /* Create the task. */
-            xTaskCreateRestricted( &( xQueueSetReceivingTaskParameters ), NULL );
+            xTaskCreateRestricted( &( xQueueSetReceivingTaskParameters ), &( xQueueSetReceivingTaskHandle ) );
+
+#if( configENABLE_ACCESS_CONTROL_LIST == 1)
+            vGrantAccessToQueue( xQueueSetReceivingTaskHandle, xQueue );
+            vGrantAccessToQueue( xQueueSetReceivingTaskHandle, xQueueSet[ 0 ] );
+#endif
         }
     }
 /*-----------------------------------------------------------*/

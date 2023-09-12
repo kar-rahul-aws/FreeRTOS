@@ -133,9 +133,11 @@ static void prvTakeTwoMutexesReturnInDifferentOrder( SemaphoreHandle_t xMutex,
 
 /* Handles used in the mutex test to suspend and resume the high and medium
  * priority mutex test tasks. */
-#define HIGH_PRIO_MUTEX_TASK_IDX     0
-#define MED_PRIO_MUTEX_TASK_IDX      1
-#define MED_PRIO_MUTEX_2_TASK_IDX    2
+#define LOW_PRIO_MUTEX_TASK_IDX		0
+#define HIGH_PRIO_MUTEX_TASK_IDX    1
+#define MED_PRIO_MUTEX_TASK_IDX     2
+#define MED_PRIO_MUTEX_2_TASK_IDX   3
+#define SEND_FRONT_BACK_TASK_IDX	4
 static TaskHandle_t xLocalTaskHandles[ genqSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( 32 ) ) ) = { NULL };
 
 /* Shared array  to accommodate 3 user regions. */
@@ -206,7 +208,10 @@ void vStartGenericQueueTasks( UBaseType_t uxPriority )
         /* Create the demo task and pass it the queue just created.  We are
          * passing the queue handle by value so it does not matter that it is
          * declared on the stack here. */
-        xTaskCreateRestricted( &( xSendFrontAndBackTestParameters ), NULL );
+        xTaskCreateRestricted( &( xSendFrontAndBackTestParameters ), &( xLocalTaskHandles[ SEND_FRONT_BACK_TASK_IDX ] ) );
+#if( configENABLE_ACCESS_CONTROL_LIST == 1)
+        vGrantAccessToQueue( xLocalTaskHandles[ SEND_FRONT_BACK_TASK_IDX ], xQueue );
+#endif
     }
 
     /* Create the mutex used by the prvMutexTest task. */
@@ -331,15 +336,23 @@ void vStartGenericQueueTasks( UBaseType_t uxPriority )
         /* Create the mutex demo tasks and pass it the mutex just created.  We
          * are passing the mutex handle by value so it does not matter that it is
          * declared on the stack here. */
-        xTaskCreateRestricted( &( xLowPriorityMutexTaskParameters ), NULL );
+        xTaskCreateRestricted( &( xLowPriorityMutexTaskParameters ), &( xLocalTaskHandles[ LOW_PRIO_MUTEX_TASK_IDX ] ) );
         xTaskCreateRestricted( &( xMediumPriorityMutexTaskParameters ), &( xLocalTaskHandles[ MED_PRIO_MUTEX_TASK_IDX ] ) );
         xTaskCreateRestricted( &( xHighPriorityMutexTaskParameters ), &( xLocalTaskHandles[ HIGH_PRIO_MUTEX_TASK_IDX ] ) );
+
+#if ( configENABLE_ACCESS_CONTROL_LIST == 1)
+        vGrantAccessToQueue( xLocalTaskHandles[ MED_PRIO_MUTEX_TASK_IDX ], xMutex );
+        vGrantAccessToQueue( xLocalTaskHandles[ HIGH_PRIO_MUTEX_TASK_IDX ], xMutex );
+#endif
 
         /* If INCLUDE_xTaskAbortDelay is set then additional tests are performed,
          * requiring two instances of prvHighPriorityMutexTask(). */
         #if ( INCLUDE_xTaskAbortDelay == 1 )
             {
                 xTaskCreateRestricted( &( xHighPriorityMutexTask2Parameters ), &( xLocalTaskHandles[ MED_PRIO_MUTEX_2_TASK_IDX ] ) );
+#if ( configENABLE_ACCESS_CONTROL_LIST == 1)
+                vGrantAccessToQueue( xLocalTaskHandles[ MED_PRIO_MUTEX_2_TASK_IDX ], xMutex );
+#endif
             }
         #endif /* INCLUDE_xTaskAbortDelay */
     }

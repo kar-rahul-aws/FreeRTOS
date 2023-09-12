@@ -84,7 +84,7 @@ static uint32_t ulCycleCount[ streambufferSHARED_MEM_SIZE_WORDS ] __attribute__(
 void vStartStreamBufferInterruptDemo( void )
 {
     static StackType_t xReceivingTaskStack[ configMINIMAL_STACK_SIZE ] __attribute__( ( aligned( 32 ) ) );
-
+    static TaskHandle_t xReceivingTaskHandle = NULL;
     /* Create the stream buffer that sends data from the interrupt to the
      * task, and create the task. */
     xStreamBuffer[ 0 ] = xStreamBufferCreate( sbiSTREAM_BUFFER_LENGTH_BYTES,    /* The buffer length in bytes. */
@@ -120,7 +120,11 @@ void vStartStreamBufferInterruptDemo( void )
         }
     };
 
-    xTaskCreateRestricted( &( xReceivingTaskParameters ), NULL );
+    xTaskCreateRestricted( &( xReceivingTaskParameters ), &( xReceivingTaskHandle ) );
+
+#if( configENABLE_ACCESS_CONTROL_LIST == 1)
+    vGrantAccessToStreamBuffer( xReceivingTaskHandle, xStreamBuffer[ 0 ] );
+#endif
 }
 /*-----------------------------------------------------------*/
 

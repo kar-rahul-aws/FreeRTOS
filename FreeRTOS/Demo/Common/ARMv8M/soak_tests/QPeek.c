@@ -76,9 +76,10 @@ static volatile BaseType_t xErrorDetected = pdFALSE;
 static volatile uint32_t ulLoopCounter[ qpeekSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( 32 ) ) ) = { 0 };
 
 /* Handles to the test tasks. */
-#define qpeekMED_PRIO_TASK_IDX        0
-#define qpeekHIGH_PRIO_TASK_IDX       1
-#define qpeekHIGHEST_PRIO_TASK_IDX    2
+#define qpeekLOW_PRIO_TASK_IDX		0
+#define qpeekMED_PRIO_TASK_IDX      1
+#define qpeekHIGH_PRIO_TASK_IDX     2
+#define qpeekHIGHEST_PRIO_TASK_IDX  3
 static TaskHandle_t xQPeekLocalTaskHandles[ qpeekSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( 32 ) ) );
 /*-----------------------------------------------------------*/
 
@@ -223,7 +224,18 @@ void vStartQueuePeekTasks( void )
         xTaskCreateRestricted( &( xMediumPriorityPeekTaskParameters ), &( xQPeekLocalTaskHandles[ qpeekMED_PRIO_TASK_IDX ] ) );
         xTaskCreateRestricted( &( xHighPriorityPeekTaskParameters ), &( xQPeekLocalTaskHandles[ qpeekHIGH_PRIO_TASK_IDX ] ) );
         xTaskCreateRestricted( &( xHighestPriorityPeekTaskParameters ), &( xQPeekLocalTaskHandles[ qpeekHIGHEST_PRIO_TASK_IDX ] ) );
-        xTaskCreateRestricted( &( xLowPriorityPeekTaskParameters ), NULL );
+        xTaskCreateRestricted( &( xLowPriorityPeekTaskParameters ), &( xQPeekLocalTaskHandles[ qpeekLOW_PRIO_TASK_IDX ] ) );
+
+#if( configENABLE_ACCESS_CONTROL_LIST == 1)
+        vGrantAccessToQueue( xQPeekLocalTaskHandles[ qpeekLOW_PRIO_TASK_IDX ], xQueue );
+        vGrantAccessToQueue( xQPeekLocalTaskHandles[ qpeekMED_PRIO_TASK_IDX ], xQueue );
+        vGrantAccessToQueue( xQPeekLocalTaskHandles[ qpeekHIGH_PRIO_TASK_IDX ], xQueue );
+        vGrantAccessToQueue( xQPeekLocalTaskHandles[ qpeekHIGHEST_PRIO_TASK_IDX ], xQueue );
+
+        vGrantAccessToTask( xQPeekLocalTaskHandles[ qpeekMED_PRIO_TASK_IDX ], xQPeekLocalTaskHandles[ qpeekLOW_PRIO_TASK_IDX ] );
+        vGrantAccessToTask( xQPeekLocalTaskHandles[ qpeekHIGH_PRIO_TASK_IDX ], xQPeekLocalTaskHandles[ qpeekLOW_PRIO_TASK_IDX ] );
+        vGrantAccessToTask( xQPeekLocalTaskHandles[ qpeekHIGHEST_PRIO_TASK_IDX ], xQPeekLocalTaskHandles[ qpeekLOW_PRIO_TASK_IDX ] );
+#endif
     }
 }
 /*-----------------------------------------------------------*/

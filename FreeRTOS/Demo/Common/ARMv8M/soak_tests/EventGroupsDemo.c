@@ -193,7 +193,7 @@ void vStartEventGroupTasks( void )
      * Create the test tasks as described at the top of this file.
      */
     static StackType_t xTestSlaveTaskStack[ ebRENDESVOUS_TEST_TASK_STACK_SIZE ] __attribute__( ( aligned( 32 ) ) );
-    static StackType_t xTestMasterTaskStack[ ebEVENT_GROUP_SET_BITS_TEST_TASK_STACK_SIZE ] __attribute__( ( aligned( ebEVENT_GROUP_SET_BITS_TEST_TASK_STACK_SIZE * sizeof( StackType_t ) ) ) );
+    static StackType_t xTestMasterTaskStack[ ebEVENT_GROUP_SET_BITS_TEST_TASK_STACK_SIZE ] __attribute__( ( aligned( 32 ) ) );
     static StackType_t xSyncTaskOneStack[ ebRENDESVOUS_TEST_TASK_STACK_SIZE ] __attribute__( ( aligned( 32 ) ) );
     static StackType_t xSyncTaskTwoStack[ ebRENDESVOUS_TEST_TASK_STACK_SIZE ] __attribute__( ( aligned( 32 ) ) );
     TaskHandle_t xTestSlaveTaskHandle;
@@ -317,6 +317,12 @@ void vStartEventGroupTasks( void )
 
     /* If the last task was created then the others will have been too. */
     configASSERT( xSyncTaskHandle[ SYNC_TASK_TWO_IDX ] );
+
+#if ( configENABLE_ACCESS_CONTROL_LIST == 1)
+    vGrantAccessToEventGroup( xTestSlaveTaskHandle, xEventGroup[ 0 ] );
+    vGrantAccessToEventGroup( xSyncTaskHandle[ SYNC_TASK_ONE_IDX ], xEventGroup[ 0 ] );
+    vGrantAccessToEventGroup( xSyncTaskHandle[ SYNC_TASK_TWO_IDX ], xEventGroup[ 0 ] );
+#endif
 
     /* Create the event group used by the ISR tests.  The event group used by
      * the tasks is created by the tasks themselves. */

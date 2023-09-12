@@ -127,6 +127,9 @@ void vStartCountingSemaphoreTasks( void )
     static StackType_t xCountingSemaphoreTaskStack1[ configMINIMAL_STACK_SIZE ] __attribute__( ( aligned( 32 ) ) );
     static StackType_t xCountingSemaphoreTaskStack2[ configMINIMAL_STACK_SIZE ] __attribute__( ( aligned( 32 ) ) );
 
+    static TaskHandle_t xCountingSemaphoreTask1Handle = NULL;
+    static TaskHandle_t xCountingSemaphoreTask2Handle = NULL;
+
     TaskParameters_t xCountingSemaphoreTask1 =
     {
         .pvTaskCode     = prvCountingSemaphoreTask,
@@ -195,8 +198,13 @@ void vStartCountingSemaphoreTasks( void )
         vQueueAddToRegistry( ( QueueHandle_t ) xParameters2.xSemaphore, "Counting_Sem_2" );
 
         /* Create the demo tasks, passing in the semaphore to use as the parameter. */
-        xTaskCreateRestricted( &( xCountingSemaphoreTask1 ), NULL );
-        xTaskCreateRestricted( &( xCountingSemaphoreTask2 ), NULL );
+        xTaskCreateRestricted( &( xCountingSemaphoreTask1 ), &( xCountingSemaphoreTask1Handle ) );
+        xTaskCreateRestricted( &( xCountingSemaphoreTask2 ), &( xCountingSemaphoreTask2Handle ) );
+
+#if( configENABLE_ACCESS_CONTROL_LIST == 1 )
+        vGrantAccessToQueue( xCountingSemaphoreTask1Handle, xParameters1.xSemaphore );
+        vGrantAccessToQueue( xCountingSemaphoreTask2Handle, xParameters2.xSemaphore );
+#endif
     }
 }
 /*-----------------------------------------------------------*/
