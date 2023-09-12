@@ -109,6 +109,10 @@ void vStartPolledQueueTasks( UBaseType_t uxPriority )
 
         static StackType_t xPolledQueueConsumerStack[ pollqSTACK_SIZE ] __attribute__( ( aligned( pollqSTACK_SIZE * sizeof( StackType_t ) ) ) );
         static StackType_t xPolledQueueProducerStack[ pollqSTACK_SIZE ] __attribute__( ( aligned( pollqSTACK_SIZE * sizeof( StackType_t ) ) ) );
+
+        static TaskHandle_t xPolledQueueConsumerTask = NULL;
+        static TaskHandle_t xPolledQueueProducerTask = NULL;
+
         TaskParameters_t xvPolledQueueConsumer =
         {
             .pvTaskCode      = vPolledQueueConsumer,
@@ -147,8 +151,13 @@ void vStartPolledQueueTasks( UBaseType_t uxPriority )
                                 }
         };
 
-        xTaskCreateRestricted( &( xvPolledQueueConsumer ), ( TaskHandle_t * ) NULL);
-        xTaskCreateRestricted( &( xvPolledQueueProducer ), ( TaskHandle_t * ) NULL);
+        xTaskCreateRestricted( &( xvPolledQueueConsumer ), &( xPolledQueueConsumerTask ) );
+        xTaskCreateRestricted( &( xvPolledQueueProducer ), &( xPolledQueueProducerTask ) );
+
+#if( configENABLE_ACCESS_CONTROL_LIST == 1)
+        vGrantAccessToQueue( xPolledQueueConsumerTask, xPolledQueue[ 0 ] );
+        vGrantAccessToQueue( xPolledQueueProducerTask, xPolledQueue[ 0 ] );
+#endif
     }
 }
 /*-----------------------------------------------------------*/

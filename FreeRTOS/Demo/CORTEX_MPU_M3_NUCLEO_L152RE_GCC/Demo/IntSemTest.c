@@ -220,6 +220,11 @@ void vStartInterruptSemaphoreTasks( void )
     xTaskCreateRestricted( &( xInterruptMutexSlaveTaskParameters ), &( xSlaveHandle[ 0 ] ) );
     xTaskCreateRestricted( &( xInterruptMutexMasterTaskParameters ), NULL );
     xTaskCreateRestricted( &( xInterruptCountingSemaphoreTaskParameters ), NULL );
+
+#if( configENABLE_ACCESS_CONTROL_LIST == 1 )
+    vGrantAccessToQueue( xSlaveHandle[ 0 ], xSharedMutexes[ MASTER_SLAVE_MUTEX_IDX ] );
+#endif
+
 }
 /*-----------------------------------------------------------*/
 

@@ -97,6 +97,8 @@ static volatile uint32_t sSharedVariable[ semqSHARED_MEM_SIZE_WORDS ] __attribut
 static xSemaphoreParameters xSemaphoreParameters1 __attribute__( ( aligned( semqSHARED_MEM_SIZE_BYTES ) ) );
 static xSemaphoreParameters xSemaphoreParameters2 __attribute__( ( aligned( semqSHARED_MEM_SIZE_BYTES ) ) );
 
+static TaskHandle_t xSemaphoreTestTaskHandles[ semqSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( semqSHARED_MEM_SIZE_BYTES ) ) );
+
 /*-----------------------------------------------------------*/
 
 void vStartSemaphoreTasks( UBaseType_t uxPriority )
@@ -171,8 +173,8 @@ void vStartSemaphoreTasks( UBaseType_t uxPriority )
                 }
             };
 
-            xTaskCreateRestricted( &( xSemaphoreTest1Parameters ), NULL );
-            xTaskCreateRestricted( &( xSemaphoreTest2Parameters ), NULL );
+            xTaskCreateRestricted( &( xSemaphoreTest1Parameters ), &( xSemaphoreTestTaskHandles[ 0 ] ) );
+            xTaskCreateRestricted( &( xSemaphoreTest2Parameters ), &( xSemaphoreTestTaskHandles[ 1 ] ) );
 
             /* vQueueAddToRegistry() adds the semaphore to the registry, if one
              * is in use.  The registry is provided as a means for kernel aware
@@ -181,6 +183,10 @@ void vStartSemaphoreTasks( UBaseType_t uxPriority )
              * be removed by the pre-processor if configQUEUE_REGISTRY_SIZE is not
              * defined or is defined to be less than 1. */
             vQueueAddToRegistry( ( QueueHandle_t ) pxFirstSemaphoreParameters->xSemaphore, "Counting_Sem_1" );
+#if ( configENABLE_ACCESS_CONTROL_LIST == 1 )
+            vGrantAccessToQueue( xSemaphoreTestTaskHandles[ 0 ], pxFirstSemaphoreParameters->xSemaphore );
+            vGrantAccessToQueue( xSemaphoreTestTaskHandles[ 1 ], pxFirstSemaphoreParameters->xSemaphore );
+#endif
         }
     }
 
@@ -237,8 +243,8 @@ void vStartSemaphoreTasks( UBaseType_t uxPriority )
                 }
             };
 
-            xTaskCreateRestricted( &( xSemaphoreTest3Parameters ), NULL );
-            xTaskCreateRestricted( &( xSemaphoreTest4Parameters ), NULL );
+            xTaskCreateRestricted( &( xSemaphoreTest3Parameters ), &( xSemaphoreTestTaskHandles[ 2 ] ) );
+            xTaskCreateRestricted( &( xSemaphoreTest4Parameters ), &( xSemaphoreTestTaskHandles[ 3 ] ) );
 
             /* vQueueAddToRegistry() adds the semaphore to the registry, if one
              * is in use.  The registry is provided as a means for kernel aware
@@ -247,6 +253,10 @@ void vStartSemaphoreTasks( UBaseType_t uxPriority )
              * be removed by the pre-processor if configQUEUE_REGISTRY_SIZE is not
              * defined or is defined to be less than 1. */
             vQueueAddToRegistry( ( QueueHandle_t ) pxSecondSemaphoreParameters->xSemaphore, "Counting_Sem_2" );
+#if ( configENABLE_ACCESS_CONTROL_LIST == 1 )
+            vGrantAccessToQueue( xSemaphoreTestTaskHandles[ 2 ], pxSecondSemaphoreParameters->xSemaphore );
+            vGrantAccessToQueue( xSemaphoreTestTaskHandles[ 3 ], pxSecondSemaphoreParameters->xSemaphore );
+#endif
         }
     }
 }

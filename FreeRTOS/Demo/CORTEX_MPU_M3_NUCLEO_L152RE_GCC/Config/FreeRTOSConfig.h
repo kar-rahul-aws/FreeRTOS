@@ -163,8 +163,8 @@ header file. */
  */
 
 #define configPROTECTED_KERNEL_OBJECT_POOL_SIZE     ( 150 )
-
-#define configUSE_MPU_WRAPPERS_V1                   ( 1 )
+#define configENABLE_ACCESS_CONTROL_LIST            ( 1 )
+#define configUSE_MPU_WRAPPERS_V1                   ( 0 )
 #define configSYSTEM_CALL_STACK_SIZE                ( 128 )
 /* Defines for Testing Project https://github.com/FreeRTOS/FreeRTOS/tree/main/FreeRTOS/Demo/ThirdParty/Template*/
 

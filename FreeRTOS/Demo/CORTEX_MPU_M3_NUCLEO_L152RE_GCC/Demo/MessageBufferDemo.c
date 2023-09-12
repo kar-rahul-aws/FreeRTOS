@@ -315,6 +315,13 @@ void vStartMessageBufferTasks( configSTACK_DEPTH_TYPE xStackSize )
     xEchoClientTask2Parameters.pvParameters = ( void * ) &( xEchoMessageBuffersArray[ ECHO_MESSAGE_BUFFERS_2_IDX ] );
     xTaskCreateRestricted( &( xEchoClientTask1Parameters ), &( xEchoClientTaskHandles[ ECHO_CLIENT_TASK1_IDX ] ) );
     xTaskCreateRestricted( &( xEchoClientTask2Parameters ), &( xEchoClientTaskHandles[ ECHO_CLIENT_TASK2_IDX ] ) );
+
+#if( configENABLE_ACCESS_CONTROL_LIST == 1)
+    vGrantAccessToMessageBuffer( xEchoClientTaskHandles[ ECHO_CLIENT_TASK1_IDX ], xEchoMessageBuffersArray[ ECHO_MESSAGE_BUFFERS_1_IDX ].xEchoClientBuffer );
+    vGrantAccessToMessageBuffer( xEchoClientTaskHandles[ ECHO_CLIENT_TASK1_IDX ], xEchoMessageBuffersArray[ ECHO_MESSAGE_BUFFERS_1_IDX ].xEchoServerBuffer );
+    vGrantAccessToMessageBuffer( xEchoClientTaskHandles[ ECHO_CLIENT_TASK2_IDX ], xEchoMessageBuffersArray[ ECHO_MESSAGE_BUFFERS_2_IDX ].xEchoClientBuffer );
+    vGrantAccessToMessageBuffer( xEchoClientTaskHandles[ ECHO_CLIENT_TASK2_IDX ], xEchoMessageBuffersArray[ ECHO_MESSAGE_BUFFERS_2_IDX ].xEchoServerBuffer );
+#endif
     vTaskSuspend( xEchoClientTaskHandles[ ECHO_CLIENT_TASK1_IDX ] );
     vTaskSuspend( xEchoClientTaskHandles[ ECHO_CLIENT_TASK2_IDX ] );
 

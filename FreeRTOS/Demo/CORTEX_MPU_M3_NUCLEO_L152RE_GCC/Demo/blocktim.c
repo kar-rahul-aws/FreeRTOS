@@ -157,6 +157,10 @@ void vCreateBlockTimeTasks( void )
         };
         xTaskCreateRestricted( &( xPrimaryBlockTimerTestTaskParameters ), NULL );
         xTaskCreateRestricted( &( xSecondaryBlockTimerTestTaskParameters ), &xSecondary[ 0 ] );
+
+#if( configENABLE_ACCESS_CONTROL_LIST == 1)
+        vGrantAccessToQueue( xSecondary[ 0 ], xTestQueue[ 0 ] );
+#endif
     }
 }
 /*-----------------------------------------------------------*/

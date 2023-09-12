@@ -61,6 +61,7 @@
 #define blckqSTACK_SIZE       configMINIMAL_STACK_SIZE
 #define blckqNUM_TASK_SETS    ( 3 )
 
+#define blckqSHARED_MEM_SIZE_WORDS ( 8 )
 #define blckqSHARED_MEM_SIZE_HALF_WORDS    ( 16 )
 #define blckqSHARED_MEM_SIZE_BYTES         ( 32 )
 
@@ -99,6 +100,8 @@ static xBlockingQueueParameters xQueueParameters3 __attribute__( ( aligned( blck
 static xBlockingQueueParameters xQueueParameters4 __attribute__( ( aligned( blckqSHARED_MEM_SIZE_BYTES ) ) );
 static xBlockingQueueParameters xQueueParameters5 __attribute__( ( aligned( blckqSHARED_MEM_SIZE_BYTES ) ) );
 static xBlockingQueueParameters xQueueParameters6 __attribute__( ( aligned( blckqSHARED_MEM_SIZE_BYTES ) ) );
+
+static TaskHandle_t xBlockingQueueTaskHandles[ blckqSHARED_MEM_SIZE_WORDS ] __attribute__( ( aligned( blckqSHARED_MEM_SIZE_BYTES ) ) ) = { 0 };
 /*-----------------------------------------------------------*/
 
 void vStartBlockingQueueTasks( UBaseType_t uxPriority )
@@ -189,8 +192,8 @@ void vStartBlockingQueueTasks( UBaseType_t uxPriority )
                                 }
         };
 
-    xTaskCreateRestricted( &( xBlockingQueueConsumerB1Task ), NULL );
-    xTaskCreateRestricted( &( xBlockingQueueProducerB2Task ), NULL );
+    xTaskCreateRestricted( &( xBlockingQueueConsumerB1Task ), &( xBlockingQueueTaskHandles[ 0 ] ) );
+    xTaskCreateRestricted( &( xBlockingQueueProducerB2Task ), &( xBlockingQueueTaskHandles[ 1 ] ) );
 
 
     /* Create the second two tasks as described at the top of the file.   This uses
@@ -243,8 +246,8 @@ void vStartBlockingQueueTasks( UBaseType_t uxPriority )
                                 }
         };
 
-    xTaskCreateRestricted( &( xBlockingQueueConsumerB3Task ), NULL );
-    xTaskCreateRestricted( &( xBlockingQueueProducerB4Task ), NULL );
+    xTaskCreateRestricted( &( xBlockingQueueConsumerB3Task ), &( xBlockingQueueTaskHandles[ 2 ] ) );
+    xTaskCreateRestricted( &( xBlockingQueueProducerB4Task ), &( xBlockingQueueTaskHandles[ 3 ] ) );
 
     /* Create the last two tasks as described above.  The mechanism is again just
      * the same.  This time both parameter structures are given a block time. */
@@ -295,8 +298,17 @@ void vStartBlockingQueueTasks( UBaseType_t uxPriority )
                                 }
         };
 
-    xTaskCreateRestricted( &( xBlockingQueueProducerB5Task ), NULL );
-    xTaskCreateRestricted( &( xBlockingQueueConsumerB6Task ), NULL );
+    xTaskCreateRestricted( &( xBlockingQueueProducerB5Task ), &( xBlockingQueueTaskHandles[ 4 ] ) );
+    xTaskCreateRestricted( &( xBlockingQueueConsumerB6Task ), &( xBlockingQueueTaskHandles[ 5 ] ) );
+
+#if ( configENABLE_ACCESS_CONTROL_LIST == 1 )
+    vGrantAccessToQueue( xBlockingQueueTaskHandles[ 0 ], pxQueueParameters1->xQueue );
+    vGrantAccessToQueue( xBlockingQueueTaskHandles[ 1 ], pxQueueParameters2->xQueue );
+    vGrantAccessToQueue( xBlockingQueueTaskHandles[ 2 ], pxQueueParameters3->xQueue );
+    vGrantAccessToQueue( xBlockingQueueTaskHandles[ 3 ], pxQueueParameters4->xQueue );
+    vGrantAccessToQueue( xBlockingQueueTaskHandles[ 4 ], pxQueueParameters5->xQueue );
+    vGrantAccessToQueue( xBlockingQueueTaskHandles[ 5 ], pxQueueParameters6->xQueue );
+#endif
 }
 /*-----------------------------------------------------------*/
 
