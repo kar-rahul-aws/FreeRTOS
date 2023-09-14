@@ -518,6 +518,10 @@ void vStartMessageBufferTasks( configSTACK_DEPTH_TYPE xStackSize )
         {
             static StackType_t xCoherenceActorTaskStack[ configMINIMAL_STACK_SIZE ] __attribute__( ( aligned( 32 ) ) );
             static StackType_t xCoherenceTesterTaskStack[ configMINIMAL_STACK_SIZE ] __attribute__( ( aligned( 32 ) ) );
+
+            static TaskHandle_t xCoherenceActorTaskHandle = NULL;
+            static TaskHandle_t xCoherenceTesterTaskHandle = NULL;
+
             TaskParameters_t xCoherenceActorTaskParameters =
             {
                 .pvTaskCode     = prvSpaceAvailableCoherenceActor,
@@ -576,6 +580,11 @@ void vStartMessageBufferTasks( configSTACK_DEPTH_TYPE xStackSize )
             xCoherenceTesterTaskParameters.pvParameters = ( void * ) xCoherenceTestMessageBuffer;
             xTaskCreateRestricted( &( xCoherenceActorTaskParameters ), NULL );
             xTaskCreateRestricted( &( xCoherenceTesterTaskParameters ), NULL );
+#if ( configENABLE_ACCESS_CONTROL_LIST == 1)
+    vGrantAccessToMessageBuffer( xCoherenceActorTaskHandle, xCoherenceTestMessageBuffer );
+    vGrantAccessToMessageBuffer( xCoherenceTesterTaskHandle, xCoherenceTestMessageBuffer );
+#endif
+
         }
     #endif /* configRUN_ADDITIONAL_TESTS */
 }

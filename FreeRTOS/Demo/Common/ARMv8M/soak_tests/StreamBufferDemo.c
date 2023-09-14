@@ -451,12 +451,6 @@ void vStartStreamBufferTasks( void )
     xEchoClientTask2Parameters.pvParameters = ( void * ) &( xEchoStreamBuffersArray[ ECHO_STREAM_BUFFERS_2_IDX ] );
     xTaskCreateRestricted( &( xEchoClientTask1Parameters ), &( xEchoClientTaskHandles[ ECHO_CLIENT_TASK1_IDX ] ) );
     xTaskCreateRestricted( &( xEchoClientTask2Parameters ), &( xEchoClientTaskHandles[ ECHO_CLIENT_TASK2_IDX ] ) );
-#if( configENABLE_ACCESS_CONTROL_LIST == 1)
-    vGrantAccessToStreamBuffer( xEchoClientTaskHandles[ ECHO_SERVER_TASK2_IDX ], xEchoStreamBuffersArray[ ECHO_STREAM_BUFFERS_2_IDX ].xEchoClientBuffer);
-    vGrantAccessToStreamBuffer( xEchoClientTaskHandles[ ECHO_SERVER_TASK2_IDX ], xEchoStreamBuffersArray[ ECHO_STREAM_BUFFERS_2_IDX ].xEchoServerBuffer);
-
-    vGrantAccessToTask( xEchoClientTaskHandles[ ECHO_CLIENT_TASK2_IDX ], xEchoClientTaskHandles[ ECHO_SERVER_TASK2_IDX ] );
-#endif
     vTaskSuspend( xEchoClientTaskHandles[ ECHO_CLIENT_TASK1_IDX ] );
     vTaskSuspend( xEchoClientTaskHandles[ ECHO_CLIENT_TASK2_IDX ] );
 

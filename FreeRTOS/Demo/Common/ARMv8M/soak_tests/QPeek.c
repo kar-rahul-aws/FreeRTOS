@@ -232,9 +232,9 @@ void vStartQueuePeekTasks( void )
         vGrantAccessToQueue( xQPeekLocalTaskHandles[ qpeekHIGH_PRIO_TASK_IDX ], xQueue );
         vGrantAccessToQueue( xQPeekLocalTaskHandles[ qpeekHIGHEST_PRIO_TASK_IDX ], xQueue );
 
-        vGrantAccessToTask( xQPeekLocalTaskHandles[ qpeekMED_PRIO_TASK_IDX ], xQPeekLocalTaskHandles[ qpeekLOW_PRIO_TASK_IDX ] );
-        vGrantAccessToTask( xQPeekLocalTaskHandles[ qpeekHIGH_PRIO_TASK_IDX ], xQPeekLocalTaskHandles[ qpeekLOW_PRIO_TASK_IDX ] );
-        vGrantAccessToTask( xQPeekLocalTaskHandles[ qpeekHIGHEST_PRIO_TASK_IDX ], xQPeekLocalTaskHandles[ qpeekLOW_PRIO_TASK_IDX ] );
+        vGrantAccessToTask( xQPeekLocalTaskHandles[ qpeekLOW_PRIO_TASK_IDX ], xQPeekLocalTaskHandles[ qpeekMED_PRIO_TASK_IDX ] );
+        vGrantAccessToTask( xQPeekLocalTaskHandles[ qpeekLOW_PRIO_TASK_IDX ], xQPeekLocalTaskHandles[ qpeekHIGH_PRIO_TASK_IDX ] );
+        vGrantAccessToTask( xQPeekLocalTaskHandles[ qpeekLOW_PRIO_TASK_IDX ], xQPeekLocalTaskHandles[ qpeekHIGHEST_PRIO_TASK_IDX ] );
 #endif
     }
 }

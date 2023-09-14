@@ -500,7 +500,7 @@ void vStartStreamBufferTasks( void )
     vGrantAccessToStreamBuffer( xEchoClientTaskHandles[ ECHO_SERVER_TASK2_IDX ], xEchoStreamBuffersArray[ ECHO_STREAM_BUFFERS_2_IDX ].xEchoClientBuffer);
     vGrantAccessToStreamBuffer( xEchoClientTaskHandles[ ECHO_SERVER_TASK2_IDX ], xEchoStreamBuffersArray[ ECHO_STREAM_BUFFERS_2_IDX ].xEchoServerBuffer);
 
-    vGrantAccessToTask( xEchoClientTaskHandles[ ECHO_CLIENT_TASK2_IDX ], xEchoClientTaskHandles[ ECHO_SERVER_TASK2_IDX ] );
+    vGrantAccessToTask( xEchoClientTaskHandles[ ECHO_SERVER_TASK2_IDX ], xEchoClientTaskHandles[ ECHO_CLIENT_TASK2_IDX ] );
 #endif
 
     vTaskSuspend( xEchoClientTaskHandles[ ECHO_CLIENT_TASK1_IDX ] );

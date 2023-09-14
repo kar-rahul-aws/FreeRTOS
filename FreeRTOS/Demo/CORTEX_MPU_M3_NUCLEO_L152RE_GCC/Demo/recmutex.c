@@ -207,8 +207,8 @@ void vStartRecursiveMutexTasks( void )
         vGrantAccessToQueue( xLocalTaskHandles[ BLOCKING_TASK_IDX ], xMutex[ 0 ] );
         vGrantAccessToQueue( xLocalTaskHandles[ POLLING_TASK_IDX ], xMutex[ 0 ] );
 
-        vGrantAccessToTask( xLocalTaskHandles[ CONTROLLING_TASK_IDX ], xLocalTaskHandles[ POLLING_TASK_IDX ] );
-        vGrantAccessToTask( xLocalTaskHandles[ BLOCKING_TASK_IDX ], xLocalTaskHandles[ POLLING_TASK_IDX ] );
+        vGrantAccessToTask( xLocalTaskHandles[ POLLING_TASK_IDX ], xLocalTaskHandles[ CONTROLLING_TASK_IDX ] );
+        vGrantAccessToTask( xLocalTaskHandles[ POLLING_TASK_IDX ], xLocalTaskHandles[ BLOCKING_TASK_IDX ] );
 #endif
     }
 }
