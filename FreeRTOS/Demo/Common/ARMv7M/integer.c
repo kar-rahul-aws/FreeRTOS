@@ -74,7 +74,7 @@ void vStartIntegerMathTasks( UBaseType_t uxPriority )
         .pcName          = "IntMath",
         .usStackDepth    = intgSTACK_SIZE,
         .pvParameters    = ( void * ) &( xTaskCheck[ 0 ] ),
-        .uxPriority      = uxPriority,
+        .uxPriority      = ( uxPriority | portPRIVILEGE_BIT ),
         .puxStackBuffer  = xCompletingIntMathTaskStack,
         .xRegions        =    {
                                 { ( void * ) &( xTaskCheck[ 0 ] ), intgSHARED_MEM_SIZE_BYTES,
