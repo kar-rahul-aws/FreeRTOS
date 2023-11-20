@@ -119,7 +119,7 @@ void vStartPolledQueueTasks( UBaseType_t uxPriority )
             .pcName          = "QConsNB",
             .usStackDepth    = pollqSTACK_SIZE,
             .pvParameters    = ( void * ) &( xPolledQueue[ 0 ] ),
-            .uxPriority      = uxPriority,
+            .uxPriority      = uxPriority | portPRIVILEGE_BIT,
             .puxStackBuffer  = xPolledQueueConsumerStack,
             .xRegions        =    {
                                     { ( void * ) &( xPollingConsumerCount[ 0 ] ), pollqSHARED_MEM_SIZE_BYTES,
@@ -138,7 +138,7 @@ void vStartPolledQueueTasks( UBaseType_t uxPriority )
             .pcName          = "QProdNB",
             .usStackDepth    = pollqSTACK_SIZE,
             .pvParameters    = ( void * ) &( xPolledQueue[ 0 ] ),
-            .uxPriority      = uxPriority,
+            .uxPriority      = uxPriority | portPRIVILEGE_BIT,
             .puxStackBuffer  = xPolledQueueProducerStack,
             .xRegions        =    {
                                     { ( void * ) &( xPollingProducerCount[ 0 ] ), pollqSHARED_MEM_SIZE_BYTES,

@@ -578,8 +578,8 @@ void vStartMessageBufferTasks( configSTACK_DEPTH_TYPE xStackSize )
             configASSERT( xCoherenceTestMessageBuffer );
             xCoherenceActorTaskParameters.pvParameters = ( void * ) xCoherenceTestMessageBuffer;
             xCoherenceTesterTaskParameters.pvParameters = ( void * ) xCoherenceTestMessageBuffer;
-            xTaskCreateRestricted( &( xCoherenceActorTaskParameters ), NULL );
-            xTaskCreateRestricted( &( xCoherenceTesterTaskParameters ), NULL );
+            xTaskCreateRestricted( &( xCoherenceActorTaskParameters ), &( xCoherenceActorTaskHandle ) );
+            xTaskCreateRestricted( &( xCoherenceTesterTaskParameters ), &( xCoherenceTesterTaskHandle ) );
 #if ( configENABLE_ACCESS_CONTROL_LIST == 1)
     vGrantAccessToMessageBuffer( xCoherenceActorTaskHandle, xCoherenceTestMessageBuffer );
     vGrantAccessToMessageBuffer( xCoherenceTesterTaskHandle, xCoherenceTestMessageBuffer );

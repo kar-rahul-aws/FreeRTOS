@@ -142,7 +142,7 @@ void vStartSemaphoreTasks( UBaseType_t uxPriority )
                 .pcName         = "PolSEM1",
                 .usStackDepth   = semtstSTACK_SIZE,
                 .pvParameters   = ( void * ) pxFirstSemaphoreParameters,
-                .uxPriority     = tskIDLE_PRIORITY,
+                .uxPriority     = tskIDLE_PRIORITY | portPRIVILEGE_BIT,
                 .puxStackBuffer = xSemesterTest1Stack,
                 .xRegions       =
                 {
@@ -160,7 +160,7 @@ void vStartSemaphoreTasks( UBaseType_t uxPriority )
                 .pcName         = "PolSEM2",
                 .usStackDepth   = semtstSTACK_SIZE,
                 .pvParameters   = ( void * ) pxFirstSemaphoreParameters,
-                .uxPriority     = tskIDLE_PRIORITY,
+                .uxPriority     = tskIDLE_PRIORITY | portPRIVILEGE_BIT,
                 .puxStackBuffer = xSemesterTest2Stack,
                 .xRegions       =
                 {
@@ -212,7 +212,7 @@ void vStartSemaphoreTasks( UBaseType_t uxPriority )
                 .pcName         = "BlkSEM1",
                 .usStackDepth   = semtstSTACK_SIZE,
                 .pvParameters   = ( void * ) pxSecondSemaphoreParameters,
-                .uxPriority     = tskIDLE_PRIORITY,
+                .uxPriority     = tskIDLE_PRIORITY | portPRIVILEGE_BIT,
                 .puxStackBuffer = xSemesterTest3Stack,
                 .xRegions       =
                 {
@@ -230,7 +230,7 @@ void vStartSemaphoreTasks( UBaseType_t uxPriority )
                 .pcName         = "BlkSEM2",
                 .usStackDepth   = semtstSTACK_SIZE,
                 .pvParameters   = ( void * ) pxSecondSemaphoreParameters,
-                .uxPriority     = tskIDLE_PRIORITY,
+                .uxPriority     = tskIDLE_PRIORITY | portPRIVILEGE_BIT,
                 .puxStackBuffer = xSemesterTest4Stack,
                 .xRegions       =
                 {
