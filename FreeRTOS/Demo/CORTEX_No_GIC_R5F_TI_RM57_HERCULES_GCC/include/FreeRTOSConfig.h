@@ -32,11 +32,14 @@
 /* debug ASSERT The first option calls a function that prints to UART
  * The second one loops for when using a debugger. */
 extern void vAssertCalled( const char * pcFileName, uint32_t ulLine );
+
+/*
         #define configASSERT( x )                    \
             if( ( x ) == pdFALSE )                   \
             {                                        \
                 vAssertCalled( __func__, __LINE__ ); \
             }
+*/
 
 extern void vMainSetupTimerInterrupt( void );
         #define configCLEAR_TICK_INTERRUPT()
@@ -76,6 +79,7 @@ extern void vMainSetupTimerInterrupt( void );
     #define configSUPPORT_STATIC_ALLOCATION                        1U
     #define configSUPPORT_DYNAMIC_ALLOCATION                       0U
     #define configUSE_TASK_FPU_SUPPORT                             2U
+    #define configUSE_SAFETY                                       1U
 
     #define configCPU_CLOCK_HZ                                     ( 110000000U )
     #define configTICK_RATE_HZ                                     ( 1000U )

@@ -100,6 +100,8 @@ int main( void )
     sci_print( "\r\n---------------------------- Create FreeRTOS Tasks"
                "----------------------------\r\n\r\n" );
 
+//    safeASSERT( 0 );
+
     #if ( mainDEMO_TYPE & REGISTER_DEMO )
         {
             if( pdPASS == xReturn )
@@ -307,6 +309,48 @@ void vAssertCalled( const char * pcFuncName,
         }
     }
     taskEXIT_CRITICAL();
+}
+
+/*---------------------------------------------------------------------------*/
+
+void vApplicationSafeAssertCallback( xFrPFaultExceptionInfo * pxPortAssertInfo )
+{
+    sci_print("Running vApplicationSafeAssertCallback()\r\n");
+    volatile uint32_t ulSetToNonZeroInDebuggerToContinue = 0UL;
+    char strBuf[0x200];
+    int overFlowCheck;
+
+
+    if( pxPortAssertInfo != NULL )
+    {
+        overFlowCheck = snprintf(strBuf, 0x200,
+            "General Purpose Register 0 = 0x%lx\r\n"
+            "General Purpose Register 1 = 0x%lx\r\n"
+            "General Purpose Register 2 = 0x%lx\r\n"
+            "General Purpose Register 3 = 0x%lx\r\n",
+            pxPortAssertInfo->ulGPRZero,
+            pxPortAssertInfo->ulGPROne,
+            pxPortAssertInfo->ulGPRTwo,
+            pxPortAssertInfo->ulGPRThree );
+        sci_print(strBuf);
+
+        overFlowCheck = snprintf(strBuf, 0x200,
+            "General Purpose Register 12 = 0x%lx\r\n"
+            "Link Register when Fault Happened. = 0x%lx\r\n"
+            "Program Counter when Fault Happened.  = 0x%lx\r\n"
+            "Current Program Status Register when fault happened = 0x%lx\r\n",
+            pxPortAssertInfo->ulGPRTwelve,
+            pxPortAssertInfo->ulLinkRegister,
+            pxPortAssertInfo->ulProgramCounter,
+            pxPortAssertInfo->ulProgramStatusRegister );
+        sci_print(strBuf);
+    }
+
+    /* These variables can be inspected in a debugger. */
+    while( ulSetToNonZeroInDebuggerToContinue == 0UL)
+    {
+        __asm volatile( "NOP" );
+    }
 }
 
 /*---------------------------------------------------------------------------*/
