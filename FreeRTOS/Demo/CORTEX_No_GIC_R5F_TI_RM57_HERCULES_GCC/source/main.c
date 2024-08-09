@@ -100,7 +100,7 @@ int main( void )
     sci_print( "\r\n---------------------------- Create FreeRTOS Tasks"
                "----------------------------\r\n\r\n" );
 
-//    safeASSERT( 0 );
+    safeASSERT( 0 );
 
     #if ( mainDEMO_TYPE & REGISTER_DEMO )
         {
@@ -313,7 +313,7 @@ void vAssertCalled( const char * pcFuncName,
 
 /*---------------------------------------------------------------------------*/
 
-void vApplicationSafeAssertCallback( xFrPFaultExceptionInfo * pxPortAssertInfo )
+void vApplicationSafeAssertCallback( xSafeAssertFaultInfo_t * pxPortAssertInfo )
 {
     sci_print("Running vApplicationSafeAssertCallback()\r\n");
     volatile uint32_t ulSetToNonZeroInDebuggerToContinue = 0UL;
@@ -325,21 +325,10 @@ void vApplicationSafeAssertCallback( xFrPFaultExceptionInfo * pxPortAssertInfo )
     {
         overFlowCheck = snprintf(strBuf, 0x200,
             "General Purpose Register 0 = 0x%lx\r\n"
-            "General Purpose Register 1 = 0x%lx\r\n"
-            "General Purpose Register 2 = 0x%lx\r\n"
-            "General Purpose Register 3 = 0x%lx\r\n",
-            pxPortAssertInfo->ulGPRZero,
-            pxPortAssertInfo->ulGPROne,
-            pxPortAssertInfo->ulGPRTwo,
-            pxPortAssertInfo->ulGPRThree );
-        sci_print(strBuf);
-
-        overFlowCheck = snprintf(strBuf, 0x200,
-            "General Purpose Register 12 = 0x%lx\r\n"
             "Link Register when Fault Happened. = 0x%lx\r\n"
             "Program Counter when Fault Happened.  = 0x%lx\r\n"
             "Current Program Status Register when fault happened = 0x%lx\r\n",
-            pxPortAssertInfo->ulGPRTwelve,
+            pxPortAssertInfo->ulGPRZero,
             pxPortAssertInfo->ulLinkRegister,
             pxPortAssertInfo->ulProgramCounter,
             pxPortAssertInfo->ulProgramStatusRegister );
