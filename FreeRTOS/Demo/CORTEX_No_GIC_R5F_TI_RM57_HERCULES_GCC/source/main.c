@@ -324,14 +324,28 @@ void vApplicationSafeAssertCallback( xSafeAssertFaultInfo_t * pxPortAssertInfo )
     if( pxPortAssertInfo != NULL )
     {
         overFlowCheck = snprintf(strBuf, 0x200,
-            "General Purpose Register 0 = 0x%lx\r\n"
             "Link Register when Fault Happened. = 0x%lx\r\n"
             "Program Counter when Fault Happened.  = 0x%lx\r\n"
-            "Current Program Status Register when fault happened = 0x%lx\r\n",
-            pxPortAssertInfo->ulGPRZero,
-            pxPortAssertInfo->ulLinkRegister,
-            pxPortAssertInfo->ulProgramCounter,
-            pxPortAssertInfo->ulProgramStatusRegister );
+            "Current Program Status Register when fault happened = 0x%lx\r\n"
+            "CPSR = 0x%lx\r\n"
+            "DFSR = 0x%lx\r\n"
+            "IFSR = 0x%lx\r\n"
+            "ADFSR = 0x%lx\r\n"
+            "AIFSR = 0x%lx\r\n"
+            "DFAR = 0x%lx\r\n"
+            "IFAR = 0x%lx\r\n",
+            pxSafeAssertFaultInfo->ulLinkRegister,
+            pxSafeAssertFaultInfo->ulProgramCounter,
+            pxSafeAssertFaultInfo->ulProgramStatusRegister,
+            pxSafeAssertFaultInfo->ulCPSR,
+            pxSafeAssertFaultInfo->ulDFSR,
+            pxSafeAssertFaultInfo->ulIFSR,
+            pxSafeAssertFaultInfo->ulADFSR,
+            pxSafeAssertFaultInfo->ulAIFSR,
+            pxSafeAssertFaultInfo->ulDFAR,
+            pxSafeAssertFaultInfo->ulIFAR);
+        sci_print(strBuf);
+    }
         sci_print(strBuf);
     }
 
