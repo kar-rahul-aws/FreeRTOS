@@ -1,5 +1,5 @@
 /*
- * FreeRTOS V202212.00
+ * FreeRTOS V222211.00
  * Copyright (C) 2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
